@@ -24,6 +24,8 @@ dependencies = [
     "python-dotenv>=1.2.2",
     # Used by xlsx-related tasks (verifiers and gold fixtures).
     "openpyxl>=3.1",
+    # Required on Windows runners for zoneinfo-based timezone gold checks.
+    "tzdata>=2025.2",
 ]
 
 [project.optional-dependencies]

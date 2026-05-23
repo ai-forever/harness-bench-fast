@@ -16,6 +16,42 @@ from harness_bench.core import Task, VerifyResult
 from harness_bench.tasks import ALL_TASKS, get_task
 
 
+def _is_graph_recursion_error(exc: BaseException) -> bool:
+    """Return True when ``exc`` is LangGraph's recursion-limit failure."""
+    try:
+        from langgraph.errors import GraphRecursionError
+    except ImportError:  # pragma: no cover - langgraph is an indirect runtime dep.
+        return exc.__class__.__name__ == "GraphRecursionError"
+    return isinstance(exc, GraphRecursionError)
+
+
+def _agent_exception_task_run(
+    exc: BaseException,
+    *,
+    task_id: str,
+    elapsed_seconds: float,
+    recursion_limit: int,
+    workspace: Path | None,
+) -> TaskRun:
+    """Convert an agent/runtime exception into a normal task failure."""
+    if _is_graph_recursion_error(exc):
+        return TaskRun(
+            task_id=task_id,
+            passed=False,
+            message=f"graph recursion limit reached after {recursion_limit} steps",
+            elapsed_seconds=elapsed_seconds,
+            workspace=workspace,
+        )
+    return TaskRun(
+        task_id=task_id,
+        passed=False,
+        message="",
+        elapsed_seconds=elapsed_seconds,
+        error=traceback.format_exc(),
+        workspace=workspace,
+    )
+
+
 @dataclass
 class TaskRun:
     """The outcome of running a single task."""
@@ -69,8 +105,12 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     )
     model = GigaChat(
         model=os.getenv("GIGACHAT_MODEL", "GigaChat-3-Ultra"),
-        base_url=os.getenv("GIGACHAT_BASE_URL", "https://gigachat.sberdevices.ru/v1"),
-        verify_ssl_certs=False,
+        # Let gigachat-sdk use its current default base URL unless the caller
+        # explicitly overrides it. Hard-coding the old IFT URL here breaks
+        # CORP/PERS credentials that expect the SDK default endpoint.
+        base_url=os.getenv("GIGACHAT_BASE_URL") or None,
+        verify_ssl_certs=os.getenv("GIGACHAT_VERIFY_SSL_CERTS", "false").lower()
+        not in ("false", "0", "no"),
         profanity_check=False,
         timeout=600,
         # Transient backend errors (403/429/5xx from IFT endpoint under
@@ -127,13 +167,12 @@ def run_task(
         try:
             agent = build_agent(workspace_path, recursion_limit=recursion_limit)
             agent.invoke({"messages": [{"role": "user", "content": task.prompt}]})
-        except Exception:  # noqa: BLE001 — log and surface as failure
-            return TaskRun(
+        except Exception as exc:  # noqa: BLE001 — log and surface as task failure
+            return _agent_exception_task_run(
+                exc,
                 task_id=task.id,
-                passed=False,
-                message="",
                 elapsed_seconds=time.monotonic() - started,
-                error=traceback.format_exc(),
+                recursion_limit=recursion_limit,
                 workspace=workspace_path if keep_workspace else None,
             )
         result = task.verify(workspace_path)
@@ -253,10 +292,19 @@ def summarize(results: list[TaskRun]) -> None:
     if passed < total:
         print()
         print("Failures:")
+        show_tracebacks = os.getenv("HARNESS_BENCH_SHOW_TRACEBACK", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         for r in results:
             if r.passed:
                 continue
             print(f"  - {r.task_id}: {_one_line_detail(r)}")
+            if show_tracebacks and r.error:
+                print("    Traceback:")
+                for line in r.error.rstrip().splitlines():
+                    print(f"      {line}")
 
 
 # ---------------------------------------------------------------------------
