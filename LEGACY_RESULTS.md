@@ -3,8 +3,10 @@
 Historical runs on the older 200-task and 221-task sets. **Not
 comparable across set sizes** — the bench grew to 231 tasks on
 2026-05-21 (10 new memory-discipline tasks added in
-`tasks_memory.py`). Current results live in `README.md`; this file is
-kept for traceability only.
+`tasks_memory.py`). In task-set version terms, the 200-task set is
+`v0.1.0`, the 221-task set is `v0.2.0`, and the current 231-task set is
+`v0.3.0`. Current results live in `README.md`; this file is kept for
+traceability only.
 
 ## Runs on the 221-task set (set existed 2026-05-19 → 2026-05-21)
 

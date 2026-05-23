@@ -18,6 +18,7 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 
 from harness_bench.runner import run_all, summarize, verify_gold
@@ -26,6 +27,12 @@ from harness_bench.runner_openrouter import DEFAULT_OPENROUTER_MODEL
 from harness_bench.runner_openrouter import run_all as run_all_openrouter
 from harness_bench.runner_pure import run_all as run_all_pure
 from harness_bench.tasks import ALL_TASKS
+from harness_bench.versioning import (
+    CURRENT_TASK_SET_REVISION,
+    TASK_SET_REVISIONS,
+    TASK_SET_VERSION,
+    validate_task_set_metadata,
+)
 
 
 def _cmd_list(_args: argparse.Namespace) -> int:
@@ -33,7 +40,48 @@ def _cmd_list(_args: argparse.Namespace) -> int:
         tags = f"  [{', '.join(task.tags)}]" if task.tags else ""
         print(f"  {task.id} — {task.name}{tags}")
     print(f"\nTotal: {len(ALL_TASKS)} tasks")
+    print(f"Task-set version: {TASK_SET_VERSION}")
     return 0
+
+
+def _cmd_version(args: argparse.Namespace) -> int:
+    errors = validate_task_set_metadata(ALL_TASKS)
+    if args.json:
+        payload = {
+            "task_set_version": TASK_SET_VERSION,
+            "task_count": len(ALL_TASKS),
+            "expected_task_count": CURRENT_TASK_SET_REVISION.total_tasks,
+            "revisions": [
+                {
+                    "version": revision.version,
+                    "introduced": revision.introduced,
+                    "total_tasks": revision.total_tasks,
+                    "added_task_numbers": list(revision.added_task_numbers),
+                    "modules": list(revision.modules),
+                    "notes": revision.notes,
+                }
+                for revision in TASK_SET_REVISIONS
+            ],
+            "metadata_errors": errors,
+        }
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+    else:
+        print(f"Task-set version: {TASK_SET_VERSION}")
+        print(f"Current tasks: {len(ALL_TASKS)}")
+        print()
+        print("Revisions:")
+        for revision in TASK_SET_REVISIONS:
+            print(
+                f"  {revision.version:7s} {revision.introduced}  "
+                f"+{revision.added_range:7s} total={revision.total_tasks:3d}  "
+                f"{revision.notes}"
+            )
+        if errors:
+            print()
+            print("Metadata check failed:")
+            for error in errors:
+                print(f"  - {error}")
+    return 1 if args.check and errors else 0
 
 
 def _cmd_run(args: argparse.Namespace) -> int:
@@ -104,6 +152,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_list = sub.add_parser("list", help="List all benchmark tasks")
     p_list.set_defaults(func=_cmd_list)
+
+    p_version = sub.add_parser("version", help="Show benchmark task-set version metadata")
+    p_version.add_argument("--json", action="store_true", help="Print metadata as JSON")
+    p_version.add_argument(
+        "--check",
+        action="store_true",
+        help="Exit non-zero if task registry and version metadata disagree",
+    )
+    p_version.set_defaults(func=_cmd_version)
 
     p_run = sub.add_parser("run", help="Run benchmark with the GigaChat agent")
     p_run.add_argument(

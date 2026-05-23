@@ -1,15 +1,16 @@
 # harness-bench
 
-A self-contained **231-task agent benchmark** for evaluating LLM-backed
+A self-contained **231-task agent benchmark** (`task-set v0.3.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
 all of that into multi-step pipelines.
 
-Every task is **mechanically verified** — no LLM-as-judge. Verifiers do
-exact content checks, regex matches, line lists, JSON parsing, importing
-a Python module and calling a function, running `pytest`, comparing
-SQLite query results, comparing XLSX cells, and so on.
+Every task is **mechanically verified** — no LLM-as-judge. Verifiers use
+exact content checks where byte-for-byte output matters, plus regex
+matches, line lists, JSON parsing, importing a Python module and calling
+a function, running `pytest`, comparing SQLite query results, comparing
+XLSX cells, and so on.
 
 The benchmark exists to track how well an agent harness + model
 combination handles **realistic coding tasks** with adversarially-chosen
@@ -22,12 +23,22 @@ and was extracted into its own repo once it matured.
 
 ```bash
 # Install the bench in a fresh venv. The `[gigachat]` extra adds the
-# GigaChat client + the harness profile; the `[openrouter]` extra adds
-# the OpenAI-compatible client used by `run-openrouter`.
+# GigaChat client; `[openrouter]` adds the OpenAI-compatible client used
+# by `run-openrouter`.
 uv venv && uv pip install -e ".[gigachat,openrouter]"
+
+# Optional: install the public GigaChat harness profile. Exact v9/v10
+# result reproduction may require installing the matching local
+# deepagents-gigachat wheel/source instead; after installing a local
+# wheel, use `uv run --no-sync ...` so uv does not re-resolve it back
+# to the public profile.
+uv pip install -e ".[gigachat-profile]"
 
 # List all 231 tasks
 uv run python -m harness_bench list
+
+# Show the benchmark task-set version and revision history
+uv run python -m harness_bench version --check
 
 # Run the whole bench against GigaChat (needs GIGACHAT_USER /
 # GIGACHAT_PASSWORD in .env or env, plus GIGACHAT_BASE_URL pointing at
@@ -38,6 +49,10 @@ uv run python -m harness_bench run --concurrency 5
 # OPENROUTER_API_KEY):
 uv run python -m harness_bench run-openrouter \
     --model deepseek/deepseek-v4-flash --concurrency 5
+
+# Run stock deepagents + GigaChat while bypassing the GigaChat harness
+# profile even if deepagents-gigachat is installed.
+uv run python -m harness_bench run-pure --concurrency 5
 
 # Drive an external CLI agent (Claude Code, etc.). Example with
 # Anthropic's free-code CLI:
@@ -55,7 +70,7 @@ uv run python -m harness_bench verify-gold
 
 ## What's inside
 
-### Tasks (231 total)
+### Tasks (231 total, task-set v0.3.0)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -71,6 +86,19 @@ Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
 only.
 
+### Task-set revisions
+
+Benchmark task-set versions live in `harness_bench/versioning.py` and are
+separate from the Python package version. Bump the task-set version when a
+task is added, removed, or materially changed; runner-only or documentation
+changes do not need a task-set bump.
+
+| Version | Introduced | Added tasks | Total | Notes |
+| --- | --- | --- | --- | --- |
+| `0.1.0` | 2026-05-13 | 1–200 | 200 | Initial extracted file/code/data benchmark |
+| `0.2.0` | 2026-05-19 | 201–221 | 221 | Advanced composites and diagnostic hard tasks |
+| `0.3.0` | 2026-05-21 | 222–231 | 231 | Memory-discipline tasks using `AGENTS.md` and `MEMORY.md` |
+
 ### Infrastructure
 
 | File | Purpose |
@@ -80,21 +108,24 @@ only.
 | `runner.py` | Runs a task in an isolated `tempfile.TemporaryDirectory` with `LocalShellBackend(virtual_mode=True)` rooted at that directory. Drives GigaChat through `langchain-gigachat`. Optional `--concurrency` via a thread pool. Auto-loads the `deepagents-gigachat` harness profile if installed. |
 | `runner_cli.py` | Alternative driver that shells out to an external CLI agent (`free-code`, `claude`, etc.). Default: `free-code -p --model haiku --dangerously-skip-permissions`. Detects Claude-Code-style CLIs and auto-injects workspace `AGENTS.md` via `--append-system-prompt`. |
 | `runner_openrouter.py` | Runner for any OpenAI-compatible OpenRouter model via `langchain-openai`. Does **not** apply any harness profile — measures raw `deepagents` defaults against the chosen model. |
-| `runner_pure.py` | Bare-minimum runner that talks straight to the GigaChat API without `deepagents`. Useful as a baseline for "what does the model do with no agent harness at all". |
-| `__main__.py` | CLI: `list`, `run`, `run-cli`, `run-openrouter`, `verify-gold`. |
+| `runner_pure.py` | Stock `deepagents` + GigaChat runner that bypasses `deepagents-gigachat` profile lookup even when that package is installed. Useful as a no-profile baseline, not a direct raw-API baseline. |
+| `__main__.py` | CLI: `list`, `version`, `run`, `run-pure`, `run-cli`, `run-openrouter`, `verify-gold`. |
 
 Each task is independent: the runner creates a fresh
 `tempfile.TemporaryDirectory`, writes `setup_files` (and optionally
 calls `setup_callback` for binary fixtures), then points
 `LocalShellBackend` at that directory as its `root_dir`. The agent
-only sees those files — `virtual_mode=True` blocks path traversal
-through the file tools, though `execute` still spawns a real shell on
-the host (the benchmark is meant for a trusted local environment).
-After the agent stops, the per-task verifier inspects the workspace.
+file tools are rooted there by `virtual_mode=True`. This is not a
+security sandbox: `execute` still spawns a real shell on the host and
+the runners inherit environment variables. The benchmark is meant for a
+trusted local environment. After the agent stops, the per-task verifier
+inspects the workspace.
 
 ## Results
 
-All runs use `--concurrency 5` on the 231-task set.
+All runs use `--concurrency 5` on the 231-task set (`task-set v0.3.0`).
+Raw run directories are local artifacts and are ignored by git; the table
+below is a traceability summary, not a bundled replay log.
 
 | # | Date | Runner | Model | Harness adapt | Result | % |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -145,9 +176,15 @@ single model across time.
    `setup_files`, `gold_files`, `verifier`.
 2. Wire it into the corresponding module's `*_TASKS` list — it gets
    pulled into `ALL_TASKS` automatically via `tasks.py`.
-3. `uv run python -m harness_bench verify-gold --task <new_id>` —
+3. Append a new entry in `harness_bench/versioning.py`, bump
+   `TASK_SET_VERSION`, and update the total task count. Use a new minor
+   version for a new task wave (for example `0.4.0`) and a patch version
+   for verifier/gold fixes that change scoring semantics.
+4. `uv run python -m harness_bench version --check` — confirms task ids,
+   task count, and version metadata agree.
+5. `uv run python -m harness_bench verify-gold --task <new_id>` —
    confirms the verifier accepts the gold solution.
-4. `uv run python -m harness_bench run --task <new_id>` — sanity-check
+6. `uv run python -m harness_bench run --task <new_id>` — sanity-check
    against a live model.
 
 ## License

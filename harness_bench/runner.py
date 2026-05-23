@@ -52,9 +52,9 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     from langchain_gigachat import GigaChat
 
     # The deepagents-gigachat harness profile is optional. When installed,
-    # it auto-registers itself for the "gigachat" provider via the
-    # `deepagents.harness_profiles` entry-point — no explicit call needed.
-    # Without it the agent runs on stock deepagents defaults.
+    # register it explicitly so editable/local installs work the same way as
+    # entry-point installs and so AgentsMdInjectMiddleware knows this task's
+    # workspace. Without it the agent runs on stock deepagents defaults.
     try:
         from deepagents_gigachat import register_harness, set_workspace_path
         register_harness()

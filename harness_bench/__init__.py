@@ -13,11 +13,19 @@ from __future__ import annotations
 from harness_bench.core import Task, VerifyResult
 from harness_bench.runner import TaskRun, run_all, run_task, summarize
 from harness_bench.tasks import ALL_TASKS, get_task
+from harness_bench.versioning import (
+    CURRENT_TASK_SET_REVISION,
+    TASK_SET_REVISIONS,
+    TASK_SET_VERSION,
+)
 
 __all__ = [
     "ALL_TASKS",
+    "CURRENT_TASK_SET_REVISION",
     "Task",
     "TaskRun",
+    "TASK_SET_REVISIONS",
+    "TASK_SET_VERSION",
     "VerifyResult",
     "get_task",
     "run_all",

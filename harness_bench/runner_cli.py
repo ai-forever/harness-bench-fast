@@ -30,7 +30,13 @@ from pathlib import Path
 from tempfile import TemporaryDirectory, mkdtemp
 
 from harness_bench.core import Task
-from harness_bench.runner import TaskRun, _one_line_detail, _task_sort_key, summarize
+from harness_bench.runner import (
+    TaskRun,
+    _load_env_from_dotenv,
+    _one_line_detail,
+    _task_sort_key,
+    summarize,
+)
 from harness_bench.tasks import ALL_TASKS, get_task
 
 DEFAULT_CLI_COMMAND = (
@@ -246,6 +252,7 @@ def run_task_cli(
     backoff before the task is counted as a real failure. Each retry runs in
     a fresh per-task temp workspace so the agent starts from clean fixtures.
     """
+    _load_env_from_dotenv()
     workspace_keepalive: TemporaryDirectory | None = None
     base_argv = shlex.split(cli_command)
     last_result: subprocess.CompletedProcess[str] | None = None
@@ -449,6 +456,7 @@ def run_all_cli(
     concurrency: int = 1,
 ) -> list[TaskRun]:
     """Run a subset (or all) of the benchmark via the CLI agent."""
+    _load_env_from_dotenv()
     targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
 
     if concurrency <= 1:

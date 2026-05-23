@@ -19,6 +19,8 @@ classifiers = [
 ]
 dependencies = [
     "deepagents>=0.6.2",
+    # Several benchmark tasks are verified by running `python -m pytest`.
+    "pytest>=9.0.2",
     "python-dotenv>=1.2.2",
     # Used by xlsx-related tasks (verifiers and gold fixtures).
     "openpyxl>=3.1",
@@ -26,14 +28,16 @@ dependencies = [
 
 [project.optional-dependencies]
 # `uv pip install harness-bench-fast[gigachat]` for running against GigaChat
-# through `runner.py`. The harness profile itself ships separately.
+# through `runner.py`. The optional harness profile ships separately and is
+# auto-detected when installed.
 gigachat = [
     "langchain-gigachat>=0.5.0",
-    # deepagents-gigachat v10 (0.0.1a5) is not on PyPI yet — install from
-    # the local repo (`uv pip install -e ../deepagents-gigachat`) or from
-    # the source tarball/wheel under its `dist/`. The `>=0.0.1a4` floor
-    # accepts the published v9 too.
-    "deepagents-gigachat>=0.0.1a4",
+]
+# Public profile extra. For exact v9/v10 result reproduction, install the
+# matching local deepagents-gigachat wheel/source described in README.md.
+gigachat-profile = [
+    "langchain-gigachat>=0.5.0",
+    "deepagents-gigachat>=0.0.1a3",
 ]
 # `uv pip install harness-bench-fast[openrouter]` for `runner_openrouter.py`
 # against any OpenAI-compatible OpenRouter model.
@@ -57,6 +61,7 @@ include = [
     "/README.md",
     "/LEGACY_RESULTS.md",
     "/pyproject.toml",
+    "/tests",
 ]
 exclude = [
     "/.github",
@@ -74,11 +79,10 @@ packages = ["harness_bench"]
 
 [dependency-groups]
 dev = [
-    "pytest>=9.0.2",
     "ruff>=0.15.12",
     "langchain-openai>=1.2.1",
     "langchain-gigachat>=0.5.0",
-    "deepagents-gigachat>=0.0.1a4",
+    "deepagents-gigachat>=0.0.1a3",
 ]
 
 [tool.ruff]

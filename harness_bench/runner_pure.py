@@ -1,4 +1,4 @@
-"""Run benchmark tasks against pure deepagents + GigaChat (no harness profile)."""
+"""Run benchmark tasks against stock deepagents + GigaChat (no harness profile)."""
 
 from __future__ import annotations
 
@@ -33,17 +33,27 @@ def _ensure_credentials() -> None:
 
 
 def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
-    """Build stock deepagents agent without deepagents_gigachat register_harness."""
+    """Build stock deepagents agent without the deepagents-gigachat profile.
+
+    `deepagents` discovers harness profiles through entry points. If
+    `deepagents-gigachat` is installed, a normal `GigaChat` instance resolves
+    provider `"gigachat"` and receives that profile automatically. A tiny
+    subclass changes only LangSmith/provider metadata, which is enough for the
+    profile lookup to miss while preserving the same API client behavior.
+    """
     from deepagents import create_deep_agent
     from deepagents.backends import LocalShellBackend
     from langchain_gigachat import GigaChat
+
+    class ProfilelessGigaChat(GigaChat):
+        """GigaChat client whose provider metadata does not match profile keys."""
 
     backend = LocalShellBackend(
         root_dir=workspace,
         virtual_mode=True,
         inherit_env=True,
     )
-    model = GigaChat(
+    model = ProfilelessGigaChat(
         model=os.getenv("GIGACHAT_MODEL", "GigaChat-3-Ultra"),
         base_url=os.getenv("GIGACHAT_BASE_URL", "https://gigachat.sberdevices.ru/v1"),
         verify_ssl_certs=False,
@@ -152,4 +162,3 @@ def run_all(
                     print(f"           workspace: {run.workspace}")
     results.sort(key=lambda r: _task_sort_key(r.task_id))
     return results
-
