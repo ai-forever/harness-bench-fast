@@ -94,6 +94,77 @@ _TOKEN_CACHE: dict[str, tuple[str, float]] = {}
 _CLEANUP_RETRY_DELAYS = (0.1, 0.25, 0.5, 1.0, 2.0)
 """Short retry window for Windows temp-dir cleanup races / stale handles."""
 
+_PROCESS_TREE_SHUTDOWN_TIMEOUT = 10
+"""Seconds to wait for pipes to close after killing a timed-out CLI tree."""
+
+
+def _terminate_process_tree(proc: subprocess.Popen[str]) -> None:
+    """Terminate a CLI process and its children without changing the CLI command.
+
+    ``run-cli`` often launches Windows agents through ``cmd /c`` because the
+    real executable can be a ``.cmd`` wrapper. Killing only that immediate
+    ``cmd.exe`` leaves the actual agent process alive with inherited stdout /
+    stderr handles, so ``communicate()`` can block long after the configured
+    per-task timeout. On Windows, ``taskkill /T`` kills the whole tree rooted at
+    the wrapper process. On POSIX, start a new process group and terminate that
+    group.
+    """
+    if os.name == "nt":
+        subprocess.run(  # noqa: S603,S607 — Windows process-tree cleanup helper
+            ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+        return
+
+    try:
+        os.killpg(proc.pid, 15)
+    except ProcessLookupError:
+        return
+    except OSError:
+        proc.kill()
+
+
+def _run_cli_subprocess(
+    argv: list[str],
+    *,
+    cwd: Path,
+    timeout: int,
+    env: dict[str, str] | None,
+) -> subprocess.CompletedProcess[str]:
+    """Run the CLI command with a hard per-task process-tree timeout."""
+    creationflags = 0
+    start_new_session = False
+    if os.name == "nt":
+        creationflags = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+    else:
+        start_new_session = True
+
+    proc = subprocess.Popen(  # noqa: S603 — trusted local benchmark command
+        argv,
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdin=subprocess.DEVNULL,
+        text=True,
+        encoding="utf-8",
+        env=env,
+        creationflags=creationflags,
+        start_new_session=start_new_session,
+    )
+    try:
+        stdout, stderr = proc.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        _terminate_process_tree(proc)
+        try:
+            proc.communicate(timeout=_PROCESS_TREE_SHUTDOWN_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.communicate()
+        raise
+    return subprocess.CompletedProcess(argv, proc.returncode, stdout, stderr)
+
 
 def _cleanup_workspace_keepalive(
     workspace_keepalive: TemporaryDirectory[str],
@@ -335,15 +406,10 @@ def run_task_cli(
             argv += [task.prompt]
 
             try:
-                last_result = subprocess.run(  # noqa: S603 — trusted local benchmark
+                last_result = _run_cli_subprocess(
                     argv,
                     cwd=workspace_path,
-                    capture_output=True,
-                    text=True,
-                    encoding="utf-8",
                     timeout=timeout,
-                    check=False,
-                    stdin=subprocess.DEVNULL,
                     env=_subprocess_env_with_token(),
                 )
             except subprocess.TimeoutExpired:
@@ -443,15 +509,10 @@ def run_task_cli(
                         workspace_path = Path(workspace_keepalive.name)
                     task.setup(workspace_path)
                     try:
-                        prom_result = subprocess.run(  # noqa: S603
+                        prom_result = _run_cli_subprocess(
                             prom_argv,
                             cwd=workspace_path,
-                            capture_output=True,
-                            text=True,
-                            encoding="utf-8",
                             timeout=timeout,
-                            check=False,
-                            stdin=subprocess.DEVNULL,
                             env=prom_env,
                         )
                     except subprocess.TimeoutExpired:

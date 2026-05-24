@@ -66,6 +66,47 @@ def test_allow_task_failures_returns_zero_when_harness_completed(monkeypatch) ->
     assert bench_main.main(["run", "--task", "task_fake", "--allow-task-failures"]) == 0
 
 
+def test_cli_timeout_kills_windows_process_tree(monkeypatch, tmp_path: Path) -> None:
+    from harness_bench import runner_cli
+
+    taskkill_calls: list[list[str]] = []
+
+    class _TimeoutThenClosedProcess:
+        pid = 4242
+        returncode = None
+
+        def communicate(self, timeout: int | None = None) -> tuple[str, str]:
+            if timeout == 600:
+                raise subprocess.TimeoutExpired(cmd=["cmd", "/c", "gigacode"], timeout=timeout)
+            return "", ""
+
+        def kill(self) -> None:
+            raise AssertionError("taskkill should close the process tree before fallback kill")
+
+    monkeypatch.setattr(runner_cli.os, "name", "nt")
+    monkeypatch.setattr(
+        runner_cli.subprocess,
+        "Popen",
+        lambda *_args, **_kwargs: _TimeoutThenClosedProcess(),
+    )
+
+    def _fake_run(argv: list[str], **_kwargs: object) -> subprocess.CompletedProcess[str]:
+        taskkill_calls.append(argv)
+        return subprocess.CompletedProcess(argv, 0)
+
+    monkeypatch.setattr(runner_cli.subprocess, "run", _fake_run)
+
+    with pytest.raises(subprocess.TimeoutExpired):
+        runner_cli._run_cli_subprocess(
+            ["cmd", "/c", "gigacode", "--approval-mode=auto-edit"],
+            cwd=tmp_path,
+            timeout=600,
+            env=None,
+        )
+
+    assert taskkill_calls == [["taskkill", "/F", "/T", "/PID", "4242"]]
+
+
 def test_cli_temp_workspace_cleanup_failure_does_not_abort_task(
     monkeypatch,
     tmp_path: Path,
@@ -99,8 +140,8 @@ def test_cli_temp_workspace_cleanup_failure_does_not_abort_task(
     monkeypatch.setattr(runner_cli, "_CLEANUP_RETRY_DELAYS", ())
     monkeypatch.setattr(runner_cli, "TemporaryDirectory", _CleanupFailingTemporaryDirectory)
     monkeypatch.setattr(
-        runner_cli.subprocess,
-        "run",
+        runner_cli,
+        "_run_cli_subprocess",
         lambda *_args, **_kwargs: subprocess.CompletedProcess(args=[], returncode=0),
     )
 
