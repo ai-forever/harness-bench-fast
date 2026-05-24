@@ -18,10 +18,12 @@ defaults to operating on its own cwd.
 
 from __future__ import annotations
 
+import gc
 import os
 import re
 import shlex
 import subprocess
+import sys
 import threading
 import time
 import traceback
@@ -88,6 +90,45 @@ schedule waits for the IP to be unblocked before the next attempt.
 _TOKEN_LOCK = threading.Lock()
 _TOKEN_CACHE: dict[str, tuple[str, float]] = {}
 """Per-token-URL cache of (access_token, expires_at_unix_seconds)."""
+
+_CLEANUP_RETRY_DELAYS = (0.1, 0.25, 0.5, 1.0, 2.0)
+"""Short retry window for Windows temp-dir cleanup races / stale handles."""
+
+
+def _cleanup_workspace_keepalive(
+    workspace_keepalive: TemporaryDirectory[str],
+    *,
+    task_id: str,
+) -> Path | None:
+    """Best-effort cleanup of a per-task temp workspace.
+
+    On Windows, a CLI agent or shell child can keep a file handle/cwd inside the
+    workspace for a moment after ``subprocess.run`` returns. ``TemporaryDirectory``
+    then raises ``OSError: [WinError 145] The directory is not empty`` and used
+    to abort the whole benchmark run after an otherwise completed task. Retry a
+    few times, then leave the workspace behind with a warning instead of turning
+    cleanup into a harness crash.
+    """
+    workspace = Path(workspace_keepalive.name)
+    last_exc: OSError | None = None
+    for attempt, delay in enumerate((0.0, *_CLEANUP_RETRY_DELAYS), start=1):
+        if delay:
+            gc.collect()
+            time.sleep(delay)
+        try:
+            workspace_keepalive.cleanup()
+            return None
+        except OSError as exc:
+            last_exc = exc
+            if attempt <= len(_CLEANUP_RETRY_DELAYS):
+                continue
+
+    print(
+        f"[WARN] cleanup failed for {task_id} workspace {workspace}: {last_exc}; "
+        "leaving it for inspection",
+        file=sys.stderr,
+    )
+    return workspace
 
 
 def _get_gigachat_access_token() -> str | None:
@@ -356,7 +397,7 @@ def run_task_cli(
                 # — long enough to outlive multi-minute IP throttles on the
                 # IFT endpoint.
                 if workspace_keepalive is not None:
-                    workspace_keepalive.cleanup()
+                    _cleanup_workspace_keepalive(workspace_keepalive, task_id=task.id)
                     workspace_keepalive = None
                 delay = _BACKOFF_SCHEDULE[min(attempt, len(_BACKOFF_SCHEDULE) - 1)]
                 time.sleep(delay)
@@ -391,7 +432,7 @@ def run_task_cli(
                     ) + [task.prompt]
                     # Clean prior workspace and re-set up for PROM attempt.
                     if workspace_keepalive is not None:
-                        workspace_keepalive.cleanup()
+                        _cleanup_workspace_keepalive(workspace_keepalive, task_id=task.id)
                         workspace_keepalive = None
                     if keep_workspace:
                         workspace_path = Path(mkdtemp(prefix=f"hb_cli_prom_{task.id}_"))
@@ -444,7 +485,7 @@ def run_task_cli(
         raise RuntimeError("run_task_cli retry loop fell through")
     finally:
         if workspace_keepalive is not None:
-            workspace_keepalive.cleanup()
+            _cleanup_workspace_keepalive(workspace_keepalive, task_id=task.id)
 
 
 def run_all_cli(

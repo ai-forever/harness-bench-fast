@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
 from types import SimpleNamespace
+from typing import cast
 
 import pytest
 from langgraph.errors import GraphRecursionError
 
 from harness_bench import __main__ as bench_main
-from harness_bench.core import VerifyResult
+from harness_bench.core import Task, VerifyResult
 from harness_bench.runner import TaskRun, run_task
 
 
@@ -62,6 +64,56 @@ def test_allow_task_failures_returns_zero_when_harness_completed(monkeypatch) ->
     monkeypatch.setattr(bench_main, "summarize", lambda _results: None)
 
     assert bench_main.main(["run", "--task", "task_fake", "--allow-task-failures"]) == 0
+
+
+def test_cli_temp_workspace_cleanup_failure_does_not_abort_task(
+    monkeypatch,
+    tmp_path: Path,
+    capsys,
+) -> None:
+    from harness_bench import runner_cli
+
+    workspace = tmp_path / "hb_cli_task_fake_cleanup"
+
+    class _CleanupFailingTemporaryDirectory:
+        def __init__(self, *_args: object, **_kwargs: object) -> None:
+            workspace.mkdir()
+            self.name = str(workspace)
+
+        def cleanup(self) -> None:
+            raise OSError(145, "The directory is not empty", self.name)
+
+    class _PassingCliTask:
+        id = "task_fake_cleanup"
+        prompt = "write done.txt"
+
+        def setup(self, path: Path) -> None:
+            (path / "input.txt").write_text("fixture", encoding="utf-8")
+
+        def verify(self, path: Path) -> VerifyResult:
+            assert path == workspace
+            return VerifyResult(True, "ok")
+
+    monkeypatch.setattr(runner_cli, "_load_env_from_dotenv", lambda: None)
+    monkeypatch.setattr(runner_cli, "_subprocess_env_with_token", lambda: None)
+    monkeypatch.setattr(runner_cli, "_CLEANUP_RETRY_DELAYS", ())
+    monkeypatch.setattr(runner_cli, "TemporaryDirectory", _CleanupFailingTemporaryDirectory)
+    monkeypatch.setattr(
+        runner_cli.subprocess,
+        "run",
+        lambda *_args, **_kwargs: subprocess.CompletedProcess(args=[], returncode=0),
+    )
+
+    result = runner_cli.run_task_cli(
+        cast(Task, _PassingCliTask()),
+        cli_command="python -c pass",
+        timeout=1,
+    )
+
+    assert result.passed is True
+    assert result.message == "ok"
+    assert result.workspace is None
+    assert "[WARN] cleanup failed for task_fake_cleanup workspace" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize(
