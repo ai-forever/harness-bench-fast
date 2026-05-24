@@ -1,0 +1,186 @@
+name: Windows benchmark smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: "Benchmark runner to execute"
+        required: true
+        default: "run-cli"
+        type: choice
+        options:
+          - run
+          - run-pure
+          - run-openrouter
+          - run-cli
+      tasks:
+        description: "Task ids separated by comma, space, or newline"
+        required: true
+        type: string
+        default: "task_111_xlsx_extract_b2, task_112_xlsx_sum_column, task_113_xlsx_update_cell, task_123_sqlite_count, task_124_sqlite_sum, task_148_csv_to_xlsx, task_149_sqlite_to_json, task_152_sqlite_join_to_json, task_153_xlsx_to_markdown_report, task_154_jsonl_into_sqlite, task_158_xlsx_split_sheets, task_191_sqlite_revenue_report, task_196_xlsx_to_csv_and_json, task_199_sqlite_filtered_export, task_203_sqlite_team_markdown_report, task_207_inventory_anomaly_report, task_219_sql_paid_leaderboard"
+      recursion_limit:
+        description: "Agent recursion limit for in-process deepagents runners"
+        required: true
+        default: "80"
+        type: string
+      openrouter_model:
+        description: "Model id for run-openrouter"
+        required: true
+        default: "qwen/qwen3.6-plus"
+        type: string
+      cli_command:
+        description: "Command prefix for run-cli; the task prompt is appended by the benchmark"
+        required: false
+        default: "cmd /c npx -y opencode-ai@latest run --model openrouter/qwen/qwen3.6-plus"
+        type: string
+      cli_timeout:
+        description: "Per-task timeout in seconds for run-cli"
+        required: true
+        default: "900"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  windows-benchmark-smoke:
+    name: Windows real benchmark smoke (${{ inputs.runner }})
+    runs-on: windows-latest
+    timeout-minutes: 180
+
+    env:
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: "utf-8"
+      UV_SYSTEM_PYTHON: "0"
+      # Keep --keep workspaces inside the checkout so they can be uploaded.
+      TEMP: ${{ github.workspace }}\\.bench-tmp
+      TMP: ${{ github.workspace }}\\.bench-tmp
+      # GigaChat path: `run` and `run-pure`.
+      GIGACHAT_CREDENTIALS: ${{ secrets.GIGACHAT_CREDENTIALS }}
+      GIGACHAT_USER: ${{ secrets.GIGACHAT_USER }}
+      GIGACHAT_PASSWORD: ${{ secrets.GIGACHAT_PASSWORD }}
+      GIGACHAT_BASE_URL: ${{ secrets.GIGACHAT_BASE_URL }}
+      GIGACHAT_MODEL: ${{ vars.GIGACHAT_MODEL || 'GigaChat-3-Ultra' }}
+      GIGACHAT_SCOPE: ${{ vars.GIGACHAT_SCOPE }}
+      GIGACHAT_VERIFY_SSL_CERTS: ${{ vars.GIGACHAT_VERIFY_SSL_CERTS }}
+      # OpenRouter path: `run-openrouter` and the default `run-cli` command.
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      OPENROUTER_BASE_URL: ${{ vars.OPENROUTER_BASE_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Preflight selected runner
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          New-Item -ItemType Directory -Force -Path $env:TEMP | Out-Null
+
+          foreach ($name in @("GIGACHAT_BASE_URL", "GIGACHAT_MODEL", "GIGACHAT_SCOPE", "GIGACHAT_VERIFY_SSL_CERTS", "OPENROUTER_BASE_URL")) {
+            if ((Test-Path "Env:\\$name") -and -not (Get-Item "Env:\\$name").Value) {
+              Remove-Item "Env:\\$name"
+            }
+          }
+
+          $runner = "${{ inputs.runner }}"
+          Write-Host "Runner: $runner"
+          uv run python -m harness_bench list | Select-Object -First 20
+
+          if ($runner -in @("run", "run-pure")) {
+            if (-not $env:GIGACHAT_CREDENTIALS -and -not (($env:GIGACHAT_USER) -and ($env:GIGACHAT_PASSWORD))) {
+              throw "Runner '$runner' requires GIGACHAT_CREDENTIALS or GIGACHAT_USER + GIGACHAT_PASSWORD repository secrets."
+            }
+          }
+
+          if ($runner -eq "run-openrouter") {
+            if (-not $env:OPENROUTER_API_KEY) {
+              throw "Runner 'run-openrouter' requires OPENROUTER_API_KEY repository secret."
+            }
+          }
+
+          if ($runner -eq "run-cli") {
+            $cliCommand = "${{ inputs.cli_command }}"
+            Write-Host "CLI command: $cliCommand"
+            node --version
+            npm --version
+            if ($cliCommand -match "(?i)openrouter" -and -not $env:OPENROUTER_API_KEY) {
+              throw "Runner 'run-cli' with an OpenRouter-backed CLI command requires OPENROUTER_API_KEY repository secret."
+            }
+          }
+
+      - name: Run benchmark smoke
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Continue"
+          foreach ($name in @("GIGACHAT_BASE_URL", "GIGACHAT_MODEL", "GIGACHAT_SCOPE", "GIGACHAT_VERIFY_SSL_CERTS", "OPENROUTER_BASE_URL")) {
+            if ((Test-Path "Env:\\$name") -and -not (Get-Item "Env:\\$name").Value) {
+              Remove-Item "Env:\\$name"
+            }
+          }
+
+          $runner = "${{ inputs.runner }}"
+          $tasksText = @'
+          ${{ inputs.tasks }}
+          '@
+          $tasks = $tasksText -split "[,\s]+" |
+            ForEach-Object { $_.Trim() } |
+            Where-Object { $_ -and -not $_.StartsWith("#") }
+
+          if (-not $tasks) {
+            throw "No benchmark tasks selected."
+          }
+
+          $benchArgs = @("-m", "harness_bench", $runner)
+          foreach ($task in $tasks) {
+            $benchArgs += @("--task", $task)
+          }
+          $benchArgs += @("--keep", "--allow-task-failures")
+
+          if ($runner -in @("run", "run-pure", "run-openrouter")) {
+            $benchArgs += @("--recursion-limit", "${{ inputs.recursion_limit }}")
+          }
+          if ($runner -eq "run-openrouter") {
+            $benchArgs += @("--model", "${{ inputs.openrouter_model }}")
+          }
+          if ($runner -eq "run-cli") {
+            $benchArgs += @("--cli-command", "${{ inputs.cli_command }}", "--timeout", "${{ inputs.cli_timeout }}")
+          }
+
+          Write-Host "uv run python $($benchArgs -join ' ')"
+          uv run python @benchArgs
+          $exitCode = $LASTEXITCODE
+          Write-Host "Benchmark exit code: $exitCode"
+
+          Write-Host "Workspace directories kept under $env:TEMP:"
+          if (Test-Path $env:TEMP) {
+            Get-ChildItem -Path $env:TEMP -Directory -ErrorAction SilentlyContinue |
+              Select-Object -ExpandProperty FullName
+          }
+
+          exit $exitCode
+
+      - name: Upload kept benchmark workspaces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-benchmark-workspaces-${{ inputs.runner }}
+          path: .bench-tmp/**
+          if-no-files-found: ignore
+          retention-days: 7

@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Sequence
 
 from harness_bench.runner import run_all, summarize, verify_gold
 from harness_bench.runner_cli import DEFAULT_CLI_COMMAND, DEFAULT_TIMEOUT_SECONDS, run_all_cli
@@ -33,6 +34,13 @@ from harness_bench.versioning import (
     TASK_SET_VERSION,
     validate_task_set_metadata,
 )
+
+
+def _exit_code(results: Sequence[object], *, allow_task_failures: bool) -> int:
+    """Return the process exit code for a completed benchmark run."""
+    if allow_task_failures:
+        return 0
+    return 0 if all(getattr(r, "passed", False) for r in results) else 1
 
 
 def _cmd_list(_args: argparse.Namespace) -> int:
@@ -92,7 +100,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
     )
     summarize(results)
-    return 0 if all(r.passed for r in results) else 1
+    return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
 
 def _cmd_run_openrouter(args: argparse.Namespace) -> int:
@@ -104,7 +112,7 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
     )
     summarize(results)
-    return 0 if all(r.passed for r in results) else 1
+    return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
 
 def _cmd_run_pure(args: argparse.Namespace) -> int:
@@ -115,7 +123,7 @@ def _cmd_run_pure(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
     )
     summarize(results)
-    return 0 if all(r.passed for r in results) else 1
+    return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
 
 def _cmd_run_cli(args: argparse.Namespace) -> int:
@@ -127,7 +135,7 @@ def _cmd_run_cli(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
     )
     summarize(results)
-    return 0 if all(r.passed for r in results) else 1
+    return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
 
 def _cmd_verify_gold(args: argparse.Namespace) -> int:
@@ -186,6 +194,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run up to N tasks in parallel (default: 1; uses a thread pool, "
         "each task still has its own isolated TemporaryDirectory).",
     )
+    p_run.add_argument(
+        "--allow-task-failures",
+        action="store_true",
+        help=(
+            "Exit 0 when the harness completes even if some benchmark tasks fail. "
+            "Useful for smoke tests that validate runner mechanics rather than model quality."
+        ),
+    )
     p_run.set_defaults(func=_cmd_run)
 
     p_or = sub.add_parser(
@@ -204,6 +220,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_or.add_argument("--keep", action="store_true", help="Keep temp workspaces")
     p_or.add_argument("--recursion-limit", type=int, default=80)
     p_or.add_argument("--concurrency", type=int, default=1)
+    p_or.add_argument(
+        "--allow-task-failures",
+        action="store_true",
+        help="Exit 0 when the harness completes even if some benchmark tasks fail.",
+    )
     p_or.set_defaults(func=_cmd_run_openrouter)
 
     p_pure = sub.add_parser(
@@ -217,6 +238,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_pure.add_argument("--keep", action="store_true", help="Keep temp workspaces")
     p_pure.add_argument("--recursion-limit", type=int, default=80)
     p_pure.add_argument("--concurrency", type=int, default=1)
+    p_pure.add_argument(
+        "--allow-task-failures",
+        action="store_true",
+        help="Exit 0 when the harness completes even if some benchmark tasks fail.",
+    )
     p_pure.set_defaults(func=_cmd_run_pure)
 
     p_gold = sub.add_parser(
@@ -263,6 +289,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=1,
         help="Run up to N tasks in parallel (default: 1).",
+    )
+    p_cli.add_argument(
+        "--allow-task-failures",
+        action="store_true",
+        help="Exit 0 when the harness completes even if some benchmark tasks fail.",
     )
     p_cli.set_defaults(func=_cmd_run_cli)
 
