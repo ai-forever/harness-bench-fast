@@ -63,6 +63,13 @@ uv run python -m harness_bench run-cli \
     --cli-command 'free-code -p --model haiku --dangerously-skip-permissions' \
     --concurrency 5
 
+# Run repeated attempts and report pass@ / pass^ metrics. With
+# --attempts N, summaries print pass@1..N and pass^1..N by default;
+# --pass-at/--pass@ and --pass-hat/--pass^ can request specific K values.
+uv run python -m harness_bench run-cli \
+    --cli-command 'free-code -p --model haiku --dangerously-skip-permissions' \
+    --attempts 5 --pass@ 5 --pass^ 5 --concurrency 5
+
 # Verify the gold solutions without calling any model. Useful when
 # adding a new task — confirms the verifier accepts a hand-written
 # "perfect" solution.
@@ -114,6 +121,7 @@ changes do not need a task-set bump.
 | File | Purpose |
 | --- | --- |
 | `core.py` | `Task` (dataclass) and `VerifyResult`. Supports `setup_callback` / `gold_callback` hooks for binary fixtures (xlsx, sqlite, zip, tar). |
+| `metrics.py` | Computes `pass@K` (at least one of K attempts passes) and `pass^K` (all K attempts pass) from repeated task runs. |
 | `verifiers.py` | Helpers for building verifiers: `file_exists`, `file_contains`, `file_lines_equal`, `file_matches_regex`, `json_file_has`, `python_runs`, `python_callable_returns`, `pytest_passes`, `xlsx_cell_equals`, `sqlite_query_returns`, `all_of`, etc. |
 | `runner.py` | Runs a task in an isolated `tempfile.TemporaryDirectory` with `LocalShellBackend(virtual_mode=True)` rooted at that directory. Drives GigaChat through `langchain-gigachat`. Optional `--concurrency` via a thread pool. Auto-loads the `deepagents-gigachat` harness profile if installed. |
 | `runner_cli.py` | Alternative driver that shells out to an external CLI agent (`free-code`, `claude`, etc.). Default: `free-code -p --model haiku --dangerously-skip-permissions`. Detects Claude-Code-style CLIs and auto-injects workspace `AGENTS.md` via `--append-system-prompt`. |

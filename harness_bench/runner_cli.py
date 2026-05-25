@@ -32,8 +32,11 @@ from tempfile import TemporaryDirectory, mkdtemp
 from harness_bench.core import Task
 from harness_bench.runner import (
     TaskRun,
+    _attempt_suffix,
     _load_env_from_dotenv,
+    _mark_attempt,
     _one_line_detail,
+    _task_attempt_label,
     _task_sort_key,
     summarize,
 )
@@ -454,31 +457,37 @@ def run_all_cli(
     timeout: int = DEFAULT_TIMEOUT_SECONDS,
     keep_workspace: bool = False,
     concurrency: int = 1,
+    attempts: int = 1,
 ) -> list[TaskRun]:
     """Run a subset (or all) of the benchmark via the CLI agent."""
     _load_env_from_dotenv()
+    if attempts < 1:
+        raise ValueError("attempts must be positive")
+
     targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
 
     if concurrency <= 1:
         results: list[TaskRun] = []
         for task in targets:
-            print(f"→ {task.id}: {task.name}")
-            run = run_task_cli(
-                task,
-                cli_command=cli_command,
-                timeout=timeout,
-                keep_workspace=keep_workspace,
-            )
-            results.append(run)
-            status = "PASS" if run.passed else "FAIL"
-            print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
-            if keep_workspace and run.workspace:
-                print(f"  workspace: {run.workspace}")
+            for attempt in range(1, attempts + 1):
+                print(f"→ {task.id}: {task.name}{_attempt_suffix(attempt, attempts)}")
+                run = run_task_cli(
+                    task,
+                    cli_command=cli_command,
+                    timeout=timeout,
+                    keep_workspace=keep_workspace,
+                )
+                run = _mark_attempt(run, attempt, attempts)
+                results.append(run)
+                status = "PASS" if run.passed else "FAIL"
+                print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
+                if keep_workspace and run.workspace:
+                    print(f"  workspace: {run.workspace}")
         return results
 
     print_lock = threading.Lock()
     completed = 0
-    total = len(targets)
+    total = len(targets) * attempts
     results = []
     with ThreadPoolExecutor(max_workers=concurrency) as executor:
         future_to_task = {
@@ -488,22 +497,25 @@ def run_all_cli(
                 cli_command=cli_command,
                 timeout=timeout,
                 keep_workspace=keep_workspace,
-            ): task
+            ): (task, attempt)
             for task in targets
+            for attempt in range(1, attempts + 1)
         }
         for future in as_completed(future_to_task):
-            run = future.result()
+            _task, attempt = future_to_task[future]
+            run = _mark_attempt(future.result(), attempt, attempts)
             results.append(run)
             with print_lock:
                 completed += 1
                 status = "PASS" if run.passed else "FAIL"
                 print(
-                    f"[{completed:3d}/{total}] [{status}] {run.task_id:36s} "
+                    f"[{completed:3d}/{total}] [{status}] "
+                    f"{_task_attempt_label(run):40s} "
                     f"{run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}"
                 )
                 if keep_workspace and run.workspace:
                     print(f"           workspace: {run.workspace}")
-    results.sort(key=lambda r: _task_sort_key(r.task_id))
+    results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
     return results
 
 
