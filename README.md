@@ -190,12 +190,13 @@ tracked in this repository.
 | 10 | 2026-05-23 | `deepagents` | **GigaChat-3-Ultra** (PROM, deepagents 0.6.3) | **yes (v10 = v9 + `AgentsMdInjectMiddleware`)** | **194 / 231** | **84.0 %** |
 | 11 | 2026-05-24 | `pi-mono` 0.75.3 | GigaChat-3-Ultra (PROM, `@gigachain/pi-gigachat`) | yes (pi tools + AGENTS.md discovery) | 188 / 231 | 81.4 % |
 | 12 | 2026-05-22 | `deepagents` | DeepSeek V4 Flash (284B-A13B MoE) | no | 186 / 231 | 80.5 % |
-| 13 | 2026-05-22 | `deepagents` | OpenAI gpt-oss-120b (120B dense) | no | 165 / 231 | 71.4 % |
-| 14 | 2026-05-24 | `deepagents` | GigaChat-3-Ultra (PROM) | no (baseline, no profile, `run-pure`) | 164 / 231 | 71.0 % |
-| 15 | 2026-05-22 | `deepagents` | Qwen3-235B-A22B-Instruct-2507 | no | 162 / 231 | 70.1 % |
-| 16 | 2026-05-25 | `gigacode cli` | unknown | unknown | 151 / 231 | 65.4 % |
-| 17 | 2026-05-23 | `ouroboros` | GigaChat-3-Ultra (PROM, native function-calling mode) | no | 136 / 231 | 58.9 % |
-| 18 | 2026-05-22 | `deepagents` | GLM-4-32B (32B dense) | no | 76 / 231 | 32.9 % |
+| 13 | 2026-05-25 | `OpenHands SDK` 1.22.1 | GigaChat-3-Ultra (PROM via `gpt2giga`) | yes (SDK CLI wrapper + AGENTS.md/MEMORY.md prompt wiring) | 183 / 231 | 79.2 % |
+| 14 | 2026-05-22 | `deepagents` | OpenAI gpt-oss-120b (120B dense) | no | 165 / 231 | 71.4 % |
+| 15 | 2026-05-24 | `deepagents` | GigaChat-3-Ultra (PROM) | no (baseline, no profile, `run-pure`) | 164 / 231 | 71.0 % |
+| 16 | 2026-05-22 | `deepagents` | Qwen3-235B-A22B-Instruct-2507 | no | 162 / 231 | 70.1 % |
+| 17 | 2026-05-25 | `gigacode cli` | unknown | unknown | 151 / 231 | 65.4 % |
+| 18 | 2026-05-23 | `ouroboros` | GigaChat-3-Ultra (PROM, native function-calling mode) | no | 136 / 231 | 58.9 % |
+| 19 | 2026-05-22 | `deepagents` | GLM-4-32B (32B dense) | no | 76 / 231 | 32.9 % |
 
 The full /200 and /221 task-set history (older runs done before the
 bench was extended), plus superseded /231 rows, lives in
