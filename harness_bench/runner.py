@@ -333,7 +333,10 @@ def _format_metrics_table(metrics: list[PassMetric]) -> list[str]:
 def _format_metric_value(metric: PassMetric | None) -> str:
     if metric is None:
         return "-"
-    return f"{metric.value * 100:.1f}%"
+    task_equivalent = metric.value * metric.task_count
+    rounded = round(task_equivalent)
+    count = str(rounded) if abs(task_equivalent - rounded) < 1e-9 else f"{task_equivalent:.1f}"
+    return f"{count}/{metric.task_count}"
 
 
 def _format_table_row(values: list[str], widths: list[int]) -> str:

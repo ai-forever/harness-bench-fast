@@ -33,7 +33,7 @@ def test_compute_pass_metrics_groups_attempts_by_task() -> None:
 
 def test_cli_metric_defaults_for_repeated_attempts() -> None:
     parser = build_parser()
-    args = parser.parse_args(["run-cli", "--attempts", "5"])
+    args = parser.parse_args(["run-cli", "-k", "5"])
 
     assert _resolve_metric_ks(args) == ((1, 2, 3, 4, 5), (1, 2, 3, 4, 5))
 
@@ -61,6 +61,6 @@ def test_summary_prints_pass_metrics_for_attempts(capsys: pytest.CaptureFixture[
     assert "Passed attempts: 3/4" in out
     assert "K  pass@K  pass^K" in out
     assert "-  ------  ------" in out
-    assert "1   75.0%       -" in out
-    assert "2  100.0%   50.0%" in out
+    assert "1   1.5/2       -" in out
+    assert "2     2/2     1/2" in out
     assert "task_1 #2/2: bad" in out

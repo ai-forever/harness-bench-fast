@@ -167,6 +167,7 @@ def _positive_int(value: str) -> int:
 
 def _add_metric_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
+        "-k",
         "--attempts",
         type=_positive_int,
         default=1,
