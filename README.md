@@ -6,6 +6,9 @@ files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
 all of that into multi-step pipelines.
 
+This benchmark is part of the
+[`GigaChain`](https://github.com/ai-forever/gigachain) project.
+
 Every task is **mechanically verified** — no LLM-as-judge. Verifiers use
 exact content checks where byte-for-byte output matters, plus regex
 matches, line lists, JSON parsing, importing a Python module and calling
