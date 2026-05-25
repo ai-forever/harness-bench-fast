@@ -8,6 +8,19 @@ comparable across set sizes** — the bench grew to 231 tasks on
 `v0.3.0`. Current results live in `README.md`; this file is kept for
 traceability only.
 
+The older `pi-mono` / GigaChat row on the 200-task set has been
+superseded by the 2026-05-24 `pi-mono` / GigaChat-3-Ultra row in
+`README.md`; it remains below only as legacy /200 evidence.
+
+## Superseded runs on the current 231-task set
+
+These rows used the current task-set size but were replaced by newer
+same-runner or same-model measurements in `README.md`.
+
+| Date | Runner | Model | Harness adapt | Result | % | Replaced by |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-05-22 | `deepagents` | GigaChat-3-Ultra (PROM) | no (baseline, no profile) | 154 / 231 | 66.7 % | 2026-05-24 `deepagents` / GigaChat-3-Ultra (PROM), no profile: 164 / 231 |
+
 ## Runs on the 221-task set (set existed 2026-05-19 → 2026-05-21)
 
 | Date | Runner | Model | Harness adapt | Result | % |

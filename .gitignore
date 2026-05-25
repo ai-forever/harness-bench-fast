@@ -51,6 +51,12 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# Generated benchmark exports / local Harbor runs
+harbor_dataset*/
+harbor_jobs*/
+jobs/
+pi_mono_gigachat_full_*.log
+
 # Translations
 *.mo
 *.pot

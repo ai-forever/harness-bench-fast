@@ -20,14 +20,16 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 
+from harness_bench.harbor_export import export_harbor_dataset
 from harness_bench.metrics import default_metric_ks
 from harness_bench.runner import run_all, summarize, verify_gold
 from harness_bench.runner_cli import DEFAULT_CLI_COMMAND, DEFAULT_TIMEOUT_SECONDS, run_all_cli
 from harness_bench.runner_openrouter import DEFAULT_OPENROUTER_MODEL
 from harness_bench.runner_openrouter import run_all as run_all_openrouter
 from harness_bench.runner_pure import run_all as run_all_pure
-from harness_bench.tasks import ALL_TASKS
+from harness_bench.tasks import ALL_TASKS, get_task
 from harness_bench.versioning import (
     CURRENT_TASK_SET_REVISION,
     TASK_SET_REVISIONS,
@@ -105,6 +107,7 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         model_name=args.model,
         keep_workspace=args.keep,
         recursion_limit=args.recursion_limit,
+        max_tokens=args.max_tokens,
         concurrency=args.concurrency,
         attempts=args.attempts,
     )
@@ -152,6 +155,50 @@ def _cmd_verify_gold(args: argparse.Namespace) -> int:
             head = (r.message or "").splitlines()
             print(f"  - {r.task_id}: {head[0] if head else ''}")
         return 1
+    return 0
+
+
+def _cmd_apply_gold(args: argparse.Namespace) -> int:
+    task = get_task(args.task)
+    workspace = Path(args.workspace)
+    workspace.mkdir(parents=True, exist_ok=True)
+    task.apply_gold(workspace)
+    print(f"Applied gold solution for {task.id} in {workspace}")
+    return 0
+
+
+def _cmd_verify_task(args: argparse.Namespace) -> int:
+    task = get_task(args.task)
+    workspace = Path(args.workspace)
+    result = task.verify(workspace)
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "task_id": task.id,
+                    "workspace": str(workspace),
+                    "passed": result.passed,
+                    "message": result.message,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+    else:
+        status = "OK" if result.passed else "BAD"
+        print(f"[{status}] {task.id}: {result.message}")
+    return 0 if result.passed else 1
+
+
+def _cmd_export_harbor(args: argparse.Namespace) -> int:
+    result = export_harbor_dataset(
+        args.output,
+        task_ids=args.task,
+        org=args.org,
+        dataset=args.dataset,
+        clean=args.clean,
+    )
+    print(f"Exported {result.task_count} Harbor task(s) to {result.output_dir}")
     return 0
 
 
@@ -274,6 +321,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_or.add_argument("--keep", action="store_true", help="Keep temp workspaces")
     p_or.add_argument("--recursion-limit", type=int, default=80)
+    p_or.add_argument(
+        "--max-tokens",
+        type=int,
+        default=None,
+        help=(
+            "Optional ChatOpenAI max_tokens override. Leave unset to preserve "
+            "the provider/model default."
+        ),
+    )
     p_or.add_argument("--concurrency", type=int, default=1)
     _add_metric_args(p_or)
     p_or.set_defaults(func=_cmd_run_openrouter)
@@ -298,6 +354,58 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_gold.add_argument("--task", action="append", help="Task id (repeatable)")
     p_gold.set_defaults(func=_cmd_verify_gold)
+
+    p_apply_gold = sub.add_parser(
+        "apply-gold",
+        help="Apply one task's gold solution to a workspace (no Docker required)",
+    )
+    p_apply_gold.add_argument("--task", required=True, help="Task id")
+    p_apply_gold.add_argument(
+        "--workspace",
+        default=".",
+        help="Workspace path to modify (default: current directory)",
+    )
+    p_apply_gold.set_defaults(func=_cmd_apply_gold)
+
+    p_verify_task = sub.add_parser(
+        "verify-task",
+        help="Run one task verifier against a workspace (no Docker required)",
+    )
+    p_verify_task.add_argument("--task", required=True, help="Task id")
+    p_verify_task.add_argument(
+        "--workspace",
+        default=".",
+        help="Workspace path to inspect (default: current directory)",
+    )
+    p_verify_task.add_argument("--json", action="store_true", help="Print result as JSON")
+    p_verify_task.set_defaults(func=_cmd_verify_task)
+
+    p_harbor = sub.add_parser(
+        "export-harbor",
+        help="Generate a local Harbor dataset from the benchmark task registry",
+    )
+    p_harbor.add_argument(
+        "--output",
+        default="harbor_dataset",
+        help="Output directory (default: harbor_dataset)",
+    )
+    p_harbor.add_argument(
+        "--task",
+        action="append",
+        help="Task id (repeatable). Export all tasks if omitted.",
+    )
+    p_harbor.add_argument("--org", default="ai-forever", help="Harbor org namespace")
+    p_harbor.add_argument(
+        "--dataset",
+        default="harness-bench-fast",
+        help="Harbor dataset name",
+    )
+    p_harbor.add_argument(
+        "--clean",
+        action="store_true",
+        help="Delete the output directory before exporting",
+    )
+    p_harbor.set_defaults(func=_cmd_export_harbor)
 
     p_cli = sub.add_parser(
         "run-cli",

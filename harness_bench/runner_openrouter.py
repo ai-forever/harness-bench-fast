@@ -45,6 +45,7 @@ def build_agent(
     *,
     model_name: str = DEFAULT_OPENROUTER_MODEL,
     recursion_limit: int = 80,
+    max_tokens: int | None = None,
 ) -> Any:
     """Build a stock `deepagents` agent backed by an OpenRouter model.
 
@@ -61,11 +62,15 @@ def build_agent(
         virtual_mode=True,
         inherit_env=True,
     )
+    model_kwargs: dict[str, Any] = {}
+    if max_tokens is not None:
+        model_kwargs["max_tokens"] = max_tokens
     model = ChatOpenAI(
         model=model_name,
         base_url=os.getenv("OPENROUTER_BASE_URL", DEFAULT_BASE_URL),
         api_key=os.getenv("OPENROUTER_API_KEY"),
         timeout=600,
+        **model_kwargs,
     )
     # Memory tasks (222–231) ship an AGENTS.md fixture; pre-existing 221
     # tasks do not. `LocalShellBackend(virtual_mode=True)` maps
@@ -81,6 +86,7 @@ def run_task(
     model_name: str = DEFAULT_OPENROUTER_MODEL,
     keep_workspace: bool = False,
     recursion_limit: int = 80,
+    max_tokens: int | None = None,
 ) -> TaskRun:
     workspace_keepalive: TemporaryDirectory | None = None
     try:
@@ -97,6 +103,7 @@ def run_task(
                 workspace_path,
                 model_name=model_name,
                 recursion_limit=recursion_limit,
+                max_tokens=max_tokens,
             )
             agent.invoke({"messages": [{"role": "user", "content": task.prompt}]})
         except Exception:  # noqa: BLE001 — surface as failure
@@ -127,6 +134,7 @@ def run_all(
     model_name: str = DEFAULT_OPENROUTER_MODEL,
     keep_workspace: bool = False,
     recursion_limit: int = 80,
+    max_tokens: int | None = None,
     concurrency: int = 1,
     attempts: int = 1,
 ) -> list[TaskRun]:
@@ -148,6 +156,7 @@ def run_all(
                     model_name=model_name,
                     keep_workspace=keep_workspace,
                     recursion_limit=recursion_limit,
+                    max_tokens=max_tokens,
                 )
                 run = _mark_attempt(run, attempt, attempts)
                 results.append(run)
@@ -169,6 +178,7 @@ def run_all(
                 model_name=model_name,
                 keep_workspace=keep_workspace,
                 recursion_limit=recursion_limit,
+                max_tokens=max_tokens,
             ): (task, attempt)
             for task in targets
             for attempt in range(1, attempts + 1)

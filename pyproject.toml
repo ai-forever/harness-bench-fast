@@ -24,6 +24,8 @@ dependencies = [
     "python-dotenv>=1.2.2",
     # Used by xlsx-related tasks (verifiers and gold fixtures).
     "openpyxl>=3.1",
+    # Used by YAML-related task fixtures and verifiers.
+    "PyYAML>=6.0",
 ]
 
 [project.optional-dependencies]
@@ -92,3 +94,13 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 ignore = ["E501"]
+
+[tool.pytest.ini_options]
+norecursedirs = [
+    ".git",
+    ".venv",
+    "dist",
+    "harbor_dataset*",
+    "harbor_jobs*",
+    "jobs",
+]
