@@ -21,6 +21,7 @@ import argparse
 import json
 import sys
 
+from harness_bench.metrics import default_metric_ks
 from harness_bench.runner import run_all, summarize, verify_gold
 from harness_bench.runner_cli import DEFAULT_CLI_COMMAND, DEFAULT_TIMEOUT_SECONDS, run_all_cli
 from harness_bench.runner_openrouter import DEFAULT_OPENROUTER_MODEL
@@ -85,48 +86,56 @@ def _cmd_version(args: argparse.Namespace) -> int:
 
 
 def _cmd_run(args: argparse.Namespace) -> int:
+    pass_at_ks, pass_hat_ks = _resolve_metric_ks(args)
     results = run_all(
         task_ids=args.task,
         keep_workspace=args.keep,
         recursion_limit=args.recursion_limit,
         concurrency=args.concurrency,
+        attempts=args.attempts,
     )
-    summarize(results)
+    summarize(results, pass_at_ks=pass_at_ks, pass_hat_ks=pass_hat_ks)
     return 0 if all(r.passed for r in results) else 1
 
 
 def _cmd_run_openrouter(args: argparse.Namespace) -> int:
+    pass_at_ks, pass_hat_ks = _resolve_metric_ks(args)
     results = run_all_openrouter(
         task_ids=args.task,
         model_name=args.model,
         keep_workspace=args.keep,
         recursion_limit=args.recursion_limit,
         concurrency=args.concurrency,
+        attempts=args.attempts,
     )
-    summarize(results)
+    summarize(results, pass_at_ks=pass_at_ks, pass_hat_ks=pass_hat_ks)
     return 0 if all(r.passed for r in results) else 1
 
 
 def _cmd_run_pure(args: argparse.Namespace) -> int:
+    pass_at_ks, pass_hat_ks = _resolve_metric_ks(args)
     results = run_all_pure(
         task_ids=args.task,
         keep_workspace=args.keep,
         recursion_limit=args.recursion_limit,
         concurrency=args.concurrency,
+        attempts=args.attempts,
     )
-    summarize(results)
+    summarize(results, pass_at_ks=pass_at_ks, pass_hat_ks=pass_hat_ks)
     return 0 if all(r.passed for r in results) else 1
 
 
 def _cmd_run_cli(args: argparse.Namespace) -> int:
+    pass_at_ks, pass_hat_ks = _resolve_metric_ks(args)
     results = run_all_cli(
         task_ids=args.task,
         cli_command=args.cli_command,
         timeout=args.timeout,
         keep_workspace=args.keep,
         concurrency=args.concurrency,
+        attempts=args.attempts,
     )
-    summarize(results)
+    summarize(results, pass_at_ks=pass_at_ks, pass_hat_ks=pass_hat_ks)
     return 0 if all(r.passed for r in results) else 1
 
 
@@ -144,6 +153,66 @@ def _cmd_verify_gold(args: argparse.Namespace) -> int:
             print(f"  - {r.task_id}: {head[0] if head else ''}")
         return 1
     return 0
+
+
+def _positive_int(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(f"expected a positive integer, got {value!r}") from exc
+    if parsed < 1:
+        raise argparse.ArgumentTypeError(f"expected a positive integer, got {value!r}")
+    return parsed
+
+
+def _add_metric_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--attempts",
+        type=_positive_int,
+        default=1,
+        help=(
+            "Run each selected task N independent times. Default: 1. "
+            "Use N > 1 to compute pass@N / pass^N."
+        ),
+    )
+    parser.add_argument(
+        "--pass-at",
+        "--pass@",
+        dest="pass_at",
+        action="append",
+        type=_positive_int,
+        metavar="K",
+        help=(
+            "Print pass@K (at least one of K attempts passes). Repeatable. "
+            "Defaults to pass@1, plus pass@N when --attempts N > 1."
+        ),
+    )
+    parser.add_argument(
+        "--pass-hat",
+        "--pass-caret",
+        "--pass^",
+        dest="pass_hat",
+        action="append",
+        type=_positive_int,
+        metavar="K",
+        help=(
+            "Print pass^K (all K attempts pass). Repeatable. "
+            "Defaults to pass^N when --attempts N > 1."
+        ),
+    )
+
+
+def _resolve_metric_ks(args: argparse.Namespace) -> tuple[tuple[int, ...], tuple[int, ...]]:
+    default_pass_at, default_pass_hat = default_metric_ks(args.attempts)
+    pass_at_ks = tuple(args.pass_at) if args.pass_at else default_pass_at
+    pass_hat_ks = tuple(args.pass_hat) if args.pass_hat else default_pass_hat
+    too_large = [k for k in (*pass_at_ks, *pass_hat_ks) if k > args.attempts]
+    if too_large:
+        joined = ", ".join(str(k) for k in too_large)
+        raise SystemExit(
+            f"Metric k cannot exceed --attempts ({args.attempts}); got: {joined}"
+        )
+    return pass_at_ks, pass_hat_ks
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -186,6 +255,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run up to N tasks in parallel (default: 1; uses a thread pool, "
         "each task still has its own isolated TemporaryDirectory).",
     )
+    _add_metric_args(p_run)
     p_run.set_defaults(func=_cmd_run)
 
     p_or = sub.add_parser(
@@ -204,6 +274,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_or.add_argument("--keep", action="store_true", help="Keep temp workspaces")
     p_or.add_argument("--recursion-limit", type=int, default=80)
     p_or.add_argument("--concurrency", type=int, default=1)
+    _add_metric_args(p_or)
     p_or.set_defaults(func=_cmd_run_openrouter)
 
     p_pure = sub.add_parser(
@@ -217,6 +288,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_pure.add_argument("--keep", action="store_true", help="Keep temp workspaces")
     p_pure.add_argument("--recursion-limit", type=int, default=80)
     p_pure.add_argument("--concurrency", type=int, default=1)
+    _add_metric_args(p_pure)
     p_pure.set_defaults(func=_cmd_run_pure)
 
     p_gold = sub.add_parser(
@@ -264,6 +336,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=1,
         help="Run up to N tasks in parallel (default: 1).",
     )
+    _add_metric_args(p_cli)
     p_cli.set_defaults(func=_cmd_run_cli)
 
     return parser
