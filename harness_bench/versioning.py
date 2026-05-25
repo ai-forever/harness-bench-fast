@@ -62,6 +62,39 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
         modules=("tasks_memory.py",),
         notes="Added memory-discipline tasks using AGENTS.md and MEMORY.md.",
     ),
+    TaskSetRevision(
+        version="0.4.0",
+        introduced="2026-05-25",
+        total_tasks=240,
+        added_task_numbers=(232, 240),
+        modules=("tasks_agentic.py",),
+        notes=(
+            "Added benchmark-inspired agentic tasks adapted from Terminal-Bench, "
+            "tau2-bench, and SWE-bench patterns."
+        ),
+    ),
+    TaskSetRevision(
+        version="0.5.0",
+        introduced="2026-05-25",
+        total_tasks=261,
+        added_task_numbers=(241, 261),
+        modules=("tasks_agentic.py",),
+        notes=(
+            "Expanded the agentic wave to 10 Terminal-Bench-style, "
+            "10 tau2-style, and 10 SWE-bench-style tasks."
+        ),
+    ),
+    TaskSetRevision(
+        version="0.6.0",
+        introduced="2026-05-25",
+        total_tasks=276,
+        added_task_numbers=(262, 276),
+        modules=("tasks_agentic.py",),
+        notes=(
+            "Expanded the agentic wave to 15 Terminal-Bench-style, "
+            "15 tau2-style, and 15 SWE-bench-style tasks."
+        ),
+    ),
 )
 
 CURRENT_TASK_SET_REVISION = TASK_SET_REVISIONS[-1]
