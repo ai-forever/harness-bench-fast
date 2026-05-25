@@ -35,7 +35,7 @@ def test_cli_metric_defaults_for_repeated_attempts() -> None:
     parser = build_parser()
     args = parser.parse_args(["run-cli", "--attempts", "5"])
 
-    assert _resolve_metric_ks(args) == ((1, 5), (5,))
+    assert _resolve_metric_ks(args) == ((1, 2, 3, 4, 5), (1, 2, 3, 4, 5))
 
 
 def test_cli_accepts_symbolic_metric_aliases() -> None:

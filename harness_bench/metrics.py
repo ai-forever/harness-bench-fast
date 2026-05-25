@@ -76,9 +76,8 @@ def default_metric_ks(num_attempts: int) -> tuple[tuple[int, ...], tuple[int, ..
     """Default metrics for CLI summaries."""
     if num_attempts < 1:
         raise ValueError("num_attempts must be positive")
-    if num_attempts == 1:
-        return (1,), ()
-    return (1, num_attempts), (num_attempts,)
+    ks = tuple(range(1, num_attempts + 1))
+    return ks, ks
 
 
 def format_metric(metric: PassMetric) -> str:

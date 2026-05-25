@@ -61,7 +61,7 @@ uv run python -m harness_bench run-cli \
     --concurrency 5
 
 # Run repeated attempts and report pass@ / pass^ metrics. With
-# --attempts N, summaries print pass@1, pass@N, and pass^N by default;
+# --attempts N, summaries print pass@1..N and pass^1..N by default;
 # --pass-at/--pass@ and --pass-hat/--pass^ can request specific K values.
 uv run python -m harness_bench run-cli \
     --cli-command 'free-code -p --model haiku --dangerously-skip-permissions' \

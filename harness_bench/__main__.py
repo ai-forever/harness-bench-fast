@@ -172,7 +172,7 @@ def _add_metric_args(parser: argparse.ArgumentParser) -> None:
         default=1,
         help=(
             "Run each selected task N independent times. Default: 1. "
-            "Use N > 1 to compute pass@N / pass^N."
+            "Use N > 1 to compute pass@K / pass^K for K=1..N."
         ),
     )
     parser.add_argument(
@@ -184,7 +184,7 @@ def _add_metric_args(parser: argparse.ArgumentParser) -> None:
         metavar="K",
         help=(
             "Print pass@K (at least one of K attempts passes). Repeatable. "
-            "Defaults to pass@1, plus pass@N when --attempts N > 1."
+            "Defaults to all K values from 1 to --attempts."
         ),
     )
     parser.add_argument(
@@ -197,7 +197,7 @@ def _add_metric_args(parser: argparse.ArgumentParser) -> None:
         metavar="K",
         help=(
             "Print pass^K (all K attempts pass). Repeatable. "
-            "Defaults to pass^N when --attempts N > 1."
+            "Defaults to all K values from 1 to --attempts."
         ),
     )
 
