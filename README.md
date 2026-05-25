@@ -1,6 +1,6 @@
 # harness-bench
 
-A self-contained **231-task agent benchmark** (`task-set v0.3.0`) for evaluating LLM-backed
+A self-contained **276-task agent benchmark** (`task-set v0.6.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -34,7 +34,7 @@ uv venv && uv pip install -e ".[gigachat,openrouter]"
 # to the public profile.
 uv pip install -e ".[gigachat-profile]"
 
-# List all 231 tasks
+# List all 276 tasks
 uv run python -m harness_bench list
 
 # Show the benchmark task-set version and revision history
@@ -70,7 +70,7 @@ uv run python -m harness_bench verify-gold
 
 ## What's inside
 
-### Tasks (231 total, task-set v0.3.0)
+### Tasks (276 total, task-set v0.6.0)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -81,6 +81,7 @@ uv run python -m harness_bench verify-gold
 | `tasks_extreme.py` | 151–205 | composite pipelines, archives, project-wide refactors, algorithms with pytest, statistics, XML / markdown, three-way joins |
 | `tasks_diagnostic.py` | 206–221 | paid-revenue reconciliation, inventory anomalies, pricing-API migration, latency reconstruction, tar+hash manifests, interval merge, config precedence, markdown link audit, data-quality reports, TODO/FIXME triage, category rollups, email extraction, runtime config, SQL leaderboards, import migrations, log-level summaries |
 | `tasks_memory.py` | 222–231 | memory discipline: read / write / forget / refuse facts in `MEMORY.md` along with the auxiliary deliverable (LICENSE, `requirements-dev.txt`, `bio.txt`, `profile.json`, …). Exercises agent memory rather than file I/O. |
+| `tasks_agentic.py` | 232–276 | 45 compact agentic tasks adapted from Terminal-Bench, tau2-bench, and SWE-bench patterns: terminal forensics, policy-bound tool decisions, and pytest-backed repository bug fixes |
 
 Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
@@ -98,6 +99,9 @@ changes do not need a task-set bump.
 | `0.1.0` | 2026-05-13 | 1–200 | 200 | Initial extracted file/code/data benchmark |
 | `0.2.0` | 2026-05-19 | 201–221 | 221 | Advanced composites and diagnostic hard tasks |
 | `0.3.0` | 2026-05-21 | 222–231 | 231 | Memory-discipline tasks using `AGENTS.md` and `MEMORY.md` |
+| `0.4.0` | 2026-05-25 | 232–240 | 240 | Agentic wave adapted from Terminal-Bench, tau2-bench, and SWE-bench task patterns |
+| `0.5.0` | 2026-05-25 | 241–261 | 261 | Expanded the agentic wave to 10 tasks each from Terminal-Bench-style, tau2-style, and SWE-bench-style patterns |
+| `0.6.0` | 2026-05-25 | 262–276 | 276 | Expanded the agentic wave to 15 tasks each from Terminal-Bench-style, tau2-style, and SWE-bench-style patterns |
 
 ### Infrastructure
 
@@ -123,7 +127,9 @@ inspects the workspace.
 
 ## Results
 
-All runs use `--concurrency 5` on the 231-task set (`task-set v0.3.0`).
+Published runs below use `--concurrency 5` on the previous 231-task set
+(`task-set v0.3.0`). New v0.6.0 results should be recorded separately
+because the denominator is now 276 tasks.
 Raw run directories are local artifacts and are ignored by git; the table
 below is a traceability summary, not a bundled replay log.
 
@@ -171,7 +177,7 @@ single model across time.
 
 1. In one of the task modules (`tasks.py`, `tasks_extra.py`,
    `tasks_more.py`, `tasks_hard.py`, `tasks_extreme.py`,
-   `tasks_diagnostic.py`, `tasks_memory.py` — pick the one that fits
+   `tasks_diagnostic.py`, `tasks_memory.py`, `tasks_agentic.py` — pick the one that fits
    the wave / difficulty) describe a `Task(...)` — id, prompt,
    `setup_files`, `gold_files`, `verifier`.
 2. Wire it into the corresponding module's `*_TASKS` list — it gets
