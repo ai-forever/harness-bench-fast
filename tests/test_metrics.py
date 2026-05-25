@@ -59,7 +59,8 @@ def test_summary_prints_pass_metrics_for_attempts(capsys: pytest.CaptureFixture[
 
     out = capsys.readouterr().out
     assert "Passed attempts: 3/4" in out
-    assert "pass@1: 75.0%" in out
-    assert "pass@2: 100.0%" in out
-    assert "pass^2: 50.0%" in out
+    assert "K  pass@K  pass^K" in out
+    assert "-  ------  ------" in out
+    assert "1   75.0%       -" in out
+    assert "2  100.0%   50.0%" in out
     assert "task_1 #2/2: bad" in out

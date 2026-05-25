@@ -13,7 +13,7 @@ from tempfile import TemporaryDirectory
 from typing import Any
 
 from harness_bench.core import Task, VerifyResult
-from harness_bench.metrics import compute_pass_metrics, format_metric
+from harness_bench.metrics import PassMetric, compute_pass_metrics
 from harness_bench.tasks import ALL_TASKS, get_task
 
 
@@ -292,8 +292,8 @@ def summarize(
     if metrics:
         print()
         print("Metrics:")
-        for metric in metrics:
-            print(f"  {format_metric(metric)}")
+        for line in _format_metrics_table(metrics):
+            print(f"  {line}")
     if passed < total:
         print()
         print("Failures:")
@@ -301,6 +301,44 @@ def summarize(
             if r.passed:
                 continue
             print(f"  - {_task_attempt_label(r)}: {_one_line_detail(r)}")
+
+
+def _format_metrics_table(metrics: list[PassMetric]) -> list[str]:
+    metric_by_key = {(metric.kind, metric.k): metric for metric in metrics}
+    ks = sorted({metric.k for metric in metrics})
+    kinds = [kind for kind in ("pass@", "pass^") if any(m.kind == kind for m in metrics)]
+    headers = ["K", *(f"{kind}K" for kind in kinds)]
+    rows = [
+        [
+            str(k),
+            *[
+                _format_metric_value(metric_by_key.get((kind, k)))
+                for kind in kinds
+            ],
+        ]
+        for k in ks
+    ]
+    widths = [
+        max(len(row[i]) for row in [headers, *rows])
+        for i in range(len(headers))
+    ]
+    lines = [
+        _format_table_row(headers, widths),
+        _format_table_row(["-" * width for width in widths], widths),
+    ]
+    lines.extend(_format_table_row(row, widths) for row in rows)
+    return lines
+
+
+def _format_metric_value(metric: PassMetric | None) -> str:
+    if metric is None:
+        return "-"
+    return f"{metric.value * 100:.1f}%"
+
+
+def _format_table_row(values: list[str], widths: list[int]) -> str:
+    cells = [value.rjust(width) for value, width in zip(values, widths, strict=True)]
+    return "  ".join(cells)
 
 
 # ---------------------------------------------------------------------------
