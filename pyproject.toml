@@ -1,0 +1,106 @@
+[project]
+name = "harness-bench-fast"
+version = "0.1.0"
+description = "Self-contained 231-task agent benchmark (file ops, code edits, CSV/SQLite/XLSX pipelines, memory discipline)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [
+    { name = "AI Forever" },
+]
+keywords = ["benchmark", "agent", "deepagents", "langchain", "evaluation", "harness"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "deepagents>=0.6.2",
+    # Several benchmark tasks are verified by running `python -m pytest`.
+    "pytest>=9.0.2",
+    "python-dotenv>=1.2.2",
+    # Used by xlsx-related tasks (verifiers and gold fixtures).
+    "openpyxl>=3.1",
+    # Used by YAML-related task fixtures and verifiers.
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+# `uv pip install harness-bench-fast[gigachat]` for running against GigaChat
+# through `runner.py`. The optional harness profile ships separately and is
+# auto-detected when installed.
+gigachat = [
+    "langchain-gigachat>=0.5.0",
+]
+# Public profile extra. For exact v9/v10 result reproduction, install the
+# matching local deepagents-gigachat wheel/source described in README.md.
+gigachat-profile = [
+    "langchain-gigachat>=0.5.0",
+    "deepagents-gigachat>=0.0.1a3",
+]
+# `uv pip install harness-bench-fast[openrouter]` for `runner_openrouter.py`
+# against any OpenAI-compatible OpenRouter model.
+openrouter = [
+    "langchain-openai>=1.2.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/ai-forever/harness-bench-fast"
+Repository = "https://github.com/ai-forever/harness-bench-fast"
+Issues = "https://github.com/ai-forever/harness-bench-fast/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/harness_bench",
+    "/LICENSE",
+    "/README.md",
+    "/LEGACY_RESULTS.md",
+    "/pyproject.toml",
+    "/tests",
+]
+exclude = [
+    "/.github",
+    "/.gitignore",
+    "/.venv",
+    "/dist",
+    "/uv.lock",
+    "/harness_bench/runs",
+    "/harness_bench/.free-code-logs",
+    "/.free-code-logs",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["harness_bench"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.12",
+    "langchain-openai>=1.2.1",
+    "langchain-gigachat>=0.5.0",
+    "deepagents-gigachat>=0.0.1a3",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+norecursedirs = [
+    ".git",
+    ".venv",
+    "dist",
+    "harbor_dataset*",
+    "harbor_jobs*",
+    "jobs",
+]
