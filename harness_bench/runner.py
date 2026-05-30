@@ -259,6 +259,56 @@ def summarize(results: list[TaskRun]) -> None:
             print(f"  - {r.task_id}: {_one_line_detail(r)}")
 
 
+def results_to_payload(results: list[TaskRun]) -> dict[str, Any]:
+    """Build a JSON-serializable payload describing a benchmark run.
+
+    The payload carries an aggregate (``passed``/``total``/``pass_rate``) plus a
+    per-task breakdown including each task's free-form ``tags`` and numeric id,
+    so downstream tooling can compute per-category metrics without re-importing
+    the task registry.
+    """
+    from harness_bench.versioning import TASK_SET_VERSION, task_number
+
+    total = len(results)
+    passed = sum(1 for r in results if r.passed)
+    tasks_payload: list[dict[str, Any]] = []
+    for r in results:
+        try:
+            tags = list(get_task(r.task_id).tags)
+        except Exception:  # noqa: BLE001 — tags are best-effort metadata
+            tags = []
+        tasks_payload.append(
+            {
+                "task_id": r.task_id,
+                "number": task_number(r.task_id),
+                "passed": r.passed,
+                "message": r.message,
+                "elapsed_seconds": r.elapsed_seconds,
+                "error": r.error,
+                "tags": tags,
+            }
+        )
+    return {
+        "task_set_version": TASK_SET_VERSION,
+        "total": total,
+        "passed": passed,
+        "pass_rate": (passed / total) if total else 0.0,
+        "tasks": tasks_payload,
+    }
+
+
+def write_results_json(results: list[TaskRun], path: str | Path) -> None:
+    """Serialize a run's results to ``path`` as JSON (parents are created)."""
+    import json
+
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(
+        json.dumps(results_to_payload(results), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
 # ---------------------------------------------------------------------------
 # Gold sanity check (no LLM): exercises the verifiers themselves.
 # ---------------------------------------------------------------------------
