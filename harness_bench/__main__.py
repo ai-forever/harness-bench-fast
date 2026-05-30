@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 from harness_bench.harbor_export import export_harbor_dataset
-from harness_bench.runner import run_all, summarize, verify_gold
+from harness_bench.runner import run_all, summarize, verify_gold, write_results_json
 from harness_bench.runner_cli import DEFAULT_CLI_COMMAND, DEFAULT_TIMEOUT_SECONDS, run_all_cli
 from harness_bench.runner_openrouter import DEFAULT_OPENROUTER_MODEL
 from harness_bench.runner_openrouter import run_all as run_all_openrouter
@@ -86,6 +86,13 @@ def _cmd_version(args: argparse.Namespace) -> int:
     return 1 if args.check and errors else 0
 
 
+def _maybe_write_json(args: argparse.Namespace, results: list) -> None:
+    json_output = getattr(args, "json_output", None)
+    if json_output:
+        write_results_json(results, json_output)
+        print(f"\nWrote results JSON to {json_output}")
+
+
 def _cmd_run(args: argparse.Namespace) -> int:
     results = run_all(
         task_ids=args.task,
@@ -94,6 +101,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
     )
     summarize(results)
+    _maybe_write_json(args, results)
     return 0 if all(r.passed for r in results) else 1
 
 
@@ -107,6 +115,7 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
     )
     summarize(results)
+    _maybe_write_json(args, results)
     return 0 if all(r.passed for r in results) else 1
 
 
@@ -118,6 +127,7 @@ def _cmd_run_pure(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
     )
     summarize(results)
+    _maybe_write_json(args, results)
     return 0 if all(r.passed for r in results) else 1
 
 
@@ -130,6 +140,7 @@ def _cmd_run_cli(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
     )
     summarize(results)
+    _maybe_write_json(args, results)
     return 0 if all(r.passed for r in results) else 1
 
 
@@ -193,6 +204,18 @@ def _cmd_export_harbor(args: argparse.Namespace) -> int:
     return 0
 
 
+def _add_json_output(p: argparse.ArgumentParser) -> None:
+    p.add_argument(
+        "--json-output",
+        dest="json_output",
+        default=None,
+        help=(
+            "Write a machine-readable JSON report (aggregate pass_rate plus a "
+            "per-task breakdown with tags) to this path."
+        ),
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m harness_bench")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -233,6 +256,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run up to N tasks in parallel (default: 1; uses a thread pool, "
         "each task still has its own isolated TemporaryDirectory).",
     )
+    _add_json_output(p_run)
     p_run.set_defaults(func=_cmd_run)
 
     p_or = sub.add_parser(
@@ -260,6 +284,7 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     p_or.add_argument("--concurrency", type=int, default=1)
+    _add_json_output(p_or)
     p_or.set_defaults(func=_cmd_run_openrouter)
 
     p_pure = sub.add_parser(
@@ -273,6 +298,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_pure.add_argument("--keep", action="store_true", help="Keep temp workspaces")
     p_pure.add_argument("--recursion-limit", type=int, default=80)
     p_pure.add_argument("--concurrency", type=int, default=1)
+    _add_json_output(p_pure)
     p_pure.set_defaults(func=_cmd_run_pure)
 
     p_gold = sub.add_parser(
@@ -372,6 +398,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=1,
         help="Run up to N tasks in parallel (default: 1).",
     )
+    _add_json_output(p_cli)
     p_cli.set_defaults(func=_cmd_run_cli)
 
     return parser
