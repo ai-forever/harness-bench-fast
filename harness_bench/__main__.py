@@ -121,6 +121,7 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         recursion_limit=args.recursion_limit,
         max_tokens=args.max_tokens,
         concurrency=args.concurrency,
+        harness_profile=args.harness_profile,
     )
     summarize(results)
     _maybe_write_json(args, results)
@@ -300,6 +301,17 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     p_or.add_argument("--concurrency", type=int, default=1)
+    p_or.add_argument(
+        "--harness-profile",
+        dest="harness_profile",
+        default=None,
+        help=(
+            "Bridge a registered built-in deepagents harness profile onto the "
+            "chosen OpenRouter model so it actually applies (e.g. "
+            "'anthropic:claude-sonnet-4-6' for the built-in Claude Sonnet 4.6 "
+            "profile). The GigaChat profile is never registered by this runner."
+        ),
+    )
     _add_json_output(p_or)
     p_or.add_argument(
         "--allow-task-failures",
