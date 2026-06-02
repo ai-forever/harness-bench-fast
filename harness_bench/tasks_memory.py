@@ -1649,7 +1649,9 @@ TASK_241 = Task(
         "MEMORY.md": _MEM_241,
         "config.json": _CONFIG_241_INITIAL,
     },
-    gold_files={},
+    gold_files={
+        "config.json": '{\n\t"app": "demo",\n\t"port": 3000,\n\t"debug": true,\n\t"features": [\n\t\t"auth",\n\t\t"logging",\n\t\t"metrics"\n\t]\n}\n',
+    },
     verifier=_verify_task_241,
 )
 
@@ -1738,7 +1740,11 @@ TASK_242 = Task(
         "README.md": _README_242_INITIAL,
         "package.json": _PACKAGE_242_INITIAL,
     },
-    gold_files={},
+    gold_files={
+        "MEMORY.md": '- Имя: Виктор Козлов\n- Компания: NewTech\n- Должность: Senior Developer\n- Email: victor@newtech.io\n',
+        "README.md": '# About\n\nVictor Kozlov — Senior Developer at NewTech.\nContact: victor@newtech.io\n',
+        "package.json": '{\n  "name": "victor-portfolio",\n  "version": "1.0.0",\n  "author": "Victor Kozlov <victor@newtech.io>"\n}\n',
+    },
     verifier=_verify_task_242,
 )
 
@@ -1818,7 +1824,9 @@ TASK_243 = Task(
         "AGENTS.md": _AGENTS_MD,
         "MEMORY.md": _MEM_243,
     },
-    gold_files={},
+    gold_files={
+        "packing_list.json": '{\n  "destination": "Стамбул",\n  "dates": "10–17 августа 2026",\n  "categories": {\n    "Одежда": [\n      "деловой casual (рубашки, брюки)",\n      "повседневная одежда",\n      "удобная обувь"\n    ],\n    "Спорт": [\n      "кроссовки для бега",\n      "спортивная форма"\n    ],\n    "Документы": [\n      "паспорт",\n      "страховка",\n      "наличные"\n    ],\n    "Техника": [\n      "ноутбук",\n      "зарядки"\n    ]\n  },\n  "notes": "Аллергия на латекс — избегать латексных изделий. Дресс-код на конференции: business casual."\n}\n',
+    },
     verifier=_verify_task_243,
 )
 
@@ -1876,7 +1884,10 @@ TASK_244 = Task(
         "AGENTS.md": _AGENTS_MD,
         "MEMORY.md": "",
     },
-    gold_files={},
+    gold_files={
+        "MEMORY.md": '- База данных: PostgreSQL\n- Порт PostgreSQL: 5433\n- Кэш: Redis\n',
+        ".env.example": 'DATABASE_URL=postgresql://user:your_password@localhost:5433/mydb\nREDIS_URL=redis://localhost:6379\n',
+    },
     verifier=_verify_task_244,
 )
 
@@ -2072,7 +2083,9 @@ TASK_247 = Task(
         "AGENTS.md": _AGENTS_MD,
         "MEMORY.md": _MEM_247,
     },
-    gold_files={},
+    gold_files={
+        "Dockerfile": 'FROM python:3.12-slim\n\nWORKDIR /app\n\nCOPY . .\n\nRUN apt-get update -qq && apt-get install -y curl \\\n    && curl -LsSf https://astral.sh/uv/install.sh | sh\n\nRUN /root/.local/bin/uv pip install --system -r requirements.txt\n\nEXPOSE 8080\n\nCMD ["python", "app.py"]\n',
+    },
     verifier=_verify_task_247,
 )
 
@@ -2135,7 +2148,10 @@ TASK_248 = Task(
         "MEMORY.md": _MEM_248_INITIAL,
         "contacts.yml": _CONTACTS_248_INITIAL,
     },
-    gold_files={},
+    gold_files={
+        "MEMORY.md": '- Имя: Настя\n- Email личный: nastya@personal.me\n- Телефон личный: +7-900-444-55-66\n',
+        "contacts.yml": 'name: Настя\npersonal_email: nastya@personal.me\npersonal_phone: "+7-900-444-55-66"\n',
+    },
     verifier=_verify_task_248,
 )
 
@@ -2259,7 +2275,10 @@ TASK_250 = Task(
         "AGENTS.md": _AGENTS_MD,
         "MEMORY.md": _MEM_250,
     },
-    gold_files={},
+    gold_files={
+        "user_model.py": 'from dataclasses import dataclass\nfrom typing import Optional\n\n\n@dataclass\nclass User:\n    name: str\n    age: int\n    city: str\n    email: Optional[str] = None\n    phone: Optional[str] = None\n',
+        "instance.json": '{\n  "name": "Артём",\n  "age": 29,\n  "city": "Самара",\n  "email": null,\n  "phone": null\n}\n',
+    },
     verifier=_verify_task_250,
 )
 
@@ -2323,7 +2342,10 @@ TASK_251 = Task(
         "AGENTS.md": _AGENTS_MD,
         "MEMORY.md": _MEM_251_INITIAL,
     },
-    gold_files={},
+    gold_files={
+        "MEMORY.md": '- Имя: Лена\n- Система мер: метрическая\n- Рост: 170 см\n',
+        "convert.py": 'def cm_to_inches(cm: float) -> float:\n    return cm / 2.54\n\n\ndef inches_to_cm(inches: float) -> float:\n    return inches * 2.54\n',
+    },
     verifier=_verify_task_251,
 )
 
@@ -2378,7 +2400,9 @@ TASK_252 = Task(
         "AGENTS.md": _AGENTS_MD,
         "MEMORY.md": _MEM_252,
     },
-    gold_files={},
+    gold_files={
+        "milestones.py": 'MILESTONES = [\n    ("alpha", "2026-03-01"),\n    ("beta",  "2026-06-15"),\n    ("rc",    "2026-08-01"),\n    ("ga",    "2026-10-01"),\n]\n\n\ndef next_milestone(today: str) -> str | None:\n    """Return name of nearest future milestone, or None if all past."""\n    for name, date in MILESTONES:\n        if today < date:\n            return name\n    return None\n',
+    },
     verifier=_verify_task_252,
 )
 
@@ -2447,7 +2471,10 @@ TASK_253 = Task(
         "AGENTS.md": _AGENTS_MD,
         "MEMORY.md": _MEM_253_INITIAL,
     },
-    gold_files={},
+    gold_files={
+        "MEMORY.md": '- Имя: Рустам\n- Язык: Rust\n- Компания: FerrisCorp\n- Должность: Tech Lead\n',
+        "README.md": '# Рустам\n\nTech Lead в FerrisCorp.\n\n## Стек\n\n- Язык: Rust\n',
+    },
     verifier=_verify_task_253,
 )
 
