@@ -1290,8 +1290,9 @@ TASK_236 = Task(
     tags=("memory", "knowledge-update", "contradiction", "propagate", "hard"),
     prompt=(
         "У меня в памяти есть старый и новый AWS-регион. "
-        "Сделай так, чтобы в проекте везде остался только актуальный регион.\n"
-        "Нужно синхронно обновить `MEMORY.md`, `infra.auto.tfvars` и `deploy.yml`."
+        "Оставь в проекте только актуальный регион и полностью убери старый — "
+        "нигде его не упоминай, даже в комментариях или заметках.\n"
+        "Синхронно обнови `MEMORY.md`, `infra.auto.tfvars` и `deploy.yml`."
     ),
     setup_files={
         "AGENTS.md": _AGENTS_MD,
@@ -1787,17 +1788,26 @@ def _verify_task_243(ws: Path) -> VerifyResult:
 
     if not re.search(r"бег|кроссовк|running|спорт", all_items):
         return VerifyResult(False, "packing list should include running gear")
-    # A latex *allergy* is handled correctly by packing latex-FREE gear, so
-    # "без латекса" / "latex-free" items are the desired behavior, not a
-    # violation. Neutralize those negated qualifiers first; only a genuine
-    # latex item (latex not paired with a free/без qualifier) should fail.
-    latex_neutralized = re.sub(
-        r"(без\s+латекс\w*|латекс\w*[\s\-]*free|latex[\s\-]*free|free[\s\-]*of[\s\-]*latex)",
-        " ",
-        all_items,
+    # A latex *allergy* is handled correctly by packing latex-FREE gear, so an
+    # item is only a violation when it names latex WITHOUT an avoidance cue.
+    # Scanning the joined text is too blunt ("без латекса", "latex-free",
+    # "нитрил вместо латексных" all contain the substring); check each item and
+    # skip ones that carry an avoidance/substitution cue.
+    _latex = re.compile(r"(?iu)латекс|latex")
+    _avoid = re.compile(
+        r"(?iu)без|free|фри|вместо|нитрил|силикон|avoid|избег|instead|replace|аналог|не\s*латекс"
     )
-    if re.search(r"латекс|latex", latex_neutralized):
-        return VerifyResult(False, "packing list should NOT include latex items (allergy!)")
+    genuine_latex = [
+        str(it)
+        for vals in categories.values()
+        for it in (vals if isinstance(vals, list) else [vals])
+        if _latex.search(str(it)) and not _avoid.search(str(it))
+    ]
+    if genuine_latex:
+        return VerifyResult(
+            False,
+            f"packing list includes genuine latex item(s) despite allergy: {genuine_latex!r}",
+        )
 
     notes = data.get("notes")
     if not isinstance(notes, str):
