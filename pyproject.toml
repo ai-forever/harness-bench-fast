@@ -18,7 +18,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "deepagents>=0.6.4",
+    "deepagents>=0.6.2",
     # Several benchmark tasks are verified by running `python -m pytest`.
     "pytest>=9.0.2",
     "python-dotenv>=1.2.2",
@@ -86,9 +86,6 @@ dev = [
     "langchain-gigachat>=0.5.0",
     "deepagents-gigachat>=0.0.1a3",
 ]
-
-[tool.uv.sources]
-deepagents-gigachat = { path = "/Users/amiudina/Desktop/projects/deepagents-gigachat", editable = true }
 
 [tool.ruff]
 line-length = 100

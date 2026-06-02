@@ -839,7 +839,7 @@ def _verify_task_232(ws: Path) -> VerifyResult:
         ]
         for expr, expected in checks:
             res = python_callable_returns("calendar_rules.py", expr, expected)(ws)
-            if not res.ok:
+            if not res.passed:
                 return VerifyResult(False, f"calendar_rules.py behavior mismatch: {res.message}")
     except Exception as exc:  # pragma: no cover - defensive wrapper for bench diagnostics
         return VerifyResult(False, f"failed to execute calendar_rules.py checks: {exc}")
