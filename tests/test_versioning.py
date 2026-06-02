@@ -15,6 +15,10 @@ def test_task_set_metadata_matches_registry() -> None:
 
 
 def test_current_memory_tasks_belong_to_current_revision() -> None:
-    assert TASK_SET_VERSION == "0.3.0"
+    assert TASK_SET_VERSION == "0.4.0"
+    # 0.3.0 memory tasks keep their original revision.
     assert revision_for_task_id("task_222_memory_name_pyproject").version == "0.3.0"
     assert revision_for_task_id("task_231_memory_refuse_secrets").version == "0.3.0"
+    # 0.4.0 extends the memory suite with tasks 232-253.
+    assert revision_for_task_id("task_232_memory_focus_day_schedule_rules").version == "0.4.0"
+    assert revision_for_task_id("task_253_memory_mixed_save_refuse_use").version == "0.4.0"
