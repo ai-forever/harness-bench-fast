@@ -201,14 +201,15 @@ tracked in this repository.
 | 10 | 2026-05-22 | `deepagents` | **GigaChat-3-Ultra** (PROM, deepagents 0.6.3 + langgraph 1.2.1) | **yes (v9 + memory wiring)** | **195 / 231** | **84.4 %** |
 | 11 | 2026-05-23 | `deepagents` | **GigaChat-3-Ultra** (PROM, deepagents 0.6.3) | **yes (v10 = v9 + `AgentsMdInjectMiddleware`)** | **194 / 231** | **84.0 %** |
 | 12 | 2026-05-24 | `pi-mono` 0.75.3 | GigaChat-3-Ultra (PROM, `@gigachain/pi-gigachat`) | yes (pi tools + AGENTS.md discovery) | 188 / 231 | 81.4 % |
-| 13 | 2026-05-22 | `deepagents` | DeepSeek V4 Flash (284B-A13B MoE) | no | 186 / 231 | 80.5 % |
-| 14 | 2026-05-25 | `OpenHands SDK` 1.22.1 | GigaChat-3-Ultra (PROM via `gpt2giga`) | yes (SDK CLI wrapper + AGENTS.md/MEMORY.md prompt wiring) | 183 / 231 | 79.2 % |
-| 15 | 2026-05-22 | `deepagents` | OpenAI gpt-oss-120b (120B dense) | no | 165 / 231 | 71.4 % |
-| 16 | 2026-05-24 | `deepagents` | GigaChat-3-Ultra (PROM) | no (baseline, no profile, `run-pure`) | 164 / 231 | 71.0 % |
-| 17 | 2026-05-22 | `deepagents` | Qwen3-235B-A22B-Instruct-2507 | no | 162 / 231 | 70.1 % |
-| 18 | 2026-05-25 | `gigacode cli` | unknown | unknown | 151 / 231 | 65.4 % |
-| 19 | 2026-05-23 | `ouroboros` | GigaChat-3-Ultra (PROM, native function-calling mode) | no | 136 / 231 | 58.9 % |
-| 20 | 2026-05-22 | `deepagents` | GLM-4-32B (32B dense) | no | 76 / 231 | 32.9 % |
+| 13 | 2026-06-02 | `deepagents` | Qwen3.6-27B-FP8 (vLLM, deepagents defaults) | no | 187 / 231 | 81.0 % |
+| 14 | 2026-05-22 | `deepagents` | DeepSeek V4 Flash (284B-A13B MoE) | no | 186 / 231 | 80.5 % |
+| 15 | 2026-05-25 | `OpenHands SDK` 1.22.1 | GigaChat-3-Ultra (PROM via `gpt2giga`) | yes (SDK CLI wrapper + AGENTS.md/MEMORY.md prompt wiring) | 183 / 231 | 79.2 % |
+| 16 | 2026-05-22 | `deepagents` | OpenAI gpt-oss-120b (120B dense) | no | 165 / 231 | 71.4 % |
+| 17 | 2026-05-24 | `deepagents` | GigaChat-3-Ultra (PROM) | no (baseline, no profile, `run-pure`) | 164 / 231 | 71.0 % |
+| 18 | 2026-05-22 | `deepagents` | Qwen3-235B-A22B-Instruct-2507 | no | 162 / 231 | 70.1 % |
+| 19 | 2026-05-25 | `gigacode cli` | unknown | unknown | 151 / 231 | 65.4 % |
+| 20 | 2026-05-23 | `ouroboros` | GigaChat-3-Ultra (PROM, native function-calling mode) | no | 136 / 231 | 58.9 % |
+| 21 | 2026-05-22 | `deepagents` | GLM-4-32B (32B dense) | no | 76 / 231 | 32.9 % |
 
 The full /200 and /221 task-set history (older runs done before the
 bench was extended), plus superseded /231 rows, lives in
@@ -229,6 +230,14 @@ single model across time; superseded /231 rows are kept for traceability.
   the Opus 4.7 ceiling and ahead of every recorded Claude Haiku/Sonnet
   row. The 7 misses are content-format / missing-output-file tasks plus
   one memory-note refusal (`task_231_memory_refuse_secrets`).
+- **Harness contribution on Qwen3.6-27B-FP8**: the same model on stock
+  `deepagents` defaults (`run-openrouter`, no profile, no model-specific
+  sampling) scores **187 / 231 (81.0 %)**, so the opencode harness
+  adaptation is worth **+37 tasks** (187 → 224). The baseline misses
+  skew heavily toward tasks the agent ends without writing the output
+  file (many sub-2s "missing file" failures) — i.e. on bare defaults the
+  model under-uses the file tools, which the opencode setup (and its
+  recommended sampling) largely fixes.
 - **Ouroboros + Claude via OpenRouter**: the 2026-05-24 Sonnet run ties
   the recorded Claude-Code-style Haiku row at 222/231 and lands only
   9 tasks behind the Opus ceiling. The Haiku run through the same
