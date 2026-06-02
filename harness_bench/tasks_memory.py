@@ -1554,7 +1554,7 @@ def _verify_task_240(ws: Path) -> VerifyResult:
     if not p.exists():
         return VerifyResult(False, "summary.txt missing")
     text = p.read_text(encoding="utf-8").strip()
-    lines = [l for l in text.splitlines() if l.strip()]
+    lines = [line for line in text.splitlines() if line.strip()]
     if len(lines) > 5:
         return VerifyResult(False, f"summary.txt has {len(lines)} lines; expected ≤ 5")
     if len(text) > 500:
@@ -1625,10 +1625,10 @@ def _verify_task_241(ws: Path) -> VerifyResult:
     if data.get("app") != "demo" or data.get("port") != 3000:
         return VerifyResult(False, "config.json data was changed; only formatting should change")
     content_lines = raw.splitlines()
-    indented = [l for l in content_lines if l and l[0] in (" ", "\t")]
+    indented = [line for line in content_lines if line and line[0] in (" ", "\t")]
     if not indented:
         return VerifyResult(False, "config.json has no indentation at all")
-    tab_lines = [l for l in indented if l.startswith("\t")]
+    tab_lines = [line for line in indented if line.startswith("\t")]
     if len(tab_lines) < len(indented) * 0.8:
         return VerifyResult(False, "config.json should use tabs for indentation")
     if ",\n" in raw and re.search(r",\s*[\]\}]", raw):
@@ -2294,7 +2294,7 @@ def _verify_task_251(ws: Path) -> VerifyResult:
     ]
     for expr, _ in checks:
         try:
-            res = python_callable_returns("convert.py", expr, None)(ws)
+            python_callable_returns("convert.py", expr, None)(ws)
         except Exception:
             return VerifyResult(False, f"convert.py failed on {expr}")
 
