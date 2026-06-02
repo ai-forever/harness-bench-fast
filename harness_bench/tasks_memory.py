@@ -1787,7 +1787,16 @@ def _verify_task_243(ws: Path) -> VerifyResult:
 
     if not re.search(r"бег|кроссовк|running|спорт", all_items):
         return VerifyResult(False, "packing list should include running gear")
-    if re.search(r"латекс|latex", all_items):
+    # A latex *allergy* is handled correctly by packing latex-FREE gear, so
+    # "без латекса" / "latex-free" items are the desired behavior, not a
+    # violation. Neutralize those negated qualifiers first; only a genuine
+    # latex item (latex not paired with a free/без qualifier) should fail.
+    latex_neutralized = re.sub(
+        r"(без\s+латекс\w*|латекс\w*[\s\-]*free|latex[\s\-]*free|free[\s\-]*of[\s\-]*latex)",
+        " ",
+        all_items,
+    )
+    if re.search(r"латекс|latex", latex_neutralized):
         return VerifyResult(False, "packing list should NOT include latex items (allergy!)")
 
     notes = data.get("notes")
@@ -1827,7 +1836,11 @@ def _verify_task_244(ws: Path) -> VerifyResult:
     mt = mem.read_text(encoding="utf-8")
     checks = [
         (r"(?iu)база\s*(данных|BD|DB)\s*:\s*PostgreSQL|PostgreSQL", "PostgreSQL"),
-        (r"(?iu)(порт|port)\s*(БД|DB|базы)?\s*:\s*5433", "port 5433"),
+        # 5433 is a non-default Postgres port stated verbatim in the prompt, so
+        # recording it in any phrasing ("Порт: 5433", "на порту 5433",
+        # "PostgreSQL:5433") counts as remembering the fact. Don't over-fit to a
+        # single colon-delimited key:value form.
+        (r"5433", "port 5433"),
         (r"(?iu)Redis", "Redis"),
     ]
     for pattern, label in checks:
@@ -2030,9 +2043,19 @@ def _verify_task_247(ws: Path) -> VerifyResult:
         return VerifyResult(False, "Dockerfile doesn't use uv")
     if "8080" not in text:
         return VerifyResult(False, "Dockerfile doesn't expose/use port 8080")
-    if re.search(r"\bpip\s+install\b", text):
-        return VerifyResult(False, "Dockerfile uses pip install (user prefers uv)")
-    if re.search(r"\bpoetry\b", text):
+    # The rule is "don't USE pip/poetry in build steps", so explanatory
+    # comments ("# без pip и без poetry") must not trip it. Strip full-line
+    # Dockerfile comments before the bans.
+    code = "\n".join(
+        "" if re.match(r"\s*#", line) else line for line in text.splitlines()
+    )
+    # `uv pip install` is uv's own pip-compatible interface — it IS using uv,
+    # so neutralize "uv pip" before the bare-pip ban. A standalone
+    # `RUN pip install ...` still fails.
+    code_no_uv_pip = re.sub(r"(?i)\buv\s+pip\b", "uv", code)
+    if re.search(r"\bpip\s+install\b", code_no_uv_pip):
+        return VerifyResult(False, "Dockerfile uses bare pip install (user prefers uv)")
+    if re.search(r"\bpoetry\b", code):
         return VerifyResult(False, "Dockerfile uses poetry (user dislikes it)")
     if not re.search(r"(?i)^FROM\s+python:3\.12-slim", text, re.MULTILINE):
         return VerifyResult(False, "Dockerfile FROM line doesn't use the preferred base")
