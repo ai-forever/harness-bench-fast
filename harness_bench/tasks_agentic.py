@@ -1048,8 +1048,9 @@ TASK_275 = Task(
         "Пользователь хочет перейти с pro на basic. По subscription.json и"
         " policy.md создай subscription_action.json с action, account_id,"
         " new_plan, effective_date, refund_now. Значение action —"
-        " schedule_downgrade. Downgrade вступает в силу"
-        " в следующий billing_anchor и не дает мгновенный refund."
+        " schedule_downgrade. Downgrade вступает в силу в дату billing_anchor"
+        " из subscription.json (effective_date равен этому полю) и не дает"
+        " мгновенный refund."
     ),
     setup_files={
         "subscription.json": json.dumps(
@@ -1057,7 +1058,10 @@ TASK_275 = Task(
             indent=2,
         )
         + "\n",
-        "policy.md": "- Downgrades take effect on the next billing_anchor. Immediate refund is 0.\n",
+        "policy.md": (
+            "- Downgrades take effect on the billing_anchor date from "
+            "subscription.json. Immediate refund is 0.\n"
+        ),
     },
     gold_files={
         "subscription_action.json": json.dumps(_SUBSCRIPTION_ACTION_275, indent=2) + "\n"
