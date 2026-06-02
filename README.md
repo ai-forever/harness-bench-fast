@@ -1,6 +1,6 @@
 # harness-bench
 
-A self-contained **231-task agent benchmark** (`task-set v0.3.0`) for evaluating LLM-backed
+A self-contained **298-task agent benchmark** (`task-set v0.7.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -37,7 +37,7 @@ uv venv && uv pip install -e ".[gigachat,openrouter]"
 # to the public profile.
 uv pip install -e ".[gigachat-profile]"
 
-# List all 231 tasks
+# List all 298 tasks
 uv run python -m harness_bench list
 
 # Show the benchmark task-set version and revision history
@@ -91,7 +91,7 @@ uv run python -m harness_bench apply-gold \
 
 ## What's inside
 
-### Tasks (231 total, task-set v0.3.0)
+### Tasks (298 total, task-set v0.7.0)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -101,7 +101,8 @@ uv run python -m harness_bench apply-gold \
 | `tasks_hard.py` | 101–150 | CSV / XLSX / SQLite aggregates, JSONL, Python impl + pytest, multi-file `grep`, Apache log parsing |
 | `tasks_extreme.py` | 151–205 | composite pipelines, archives, project-wide refactors, algorithms with pytest, statistics, XML / markdown, three-way joins |
 | `tasks_diagnostic.py` | 206–221 | paid-revenue reconciliation, inventory anomalies, pricing-API migration, latency reconstruction, tar+hash manifests, interval merge, config precedence, markdown link audit, data-quality reports, TODO/FIXME triage, category rollups, email extraction, runtime config, SQL leaderboards, import migrations, log-level summaries |
-| `tasks_memory.py` | 222–231 | memory discipline: read / write / forget / refuse facts in `MEMORY.md` along with the auxiliary deliverable (LICENSE, `requirements-dev.txt`, `bio.txt`, `profile.json`, …). Exercises agent memory rather than file I/O. |
+| `tasks_memory.py` | 222–253 | memory discipline: read / write / forget / refuse facts in `MEMORY.md` along with the auxiliary deliverable (LICENSE, `requirements-dev.txt`, `bio.txt`, `profile.json`, …). Exercises agent memory rather than file I/O. |
+| `tasks_agentic.py` | 254–298 | benchmark-inspired agentic wave adapted from Terminal-Bench (logs, process tables, Makefile plans, checksums, permission audits), tau2-bench (policy-bound action decisions across airline / retail / banking / clinic / etc.), and SWE-bench (pytest bug-fix tasks). |
 
 Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
@@ -119,6 +120,10 @@ changes do not need a task-set bump.
 | `0.1.0` | 2026-05-13 | 1–200 | 200 | Initial extracted file/code/data benchmark |
 | `0.2.0` | 2026-05-19 | 201–221 | 221 | Advanced composites and diagnostic hard tasks |
 | `0.3.0` | 2026-05-21 | 222–231 | 231 | Memory-discipline tasks using `AGENTS.md` and `MEMORY.md` |
+| `0.4.0` | 2026-06-02 | 232–253 | 253 | Extended memory suite: knowledge update, contradiction resolution, temporal reasoning, abstention, preferences, multi-hop/multi-session |
+| `0.5.0` | 2026-06-02 | 254–262 | 262 | Agentic wave adapted from Terminal-Bench, tau2-bench, and SWE-bench patterns |
+| `0.6.0` | 2026-06-02 | 263–283 | 283 | Agentic wave expanded to 10 Terminal-Bench / 10 tau2 / 10 SWE-bench tasks |
+| `0.7.0` | 2026-06-02 | 284–298 | 298 | Agentic wave expanded to 15 Terminal-Bench / 15 tau2 / 15 SWE-bench tasks |
 
 ### Infrastructure
 
