@@ -63,6 +63,17 @@ uv run python -m harness_bench run-cli \
     --cli-command 'free-code -p --model haiku --dangerously-skip-permissions' \
     --concurrency 5
 
+# Drive `opencode` against any OpenAI-compatible deployment (example:
+# Qwen3.6-27B-FP8 served by vLLM). Point OPENCODE_CONFIG at a config
+# that registers a custom openai-compatible provider, sets the thinking
+# sampling (temp=0.6 top_p=0.95 top_k=20) and DISABLES formatter/LSP so
+# edits stay byte-exact for the verifiers (otherwise opencode auto-runs
+# a formatter and rewrites quotes/whitespace, failing exact checks):
+OPENCODE_CONFIG=/path/to/opencode-vllm.json \
+uv run python -m harness_bench run-cli \
+    --cli-command 'opencode run -m vllm/qwen3.6-27b' \
+    --timeout 900 --concurrency 5
+
 # Verify the gold solutions without calling any model. Useful when
 # adding a new task — confirms the verifier accepts a hand-written
 # "perfect" solution.
@@ -179,24 +190,25 @@ tracked in this repository.
 | # | Date | Runner | Model | Harness adapt | Result | % |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 2026-05-21 | `free-code` 2.1.119 | **Claude Opus 4.7** | yes (built-in + AGENTS.md inject) | **231 / 231** | **100 %** |
-| 2 | 2026-05-22 | `free-code` 2.1.119 | **Claude Haiku 4.5** | yes (built-in + AGENTS.md inject) | **222 / 231** | **96.1 %** |
-| 3 | 2026-05-24 | `ouroboros` | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (Ouroboros CLI adapter) | **222 / 231** | **96.1 %** |
-| 4 | 2026-05-24 | `ouroboros` | **Claude Haiku 4.5** (via OpenRouter, native tool calls) | yes (Ouroboros CLI adapter) | **215 / 231** | **93.1 %** |
-| 5 | 2026-05-24 | `deepagents` | **Claude Haiku 4.5** (via OpenRouter, `max_tokens=4096`) | no | **209 / 231** | **90.5 %** |
-| 6 | 2026-05-22 | `deepagents` | MiniMax-M2 (via OpenRouter) | no | 209 / 231 | 90.5 % |
-| 7 | 2026-05-22 | `deepagents` | DeepSeek V3.2-exp (via OpenRouter) | no | 208 / 231 | 90.0 % |
-| 8 | 2026-05-22 | `deepagents` | GLM-4.6 (via OpenRouter) | no | 206 / 231 | 89.2 % |
-| 9 | 2026-05-22 | `deepagents` | **GigaChat-3-Ultra** (PROM, deepagents 0.6.3 + langgraph 1.2.1) | **yes (v9 + memory wiring)** | **195 / 231** | **84.4 %** |
-| 10 | 2026-05-23 | `deepagents` | **GigaChat-3-Ultra** (PROM, deepagents 0.6.3) | **yes (v10 = v9 + `AgentsMdInjectMiddleware`)** | **194 / 231** | **84.0 %** |
-| 11 | 2026-05-24 | `pi-mono` 0.75.3 | GigaChat-3-Ultra (PROM, `@gigachain/pi-gigachat`) | yes (pi tools + AGENTS.md discovery) | 188 / 231 | 81.4 % |
-| 12 | 2026-05-22 | `deepagents` | DeepSeek V4 Flash (284B-A13B MoE) | no | 186 / 231 | 80.5 % |
-| 13 | 2026-05-25 | `OpenHands SDK` 1.22.1 | GigaChat-3-Ultra (PROM via `gpt2giga`) | yes (SDK CLI wrapper + AGENTS.md/MEMORY.md prompt wiring) | 183 / 231 | 79.2 % |
-| 14 | 2026-05-22 | `deepagents` | OpenAI gpt-oss-120b (120B dense) | no | 165 / 231 | 71.4 % |
-| 15 | 2026-05-24 | `deepagents` | GigaChat-3-Ultra (PROM) | no (baseline, no profile, `run-pure`) | 164 / 231 | 71.0 % |
-| 16 | 2026-05-22 | `deepagents` | Qwen3-235B-A22B-Instruct-2507 | no | 162 / 231 | 70.1 % |
-| 17 | 2026-05-25 | `gigacode cli` | unknown | unknown | 151 / 231 | 65.4 % |
-| 18 | 2026-05-23 | `ouroboros` | GigaChat-3-Ultra (PROM, native function-calling mode) | no | 136 / 231 | 58.9 % |
-| 19 | 2026-05-22 | `deepagents` | GLM-4-32B (32B dense) | no | 76 / 231 | 32.9 % |
+| 2 | 2026-06-02 | `opencode` 1.3.7 | **Qwen3.6-27B-FP8** (vLLM, native tool calls) | yes (custom openai-compatible provider, thinking sampling, formatter/LSP off) | **224 / 231** | **97.0 %** |
+| 3 | 2026-05-22 | `free-code` 2.1.119 | **Claude Haiku 4.5** | yes (built-in + AGENTS.md inject) | **222 / 231** | **96.1 %** |
+| 4 | 2026-05-24 | `ouroboros` | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (Ouroboros CLI adapter) | **222 / 231** | **96.1 %** |
+| 5 | 2026-05-24 | `ouroboros` | **Claude Haiku 4.5** (via OpenRouter, native tool calls) | yes (Ouroboros CLI adapter) | **215 / 231** | **93.1 %** |
+| 6 | 2026-05-24 | `deepagents` | **Claude Haiku 4.5** (via OpenRouter, `max_tokens=4096`) | no | **209 / 231** | **90.5 %** |
+| 7 | 2026-05-22 | `deepagents` | MiniMax-M2 (via OpenRouter) | no | 209 / 231 | 90.5 % |
+| 8 | 2026-05-22 | `deepagents` | DeepSeek V3.2-exp (via OpenRouter) | no | 208 / 231 | 90.0 % |
+| 9 | 2026-05-22 | `deepagents` | GLM-4.6 (via OpenRouter) | no | 206 / 231 | 89.2 % |
+| 10 | 2026-05-22 | `deepagents` | **GigaChat-3-Ultra** (PROM, deepagents 0.6.3 + langgraph 1.2.1) | **yes (v9 + memory wiring)** | **195 / 231** | **84.4 %** |
+| 11 | 2026-05-23 | `deepagents` | **GigaChat-3-Ultra** (PROM, deepagents 0.6.3) | **yes (v10 = v9 + `AgentsMdInjectMiddleware`)** | **194 / 231** | **84.0 %** |
+| 12 | 2026-05-24 | `pi-mono` 0.75.3 | GigaChat-3-Ultra (PROM, `@gigachain/pi-gigachat`) | yes (pi tools + AGENTS.md discovery) | 188 / 231 | 81.4 % |
+| 13 | 2026-05-22 | `deepagents` | DeepSeek V4 Flash (284B-A13B MoE) | no | 186 / 231 | 80.5 % |
+| 14 | 2026-05-25 | `OpenHands SDK` 1.22.1 | GigaChat-3-Ultra (PROM via `gpt2giga`) | yes (SDK CLI wrapper + AGENTS.md/MEMORY.md prompt wiring) | 183 / 231 | 79.2 % |
+| 15 | 2026-05-22 | `deepagents` | OpenAI gpt-oss-120b (120B dense) | no | 165 / 231 | 71.4 % |
+| 16 | 2026-05-24 | `deepagents` | GigaChat-3-Ultra (PROM) | no (baseline, no profile, `run-pure`) | 164 / 231 | 71.0 % |
+| 17 | 2026-05-22 | `deepagents` | Qwen3-235B-A22B-Instruct-2507 | no | 162 / 231 | 70.1 % |
+| 18 | 2026-05-25 | `gigacode cli` | unknown | unknown | 151 / 231 | 65.4 % |
+| 19 | 2026-05-23 | `ouroboros` | GigaChat-3-Ultra (PROM, native function-calling mode) | no | 136 / 231 | 58.9 % |
+| 20 | 2026-05-22 | `deepagents` | GLM-4-32B (32B dense) | no | 76 / 231 | 32.9 % |
 
 The full /200 and /221 task-set history (older runs done before the
 bench was extended), plus superseded /231 rows, lives in
@@ -210,6 +222,13 @@ single model across time; superseded /231 rows are kept for traceability.
 - **Closed-source ceiling**: Claude Opus 4.7 and Haiku 4.5 saturate the
   bench (100 % and 96 %). Any number above ~95 % is now bench-limited
   rather than model-limited.
+- **opencode + Qwen3.6-27B-FP8**: run through the generic `run-cli`
+  driver with a custom OpenAI-compatible vLLM provider (thinking
+  sampling `temp=0.6 top_p=0.95 top_k=20`, formatter/LSP disabled so
+  edits stay byte-exact) reaches **224 / 231 (97.0 %)** — second only to
+  the Opus 4.7 ceiling and ahead of every recorded Claude Haiku/Sonnet
+  row. The 7 misses are content-format / missing-output-file tasks plus
+  one memory-note refusal (`task_231_memory_refuse_secrets`).
 - **Ouroboros + Claude via OpenRouter**: the 2026-05-24 Sonnet run ties
   the recorded Claude-Code-style Haiku row at 222/231 and lands only
   9 tasks behind the Opus ceiling. The Haiku run through the same
