@@ -33,6 +33,45 @@ def _json_equals(rel: str, expected: object):
     return _check
 
 
+def _json_equals_fuzzy(rel: str, expected: dict, *, free_text_fields: tuple[str, ...]):
+    """Exact JSON match, except `free_text_fields` only need to be present
+    and a non-empty string.
+
+    Use for human-readable explanation fields (`reason`, `reason_code`) whose
+    exact wording the prompt never dictates: the policy-load-bearing fields
+    (amounts, ids, dates, booleans, enum action) are still matched exactly, so
+    the task stays non-trivial, but a correctly-decided answer is not rejected
+    just because it phrased its justification differently.
+    """
+
+    def _check(ws: Path) -> VerifyResult:
+        try:
+            data = _read_json(ws, rel)
+        except FileNotFoundError:
+            return VerifyResult(False, f"{rel} missing")
+        except json.JSONDecodeError as exc:
+            return VerifyResult(False, f"{rel} invalid JSON: {exc}")
+        if not isinstance(data, dict):
+            return VerifyResult(False, f"{rel} is not a JSON object: {data!r}")
+        if set(data.keys()) != set(expected.keys()):
+            return VerifyResult(False, f"{rel} key mismatch: {sorted(data.keys())!r}")
+        for key, want in expected.items():
+            if key in free_text_fields:
+                got = data.get(key)
+                if not isinstance(got, str) or not got.strip():
+                    return VerifyResult(
+                        False, f"{rel}.{key} must be a non-empty string, got {got!r}"
+                    )
+                continue
+            if data.get(key) != want:
+                return VerifyResult(
+                    False, f"{rel}.{key} = {data.get(key)!r}, expected {want!r}"
+                )
+        return VerifyResult(True, f"{rel} matches expected JSON (free text: {free_text_fields})")
+
+    return _check
+
+
 # ---------------------------------------------------------------------------
 # 254. terminal-style log forensics
 # ---------------------------------------------------------------------------
@@ -189,14 +228,14 @@ _AIRLINE_ACTION_257 = {
 
 
 def _verify_task_257(ws: Path) -> VerifyResult:
-    try:
-        action = _read_json(ws, "agent_action.json")
-    except FileNotFoundError:
-        return VerifyResult(False, "agent_action.json missing")
-    except json.JSONDecodeError as exc:
-        return VerifyResult(False, f"invalid JSON: {exc}")
-    if action != _AIRLINE_ACTION_257:
-        return VerifyResult(False, f"agent_action.json mismatch: {action!r}")
+    # `reason` is free-form prose the prompt never dictates verbatim, so match
+    # the decision fields (action / reservation_id / refund_amount) exactly and
+    # only require `reason` to be a present, non-empty string.
+    result = _json_equals_fuzzy(
+        "agent_action.json", _AIRLINE_ACTION_257, free_text_fields=("reason",)
+    )(ws)
+    if not result.passed:
+        return result
     state = json.loads((ws / "reservation.json").read_text())
     if state != _AIRLINE_STATE_257:
         return VerifyResult(False, "reservation.json must not be modified")
@@ -335,8 +374,9 @@ TASK_259 = Task(
         "Клиент хочет самый дешевый тариф, который покроет текущее суммарное"
         " потребление всех линий без овердрафта. Используй account.json и"
         " plans.csv. Создай telecom_action.json с полями action, account_id,"
-        " new_plan, monthly_delta_usd, requires_consent. Если смена повышает"
-        " цену, requires_consent=true. Не меняй исходные файлы."
+        " new_plan, monthly_delta_usd, requires_consent. Значение action —"
+        " switch_plan. Если смена повышает цену, requires_consent=true."
+        " Не меняй исходные файлы."
     ),
     setup_files={
         "account.json": json.dumps(_TELECOM_STATE_259, indent=2) + "\n",
@@ -645,6 +685,9 @@ TASK_265 = Task(
         " Построй build_order.txt для цели deploy: каждый target должен"
         " появиться после своих зависимостей, по одному target в строке."
         " Команды под target отсутствуют; строки комментариев игнорируй."
+        " Если на каком-то шаге к сборке готовы сразу несколько targets"
+        " (все их зависимости уже идут выше), бери из них лексикографически"
+        " наименьший — чтобы порядок был однозначным."
     ),
     setup_files={
         "Makefile.simple": (
@@ -843,7 +886,9 @@ TASK_270 = Task(
         ),
     },
     gold_files={"bank_action.json": json.dumps(_BANK_ACTION_270, indent=2) + "\n"},
-    verifier=_json_equals("bank_action.json", _BANK_ACTION_270),
+    verifier=_json_equals_fuzzy(
+        "bank_action.json", _BANK_ACTION_270, free_text_fields=("reason_code",)
+    ),
 )
 
 
@@ -861,8 +906,8 @@ TASK_271 = Task(
     prompt=(
         "Гость просит late checkout до 16:00. По reservation.json и"
         " hotel_policy.md создай hotel_action.json с action, reservation_id,"
-        " latest_checkout, fee_usd. Выбери максимально поздний вариант,"
-        " разрешенный политикой."
+        " latest_checkout, fee_usd. Значение action — offer_paid_late_checkout."
+        " Выбери максимально поздний вариант, разрешенный политикой."
     ),
     setup_files={
         "reservation.json": json.dumps(
@@ -896,7 +941,7 @@ TASK_272 = Task(
         "Пациент просит ближайший утренний слот у того же врача. Используй"
         " appointment.json и slots.json. Утренние слоты начинаются до 12:00."
         " Создай clinic_action.json с action, appointment_id, new_slot,"
-        " notify_patient."
+        " notify_patient. Значение action — reschedule, notify_patient — true."
     ),
     setup_files={
         "appointment.json": json.dumps(
@@ -933,7 +978,8 @@ TASK_273 = Task(
     prompt=(
         "По claim.json и policy.md реши, можно ли одобрить claim. Создай"
         " insurance_action.json с action, claim_id, missing_documents,"
-        " can_approve_now. Для кражи дороже 500 USD нужен police_report."
+        " can_approve_now. Значение action — request_documents."
+        " Для кражи дороже 500 USD нужен police_report."
     ),
     setup_files={
         "claim.json": json.dumps(
@@ -962,7 +1008,8 @@ TASK_274 = Task(
     prompt=(
         "Заказ еды доставлен с опозданием. Используй delivery.json и"
         " policy.md. Создай delivery_action.json с action, order_id,"
-        " refund_usd, coupon_usd. Холодные товары компенсируются полностью,"
+        " refund_usd, coupon_usd. Значение action — partial_refund."
+        " Холодные товары компенсируются полностью,"
         " при задержке больше 45 минут добавляется купон 5 USD."
     ),
     setup_files={
@@ -1000,7 +1047,8 @@ TASK_275 = Task(
     prompt=(
         "Пользователь хочет перейти с pro на basic. По subscription.json и"
         " policy.md создай subscription_action.json с action, account_id,"
-        " new_plan, effective_date, refund_now. Downgrade вступает в силу"
+        " new_plan, effective_date, refund_now. Значение action —"
+        " schedule_downgrade. Downgrade вступает в силу"
         " в следующий billing_anchor и не дает мгновенный refund."
     ),
     setup_files={
@@ -1031,7 +1079,8 @@ TASK_276 = Task(
     tags=("tau2", "policy", "json", "hard"),
     prompt=(
         "По baggage_case.json и policy.md создай baggage_action.json с"
-        " action, case_id, compensation_usd, escalate. Для задержки багажа"
+        " action, case_id, compensation_usd, escalate. Значение action —"
+        " compensate_baggage_delay. Для задержки багажа"
         " больше 24 часов компенсация 100 USD; escalate только если больше"
         " 72 часов."
     ),
@@ -1446,7 +1495,7 @@ TASK_284 = Task(
 
 _PATCH_SUMMARY_285 = """\
 files_changed	3
-insertions	8
+insertions	7
 deletions	3
 """
 
@@ -1519,8 +1568,10 @@ TASK_287 = Task(
     tags=("terminal-bench", "markdown", "text", "medium"),
     prompt=(
         "В CHANGELOG.md найди секцию версии 1.2.0 и создай"
-        " release_notes.md, содержащий только подразделы ## Added и ## Fixed"
-        " этой версии вместе с bullet-строками. Не включай текст версии 1.1.0."
+        " release_notes.md, содержащий только подразделы Added и Fixed"
+        " этой версии вместе с bullet-строками. Заголовки подразделов в"
+        " выводе оформи уровнем ## (в исходнике они уровня ###)."
+        " Не включай текст версии 1.1.0."
     ),
     setup_files={
         "CHANGELOG.md": (
@@ -1587,7 +1638,8 @@ TASK_289 = Task(
     prompt=(
         "Клиент просит избежать отключения. По utility_account.json и"
         " policy.md создай utility_action.json с action, account_id,"
-        " installments, down_payment_usd, avoid_disconnect. Если долг меньше"
+        " installments, down_payment_usd, avoid_disconnect. Значение action —"
+        " create_payment_plan. Если долг меньше"
         " 500 и есть 20% down payment, разрешен план на 3 платежа."
     ),
     setup_files={
@@ -1616,7 +1668,8 @@ TASK_290 = Task(
     tags=("tau2", "policy", "json", "hard"),
     prompt=(
         "По rental.json и policy.md создай car_action.json с action,"
-        " rental_id, fee_usd, reason. Если найден pet_hair и pet_addon=false,"
+        " rental_id, fee_usd, reason. Значение action — charge_cleaning_fee."
+        " Если найден pet_hair и pet_addon=false,"
         " нужно начислить cleaning fee 75 USD."
     ),
     setup_files={
@@ -1628,7 +1681,7 @@ TASK_290 = Task(
         "policy.md": "- Pet hair without pet add-on incurs a 75 USD cleaning fee.\n",
     },
     gold_files={"car_action.json": json.dumps(_CAR_ACTION_290, indent=2) + "\n"},
-    verifier=_json_equals("car_action.json", _CAR_ACTION_290),
+    verifier=_json_equals_fuzzy("car_action.json", _CAR_ACTION_290, free_text_fields=("reason",)),
 )
 
 
@@ -1648,6 +1701,7 @@ TASK_291 = Task(
         "Студент просит extension из-за подтвержденной болезни. По"
         " request.json и policy.md создай edu_action.json с action,"
         " student_id, assignment_id, new_due_date, penalty_percent."
+        " Значение action — grant_extension."
         " Подтвержденная болезнь дает 5 дней без штрафа."
     ),
     setup_files={
@@ -1684,7 +1738,8 @@ TASK_292 = Task(
         "Пациент просит refill. По prescription.json и policy.md создай"
         " pharmacy_action.json с action, prescription_id, days_until_eligible,"
         " reason. Controlled medication можно refill не раньше чем за 2 дня"
-        " до окончания supply."
+        " до окончания supply; если рефилл запрошен слишком рано, значение"
+        " action — refuse_refill."
     ),
     setup_files={
         "prescription.json": json.dumps(
@@ -1695,7 +1750,9 @@ TASK_292 = Task(
         "policy.md": "- Controlled refills are eligible when days_supply_left <= 2.\n",
     },
     gold_files={"pharmacy_action.json": json.dumps(_PHARMACY_ACTION_292, indent=2) + "\n"},
-    verifier=_json_equals("pharmacy_action.json", _PHARMACY_ACTION_292),
+    verifier=_json_equals_fuzzy(
+        "pharmacy_action.json", _PHARMACY_ACTION_292, free_text_fields=("reason",)
+    ),
 )
 
 
@@ -1713,7 +1770,8 @@ TASK_293 = Task(
     prompt=(
         "Клиент хочет обменять билет на show-b. По ticket.json,"
         " events.json и policy.md создай event_action.json с action,"
-        " ticket_id, new_event_id, price_delta_usd. Обмен разрешен если"
+        " ticket_id, new_event_id, price_delta_usd. Значение action —"
+        " exchange_ticket. Обмен разрешен если"
         " до события больше 24 часов; price_delta = new_price - old_price."
     ),
     setup_files={
