@@ -5,6 +5,7 @@ import tarfile
 from harness_bench.__main__ import main
 from harness_bench.harbor_export import export_harbor_dataset
 from harness_bench.tasks import get_task
+from harness_bench.versioning import TASK_SET_VERSION
 
 
 def test_apply_gold_and_verify_task_cli_without_docker(tmp_path):
@@ -38,7 +39,7 @@ def test_export_harbor_dataset_materializes_task(tmp_path):
 
     task_toml = (task_dir / "task.toml").read_text()
     assert 'name = "ai-forever/harness-bench-fast__task_06_toggle_debug"' in task_toml
-    assert 'task_set_version = "0.3.0"' in task_toml
+    assert f'task_set_version = "{TASK_SET_VERSION}"' in task_toml
 
     with tarfile.open(task_dir / "environment" / "setup.tar") as archive:
         assert "config.py" in archive.getnames()

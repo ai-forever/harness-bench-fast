@@ -1,7 +1,7 @@
 [project]
 name = "harness-bench-fast"
 version = "0.1.0"
-description = "Self-contained 231-task agent benchmark (file ops, code edits, CSV/SQLite/XLSX pipelines, memory discipline)"
+description = "Self-contained 298-task agent benchmark (file ops, code edits, CSV/SQLite/XLSX pipelines, memory discipline, agentic tasks)"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
@@ -18,7 +18,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "deepagents>=0.6.2",
+    "deepagents>=0.6.7",
     # Several benchmark tasks are verified by running `python -m pytest`.
     "pytest>=9.0.2",
     "python-dotenv>=1.2.2",
@@ -26,6 +26,8 @@ dependencies = [
     "openpyxl>=3.1",
     # Used by YAML-related task fixtures and verifiers.
     "PyYAML>=6.0",
+    # Required on Windows runners for zoneinfo-based timezone gold checks.
+    "tzdata>=2025.2",
 ]
 
 [project.optional-dependencies]

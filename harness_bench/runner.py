@@ -17,6 +17,42 @@ from harness_bench.metrics import PassMetric, compute_pass_metrics
 from harness_bench.tasks import ALL_TASKS, get_task
 
 
+def _is_graph_recursion_error(exc: BaseException) -> bool:
+    """Return True when ``exc`` is LangGraph's recursion-limit failure."""
+    try:
+        from langgraph.errors import GraphRecursionError
+    except ImportError:  # pragma: no cover - langgraph is an indirect runtime dep.
+        return exc.__class__.__name__ == "GraphRecursionError"
+    return isinstance(exc, GraphRecursionError)
+
+
+def _agent_exception_task_run(
+    exc: BaseException,
+    *,
+    task_id: str,
+    elapsed_seconds: float,
+    recursion_limit: int,
+    workspace: Path | None,
+) -> TaskRun:
+    """Convert an agent/runtime exception into a normal task failure."""
+    if _is_graph_recursion_error(exc):
+        return TaskRun(
+            task_id=task_id,
+            passed=False,
+            message=f"graph recursion limit reached after {recursion_limit} steps",
+            elapsed_seconds=elapsed_seconds,
+            workspace=workspace,
+        )
+    return TaskRun(
+        task_id=task_id,
+        passed=False,
+        message="",
+        elapsed_seconds=elapsed_seconds,
+        error=traceback.format_exc(),
+        workspace=workspace,
+    )
+
+
 @dataclass
 class TaskRun:
     """The outcome of running a single task."""
@@ -72,8 +108,12 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     )
     model = GigaChat(
         model=os.getenv("GIGACHAT_MODEL", "GigaChat-3-Ultra"),
-        base_url=os.getenv("GIGACHAT_BASE_URL", "https://gigachat.sberdevices.ru/v1"),
-        verify_ssl_certs=False,
+        # Let gigachat-sdk use its current default base URL unless the caller
+        # explicitly overrides it. Hard-coding the old IFT URL here breaks
+        # CORP/PERS credentials that expect the SDK default endpoint.
+        base_url=os.getenv("GIGACHAT_BASE_URL") or None,
+        verify_ssl_certs=os.getenv("GIGACHAT_VERIFY_SSL_CERTS", "false").lower()
+        not in ("false", "0", "no"),
         profanity_check=False,
         timeout=600,
         # Transient backend errors (403/429/5xx from IFT endpoint under
@@ -130,13 +170,12 @@ def run_task(
         try:
             agent = build_agent(workspace_path, recursion_limit=recursion_limit)
             agent.invoke({"messages": [{"role": "user", "content": task.prompt}]})
-        except Exception:  # noqa: BLE001 — log and surface as failure
-            return TaskRun(
+        except Exception as exc:  # noqa: BLE001 — log and surface as task failure
+            return _agent_exception_task_run(
+                exc,
                 task_id=task.id,
-                passed=False,
-                message="",
                 elapsed_seconds=time.monotonic() - started,
-                error=traceback.format_exc(),
+                recursion_limit=recursion_limit,
                 workspace=workspace_path if keep_workspace else None,
             )
         result = task.verify(workspace_path)
@@ -163,7 +202,7 @@ def run_all(
     """Run a subset (or all) of the benchmark tasks.
 
     When `concurrency == 1` (default) tasks run sequentially and progress is
-    printed in two lines per task (`→ task_id: name` then `[PASS] ...`).
+    printed in two lines per task (`[START] task_id: name` then `[PASS] ...`).
     When `concurrency > 1` tasks run in a `ThreadPoolExecutor` (each task is
     fully isolated in its own `TemporaryDirectory`, so no synchronization is
     required around the workspace); progress is printed as a single line per
@@ -182,7 +221,8 @@ def run_all(
         results: list[TaskRun] = []
         for task in targets:
             for attempt in range(1, attempts + 1):
-                print(f"→ {task.id}: {task.name}{_attempt_suffix(attempt, attempts)}")
+                label = _task_attempt_label_for(task.id, attempt, attempts)
+                print(f"[START] {label}: {task.name}")
                 run = run_task(
                     task,
                     keep_workspace=keep_workspace,
@@ -263,16 +303,14 @@ def _mark_attempt(run: TaskRun, attempt: int, attempts: int) -> TaskRun:
     return replace(run, attempt=attempt, attempts=attempts)
 
 
-def _attempt_suffix(attempt: int, attempts: int) -> str:
+def _task_attempt_label_for(task_id: str, attempt: int, attempts: int) -> str:
     if attempts == 1:
-        return ""
-    return f" (attempt {attempt}/{attempts})"
+        return task_id
+    return f"{task_id} #{attempt}/{attempts}"
 
 
 def _task_attempt_label(run: TaskRun) -> str:
-    if run.attempts == 1:
-        return run.task_id
-    return f"{run.task_id} #{run.attempt}/{run.attempts}"
+    return _task_attempt_label_for(run.task_id, run.attempt, run.attempts)
 
 
 def summarize(
@@ -297,10 +335,19 @@ def summarize(
     if passed < total:
         print()
         print("Failures:")
+        show_tracebacks = os.getenv("HARNESS_BENCH_SHOW_TRACEBACK", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         for r in results:
             if r.passed:
                 continue
             print(f"  - {_task_attempt_label(r)}: {_one_line_detail(r)}")
+            if show_tracebacks and r.error:
+                print("    Traceback:")
+                for line in r.error.rstrip().splitlines():
+                    print(f"      {line}")
 
 
 def _format_metrics_table(metrics: list[PassMetric]) -> list[str]:
@@ -342,6 +389,58 @@ def _format_metric_value(metric: PassMetric | None) -> str:
 def _format_table_row(values: list[str], widths: list[int]) -> str:
     cells = [value.rjust(width) for value, width in zip(values, widths, strict=True)]
     return "  ".join(cells)
+
+
+def results_to_payload(results: list[TaskRun]) -> dict[str, Any]:
+    """Build a JSON-serializable payload describing a benchmark run.
+
+    The payload carries an aggregate (``passed``/``total``/``pass_rate``) plus a
+    per-task breakdown including each task's free-form ``tags`` and numeric id,
+    so downstream tooling can compute per-category metrics without re-importing
+    the task registry.
+    """
+    from harness_bench.versioning import TASK_SET_VERSION, task_number
+
+    total = len(results)
+    passed = sum(1 for r in results if r.passed)
+    tasks_payload: list[dict[str, Any]] = []
+    for r in results:
+        try:
+            tags = list(get_task(r.task_id).tags)
+        except Exception:  # noqa: BLE001 — tags are best-effort metadata
+            tags = []
+        tasks_payload.append(
+            {
+                "task_id": r.task_id,
+                "number": task_number(r.task_id),
+                "passed": r.passed,
+                "message": r.message,
+                "elapsed_seconds": r.elapsed_seconds,
+                "error": r.error,
+                "tags": tags,
+                "attempt": r.attempt,
+                "attempts": r.attempts,
+            }
+        )
+    return {
+        "task_set_version": TASK_SET_VERSION,
+        "total": total,
+        "passed": passed,
+        "pass_rate": (passed / total) if total else 0.0,
+        "tasks": tasks_payload,
+    }
+
+
+def write_results_json(results: list[TaskRun], path: str | Path) -> None:
+    """Serialize a run's results to ``path`` as JSON (parents are created)."""
+    import json
+
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(
+        json.dumps(results_to_payload(results), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
 
 
 # ---------------------------------------------------------------------------

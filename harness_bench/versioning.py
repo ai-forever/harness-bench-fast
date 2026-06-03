@@ -62,6 +62,51 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
         modules=("tasks_memory.py",),
         notes="Added memory-discipline tasks using AGENTS.md and MEMORY.md.",
     ),
+    TaskSetRevision(
+        version="0.4.0",
+        introduced="2026-06-02",
+        total_tasks=253,
+        added_task_numbers=(232, 253),
+        modules=("tasks_memory.py",),
+        notes=(
+            "Extended the memory suite: knowledge update / contradiction "
+            "resolution, temporal reasoning, abstention, preference-following, "
+            "multi-hop and multi-session reasoning, information extraction."
+        ),
+    ),
+    TaskSetRevision(
+        version="0.5.0",
+        introduced="2026-06-02",
+        total_tasks=262,
+        added_task_numbers=(254, 262),
+        modules=("tasks_agentic.py",),
+        notes=(
+            "Added benchmark-inspired agentic tasks adapted from Terminal-Bench, "
+            "tau2-bench, and SWE-bench patterns."
+        ),
+    ),
+    TaskSetRevision(
+        version="0.6.0",
+        introduced="2026-06-02",
+        total_tasks=283,
+        added_task_numbers=(263, 283),
+        modules=("tasks_agentic.py",),
+        notes=(
+            "Expanded the agentic wave to 10 Terminal-Bench-style, "
+            "10 tau2-style, and 10 SWE-bench-style tasks."
+        ),
+    ),
+    TaskSetRevision(
+        version="0.7.0",
+        introduced="2026-06-02",
+        total_tasks=298,
+        added_task_numbers=(284, 298),
+        modules=("tasks_agentic.py",),
+        notes=(
+            "Expanded the agentic wave to 15 Terminal-Bench-style, "
+            "15 tau2-style, and 15 SWE-bench-style tasks."
+        ),
+    ),
 )
 
 CURRENT_TASK_SET_REVISION = TASK_SET_REVISIONS[-1]
