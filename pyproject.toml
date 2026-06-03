@@ -26,6 +26,8 @@ dependencies = [
     "openpyxl>=3.1",
     # Used by YAML-related task fixtures and verifiers.
     "PyYAML>=6.0",
+    # Required on Windows runners for zoneinfo-based timezone gold checks.
+    "tzdata>=2025.2",
 ]
 
 [project.optional-dependencies]

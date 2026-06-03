@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 import threading
 import time
-import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -14,6 +13,7 @@ from typing import Any
 from harness_bench.core import Task
 from harness_bench.runner import (
     TaskRun,
+    _agent_exception_task_run,
     _load_env_from_dotenv,
     _one_line_detail,
     _task_sort_key,
@@ -55,8 +55,12 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     )
     model = ProfilelessGigaChat(
         model=os.getenv("GIGACHAT_MODEL", "GigaChat-3-Ultra"),
-        base_url=os.getenv("GIGACHAT_BASE_URL", "https://gigachat.sberdevices.ru/v1"),
-        verify_ssl_certs=False,
+        # Let gigachat-sdk use its current default base URL unless the caller
+        # explicitly overrides it. Hard-coding the old IFT URL here breaks
+        # CORP/PERS credentials that expect the SDK default endpoint.
+        base_url=os.getenv("GIGACHAT_BASE_URL") or None,
+        verify_ssl_certs=os.getenv("GIGACHAT_VERIFY_SSL_CERTS", "false").lower()
+        not in ("false", "0", "no"),
         profanity_check=False,
         timeout=600,
         max_retries=20,
@@ -88,13 +92,12 @@ def run_task(
         try:
             agent = build_agent(workspace_path, recursion_limit=recursion_limit)
             agent.invoke({"messages": [{"role": "user", "content": task.prompt}]})
-        except Exception:
-            return TaskRun(
+        except Exception as exc:  # noqa: BLE001 — log and surface as task failure
+            return _agent_exception_task_run(
+                exc,
                 task_id=task.id,
-                passed=False,
-                message="",
                 elapsed_seconds=time.monotonic() - started,
-                error=traceback.format_exc(),
+                recursion_limit=recursion_limit,
                 workspace=workspace_path if keep_workspace else None,
             )
         result = task.verify(workspace_path)
@@ -125,7 +128,7 @@ def run_all(
     if concurrency <= 1:
         results: list[TaskRun] = []
         for task in targets:
-            print(f"→ {task.id}: {task.name}")
+            print(f"[START] {task.id}: {task.name}")
             run = run_task(task, keep_workspace=keep_workspace, recursion_limit=recursion_limit)
             results.append(run)
             status = "PASS" if run.passed else "FAIL"

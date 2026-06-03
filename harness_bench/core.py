@@ -87,5 +87,7 @@ class Task:
         """Run the verifier, converting unexpected exceptions to failures."""
         try:
             return self.verifier(workspace)
+        except UnicodeDecodeError as exc:
+            return VerifyResult(False, f"verifier failed to decode text as UTF-8: {exc}")
         except Exception as exc:  # noqa: BLE001 — verifier robustness
             return VerifyResult(False, f"verifier raised: {type(exc).__name__}: {exc}")
