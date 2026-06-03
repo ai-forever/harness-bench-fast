@@ -74,6 +74,17 @@ uv run python -m harness_bench run-cli \
     --cli-command 'opencode run -m vllm/qwen3.6-27b' \
     --timeout 900 --concurrency 5
 
+# Windows/Git Bash + cmd.exe CLIs with non-ASCII prompts/artifacts: force UTF-8
+# in both the outer shell and the Windows console before launching the runner.
+# `cmd.exe //c` is intentional for Git Bash/MSYS; keep `cmd /c` inside
+# `--cli-command` because that string is parsed by Python's subprocess, not MSYS.
+cmd.exe //c "chcp 65001 >nul" && \
+PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LANG=C.UTF-8 LC_ALL=C.UTF-8 \
+uv run python -m harness_bench run-cli \
+    --timeout 600 \
+    --cli-command 'cmd /c gigacode --approval-mode=auto-edit' \
+    --task task_05_greet --task task_35_remove_blank_lines
+
 # Verify the gold solutions without calling any model. Useful when
 # adding a new task — confirms the verifier accepts a hand-written
 # "perfect" solution.

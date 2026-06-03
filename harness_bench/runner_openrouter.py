@@ -11,7 +11,6 @@ from __future__ import annotations
 import os
 import threading
 import time
-import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -20,6 +19,7 @@ from typing import Any
 from harness_bench.core import Task
 from harness_bench.runner import (
     TaskRun,
+    _agent_exception_task_run,
     _load_env_from_dotenv,
     _one_line_detail,
     _task_sort_key,
@@ -103,13 +103,12 @@ def run_task(
                 max_tokens=max_tokens,
             )
             agent.invoke({"messages": [{"role": "user", "content": task.prompt}]})
-        except Exception:  # noqa: BLE001 — surface as failure
-            return TaskRun(
+        except Exception as exc:  # noqa: BLE001 — surface as task failure
+            return _agent_exception_task_run(
+                exc,
                 task_id=task.id,
-                passed=False,
-                message="",
                 elapsed_seconds=time.monotonic() - started,
-                error=traceback.format_exc(),
+                recursion_limit=recursion_limit,
                 workspace=workspace_path if keep_workspace else None,
             )
         result = task.verify(workspace_path)
@@ -142,7 +141,7 @@ def run_all(
     if concurrency <= 1:
         results: list[TaskRun] = []
         for task in targets:
-            print(f"→ {task.id}: {task.name}")
+            print(f"[START] {task.id}: {task.name}")
             run = run_task(
                 task,
                 model_name=model_name,
