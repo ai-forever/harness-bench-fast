@@ -206,15 +206,16 @@ needed when invoking Harbor's own local runner.
 
 ## Results
 
-Unless noted, runs use `--concurrency 5` on the 231-task set
-(`task-set v0.3.0`). The `pi-mono` GigaChat row used `--concurrency 4`;
-the run completed 230/231 tasks and was stopped after
-`task_230_memory_forget_telegram` hung, so that task is counted as a
-failure in the table. The Claude Sonnet 4.6 rows added on 2026-06-01
-(`pi-mono`, `hermes`, and `deepagents` 0.6.7, all via OpenRouter) used
-`--concurrency 8`, except the `deepagents` 216 row which used
-`--concurrency 10`; all completed with no agent exceptions (every miss
-is a verifier failure, not an infra error). The `giga_agent` row
+Unless noted, runs use `--concurrency 5`. The newest Claude Code row uses
+the 298-task set (`task-set v0.7.0`); older rows in this table use the
+231-task set (`task-set v0.3.0`). The `pi-mono` GigaChat row used
+`--concurrency 4`; the run completed 230/231 tasks and was stopped after
+`task_230_memory_forget_telegram` hung, so that task is counted as a failure
+in the table. The Claude Sonnet 4.6 rows added on 2026-06-01 (`pi-mono`,
+`hermes`, and `deepagents` 0.6.7, all via OpenRouter) used `--concurrency 8`,
+except the `deepagents` 216 row which used `--concurrency 10`; all completed
+with no agent exceptions (every miss is a verifier failure, not an infra
+error). The `giga_agent` row
 (2026-06-02) used `--concurrency 10` with a 1200 s/task timeout and
 required `giga-agent[jupyter]` (its `local_jupyter` sandbox); a wrapper
 pins the sandbox `--cwd` to each task workspace and feeds the OpenRouter
@@ -234,32 +235,33 @@ tracked in this repository.
 
 | # | Date | Runner | Model | Harness adapt | Result | % |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 2026-05-21 | `free-code` 2.1.119 | **Claude Opus 4.7** | yes (built-in + AGENTS.md inject) | **231 / 231** | **100 %** |
-| 2 | 2026-06-01 | `pi-mono` 0.75.3 | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (pi tools + AGENTS.md discovery) | **229 / 231** | **99.1 %** |
-| 3 | 2026-06-01 | `cowork mode` (non-public) | **Claude Sonnet 4.6** | yes (non-public agent harness) | **225 / 231** | **97.4 %** |
-| 4 | 2026-06-02 | `opencode` 1.3.7 | **Qwen3.6-27B-FP8** (vLLM, native tool calls) | yes (custom openai-compatible provider, thinking sampling, formatter/LSP off) | **224 / 231** | **97.0 %** |
-| 5 | 2026-05-22 | `free-code` 2.1.119 | **Claude Haiku 4.5** | yes (built-in + AGENTS.md inject) | **222 / 231** | **96.1 %** |
-| 6 | 2026-05-24 | `ouroboros` | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (Ouroboros CLI adapter) | **222 / 231** | **96.1 %** |
-| 7 | 2026-06-02 | `giga_agent` 0.1.9 (CLI) | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (LangGraph agent + local Jupyter sandbox) | **219 / 231** | **94.8 %** |
-| 8 | 2026-06-01 | `deepagents` 0.6.7 | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (built-in Sonnet profile + `execute` cwd-relative override) | **216 / 231** | **93.5 %** |
-| 9 | 2026-05-24 | `ouroboros` | **Claude Haiku 4.5** (via OpenRouter, native tool calls) | yes (Ouroboros CLI adapter) | **215 / 231** | **93.1 %** |
-| 10 | 2026-05-24 | `deepagents` | **Claude Haiku 4.5** (via OpenRouter, `max_tokens=4096`) | no | **209 / 231** | **90.5 %** |
-| 11 | 2026-05-22 | `deepagents` | MiniMax-M2 (via OpenRouter) | no | 209 / 231 | 90.5 % |
-| 12 | 2026-05-22 | `deepagents` | DeepSeek V3.2-exp (via OpenRouter) | no | 208 / 231 | 90.0 % |
-| 13 | 2026-05-22 | `deepagents` | GLM-4.6 (via OpenRouter) | no | 206 / 231 | 89.2 % |
-| 14 | 2026-06-01 | `hermes` 0.12.0 | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (hermes tools + AGENTS.md; HOME pinned to workspace) | **204 / 231** | **88.3 %** |
-| 15 | 2026-05-22 | `deepagents` | **GigaChat-3-Ultra** (PROM, deepagents 0.6.3 + langgraph 1.2.1) | **yes (v9 + memory wiring)** | **195 / 231** | **84.4 %** |
-| 16 | 2026-05-23 | `deepagents` | **GigaChat-3-Ultra** (PROM, deepagents 0.6.3) | **yes (v10 = v9 + `AgentsMdInjectMiddleware`)** | **194 / 231** | **84.0 %** |
-| 17 | 2026-05-24 | `pi-mono` 0.75.3 | GigaChat-3-Ultra (PROM, `@gigachain/pi-gigachat`) | yes (pi tools + AGENTS.md discovery) | 188 / 231 | 81.4 % |
-| 18 | 2026-06-02 | `deepagents` | Qwen3.6-27B-FP8 (vLLM, deepagents defaults) | no | 187 / 231 | 81.0 % |
-| 19 | 2026-05-22 | `deepagents` | DeepSeek V4 Flash (284B-A13B MoE) | no | 186 / 231 | 80.5 % |
-| 20 | 2026-05-25 | `OpenHands SDK` 1.22.1 | GigaChat-3-Ultra (PROM via `gpt2giga`) | yes (SDK CLI wrapper + AGENTS.md/MEMORY.md prompt wiring) | 183 / 231 | 79.2 % |
-| 21 | 2026-05-22 | `deepagents` | OpenAI gpt-oss-120b (120B dense) | no | 165 / 231 | 71.4 % |
-| 22 | 2026-05-24 | `deepagents` | GigaChat-3-Ultra (PROM) | no (baseline, no profile, `run-pure`) | 164 / 231 | 71.0 % |
-| 23 | 2026-05-22 | `deepagents` | Qwen3-235B-A22B-Instruct-2507 | no | 162 / 231 | 70.1 % |
-| 24 | 2026-05-25 | `gigacode cli` | unknown | unknown | 151 / 231 | 65.4 % |
-| 25 | 2026-05-23 | `ouroboros` | GigaChat-3-Ultra (PROM, native function-calling mode) | no | 136 / 231 | 58.9 % |
-| 26 | 2026-05-22 | `deepagents` | GLM-4-32B (32B dense) | no | 76 / 231 | 32.9 % |
+| 1 | 2026-06-03 | `claude` 2.1.160 (Claude Code CLI) | **Claude Opus 4.8** | yes (Claude Code tools + AGENTS.md inject) | **298 / 298** | **100 %** |
+| 2 | 2026-05-21 | `free-code` 2.1.119 | **Claude Opus 4.7** | yes (built-in + AGENTS.md inject) | **231 / 231** | **100 %** |
+| 3 | 2026-06-01 | `pi-mono` 0.75.3 | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (pi tools + AGENTS.md discovery) | **229 / 231** | **99.1 %** |
+| 4 | 2026-06-01 | `cowork mode` (non-public) | **Claude Sonnet 4.6** | yes (non-public agent harness) | **225 / 231** | **97.4 %** |
+| 5 | 2026-06-02 | `opencode` 1.3.7 | **Qwen3.6-27B-FP8** (vLLM, native tool calls) | yes (custom openai-compatible provider, thinking sampling, formatter/LSP off) | **224 / 231** | **97.0 %** |
+| 6 | 2026-05-22 | `free-code` 2.1.119 | **Claude Haiku 4.5** | yes (built-in + AGENTS.md inject) | **222 / 231** | **96.1 %** |
+| 7 | 2026-05-24 | `ouroboros` | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (Ouroboros CLI adapter) | **222 / 231** | **96.1 %** |
+| 8 | 2026-06-02 | `giga_agent` 0.1.9 (CLI) | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (LangGraph agent + local Jupyter sandbox) | **219 / 231** | **94.8 %** |
+| 9 | 2026-06-01 | `deepagents` 0.6.7 | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (built-in Sonnet profile + `execute` cwd-relative override) | **216 / 231** | **93.5 %** |
+| 10 | 2026-05-24 | `ouroboros` | **Claude Haiku 4.5** (via OpenRouter, native tool calls) | yes (Ouroboros CLI adapter) | **215 / 231** | **93.1 %** |
+| 11 | 2026-05-24 | `deepagents` | **Claude Haiku 4.5** (via OpenRouter, `max_tokens=4096`) | no | **209 / 231** | **90.5 %** |
+| 12 | 2026-05-22 | `deepagents` | MiniMax-M2 (via OpenRouter) | no | 209 / 231 | 90.5 % |
+| 13 | 2026-05-22 | `deepagents` | DeepSeek V3.2-exp (via OpenRouter) | no | 208 / 231 | 90.0 % |
+| 14 | 2026-05-22 | `deepagents` | GLM-4.6 (via OpenRouter) | no | 206 / 231 | 89.2 % |
+| 15 | 2026-06-01 | `hermes` 0.12.0 | **Claude Sonnet 4.6** (via OpenRouter, native tool calls) | yes (hermes tools + AGENTS.md; HOME pinned to workspace) | **204 / 231** | **88.3 %** |
+| 16 | 2026-05-22 | `deepagents` | **GigaChat-3-Ultra** (PROM, deepagents 0.6.3 + langgraph 1.2.1) | **yes (v9 + memory wiring)** | **195 / 231** | **84.4 %** |
+| 17 | 2026-05-23 | `deepagents` | **GigaChat-3-Ultra** (PROM, deepagents 0.6.3) | **yes (v10 = v9 + `AgentsMdInjectMiddleware`)** | **194 / 231** | **84.0 %** |
+| 18 | 2026-05-24 | `pi-mono` 0.75.3 | GigaChat-3-Ultra (PROM, `@gigachain/pi-gigachat`) | yes (pi tools + AGENTS.md discovery) | 188 / 231 | 81.4 % |
+| 19 | 2026-06-02 | `deepagents` | Qwen3.6-27B-FP8 (vLLM, deepagents defaults) | no | 187 / 231 | 81.0 % |
+| 20 | 2026-05-22 | `deepagents` | DeepSeek V4 Flash (284B-A13B MoE) | no | 186 / 231 | 80.5 % |
+| 21 | 2026-05-25 | `OpenHands SDK` 1.22.1 | GigaChat-3-Ultra (PROM via `gpt2giga`) | yes (SDK CLI wrapper + AGENTS.md/MEMORY.md prompt wiring) | 183 / 231 | 79.2 % |
+| 22 | 2026-05-22 | `deepagents` | OpenAI gpt-oss-120b (120B dense) | no | 165 / 231 | 71.4 % |
+| 23 | 2026-05-24 | `deepagents` | GigaChat-3-Ultra (PROM) | no (baseline, no profile, `run-pure`) | 164 / 231 | 71.0 % |
+| 24 | 2026-05-22 | `deepagents` | Qwen3-235B-A22B-Instruct-2507 | no | 162 / 231 | 70.1 % |
+| 25 | 2026-05-25 | `gigacode cli` | unknown | unknown | 151 / 231 | 65.4 % |
+| 26 | 2026-05-23 | `ouroboros` | GigaChat-3-Ultra (PROM, native function-calling mode) | no | 136 / 231 | 58.9 % |
+| 27 | 2026-05-22 | `deepagents` | GLM-4-32B (32B dense) | no | 76 / 231 | 32.9 % |
 
 The full /200 and /221 task-set history (older runs done before the
 bench was extended), plus superseded /231 rows, lives in
@@ -270,9 +272,10 @@ single model across time; superseded /231 rows are kept for traceability.
 
 ### What the table shows
 
-- **Closed-source ceiling**: Claude Opus 4.7 and Haiku 4.5 saturate the
-  bench (100 % and 96 %). Any number above ~95 % is now bench-limited
-  rather than model-limited.
+- **Closed-source ceiling**: Claude Opus 4.8 through Claude Code now
+  saturates the 298-task set, and the older Claude Opus 4.7 run saturated
+  the 231-task set. Any number above ~95 % is now bench-limited rather than
+  model-limited.
 - **opencode + Qwen3.6-27B-FP8**: run through the generic `run-cli`
   driver with a custom OpenAI-compatible vLLM provider (thinking
   sampling `temp=0.6 top_p=0.95 top_k=20`, formatter/LSP disabled so

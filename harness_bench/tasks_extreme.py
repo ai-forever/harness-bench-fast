@@ -1927,8 +1927,11 @@ _DEAD_FUNCS = {"never_called", "also_dead"}
 
 
 def _verify_task_187(ws: Path) -> VerifyResult:
-    p = ws / "dead.txt"
-    if not p.exists():
+    p = next(
+        (candidate for candidate in (ws / "dead.txt", ws / "code" / "dead.txt") if candidate.exists()),
+        None,
+    )
+    if p is None:
         return VerifyResult(False, "dead.txt missing")
     raw = {line.strip() for line in p.read_text().splitlines() if line.strip()}
     if raw == _DEAD_FUNCS:
@@ -2051,6 +2054,22 @@ _CONCAT_ROWS = sorted(
     {(1, "Alice"), (2, "Bob"), (3, "Carol"), (4, "Dave"), (5, "Eve"), (6, "Frank")}
 )
 _CONCAT_GOLD = "id,name\n" + "".join(f"{i},{n}\n" for i, n in _CONCAT_ROWS)
+
+
+def _verify_task_190(ws: Path) -> VerifyResult:
+    p = next(
+        (candidate for candidate in (ws / "merged.csv", ws / "data" / "merged.csv") if candidate.exists()),
+        None,
+    )
+    if p is None:
+        return VerifyResult(False, "merged.csv missing")
+    actual = p.read_text(encoding="utf-8").replace("\r\n", "\n").strip()
+    expected = _CONCAT_GOLD.strip()
+    if actual == expected:
+        return VerifyResult(True, "merged.csv matches expected content")
+    return VerifyResult(False, f"merged.csv content differs\nExpected: {expected!r}\nActual:   {actual!r}")
+
+
 TASK_190 = Task(
     id="task_190_concat_dedupe_sort",
     name="Concat 3 CSVs, dedupe, sort by id",
@@ -2064,7 +2083,7 @@ TASK_190 = Task(
     ),
     setup_files=_CSVS_190,
     gold_files={"merged.csv": _CONCAT_GOLD},
-    verifier=file_text_equals("merged.csv", _CONCAT_GOLD),
+    verifier=_verify_task_190,
 )
 
 

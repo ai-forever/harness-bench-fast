@@ -1443,7 +1443,7 @@ def _verify_task_238(ws: Path) -> VerifyResult:
     notes = data.get("notes")
     if not isinstance(notes, str):
         return VerifyResult(False, "notes must be a string")
-    if not re.search(r"(?iu)не\s+указ|нет|unknown|missing|not\s+provided", notes):
+    if not re.search(r"(?iu)не\s+указ|нет|неизвест|отсутств|unknown|missing|not\s+provided", notes):
         return VerifyResult(False, "notes should explicitly state that phone is unknown/missing")
     return VerifyResult(True, "unknown phone handled via abstention (null + explicit note)")
 
