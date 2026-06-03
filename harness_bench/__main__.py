@@ -102,15 +102,27 @@ def _maybe_write_json(args: argparse.Namespace, results: list) -> None:
         print(f"\nWrote results JSON to {json_output}")
 
 
-def _summarize_run(args: argparse.Namespace, results: list) -> None:
+def _metric_ks_for_args(
+    args: argparse.Namespace,
+) -> tuple[tuple[int, ...], tuple[int, ...]] | None:
     if args.attempts == 1 and not args.pass_at and not args.pass_hat:
+        return None
+    return _resolve_metric_ks(args)
+
+
+def _summarize_run(
+    results: list,
+    metric_ks: tuple[tuple[int, ...], tuple[int, ...]] | None,
+) -> None:
+    if metric_ks is None:
         summarize(results)
         return
-    pass_at_ks, pass_hat_ks = _resolve_metric_ks(args)
+    pass_at_ks, pass_hat_ks = metric_ks
     summarize(results, pass_at_ks=pass_at_ks, pass_hat_ks=pass_hat_ks)
 
 
 def _cmd_run(args: argparse.Namespace) -> int:
+    metric_ks = _metric_ks_for_args(args)
     results = run_all(
         task_ids=args.task,
         keep_workspace=args.keep,
@@ -118,12 +130,13 @@ def _cmd_run(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
         attempts=args.attempts,
     )
-    _summarize_run(args, results)
+    _summarize_run(results, metric_ks)
     _maybe_write_json(args, results)
     return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
 
 def _cmd_run_openrouter(args: argparse.Namespace) -> int:
+    metric_ks = _metric_ks_for_args(args)
     results = run_all_openrouter(
         task_ids=args.task,
         model_name=args.model,
@@ -134,12 +147,13 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         harness_profile=args.harness_profile,
         attempts=args.attempts,
     )
-    _summarize_run(args, results)
+    _summarize_run(results, metric_ks)
     _maybe_write_json(args, results)
     return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
 
 def _cmd_run_pure(args: argparse.Namespace) -> int:
+    metric_ks = _metric_ks_for_args(args)
     results = run_all_pure(
         task_ids=args.task,
         keep_workspace=args.keep,
@@ -147,12 +161,13 @@ def _cmd_run_pure(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
         attempts=args.attempts,
     )
-    _summarize_run(args, results)
+    _summarize_run(results, metric_ks)
     _maybe_write_json(args, results)
     return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
 
 def _cmd_run_cli(args: argparse.Namespace) -> int:
+    metric_ks = _metric_ks_for_args(args)
     results = run_all_cli(
         task_ids=args.task,
         cli_command=args.cli_command,
@@ -161,7 +176,7 @@ def _cmd_run_cli(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
         attempts=args.attempts,
     )
-    _summarize_run(args, results)
+    _summarize_run(results, metric_ks)
     _maybe_write_json(args, results)
     return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
