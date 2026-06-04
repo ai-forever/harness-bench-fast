@@ -6,12 +6,14 @@ import os
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
 
 from harness_bench.core import Task
 from harness_bench.runner import (
+    AgentRunStatsCollector,
     TaskRun,
     _agent_exception_task_run,
     _load_env_from_dotenv,
@@ -19,7 +21,10 @@ from harness_bench.runner import (
     _one_line_detail,
     _task_attempt_label,
     _task_attempt_label_for,
+    _task_run_with_agent_stats,
     _task_sort_key,
+    _write_partial_results_json,
+    invoke_agent_with_stats,
 )
 from harness_bench.tasks import ALL_TASKS, get_task
 
@@ -92,23 +97,30 @@ def run_task(
 
         task.setup(workspace_path)
         started = time.monotonic()
+        stats = AgentRunStatsCollector()
         try:
             agent = build_agent(workspace_path, recursion_limit=recursion_limit)
-            agent.invoke({"messages": [{"role": "user", "content": task.prompt}]})
+            invocation_result = invoke_agent_with_stats(
+                agent,
+                {"messages": [{"role": "user", "content": task.prompt}]},
+                stats,
+            )
         except Exception as exc:  # noqa: BLE001 — log and surface as task failure
-            return _agent_exception_task_run(
+            run = _agent_exception_task_run(
                 exc,
                 task_id=task.id,
                 elapsed_seconds=time.monotonic() - started,
                 recursion_limit=recursion_limit,
                 workspace=workspace_path if keep_workspace else None,
             )
+            return replace(run, **stats.merged())
         result = task.verify(workspace_path)
-        return TaskRun(
+        return _task_run_with_agent_stats(
             task_id=task.id,
             passed=result.passed,
             message=result.message,
             elapsed_seconds=time.monotonic() - started,
+            stats=stats.merged(invocation_result),
             workspace=workspace_path if keep_workspace else None,
         )
     finally:
@@ -123,6 +135,7 @@ def run_all(
     recursion_limit: int = 80,
     concurrency: int = 1,
     attempts: int = 1,
+    json_output: str | Path | None = None,
 ) -> list[TaskRun]:
     _load_env_from_dotenv()
     _ensure_credentials()
@@ -145,6 +158,7 @@ def run_all(
                 )
                 run = _mark_attempt(run, attempt, attempts)
                 results.append(run)
+                _write_partial_results_json(results, json_output)
                 status = "PASS" if run.passed else "FAIL"
                 print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
                 if keep_workspace and run.workspace:
@@ -170,6 +184,7 @@ def run_all(
             _task, attempt = future_to_task[future]
             run = _mark_attempt(future.result(), attempt, attempts)
             results.append(run)
+            _write_partial_results_json(results, json_output)
             with print_lock:
                 completed += 1
                 status = "PASS" if run.passed else "FAIL"
@@ -181,4 +196,5 @@ def run_all(
                 if keep_workspace and run.workspace:
                     print(f"           workspace: {run.workspace}")
     results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
+    _write_partial_results_json(results, json_output)
     return results

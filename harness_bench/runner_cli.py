@@ -35,12 +35,14 @@ from tempfile import TemporaryDirectory, mkdtemp
 from harness_bench.core import Task
 from harness_bench.runner import (
     TaskRun,
+    _add_usage_counts,
     _load_env_from_dotenv,
     _mark_attempt,
     _one_line_detail,
     _task_attempt_label,
     _task_attempt_label_for,
     _task_sort_key,
+    _write_partial_results_json,
     summarize,
 )
 from harness_bench.tasks import ALL_TASKS, get_task
@@ -128,6 +130,9 @@ def _codex_json_event_stats(stdout: str) -> dict[str, int] | None:
     steps = 0
     tool_calls = 0
     shell_commands = 0
+    input_tokens = 0
+    output_tokens = 0
+    total_tokens = 0
     saw_codex_event = False
 
     for line in stdout.splitlines():
@@ -142,6 +147,13 @@ def _codex_json_event_stats(stdout: str) -> dict[str, int] | None:
             continue
         saw_codex_event = True
         events += 1
+        if payload["type"] == "turn.completed":
+            usage_stats: dict[str, int] = {}
+            _add_usage_counts(usage_stats, payload.get("usage"))
+            input_tokens += usage_stats.get("agent_input_tokens", 0)
+            output_tokens += usage_stats.get("agent_output_tokens", 0)
+            total_tokens += usage_stats.get("agent_total_tokens", 0)
+            continue
         if payload["type"] != "item.completed":
             continue
         item = payload.get("item")
@@ -158,12 +170,19 @@ def _codex_json_event_stats(stdout: str) -> dict[str, int] | None:
 
     if not saw_codex_event:
         return None
-    return {
+    result = {
         "agent_steps": steps,
         "agent_tool_calls": tool_calls,
         "agent_shell_commands": shell_commands,
         "agent_events": events,
     }
+    if input_tokens:
+        result["agent_input_tokens"] = input_tokens
+    if output_tokens:
+        result["agent_output_tokens"] = output_tokens
+    if total_tokens:
+        result["agent_total_tokens"] = total_tokens
+    return result
 
 
 def _task_run_with_cli_stats(
@@ -651,6 +670,7 @@ def run_all_cli(
     keep_workspace: bool = False,
     concurrency: int = 1,
     attempts: int = 1,
+    json_output: str | Path | None = None,
 ) -> list[TaskRun]:
     """Run a subset (or all) of the benchmark via the CLI agent."""
     _load_env_from_dotenv()
@@ -673,6 +693,7 @@ def run_all_cli(
                 )
                 run = _mark_attempt(run, attempt, attempts)
                 results.append(run)
+                _write_partial_results_json(results, json_output)
                 status = "PASS" if run.passed else "FAIL"
                 print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
                 if keep_workspace and run.workspace:
@@ -699,6 +720,7 @@ def run_all_cli(
             _task, attempt = future_to_task[future]
             run = _mark_attempt(future.result(), attempt, attempts)
             results.append(run)
+            _write_partial_results_json(results, json_output)
             with print_lock:
                 completed += 1
                 status = "PASS" if run.passed else "FAIL"
@@ -710,6 +732,7 @@ def run_all_cli(
                 if keep_workspace and run.workspace:
                     print(f"           workspace: {run.workspace}")
     results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
+    _write_partial_results_json(results, json_output)
     return results
 
 

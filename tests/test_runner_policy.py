@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
@@ -179,7 +180,10 @@ def test_codex_json_event_stats_count_agent_steps() -> None:
                 '{"type":"item.completed","item":{"type":"command_execution",'
                 '"command":"pytest","exit_code":0}}'
             ),
-            '{"type":"turn.completed","usage":{"input_tokens":1}}',
+            (
+                '{"type":"turn.completed","usage":{"input_tokens":10,'
+                '"output_tokens":5,"total_tokens":15}}'
+            ),
             "plain text footer",
         ]
     )
@@ -189,8 +193,54 @@ def test_codex_json_event_stats_count_agent_steps() -> None:
         "agent_tool_calls": 1,
         "agent_shell_commands": 1,
         "agent_events": 6,
+        "agent_input_tokens": 10,
+        "agent_output_tokens": 5,
+        "agent_total_tokens": 15,
     }
     assert runner_cli._codex_json_event_stats("plain text only") is None
+
+
+def test_deepagents_result_stats_count_steps_and_tokens() -> None:
+    from harness_bench.runner import agent_stats_from_result
+
+    result = {
+        "messages": [
+            {"role": "user", "content": "do it"},
+            {
+                "type": "ai",
+                "content": "",
+                "tool_calls": [{"name": "execute"}, {"name": "write_file"}],
+                "usage_metadata": {
+                    "input_tokens": 12,
+                    "output_tokens": 4,
+                    "total_tokens": 16,
+                },
+            },
+            {"type": "tool", "content": "ok"},
+            {
+                "type": "ai",
+                "content": "done",
+                "response_metadata": {
+                    "token_usage": {
+                        "prompt_tokens": 3,
+                        "completion_tokens": 2,
+                        "total_tokens": 5,
+                    }
+                },
+            },
+        ]
+    }
+
+    assert agent_stats_from_result(result) == {
+        "agent_input_tokens": 15,
+        "agent_output_tokens": 6,
+        "agent_total_tokens": 21,
+        "agent_events": 4,
+        "agent_steps": 3,
+        "agent_tool_calls": 2,
+        "agent_shell_commands": 1,
+        "agent_llm_calls": 2,
+    }
 
 
 def test_results_json_includes_agent_step_metrics() -> None:
@@ -207,6 +257,10 @@ def test_results_json_includes_agent_step_metrics() -> None:
                 agent_tool_calls=1,
                 agent_shell_commands=1,
                 agent_events=6,
+                agent_llm_calls=2,
+                agent_input_tokens=10,
+                agent_output_tokens=5,
+                agent_total_tokens=15,
             )
         ]
     )
@@ -216,6 +270,149 @@ def test_results_json_includes_agent_step_metrics() -> None:
     assert task["agent_tool_calls"] == 1
     assert task["agent_shell_commands"] == 1
     assert task["agent_events"] == 6
+    assert task["agent_llm_calls"] == 2
+    assert task["agent_input_tokens"] == 10
+    assert task["agent_output_tokens"] == 5
+    assert task["agent_total_tokens"] == 15
+
+
+def test_openrouter_password_auth_fallback(monkeypatch) -> None:
+    from harness_bench import runner_openrouter
+
+    class _FakeResponse:
+        def __enter__(self) -> _FakeResponse:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return b'{"access_token":"token-123","expires_in":3600}'
+
+    calls = 0
+
+    def _fake_urlopen(*_args: object, **_kwargs: object) -> _FakeResponse:
+        nonlocal calls
+        calls += 1
+        return _FakeResponse()
+
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.setenv("OPENROUTER_AUTH_URL", "https://auth.example/token")
+    monkeypatch.setenv("OPENROUTER_AUTH_USERNAME", "user")
+    monkeypatch.setenv("OPENROUTER_AUTH_PASSWORD", "pass")
+    monkeypatch.setattr(runner_openrouter.urllib.request, "urlopen", _fake_urlopen)
+    monkeypatch.setattr(runner_openrouter, "_OPENROUTER_AUTH_TOKEN", None)
+
+    assert runner_openrouter._openrouter_api_key() == "token-123"
+    assert runner_openrouter._openrouter_api_key() == "token-123"
+    assert calls == 1
+
+
+def test_openrouter_internal_tagme_shortcut(monkeypatch, tmp_path: Path) -> None:
+    from harness_bench import runner_openrouter
+
+    token_script = tmp_path / "get_token.sh"
+    token_script.write_text(
+        'USER="user@example.com"\nPASS="secret"\n',
+        encoding="utf-8",
+    )
+
+    monkeypatch.delenv("OPENROUTER_BASE_URL", raising=False)
+    monkeypatch.delenv("OPENROUTER_AUTH_URL", raising=False)
+    monkeypatch.delenv("OPENROUTER_AUTH_USERNAME", raising=False)
+    monkeypatch.delenv("OPENROUTER_AUTH_PASSWORD", raising=False)
+    monkeypatch.setenv("OPENROUTER_USE_INTERNAL_TAGME", "1")
+    monkeypatch.setenv("OPENROUTER_INTERNAL_TAGME_TOKEN_SCRIPT", str(token_script))
+
+    runner_openrouter._apply_internal_tagme_defaults()
+
+    assert os.environ["OPENROUTER_BASE_URL"] == "https://tagme.sberdevices.ru/x/ai/llm/v1"
+    assert (
+        os.environ["OPENROUTER_AUTH_URL"]
+        == "https://tagme.sberdevices.ru/auth/realms/tagme-public/protocol/openid-connect/token"
+    )
+    assert os.environ["OPENROUTER_AUTH_USERNAME"] == "user@example.com"
+    assert os.environ["OPENROUTER_AUTH_PASSWORD"] == "secret"
+
+
+def test_openrouter_run_task_retries_transient_model_errors(monkeypatch) -> None:
+    from harness_bench import runner_openrouter
+
+    calls = 0
+
+    class _EventuallyPassingAgent:
+        def invoke(self, _payload: object, **_kwargs: object) -> dict[str, list[dict[str, str]]]:
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise RuntimeError("temporary transport reset")
+            return {"messages": [{"role": "assistant", "content": "done"}]}
+
+    class _PassingTask:
+        id = "task_fake_openrouter_retry"
+        prompt = "write output"
+
+        def setup(self, workspace: Path) -> None:
+            (workspace / "input.txt").write_text("fixture", encoding="utf-8")
+
+        def verify(self, workspace: Path) -> VerifyResult:
+            assert (workspace / "input.txt").read_text(encoding="utf-8") == "fixture"
+            return VerifyResult(True, "ok")
+
+    monkeypatch.setattr(
+        runner_openrouter,
+        "build_agent",
+        lambda *_args, **_kwargs: _EventuallyPassingAgent(),
+    )
+    monkeypatch.setattr(runner_openrouter, "_is_transient_model_error", lambda _exc: True)
+
+    result = runner_openrouter.run_task(cast(Task, _PassingTask()), transient_attempts=5)
+
+    assert result.passed is True
+    assert result.message == "ok"
+    assert calls == 2
+
+
+def test_run_all_writes_incremental_json(monkeypatch, tmp_path: Path) -> None:
+    import json
+
+    from harness_bench import runner
+
+    out = tmp_path / "results.json"
+    fake_tasks = [
+        SimpleNamespace(id="task_01_fake", name="Fake one"),
+        SimpleNamespace(id="task_02_fake", name="Fake two"),
+    ]
+    calls = 0
+
+    def _fake_run_task(task: object, **_kwargs: object) -> TaskRun:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            payload = json.loads(out.read_text(encoding="utf-8"))
+            assert payload["total"] == 1
+            assert payload["tasks"][0]["task_id"] == "task_01_fake"
+        return TaskRun(
+            task_id=task.id,
+            passed=True,
+            message="ok",
+            elapsed_seconds=0.01,
+        )
+
+    monkeypatch.setattr(runner, "_load_env_from_dotenv", lambda: None)
+    monkeypatch.setattr(runner, "_ensure_credentials", lambda: None)
+    monkeypatch.setattr(runner, "get_task", lambda tid: next(t for t in fake_tasks if t.id == tid))
+    monkeypatch.setattr(runner, "run_task", _fake_run_task)
+
+    runner.run_all(
+        task_ids=["task_01_fake", "task_02_fake"],
+        concurrency=1,
+        json_output=out,
+    )
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["total"] == 2
+    assert [task["task_id"] for task in payload["tasks"]] == ["task_01_fake", "task_02_fake"]
 
 
 def test_task_203_accepts_valid_markdown_alignment(tmp_path: Path) -> None:

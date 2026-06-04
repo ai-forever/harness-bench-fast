@@ -53,6 +53,22 @@ uv run python -m harness_bench run --concurrency 5
 uv run python -m harness_bench run-openrouter \
     --model deepseek/deepseek-v4-flash --concurrency 5
 
+# Internal OpenAI-compatible gateways can use password auth instead of a
+# static API key. The runner fetches and refreshes a bearer token without
+# printing it:
+# OPENROUTER_USE_INTERNAL_TAGME=1  # local shortcut for the ignored tagme example
+# OPENROUTER_BASE_URL=https://gateway.example/x/ai/llm/v1
+# OPENROUTER_AUTH_URL=https://gateway.example/auth/realms/.../token
+# OPENROUTER_AUTH_USERNAME=...
+# OPENROUTER_AUTH_PASSWORD=...
+# OPENROUTER_AUTH_CLIENT_ID=api
+# OPENROUTER_AUTH_VERIFY_TLS=false  # only for private gateways that need curl -k
+uv run python -m harness_bench run-openrouter \
+    --model gpt-4.1-nano --concurrency 5
+# run-openrouter retries transient HTTP/timeout/transport model errors up to
+# 5 total attempts per task before counting them as task failures. Override
+# with --transient-attempts if needed.
+
 # Run stock deepagents + GigaChat while bypassing the GigaChat harness
 # profile even if deepagents-gigachat is installed.
 uv run python -m harness_bench run-pure --concurrency 5
@@ -63,9 +79,13 @@ uv run python -m harness_bench run-cli \
     --cli-command 'free-code -p --model haiku --dangerously-skip-permissions' \
     --concurrency 5
 
-# Codex CLI runs auto-enable `codex exec --json` and write per-task
-# agent_steps / agent_tool_calls / agent_shell_commands / agent_events
-# into the JSON results.
+# Runner JSON writes best-effort per-task effort metrics:
+# agent_steps / agent_tool_calls / agent_shell_commands / agent_events,
+# plus agent_llm_calls / agent_input_tokens / agent_output_tokens /
+# agent_total_tokens when the backend exposes usage metadata. Codex CLI runs
+# auto-enable `codex exec --json` so those metrics can be read from JSONL.
+# `--json-output` is checkpointed after each completed task, so completed
+# results survive a later hang or interrupted run.
 uv run python -m harness_bench run-cli \
     --cli-command 'codex exec -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox' \
     --concurrency 5 --json-output results.json

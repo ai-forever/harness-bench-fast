@@ -1,0 +1,40 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+  echo "usage: hermes-tagme MODEL PROMPT" >&2
+  exit 2
+fi
+
+model="$1"
+shift
+prompt="$1"
+
+repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+export HOME="$PWD"
+export OPENAI_BASE_URL="https://tagme.sberdevices.ru/x/ai/llm/v1"
+export OPENAI_API_KEY="$(
+  cd "$repo_root"
+  OPENROUTER_USE_INTERNAL_TAGME=1 uv run python - <<'PY'
+from harness_bench.runner_openrouter import _openrouter_api_key
+
+print(_openrouter_api_key())
+PY
+)"
+
+HERMES_HOME="$(mktemp -d "${TMPDIR:-/tmp}/hermes_state_XXXXXX")"
+export HERMES_HOME
+mkdir -p "$HERMES_HOME"
+cat > "$HERMES_HOME/config.yaml" <<YAML
+model:
+  provider: custom
+  default: "$model"
+  base_url: "$OPENAI_BASE_URL"
+  api_key: "$OPENAI_API_KEY"
+  api_mode: chat_completions
+YAML
+
+hermes --provider custom --model "$model" --yolo -z "$prompt"
+rc=$?
+rm -rf "$HERMES_HOME"
+exit "$rc"

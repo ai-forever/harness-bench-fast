@@ -1,0 +1,17 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+set -a
+source "$repo_root/.env"
+set +a
+
+exec pi \
+  -p \
+  --no-extensions \
+  -e "$repo_root/scripts/pi-gigachat-prom-extension.mjs" \
+  --provider gigachat \
+  --model "${GIGACHAT_MODEL:-GigaChat-3-Ultra}" \
+  --no-session \
+  --offline \
+  "$@"

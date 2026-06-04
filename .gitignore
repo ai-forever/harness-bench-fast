@@ -56,6 +56,7 @@ harbor_dataset*/
 harbor_jobs*/
 jobs/
 pi_mono_gigachat_full_*.log
+openrouter_connect/
 
 # Translations
 *.mo

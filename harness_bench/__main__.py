@@ -129,6 +129,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
         recursion_limit=args.recursion_limit,
         concurrency=args.concurrency,
         attempts=args.attempts,
+        json_output=args.json_output,
     )
     _summarize_run(results, metric_ks)
     _maybe_write_json(args, results)
@@ -146,6 +147,8 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
         harness_profile=args.harness_profile,
         attempts=args.attempts,
+        json_output=args.json_output,
+        transient_attempts=args.transient_attempts,
     )
     _summarize_run(results, metric_ks)
     _maybe_write_json(args, results)
@@ -160,6 +163,7 @@ def _cmd_run_pure(args: argparse.Namespace) -> int:
         recursion_limit=args.recursion_limit,
         concurrency=args.concurrency,
         attempts=args.attempts,
+        json_output=args.json_output,
     )
     _summarize_run(results, metric_ks)
     _maybe_write_json(args, results)
@@ -175,6 +179,7 @@ def _cmd_run_cli(args: argparse.Namespace) -> int:
         keep_workspace=args.keep,
         concurrency=args.concurrency,
         attempts=args.attempts,
+        json_output=args.json_output,
     )
     _summarize_run(results, metric_ks)
     _maybe_write_json(args, results)
@@ -393,6 +398,15 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     p_or.add_argument("--concurrency", type=int, default=1)
+    p_or.add_argument(
+        "--transient-attempts",
+        type=int,
+        default=5,
+        help=(
+            "Total attempts for transient model HTTP/timeout/transport errors "
+            "before counting the task as failed (default: 5)."
+        ),
+    )
     _add_metric_args(p_or)
     p_or.add_argument(
         "--harness-profile",

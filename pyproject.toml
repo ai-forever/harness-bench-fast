@@ -41,7 +41,7 @@ gigachat = [
 # matching local deepagents-gigachat wheel/source described in README.md.
 gigachat-profile = [
     "langchain-gigachat>=0.5.0",
-    "deepagents-gigachat>=0.0.1a3",
+    "deepagents-gigachat>=0.0.2",
 ]
 # `uv pip install harness-bench-fast[openrouter]` for `runner_openrouter.py`
 # against any OpenAI-compatible OpenRouter model.
@@ -86,7 +86,7 @@ dev = [
     "ruff>=0.15.12",
     "langchain-openai>=1.2.1",
     "langchain-gigachat>=0.5.0",
-    "deepagents-gigachat>=0.0.1a3",
+    "deepagents-gigachat>=0.0.2",
 ]
 
 [tool.ruff]

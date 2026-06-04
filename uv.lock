@@ -272,16 +272,16 @@ wheels = [
 
 [[package]]
 name = "deepagents-gigachat"
-version = "0.0.1a3"
+version = "0.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deepagents" },
     { name = "langchain-gigachat" },
     { name = "python-dotenv" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b0/a1/bbba458476e1ed68e11a2a41dbb0b41dae6b43ce452a30e0fdb17eb80651/deepagents_gigachat-0.0.1a3.tar.gz", hash = "sha256:d76fb56b4c8c4f5b2e66f30213e740e8f49eb59694dcbd2e3cef66413b26c9df", size = 9761, upload-time = "2026-05-14T11:19:27.253Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/99/98/5d5c5eafae55f5e9850d406e61ea3e2aa14e6ba01f94ddc75988c520a5e4/deepagents_gigachat-0.0.2.tar.gz", hash = "sha256:3408dfd52756c9b9e47c5dec879c302b0fa74faaf4dc5ed419033d7b050e7d68", size = 16091, upload-time = "2026-05-25T11:44:51.053Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/77/27/57b301d2888a2830d5ea2c9f3d92aa98414f205c3961d082cfdef3105a26/deepagents_gigachat-0.0.1a3-py3-none-any.whl", hash = "sha256:85baebf52bfcc096b18c40506a6aa399d1944e7eb931499ede9edf26cf6e00ee", size = 9625, upload-time = "2026-05-14T11:19:28.525Z" },
+    { url = "https://files.pythonhosted.org/packages/0d/74/8020ab8d28430c066e09ad8697461d40d7e6e15e932d20e4073a3cc84a99/deepagents_gigachat-0.0.2-py3-none-any.whl", hash = "sha256:8c9a02ab742e57e4dd7456d1c0e3448bd4e85078ebb4ec6b66abe23a9485f3e2", size = 16538, upload-time = "2026-05-25T11:44:49.332Z" },
 ]
 
 [[package]]
@@ -418,7 +418,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "deepagents", specifier = ">=0.6.7" },
-    { name = "deepagents-gigachat", marker = "extra == 'gigachat-profile'", specifier = ">=0.0.1a3" },
+    { name = "deepagents-gigachat", marker = "extra == 'gigachat-profile'", specifier = ">=0.0.2" },
     { name = "langchain-gigachat", marker = "extra == 'gigachat'", specifier = ">=0.5.0" },
     { name = "langchain-gigachat", marker = "extra == 'gigachat-profile'", specifier = ">=0.5.0" },
     { name = "langchain-openai", marker = "extra == 'openrouter'", specifier = ">=1.2.1" },
@@ -432,7 +432,7 @@ provides-extras = ["gigachat", "gigachat-profile", "openrouter"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "deepagents-gigachat", specifier = ">=0.0.1a3" },
+    { name = "deepagents-gigachat", specifier = ">=0.0.2" },
     { name = "langchain-gigachat", specifier = ">=0.5.0" },
     { name = "langchain-openai", specifier = ">=1.2.1" },
     { name = "ruff", specifier = ">=0.15.12" },
