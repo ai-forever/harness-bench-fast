@@ -12,10 +12,12 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | --- | --- | ---: | ---: | ---: | ---: |
 | Claude Code CLI | Claude Opus 4.8 | 298/298 | 100.0% | — | — |
 | Codex CLI | GPT-5.5 | 298/298 | 100.0% | — | — |
+| opencode | Qwen3.6-27B-FP8 (vLLM) | 291/298 | 97.7% | — | — |
 | free-code | Claude Haiku 4.5 | 284/298 | 95.3% | — | — |
 | deepagents + Anthropic profile | Claude Haiku 4.5 | 280/298 | 94.0% | 3,016 | 41,405,850 |
 | deepagents + Anthropic profile | Claude Sonnet 4.6 | 279/298 | 93.6% | 2,894 | 39,695,400 |
 | deepagents | Qwen 3.6 Flash | 277/298 | 93.0% | 3,132 | 35,108,655 |
+| deepagents | Qwen3.6-27B-FP8 (vLLM) | 274/298 | 91.9% | 3,028 | 33,645,093 |
 | deepagents | DeepSeek V4 Flash | 266/298 | 89.3% | 3,489 | 40,392,075 |
 | deepagents | Qwen 3.6 Plus | 265/298 | 88.9% | 3,288 | 37,687,035 |
 | Hermes CLI | Claude Sonnet 4.6 | 262/298 | 87.9% | — | — |
