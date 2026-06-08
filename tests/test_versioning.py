@@ -23,8 +23,7 @@ def test_memory_tasks_belong_to_their_revisions() -> None:
     assert revision_for_task_id("task_253_memory_mixed_save_refuse_use").version == "0.4.0"
 
 
-def test_current_agentic_tasks_belong_to_current_revision() -> None:
-    assert TASK_SET_VERSION == "0.7.0"
+def test_agentic_tasks_belong_to_their_revisions() -> None:
     # The agentic wave spans three revisions, tasks 254-298.
     assert revision_for_task_id("task_254_terminal_log_status_matrix").version == "0.5.0"
     assert revision_for_task_id("task_262_swe_csv_top_customers").version == "0.5.0"
@@ -32,3 +31,16 @@ def test_current_agentic_tasks_belong_to_current_revision() -> None:
     assert revision_for_task_id("task_283_swe_inventory_allocate").version == "0.6.0"
     assert revision_for_task_id("task_284_terminal_json_config_inventory").version == "0.7.0"
     assert revision_for_task_id("task_298_swe_median_even_empty").version == "0.7.0"
+
+
+def test_vcs_tasks_belong_to_their_revisions() -> None:
+    # 0.8.0 adds version-control tasks 299-308.
+    assert revision_for_task_id("task_299_resolve_conflict_take_both").version == "0.8.0"
+    assert revision_for_task_id("task_308_detect_unresolved_conflicts").version == "0.8.0"
+
+
+def test_current_multifile_vcs_tasks_belong_to_current_revision() -> None:
+    assert TASK_SET_VERSION == "0.9.0"
+    # 0.9.0 adds multi-file / multi-step VCS workflows 309-313.
+    assert revision_for_task_id("task_309_rename_refactor_scale").version == "0.9.0"
+    assert revision_for_task_id("task_313_aggregate_config_fragments").version == "0.9.0"
