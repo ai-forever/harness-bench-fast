@@ -453,6 +453,7 @@ def run_all(
     attempts: int = 1,
     json_output: str | Path | None = None,
     transient_attempts: int = DEFAULT_TRANSIENT_ATTEMPTS,
+    fail_on_runtime_error: bool = False,
 ) -> list[TaskRun]:
     _load_env_from_dotenv()
     _ensure_openrouter_key()
@@ -484,6 +485,8 @@ def run_all(
                 print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
                 if keep_workspace and run.workspace:
                     print(f"  workspace: {run.workspace}")
+                if fail_on_runtime_error and run.error:
+                    return results
         return results
 
     print_lock = threading.Lock()
@@ -520,6 +523,12 @@ def run_all(
                 )
                 if keep_workspace and run.workspace:
                     print(f"           workspace: {run.workspace}")
+            if fail_on_runtime_error and run.error:
+                for pending_future in future_to_task:
+                    if pending_future is not future:
+                        pending_future.cancel()
+                results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
+                return results
     results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
     _write_partial_results_json(results, json_output)
     return results
