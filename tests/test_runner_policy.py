@@ -69,6 +69,82 @@ def test_allow_task_failures_returns_zero_when_harness_completed(monkeypatch) ->
     assert bench_main.main(["run", "--task", "task_fake", "--allow-task-failures"]) == 0
 
 
+def test_openrouter_fail_on_runtime_error_returns_nonzero_with_allowed_task_failures(
+    monkeypatch,
+) -> None:
+    captured: dict[str, object] = {}
+
+    def _fake_run_all_openrouter(**kwargs: object) -> list[TaskRun]:
+        captured.update(kwargs)
+        return [
+            TaskRun(
+                "task_fake",
+                False,
+                "",
+                0.01,
+                error="Traceback\nRuntimeError: endpoint down",
+            )
+        ]
+
+    monkeypatch.setattr(bench_main, "run_all_openrouter", _fake_run_all_openrouter)
+    monkeypatch.setattr(bench_main, "summarize", lambda _results: None)
+
+    assert (
+        bench_main.main(
+            [
+                "run-openrouter",
+                "--task",
+                "task_fake",
+                "--allow-task-failures",
+                "--fail-on-runtime-error",
+            ]
+        )
+        == 1
+    )
+    assert captured["fail_on_runtime_error"] is True
+
+
+def test_openrouter_run_all_stops_on_runtime_error(monkeypatch) -> None:
+    from harness_bench import runner_openrouter
+
+    fake_tasks = [
+        SimpleNamespace(id="task_01_fake", name="Fake one"),
+        SimpleNamespace(id="task_02_fake", name="Fake two"),
+    ]
+    calls: list[str] = []
+
+    def _fake_run_task(task: object, **_kwargs: object) -> TaskRun:
+        task_id = cast(str, getattr(task, "id"))
+        calls.append(task_id)
+        if task_id == "task_01_fake":
+            return TaskRun(
+                task_id,
+                False,
+                "",
+                0.01,
+                error="Traceback\nRuntimeError: endpoint down",
+            )
+        raise AssertionError("must not run the second task after runtime error")
+
+    monkeypatch.setattr(runner_openrouter, "_load_env_from_dotenv", lambda: None)
+    monkeypatch.setattr(runner_openrouter, "_ensure_openrouter_key", lambda: None)
+    monkeypatch.setattr(
+        runner_openrouter,
+        "get_task",
+        lambda task_id: next(task for task in fake_tasks if task.id == task_id),
+    )
+    monkeypatch.setattr(runner_openrouter, "run_task", _fake_run_task)
+
+    results = runner_openrouter.run_all(
+        task_ids=["task_01_fake", "task_02_fake"],
+        concurrency=1,
+        fail_on_runtime_error=True,
+    )
+
+    assert calls == ["task_01_fake"]
+    assert [result.task_id for result in results] == ["task_01_fake"]
+
+
 def test_cli_timeout_kills_windows_process_tree(monkeypatch, tmp_path: Path) -> None:
     from harness_bench import runner_cli
 

@@ -39,8 +39,19 @@ from harness_bench.versioning import (
 )
 
 
-def _exit_code(results: Sequence[object], *, allow_task_failures: bool) -> int:
+def _has_runtime_error(results: Sequence[object]) -> bool:
+    return any(bool(getattr(r, "error", None)) for r in results)
+
+
+def _exit_code(
+    results: Sequence[object],
+    *,
+    allow_task_failures: bool,
+    fail_on_runtime_error: bool = False,
+) -> int:
     """Return the process exit code for a completed benchmark run."""
+    if fail_on_runtime_error and _has_runtime_error(results):
+        return 1
     if allow_task_failures:
         return 0
     return 0 if all(getattr(r, "passed", False) for r in results) else 1
@@ -149,10 +160,15 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         attempts=args.attempts,
         json_output=args.json_output,
         transient_attempts=args.transient_attempts,
+        fail_on_runtime_error=args.fail_on_runtime_error,
     )
     _summarize_run(results, metric_ks)
     _maybe_write_json(args, results)
-    return _exit_code(results, allow_task_failures=args.allow_task_failures)
+    return _exit_code(
+        results,
+        allow_task_failures=args.allow_task_failures,
+        fail_on_runtime_error=args.fail_on_runtime_error,
+    )
 
 
 def _cmd_run_pure(args: argparse.Namespace) -> int:
@@ -424,6 +440,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--allow-task-failures",
         action="store_true",
         help="Exit 0 when the harness completes even if some benchmark tasks fail.",
+    )
+    p_or.add_argument(
+        "--fail-on-runtime-error",
+        action="store_true",
+        help=(
+            "Exit non-zero and stop scheduling more tasks when a task fails with "
+            "an agent/runtime exception recorded in the JSON error field."
+        ),
     )
     p_or.set_defaults(func=_cmd_run_openrouter)
 
