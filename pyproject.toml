@@ -18,7 +18,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "deepagents>=0.6.7",
+    "deepagents>=0.6.10",
     # Several benchmark tasks are verified by running `python -m pytest`.
     "pytest>=9.0.2",
     "python-dotenv>=1.2.2",
@@ -63,7 +63,6 @@ include = [
     "/harness_bench",
     "/LICENSE",
     "/README.md",
-    "/LEGACY_RESULTS.md",
     "/pyproject.toml",
     "/tests",
 ]
