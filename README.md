@@ -20,13 +20,13 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | deepagents | Qwen 3.6 Flash | 284/313 | 90.7% | 3,452 | 39,210,903 |
 | deepagents | DeepSeek V4 Flash | 277/313 | 88.5% | 3,920 | 44,332,968 |
 | deepagents | GPT-5 Mini | 274/313 | 87.5% | 3,390 | 43,151,046 |
+| deepagents + GigaChat profile | GigaChat-3-Ultra (IFT) | 269/313 | 85.9% | 2,432 | 2,297,304 |
 | deepagents | GPT-4.1 | 264/313 | 84.3% | 2,852 | 28,581,495 |
 | OpenHands | GigaChat-3-Ultra | 264/313 | 84.3% | — | — |
 | deepagents | GPT-4.1 Mini | 255/313 | 81.5% | 2,470 | 30,506,484 |
 | deepagents | Qwen 3.5 Flash | 252/313 | 80.5% | 3,251 | 38,507,310 |
 | deepagents + GigaChat profile | GigaChat-2-Max | 249/313 | 79.6% | 2,743 | 22,150,602 |
 | pi-mono | GigaChat-3-Ultra | 248/313 | 79.2% | — | — |
-| deepagents + GigaChat profile | GigaChat-3-Ultra | 241/313 | 77.0% | 2,723 | 15,275,835 |
 | deepagents | GPT-5 Nano | 240/313 | 76.7% | 3,868 | 50,149,521 |
 | deepagents + GigaChat profile | GigaChat-3-Pro | 204/313 | 65.2% | 2,588 | 5,568,426 |
 | deepagents, no profile | GigaChat-3-Ultra | 189/313 | 60.4% | 2,730 | 69,675,294 |
