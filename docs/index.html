@@ -6,7 +6,7 @@
     <title>harness-bench results</title>
     <meta
       name="description"
-      content="Latest harness-bench v0.7.0 results across agent harnesses and models."
+      content="Latest harness-bench v0.9.0 results across agent harnesses and models."
     >
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -27,12 +27,12 @@
     <main>
       <section class="hero" aria-labelledby="title">
         <div class="hero-copy">
-          <p class="eyebrow">Latest benchmark: task-set v0.7.0</p>
-          <h1 id="title">298 mechanically verified coding-agent tasks</h1>
+          <p class="eyebrow">Latest benchmark: task-set v0.9.0</p>
+          <h1 id="title">313 mechanically verified coding-agent tasks</h1>
           <p class="lead">
             A compact benchmark for comparing agent harnesses on file edits,
-            data transforms, pytest bug fixes, memory discipline, and
-            synthetic benchmark-like workflows.
+            data transforms, pytest bug fixes, memory discipline, synthetic
+            benchmark-like workflows, and version-control work.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="#leaderboard">View results</a>
@@ -45,16 +45,16 @@
         <div class="score-panel" aria-label="Benchmark summary">
           <div class="summary-grid">
             <div>
-              <span class="metric">298</span>
+              <span class="metric">313</span>
               <span class="label">tasks</span>
             </div>
             <div>
-              <span class="metric">17</span>
+              <span class="metric">23</span>
               <span class="label">runs listed</span>
             </div>
             <div>
-              <span class="metric">2</span>
-              <span class="label">perfect runs</span>
+              <span class="metric">1</span>
+              <span class="label">perfect run</span>
             </div>
             <div>
               <span class="metric">100%</span>
@@ -70,13 +70,13 @@
             </div>
             <div class="bar-row">
               <span>Codex CLI / GPT-5.5</span>
-              <strong>100.0%</strong>
-              <i style="--score: 100%"></i>
+              <strong>99.4%</strong>
+              <i style="--score: 99.4%"></i>
             </div>
             <div class="bar-row">
-              <span>free-code / Haiku 4.5</span>
-              <strong>95.3%</strong>
-              <i style="--score: 95.3%"></i>
+              <span>openclaude / GLM 5.2</span>
+              <strong>98.7%</strong>
+              <i style="--score: 98.7%"></i>
             </div>
           </div>
         </div>
@@ -92,8 +92,8 @@
           <span>Terminal-Bench-like, tau-like, and SWE-bench-like synthetic tasks</span>
         </div>
         <div>
-          <span class="strip-number">0</span>
-          <span>LLM-as-judge checks</span>
+          <span class="strip-number">299-313</span>
+          <span>Git / version-control workflows: merge conflicts, diff apply/revert, multi-file refactors</span>
         </div>
       </section>
 
@@ -102,8 +102,9 @@
           <p class="eyebrow">Current results only</p>
           <h2 id="leaderboard-title">Leaderboard</h2>
           <p>
-            Results below use the latest 298-task set. Steps and tokens are
-            shown only when the harness exposes them.
+            Results below use the latest 313-task set. Only the latest run per
+            harness + model setup is listed. Steps and tokens are shown only
+            when the harness exposes them.
           </p>
         </div>
 
@@ -114,202 +115,274 @@
               <h3>Claude Code CLI</h3>
               <p>Claude Opus 4.8</p>
             </div>
-            <div class="score">298/298</div>
-            <div class="percent">100.0%</div>
-            <div class="bar"><span style="width: 100%"></span></div>
-            <div class="meta">Steps — · Tokens —</div>
-          </article>
-
-          <article class="result-row perfect">
-            <div class="rank">1</div>
-            <div class="who">
-              <h3>Codex CLI</h3>
-              <p>GPT-5.5</p>
-            </div>
-            <div class="score">298/298</div>
+            <div class="score">313/313</div>
             <div class="percent">100.0%</div>
             <div class="bar"><span style="width: 100%"></span></div>
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
           <article class="result-row">
-            <div class="rank">3</div>
+            <div class="rank">2</div>
             <div class="who">
-              <h3>free-code</h3>
+              <h3>Claude Code CLI</h3>
+              <p>Claude Sonnet 4.6</p>
+            </div>
+            <div class="score">311/313</div>
+            <div class="percent">99.4%</div>
+            <div class="bar"><span style="width: 99.4%"></span></div>
+            <div class="meta">Steps — · Tokens —</div>
+          </article>
+
+          <article class="result-row">
+            <div class="rank">2</div>
+            <div class="who">
+              <h3>Codex CLI</h3>
+              <p>GPT-5.5</p>
+            </div>
+            <div class="score">311/313</div>
+            <div class="percent">99.4%</div>
+            <div class="bar"><span style="width: 99.4%"></span></div>
+            <div class="meta">Steps 1,769 · Tokens 52,762,732</div>
+          </article>
+
+          <article class="result-row">
+            <div class="rank">4</div>
+            <div class="who">
+              <h3>Claude Code CLI</h3>
               <p>Claude Haiku 4.5</p>
             </div>
-            <div class="score">284/298</div>
-            <div class="percent">95.3%</div>
-            <div class="bar"><span style="width: 95.3%"></span></div>
+            <div class="score">309/313</div>
+            <div class="percent">98.7%</div>
+            <div class="bar"><span style="width: 98.7%"></span></div>
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
           <article class="result-row">
             <div class="rank">4</div>
             <div class="who">
-              <h3>deepagents + Anthropic profile</h3>
-              <p>Claude Haiku 4.5</p>
+              <h3>openclaude</h3>
+              <p>GLM 5.2</p>
             </div>
-            <div class="score">280/298</div>
-            <div class="percent">94.0%</div>
-            <div class="bar"><span style="width: 94%"></span></div>
-            <div class="meta">Steps 3,016 · Tokens 41,405,850</div>
-          </article>
-
-          <article class="result-row">
-            <div class="rank">5</div>
-            <div class="who">
-              <h3>deepagents + Anthropic profile</h3>
-              <p>Claude Sonnet 4.6</p>
-            </div>
-            <div class="score">279/298</div>
-            <div class="percent">93.6%</div>
-            <div class="bar"><span style="width: 93.6%"></span></div>
-            <div class="meta">Steps 2,894 · Tokens 39,695,400</div>
+            <div class="score">309/313</div>
+            <div class="percent">98.7%</div>
+            <div class="bar"><span style="width: 98.7%"></span></div>
+            <div class="meta">Steps — · Tokens —</div>
           </article>
 
           <article class="result-row">
             <div class="rank">6</div>
             <div class="who">
-              <h3>deepagents</h3>
-              <p>Qwen 3.6 Flash</p>
+              <h3>openclaude</h3>
+              <p>Claude Haiku 4.5</p>
             </div>
-            <div class="score">277/298</div>
-            <div class="percent">93.0%</div>
-            <div class="bar"><span style="width: 93%"></span></div>
-            <div class="meta">Steps 3,132 · Tokens 35,108,655</div>
+            <div class="score">306/313</div>
+            <div class="percent">97.8%</div>
+            <div class="bar"><span style="width: 97.8%"></span></div>
+            <div class="meta">Steps — · Tokens —</div>
           </article>
 
           <article class="result-row">
-            <div class="rank">7</div>
+            <div class="rank">6</div>
             <div class="who">
-              <h3>deepagents</h3>
-              <p>DeepSeek V4 Flash</p>
+              <h3>openclaude</h3>
+              <p>Claude Sonnet 4.6</p>
             </div>
-            <div class="score">266/298</div>
-            <div class="percent">89.3%</div>
-            <div class="bar"><span style="width: 89.3%"></span></div>
-            <div class="meta">Steps 3,489 · Tokens 40,392,075</div>
+            <div class="score">306/313</div>
+            <div class="percent">97.8%</div>
+            <div class="bar"><span style="width: 97.8%"></span></div>
+            <div class="meta">Steps — · Tokens —</div>
           </article>
 
           <article class="result-row">
             <div class="rank">8</div>
             <div class="who">
               <h3>deepagents</h3>
-              <p>Qwen 3.6 Plus</p>
+              <p>Qwen 3.6 Flash</p>
             </div>
-            <div class="score">265/298</div>
-            <div class="percent">88.9%</div>
-            <div class="bar"><span style="width: 88.9%"></span></div>
-            <div class="meta">Steps 3,288 · Tokens 37,687,035</div>
+            <div class="score">284/313</div>
+            <div class="percent">90.7%</div>
+            <div class="bar"><span style="width: 90.7%"></span></div>
+            <div class="meta">Steps 3,452 · Tokens 39,210,903</div>
           </article>
 
           <article class="result-row">
             <div class="rank">9</div>
             <div class="who">
-              <h3>Hermes CLI</h3>
-              <p>Claude Sonnet 4.6</p>
+              <h3>deepagents</h3>
+              <p>DeepSeek V4 Flash</p>
             </div>
-            <div class="score">262/298</div>
-            <div class="percent">87.9%</div>
-            <div class="bar"><span style="width: 87.9%"></span></div>
-            <div class="meta">Steps — · Tokens —</div>
+            <div class="score">277/313</div>
+            <div class="percent">88.5%</div>
+            <div class="bar"><span style="width: 88.5%"></span></div>
+            <div class="meta">Steps 3,920 · Tokens 44,332,968</div>
           </article>
 
           <article class="result-row">
             <div class="rank">10</div>
             <div class="who">
               <h3>deepagents</h3>
-              <p>GPT-4.1 Mini</p>
+              <p>GPT-5 Mini</p>
             </div>
-            <div class="score">245/298</div>
-            <div class="percent">82.2%</div>
-            <div class="bar"><span style="width: 82.2%"></span></div>
-            <div class="meta">Steps 2,754 · Tokens 27,705,519</div>
+            <div class="score">274/313</div>
+            <div class="percent">87.5%</div>
+            <div class="bar"><span style="width: 87.5%"></span></div>
+            <div class="meta">Steps 3,390 · Tokens 43,151,046</div>
           </article>
 
           <article class="result-row">
             <div class="rank">11</div>
             <div class="who">
               <h3>deepagents</h3>
-              <p>Qwen 3.5 Flash</p>
+              <p>GPT-4.1</p>
             </div>
-            <div class="score">241/298</div>
-            <div class="percent">80.9%</div>
-            <div class="bar"><span style="width: 80.9%"></span></div>
-            <div class="meta">Steps 2,677 · Tokens 30,564,414</div>
+            <div class="score">264/313</div>
+            <div class="percent">84.3%</div>
+            <div class="bar"><span style="width: 84.3%"></span></div>
+            <div class="meta">Steps 2,852 · Tokens 28,581,495</div>
           </article>
 
           <article class="result-row">
-            <div class="rank">12</div>
+            <div class="rank">11</div>
             <div class="who">
-              <h3>deepagents + GigaChat profile</h3>
-              <p>GigaChat-3-Ultra PROM</p>
+              <h3>OpenHands</h3>
+              <p>GigaChat-3-Ultra</p>
             </div>
-            <div class="score">231/298</div>
-            <div class="percent">77.5%</div>
-            <div class="bar"><span style="width: 77.5%"></span></div>
-            <div class="meta">Steps 1,466 · Tokens 9,307,062</div>
+            <div class="score">264/313</div>
+            <div class="percent">84.3%</div>
+            <div class="bar"><span style="width: 84.3%"></span></div>
+            <div class="meta">Steps — · Tokens —</div>
           </article>
 
           <article class="result-row">
-            <div class="rank">12</div>
+            <div class="rank">13</div>
             <div class="who">
               <h3>deepagents</h3>
-              <p>GLM 4.7 Flash</p>
+              <p>GPT-4.1 Mini</p>
             </div>
-            <div class="score">231/298</div>
-            <div class="percent">77.5%</div>
-            <div class="bar"><span style="width: 77.5%"></span></div>
-            <div class="meta">Steps 3,019 · Tokens 34,373,385</div>
+            <div class="score">255/313</div>
+            <div class="percent">81.5%</div>
+            <div class="bar"><span style="width: 81.5%"></span></div>
+            <div class="meta">Steps 2,470 · Tokens 30,506,484</div>
           </article>
 
           <article class="result-row">
             <div class="rank">14</div>
             <div class="who">
-              <h3>pi-mono</h3>
-              <p>GigaChat-3-Ultra PROM</p>
+              <h3>deepagents</h3>
+              <p>Qwen 3.5 Flash</p>
             </div>
-            <div class="score">226/298</div>
-            <div class="percent">75.8%</div>
-            <div class="bar"><span style="width: 75.8%"></span></div>
-            <div class="meta">Steps — · Tokens —</div>
+            <div class="score">252/313</div>
+            <div class="percent">80.5%</div>
+            <div class="bar"><span style="width: 80.5%"></span></div>
+            <div class="meta">Steps 3,251 · Tokens 38,507,310</div>
           </article>
 
           <article class="result-row">
             <div class="rank">15</div>
             <div class="who">
-              <h3>deepagents, no profile</h3>
-              <p>GigaChat-3-Ultra PROM</p>
+              <h3>deepagents + GigaChat profile</h3>
+              <p>GigaChat-2-Max</p>
             </div>
-            <div class="score">200/298</div>
-            <div class="percent">67.1%</div>
-            <div class="bar"><span style="width: 67.1%"></span></div>
-            <div class="meta">Steps 2,569 · Tokens 18,516,153</div>
+            <div class="score">249/313</div>
+            <div class="percent">79.6%</div>
+            <div class="bar"><span style="width: 79.6%"></span></div>
+            <div class="meta">Steps 2,743 · Tokens 22,150,602</div>
           </article>
 
           <article class="result-row">
             <div class="rank">16</div>
             <div class="who">
-              <h3>deepagents</h3>
-              <p>GPT-OSS-120B</p>
+              <h3>pi-mono</h3>
+              <p>GigaChat-3-Ultra</p>
             </div>
-            <div class="score">167/298</div>
-            <div class="percent">56.0%</div>
-            <div class="bar"><span style="width: 56%"></span></div>
-            <div class="meta">Steps 1,756 · Tokens 18,889,569</div>
+            <div class="score">248/313</div>
+            <div class="percent">79.2%</div>
+            <div class="bar"><span style="width: 79.2%"></span></div>
+            <div class="meta">Steps — · Tokens —</div>
           </article>
 
           <article class="result-row">
             <div class="rank">17</div>
             <div class="who">
+              <h3>deepagents + GigaChat profile</h3>
+              <p>GigaChat-3-Ultra</p>
+            </div>
+            <div class="score">241/313</div>
+            <div class="percent">77.0%</div>
+            <div class="bar"><span style="width: 77%"></span></div>
+            <div class="meta">Steps 2,723 · Tokens 15,275,835</div>
+          </article>
+
+          <article class="result-row">
+            <div class="rank">18</div>
+            <div class="who">
+              <h3>deepagents</h3>
+              <p>GPT-5 Nano</p>
+            </div>
+            <div class="score">240/313</div>
+            <div class="percent">76.7%</div>
+            <div class="bar"><span style="width: 76.7%"></span></div>
+            <div class="meta">Steps 3,868 · Tokens 50,149,521</div>
+          </article>
+
+          <article class="result-row">
+            <div class="rank">19</div>
+            <div class="who">
+              <h3>deepagents + GigaChat profile</h3>
+              <p>GigaChat-3-Pro</p>
+            </div>
+            <div class="score">204/313</div>
+            <div class="percent">65.2%</div>
+            <div class="bar"><span style="width: 65.2%"></span></div>
+            <div class="meta">Steps 2,588 · Tokens 5,568,426</div>
+          </article>
+
+          <article class="result-row">
+            <div class="rank">20</div>
+            <div class="who">
+              <h3>deepagents, no profile</h3>
+              <p>GigaChat-3-Ultra</p>
+            </div>
+            <div class="score">189/313</div>
+            <div class="percent">60.4%</div>
+            <div class="bar"><span style="width: 60.4%"></span></div>
+            <div class="meta">Steps 2,730 · Tokens 69,675,294</div>
+          </article>
+
+          <article class="result-row">
+            <div class="rank">21</div>
+            <div class="who">
               <h3>deepagents</h3>
               <p>GPT-4.1 Nano</p>
             </div>
-            <div class="score">149/298</div>
-            <div class="percent">50.0%</div>
-            <div class="bar"><span style="width: 50%"></span></div>
-            <div class="meta">Steps 2,372 · Tokens 30,104,298</div>
+            <div class="score">162/313</div>
+            <div class="percent">51.8%</div>
+            <div class="bar"><span style="width: 51.8%"></span></div>
+            <div class="meta">Steps 2,695 · Tokens 36,218,469</div>
+          </article>
+
+          <article class="result-row">
+            <div class="rank">22</div>
+            <div class="who">
+              <h3>deepagents</h3>
+              <p>GPT-OSS-120B</p>
+            </div>
+            <div class="score">155/313</div>
+            <div class="percent">49.5%</div>
+            <div class="bar"><span style="width: 49.5%"></span></div>
+            <div class="meta">Steps 1,815 · Tokens 19,550,796</div>
+          </article>
+
+          <article class="result-row">
+            <div class="rank">23</div>
+            <div class="who">
+              <h3>deepagents</h3>
+              <p>GPT-3.5 Turbo</p>
+            </div>
+            <div class="score">150/313</div>
+            <div class="percent">47.9%</div>
+            <div class="bar"><span style="width: 47.9%"></span></div>
+            <div class="meta">Steps 2,962 · Tokens 38,503,644</div>
           </article>
         </div>
       </section>
@@ -330,7 +403,7 @@
     </main>
 
     <footer class="footer">
-      <span>harness-bench · latest results for task-set v0.7.0</span>
+      <span>harness-bench · latest results for task-set v0.9.0</span>
       <a href="https://github.com/ai-forever/harness-bench-fast">Source on GitHub</a>
     </footer>
   </body>

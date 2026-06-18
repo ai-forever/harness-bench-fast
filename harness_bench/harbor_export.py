@@ -23,7 +23,7 @@ from harness_bench.versioning import TASK_SET_VERSION
 DEFAULT_HARBOR_ORG = "ai-forever"
 DEFAULT_HARBOR_DATASET = "harness-bench-fast"
 
-_PACKAGE_FILES = ("pyproject.toml", "README.md", "LICENSE", "LEGACY_RESULTS.md")
+_PACKAGE_FILES = ("pyproject.toml", "README.md", "LICENSE")
 _DEFAULT_IGNORES = ("__pycache__/", ".DS_Store", "*.pyc", "*.swp", "*.swo", "*~")
 
 

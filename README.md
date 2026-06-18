@@ -2,35 +2,39 @@
 
 ## Current Results
 
-Current benchmark results use the 298-task set (`task-set v0.7.0`). Older
-task-set histories live in [`LEGACY_RESULTS.md`](LEGACY_RESULTS.md). `Steps`
-and `Tokens` are shown when the runner exposes them.
+Current benchmark results use the 313-task set (`task-set v0.9.0`). `Steps`
+and `Tokens` are shown when the runner exposes them. Each row is the latest
+run for that harness + model setup.
 
 Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 
 | Harness | Model | Result | % | Steps | Tokens |
 | --- | --- | ---: | ---: | ---: | ---: |
-| Claude Code CLI | Claude Opus 4.8 | 298/298 | 100.0% | — | — |
-| Codex CLI | GPT-5.5 | 298/298 | 100.0% | — | — |
-| opencode | Qwen3.6-27B-FP8 (vLLM) | 291/298 | 97.7% | — | — |
-| free-code | Claude Haiku 4.5 | 284/298 | 95.3% | — | — |
-| deepagents + Anthropic profile | Claude Haiku 4.5 | 280/298 | 94.0% | 3,016 | 41,405,850 |
-| deepagents + Anthropic profile | Claude Sonnet 4.6 | 279/298 | 93.6% | 2,894 | 39,695,400 |
-| deepagents | Qwen 3.6 Flash | 277/298 | 93.0% | 3,132 | 35,108,655 |
-| deepagents | Qwen3.6-27B-FP8 (vLLM) | 274/298 | 91.9% | 3,028 | 33,645,093 |
-| deepagents | DeepSeek V4 Flash | 266/298 | 89.3% | 3,489 | 40,392,075 |
-| deepagents | Qwen 3.6 Plus | 265/298 | 88.9% | 3,288 | 37,687,035 |
-| Hermes CLI | Claude Sonnet 4.6 | 262/298 | 87.9% | — | — |
-| deepagents | GPT-4.1 Mini | 245/298 | 82.2% | 2,754 | 27,705,519 |
-| deepagents | Qwen 3.5 Flash | 241/298 | 80.9% | 2,677 | 30,564,414 |
-| deepagents + GigaChat profile | GigaChat-3-Ultra PROM | 231/298 | 77.5% | 1,466 | 9,307,062 |
-| deepagents | GLM 4.7 Flash | 231/298 | 77.5% | 3,019 | 34,373,385 |
-| pi-mono | GigaChat-3-Ultra PROM | 226/298 | 75.8% | — | — |
-| deepagents, no profile | GigaChat-3-Ultra PROM | 200/298 | 67.1% | 2,569 | 18,516,153 |
-| deepagents | GPT-OSS-120B | 167/298 | 56.0% | 1,756 | 18,889,569 |
-| deepagents | GPT-4.1 Nano | 149/298 | 50.0% | 2,372 | 30,104,298 |
+| Claude Code CLI | Claude Opus 4.8 | 313/313 | 100.0% | — | — |
+| Claude Code CLI | Claude Sonnet 4.6 | 311/313 | 99.4% | — | — |
+| Codex CLI | GPT-5.5 | 311/313 | 99.4% | 1,769 | 52,762,732 |
+| Claude Code CLI | Claude Haiku 4.5 | 309/313 | 98.7% | — | — |
+| openclaude | GLM 5.2 | 309/313 | 98.7% | — | — |
+| openclaude | Claude Haiku 4.5 | 306/313 | 97.8% | — | — |
+| openclaude | Claude Sonnet 4.6 | 306/313 | 97.8% | — | — |
+| deepagents | Qwen 3.6 Flash | 284/313 | 90.7% | 3,452 | 39,210,903 |
+| deepagents | DeepSeek V4 Flash | 277/313 | 88.5% | 3,920 | 44,332,968 |
+| deepagents | GPT-5 Mini | 274/313 | 87.5% | 3,390 | 43,151,046 |
+| deepagents | GPT-4.1 | 264/313 | 84.3% | 2,852 | 28,581,495 |
+| OpenHands | GigaChat-3-Ultra | 264/313 | 84.3% | — | — |
+| deepagents | GPT-4.1 Mini | 255/313 | 81.5% | 2,470 | 30,506,484 |
+| deepagents | Qwen 3.5 Flash | 252/313 | 80.5% | 3,251 | 38,507,310 |
+| deepagents + GigaChat profile | GigaChat-2-Max | 249/313 | 79.6% | 2,743 | 22,150,602 |
+| pi-mono | GigaChat-3-Ultra | 248/313 | 79.2% | — | — |
+| deepagents + GigaChat profile | GigaChat-3-Ultra | 241/313 | 77.0% | 2,723 | 15,275,835 |
+| deepagents | GPT-5 Nano | 240/313 | 76.7% | 3,868 | 50,149,521 |
+| deepagents + GigaChat profile | GigaChat-3-Pro | 204/313 | 65.2% | 2,588 | 5,568,426 |
+| deepagents, no profile | GigaChat-3-Ultra | 189/313 | 60.4% | 2,730 | 69,675,294 |
+| deepagents | GPT-4.1 Nano | 162/313 | 51.8% | 2,695 | 36,218,469 |
+| deepagents | GPT-OSS-120B | 155/313 | 49.5% | 1,815 | 19,550,796 |
+| deepagents | GPT-3.5 Turbo | 150/313 | 47.9% | 2,962 | 38,503,644 |
 
-A self-contained **298-task agent benchmark** (`task-set v0.7.0`) for evaluating LLM-backed
+A self-contained **313-task agent benchmark** (`task-set v0.9.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -67,7 +71,7 @@ uv venv && uv pip install -e ".[gigachat,openrouter]"
 # to the public profile.
 uv pip install -e ".[gigachat-profile]"
 
-# List all 298 tasks
+# List all 313 tasks
 uv run python -m harness_bench list
 
 # Show the benchmark task-set version and revision history
@@ -105,6 +109,18 @@ uv run python -m harness_bench run-pure --concurrency 5
 
 # Drive an external CLI agent (Claude Code, etc.). Example with
 # Anthropic's free-code CLI:
+#
+# IMPORTANT: Claude-Code-style CLIs (Claude Code `claude`, `free-code`,
+# OpenClaude `openclaude`, …) ship a built-in host-side "auto-memory"
+# feature. During a run it reframes the memory-discipline tasks
+# (`tasks_memory.py`, 222-253) toward its own ~/.claude memory store /
+# index format instead of writing the literal workspace `MEMORY.md` and
+# deliverables the strict verifiers expect, which silently corrupts that
+# wave (e.g. Claude Sonnet 4.6 scored 20/32 with it on vs 31/32 off).
+# ALWAYS set CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 when benchmarking these
+# CLIs so the memory wave is scored fairly. This is targeted (unlike
+# `--bare`, it does not break OAuth/keychain auth).
+CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 \
 uv run python -m harness_bench run-cli \
     --cli-command 'free-code -p --model haiku --dangerously-skip-permissions' \
     --concurrency 5
@@ -173,7 +189,7 @@ uv run python -m harness_bench apply-gold \
 
 ## What's inside
 
-### Tasks (298 total, task-set v0.7.0)
+### Tasks (313 total, task-set v0.9.0)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -185,6 +201,7 @@ uv run python -m harness_bench apply-gold \
 | `tasks_diagnostic.py` | 206–221 | paid-revenue reconciliation, inventory anomalies, pricing-API migration, latency reconstruction, tar+hash manifests, interval merge, config precedence, markdown link audit, data-quality reports, TODO/FIXME triage, category rollups, email extraction, runtime config, SQL leaderboards, import migrations, log-level summaries |
 | `tasks_memory.py` | 222–253 | memory discipline: read / write / forget / refuse facts in `MEMORY.md` along with the auxiliary deliverable (LICENSE, `requirements-dev.txt`, `bio.txt`, `profile.json`, …). Exercises agent memory rather than file I/O. |
 | `tasks_agentic.py` | 254–298 | benchmark-like synthetic agentic wave: Terminal-Bench-like terminal workflows (logs, process tables, Makefile plans, checksums, permission audits), tau-like policy-bound action decisions (airline, retail, banking, clinic, etc.), and SWE-bench-like pytest bug-fix tasks. |
+| `tasks_vcs.py` | 299–313 | version-control work: Git merge-conflict resolution (ours/theirs/both/manual, diff3 base sections, multi-hunk, multi-file), unified-diff apply/revert, unresolved-conflict detection, plus multi-file/multi-step workflows (scaled rename refactors, module split, ordered patch stacks, manifest-driven resolution, config deep-merge). |
 
 Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
@@ -206,6 +223,8 @@ changes do not need a task-set bump.
 | `0.5.0` | 2026-06-02 | 254–262 | 262 | Agentic wave of synthetic Terminal-Bench-like, tau-like, and SWE-bench-like tasks |
 | `0.6.0` | 2026-06-02 | 263–283 | 283 | Agentic wave expanded to 10 Terminal-Bench-like / 10 tau-like / 10 SWE-bench-like tasks |
 | `0.7.0` | 2026-06-02 | 284–298 | 298 | Agentic wave expanded to 15 Terminal-Bench-like / 15 tau-like / 15 SWE-bench-like tasks |
+| `0.8.0` | 2026-06-05 | 299–308 | 308 | Version-control tasks: Git merge-conflict resolution, multi-hunk unified-diff apply/revert, unresolved-conflict detection |
+| `0.9.0` | 2026-06-05 | 309–313 | 313 | Multi-file / multi-step version-control workflows (rename refactor, module split, patch stack, manifest-driven resolution, config deep-merge) |
 
 ### Infrastructure
 
@@ -263,9 +282,9 @@ needed when invoking Harbor's own local runner.
 
 ## Results
 
-The current 298-task results table is kept at the top of this README. Older
-task-set histories and superseded runs live in [`LEGACY_RESULTS.md`](LEGACY_RESULTS.md);
-those numbers are not directly comparable with the current task set.
+The current 313-task results table is kept at the top of this README. Only
+the latest run per harness + model setup is listed; superseded and
+older-task-set runs are not carried over.
 
 ## Adding a task
 
