@@ -535,6 +535,141 @@ def test_run_all_writes_incremental_json(monkeypatch, tmp_path: Path) -> None:
     assert [task["task_id"] for task in payload["tasks"]] == ["task_01_fake", "task_02_fake"]
 
 
+def test_json_output_bare_filename_defaults_to_jobs(tmp_path: Path) -> None:
+    from harness_bench.runner import normalize_json_output_path
+
+    assert normalize_json_output_path("results.json") == Path("jobs/results.json")
+    assert normalize_json_output_path("reports/results.json") == Path("reports/results.json")
+    generated_in_named_dir = normalize_json_output_path("reports/")
+    assert generated_in_named_dir is not None
+    assert generated_in_named_dir.parent == Path("reports")
+    assert generated_in_named_dir.suffix == ".json"
+    generated_in_dir = normalize_json_output_path(tmp_path)
+    assert generated_in_dir is not None
+    assert generated_in_dir.parent == tmp_path
+    assert generated_in_dir.suffix == ".json"
+
+    parser = bench_main.build_parser()
+    args = parser.parse_args(["run-cli", "--json-output", "results.json"])
+    assert args.json_output == Path("jobs/results.json")
+    args = parser.parse_args(["run-cli", "--json-output"])
+    assert args.json_output.parent == Path("jobs")
+    assert args.json_output.suffix == ".json"
+
+
+def test_main_records_command_in_results_json(monkeypatch, tmp_path: Path) -> None:
+    import json
+
+    out = tmp_path / "results.json"
+    monkeypatch.setattr(
+        bench_main,
+        "run_all",
+        lambda **_kwargs: [TaskRun("task_fake", True, "ok", 0.01)],
+    )
+    monkeypatch.setattr(bench_main, "summarize", lambda _results: None)
+
+    argv = ["run", "--json-output", str(out)]
+    assert bench_main.main(argv) == 0
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert list(payload)[:2] == ["task_set_version", "command"]
+    assert payload["command"] == bench_main._command_for_argv(argv)
+
+
+def test_run_all_continues_from_existing_json(monkeypatch, tmp_path: Path, capsys) -> None:
+    import json
+
+    from harness_bench import runner
+
+    out = tmp_path / "results.json"
+    runner.write_results_json(
+        [TaskRun("task_01_fake", True, "already done", 0.01)],
+        out,
+    )
+    fake_tasks = [
+        SimpleNamespace(id="task_01_fake", name="Fake one"),
+        SimpleNamespace(id="task_02_fake", name="Fake two"),
+    ]
+    calls: list[str] = []
+
+    def _fake_run_task(task: object, **_kwargs: object) -> TaskRun:
+        task_id = cast(SimpleNamespace, task).id
+        calls.append(task_id)
+        return TaskRun(
+            task_id=task_id,
+            passed=True,
+            message="newly done",
+            elapsed_seconds=0.01,
+        )
+
+    monkeypatch.setattr(runner, "_load_env_from_dotenv", lambda: None)
+    monkeypatch.setattr(runner, "_ensure_credentials", lambda: None)
+    monkeypatch.setattr(runner, "get_task", lambda tid: next(t for t in fake_tasks if t.id == tid))
+    monkeypatch.setattr(runner, "run_task", _fake_run_task)
+
+    results = runner.run_all(
+        task_ids=["task_01_fake", "task_02_fake"],
+        concurrency=1,
+        json_output=out,
+    )
+
+    assert calls == ["task_02_fake"]
+    assert [result.task_id for result in results] == ["task_01_fake", "task_02_fake"]
+    assert "[CONTINUE] loaded 1/2 completed task attempt(s)" in capsys.readouterr().out
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["total"] == 2
+    assert [task["message"] for task in payload["tasks"]] == ["already done", "newly done"]
+
+
+def test_run_all_records_keyboard_interrupt_in_json(monkeypatch, tmp_path: Path) -> None:
+    import json
+
+    from harness_bench import runner
+
+    out = tmp_path / "results.json"
+    fake_tasks = [
+        SimpleNamespace(id="task_01_fake", name="Fake one"),
+        SimpleNamespace(id="task_02_fake", name="Fake two"),
+    ]
+
+    def _fake_run_task(task: object, **_kwargs: object) -> TaskRun:
+        task_id = cast(SimpleNamespace, task).id
+        if task_id == "task_02_fake":
+            raise KeyboardInterrupt
+        return TaskRun(
+            task_id=task_id,
+            passed=True,
+            message="done before interrupt",
+            elapsed_seconds=0.01,
+        )
+
+    monkeypatch.setattr(runner, "_load_env_from_dotenv", lambda: None)
+    monkeypatch.setattr(runner, "_ensure_credentials", lambda: None)
+    monkeypatch.setattr(runner, "get_task", lambda tid: next(t for t in fake_tasks if t.id == tid))
+    monkeypatch.setattr(runner, "run_task", _fake_run_task)
+
+    with pytest.raises(KeyboardInterrupt):
+        runner.run_all(
+            task_ids=["task_01_fake", "task_02_fake"],
+            concurrency=1,
+            json_output=out,
+        )
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["run_status"] == "interrupted"
+    assert payload["interrupted"] is True
+    assert [task["task_id"] for task in payload["tasks"]] == ["task_01_fake"]
+    assert payload["interrupted_attempts"] == [
+        {
+            "task_id": "task_02_fake",
+            "attempt": 1,
+            "attempts": 1,
+            "reason": "KeyboardInterrupt",
+            "rerun_on_continue": True,
+        }
+    ]
+
+
 def test_task_203_accepts_valid_markdown_alignment(tmp_path: Path) -> None:
     (tmp_path / "team_report.md").write_text(
         "| team | open | closed | closed_hours |\n"

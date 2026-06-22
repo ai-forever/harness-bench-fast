@@ -19,13 +19,21 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import sys
 from collections.abc import Sequence
 from pathlib import Path
 
 from harness_bench.harbor_export import export_harbor_dataset
 from harness_bench.metrics import default_metric_ks
-from harness_bench.runner import run_all, summarize, verify_gold, write_results_json
+from harness_bench.runner import (
+    normalize_json_output_path,
+    run_all,
+    set_results_json_command,
+    summarize,
+    verify_gold,
+    write_results_json,
+)
 from harness_bench.runner_cli import DEFAULT_CLI_COMMAND, DEFAULT_TIMEOUT_SECONDS, run_all_cli
 from harness_bench.runner_openrouter import DEFAULT_OPENROUTER_MODEL
 from harness_bench.runner_openrouter import run_all as run_all_openrouter
@@ -266,10 +274,17 @@ def _add_json_output(p: argparse.ArgumentParser) -> None:
     p.add_argument(
         "--json-output",
         dest="json_output",
+        nargs="?",
+        const="",
         default=None,
+        type=normalize_json_output_path,
+        metavar="PATH",
         help=(
             "Write a machine-readable JSON report (aggregate pass_rate plus a "
-            "per-task breakdown with tags) to this path."
+            "per-task breakdown with tags) to this path. Bare filenames are "
+            "stored under jobs/. If PATH is omitted, a timestamped JSON file "
+            "is created under jobs/. If the file exists, completed task "
+            "attempts are loaded from it and skipped."
         ),
     )
 
@@ -580,14 +595,22 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _command_for_argv(argv: list[str] | None) -> str:
+    args = sys.argv[1:] if argv is None else argv
+    return shlex.join(["python", "-m", "harness_bench", *args])
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    set_results_json_command(_command_for_argv(argv))
     try:
         return int(args.func(args))
     except KeyboardInterrupt:
         print("\nInterrupted by user; shutdown complete.", file=sys.stderr)
         return 130
+    finally:
+        set_results_json_command(None)
 
 
 if __name__ == "__main__":

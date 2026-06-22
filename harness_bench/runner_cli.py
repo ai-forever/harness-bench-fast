@@ -40,10 +40,14 @@ from harness_bench.runner import (
     _load_env_from_dotenv,
     _mark_attempt,
     _one_line_detail,
+    _pending_task_attempts,
+    _resume_results,
     _task_attempt_label,
     _task_attempt_label_for,
     _task_sort_key,
+    _write_interrupted_results_json,
     _write_partial_results_json,
+    normalize_json_output_path,
     summarize,
 )
 from harness_bench.tasks import ALL_TASKS, get_task
@@ -776,42 +780,47 @@ def run_all_cli(
     """Run a subset (or all) of the benchmark via the CLI agent."""
     _load_env_from_dotenv()
     _STOP_REQUESTED.clear()
+    json_output = normalize_json_output_path(json_output)
     if attempts < 1:
         raise ValueError("attempts must be positive")
 
     targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
+    results = _resume_results(json_output, targets, attempts)
+    pending_attempts = _pending_task_attempts(targets, attempts, results)
+    if not pending_attempts:
+        _write_partial_results_json(results, json_output)
+        return results
 
     if concurrency <= 1:
-        results: list[TaskRun] = []
         try:
-            for task in targets:
-                for attempt in range(1, attempts + 1):
-                    label = _task_attempt_label_for(task.id, attempt, attempts)
-                    print(f"[START] {label}: {task.name}")
-                    run = run_task_cli(
-                        task,
-                        cli_command=cli_command,
-                        timeout=timeout,
-                        keep_workspace=keep_workspace,
-                    )
-                    run = _mark_attempt(run, attempt, attempts)
-                    results.append(run)
-                    _write_partial_results_json(results, json_output)
-                    status = "PASS" if run.passed else "FAIL"
-                    print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
-                    if keep_workspace and run.workspace:
-                        print(f"  workspace: {run.workspace}")
+            for task, attempt in pending_attempts:
+                label = _task_attempt_label_for(task.id, attempt, attempts)
+                print(f"[START] {label}: {task.name}")
+                run = run_task_cli(
+                    task,
+                    cli_command=cli_command,
+                    timeout=timeout,
+                    keep_workspace=keep_workspace,
+                )
+                run = _mark_attempt(run, attempt, attempts)
+                results.append(run)
+                _write_partial_results_json(results, json_output)
+                status = "PASS" if run.passed else "FAIL"
+                print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
+                if keep_workspace and run.workspace:
+                    print(f"  workspace: {run.workspace}")
         except KeyboardInterrupt:
             _STOP_REQUESTED.set()
             _terminate_all_active_processes()
-            _write_partial_results_json(results, json_output)
+            _write_interrupted_results_json(results, json_output, pending_attempts, attempts)
             raise
+        results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
+        _write_partial_results_json(results, json_output)
         return results
 
     print_lock = threading.Lock()
-    completed = 0
+    completed = len(results)
     total = len(targets) * attempts
-    results = []
     executor = ThreadPoolExecutor(max_workers=concurrency)
     interrupted = False
     future_to_task = {}
@@ -824,8 +833,7 @@ def run_all_cli(
                 timeout=timeout,
                 keep_workspace=keep_workspace,
             ): (task, attempt)
-            for task in targets
-            for attempt in range(1, attempts + 1)
+            for task, attempt in pending_attempts
         }
         for future in as_completed(future_to_task):
             _task, attempt = future_to_task[future]
@@ -848,7 +856,7 @@ def run_all_cli(
         _terminate_all_active_processes()
         for future in future_to_task:
             future.cancel()
-        _write_partial_results_json(results, json_output)
+        _write_interrupted_results_json(results, json_output, pending_attempts, attempts)
         raise
     finally:
         executor.shutdown(wait=not interrupted, cancel_futures=interrupted)

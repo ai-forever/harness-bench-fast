@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import json
 import os
 import threading
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, replace
+from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -15,6 +17,22 @@ from typing import Any
 from harness_bench.core import Task, VerifyResult
 from harness_bench.metrics import PassMetric, compute_pass_metrics
 from harness_bench.tasks import ALL_TASKS, get_task
+
+DEFAULT_JOBS_DIR = Path("jobs")
+"""Default directory for CLI-specified benchmark JSON/checkpoint files."""
+
+_AGENT_METRIC_FIELDS = (
+    "agent_steps",
+    "agent_tool_calls",
+    "agent_shell_commands",
+    "agent_events",
+    "agent_llm_calls",
+    "agent_input_tokens",
+    "agent_output_tokens",
+    "agent_total_tokens",
+)
+
+_RESULTS_JSON_COMMAND: str | None = None
 
 
 def _is_graph_recursion_error(exc: BaseException) -> bool:
@@ -96,6 +114,149 @@ def _coerce_int(value: Any) -> int | None:
     if isinstance(value, float) and value.is_integer():
         return int(value)
     return None
+
+
+def _coerce_float(value: Any) -> float:
+    if isinstance(value, bool):
+        return 0.0
+    if isinstance(value, int | float):
+        return float(value)
+    return 0.0
+
+
+def set_results_json_command(command: str | None) -> None:
+    """Set the command recorded in subsequently written benchmark JSON files."""
+    global _RESULTS_JSON_COMMAND
+    _RESULTS_JSON_COMMAND = command
+
+
+def _timestamped_json_name() -> str:
+    return f"{datetime.now():%Y%m%d_%H%M%S_%f}.json"
+
+
+def _path_has_trailing_separator(path: str) -> bool:
+    return path.endswith(("/", "\\"))
+
+
+def normalize_json_output_path(path: str | Path | None) -> Path | None:
+    """Resolve result JSON paths while keeping bare filenames under ``jobs/``."""
+    if path is None:
+        return None
+    raw_path = os.fspath(path)
+    if raw_path == "":
+        return DEFAULT_JOBS_DIR / _timestamped_json_name()
+    out = Path(path)
+    if _path_has_trailing_separator(raw_path) or (out.exists() and out.is_dir()):
+        return out / _timestamped_json_name()
+    if not out.is_absolute() and out.parent == Path("."):
+        return DEFAULT_JOBS_DIR / out
+    return out
+
+
+def task_run_from_payload(item: dict[str, Any], *, attempts: int | None = None) -> TaskRun:
+    task_id = item.get("task_id")
+    if not isinstance(task_id, str) or not task_id:
+        raise ValueError("result task entry is missing task_id")
+
+    attempt = _coerce_int(item.get("attempt")) or 1
+    saved_attempts = _coerce_int(item.get("attempts")) or 1
+    metric_values = {
+        field: _coerce_int(item.get(field))
+        for field in _AGENT_METRIC_FIELDS
+    }
+    error = item.get("error")
+    message = item.get("message")
+    return TaskRun(
+        task_id=task_id,
+        passed=bool(item.get("passed")),
+        message=message if isinstance(message, str) else "",
+        elapsed_seconds=_coerce_float(item.get("elapsed_seconds")),
+        error=error if isinstance(error, str) else None,
+        attempt=attempt,
+        attempts=attempts or saved_attempts,
+        **metric_values,
+    )
+
+
+def load_results_json(path: str | Path, *, attempts: int | None = None) -> list[TaskRun]:
+    """Load a previously written benchmark JSON report back into ``TaskRun`` rows."""
+    result_path = Path(path)
+    try:
+        payload = json.loads(result_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"{result_path} is not valid JSON: {exc}") from exc
+    if not isinstance(payload, dict) or not isinstance(payload.get("tasks"), list):
+        raise ValueError(f"{result_path} does not look like a harness-bench results JSON")
+    runs = []
+    for item in payload["tasks"]:
+        if not isinstance(item, dict):
+            raise ValueError(f"{result_path} contains a non-object task entry")
+        runs.append(task_run_from_payload(item, attempts=attempts))
+    return runs
+
+
+def _resume_results(
+    json_output: str | Path | None,
+    targets: list[Task],
+    attempts: int,
+) -> list[TaskRun]:
+    json_output_path = normalize_json_output_path(json_output)
+    if json_output_path is None or not json_output_path.exists():
+        return []
+
+    target_ids = {task.id for task in targets}
+    loaded = load_results_json(json_output_path, attempts=attempts)
+    by_key: dict[tuple[str, int], TaskRun] = {}
+    for run in loaded:
+        if run.task_id not in target_ids:
+            continue
+        if run.attempt < 1 or run.attempt > attempts:
+            continue
+        by_key[(run.task_id, run.attempt)] = replace(
+            run,
+            attempts=attempts,
+            workspace=None,
+        )
+    results = sorted(by_key.values(), key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
+    if results:
+        total = len(targets) * attempts
+        print(
+            f"[CONTINUE] loaded {len(results)}/{total} completed task attempt(s) "
+            f"from {json_output_path}"
+        )
+    return results
+
+
+def _pending_task_attempts(
+    targets: list[Task],
+    attempts: int,
+    results: list[TaskRun],
+) -> list[tuple[Task, int]]:
+    completed = {(run.task_id, run.attempt) for run in results}
+    return [
+        (task, attempt)
+        for task in targets
+        for attempt in range(1, attempts + 1)
+        if (task.id, attempt) not in completed
+    ]
+
+
+def _task_attempts_payload(
+    task_attempts: list[tuple[Task, int]],
+    attempts: int,
+    *,
+    reason: str,
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "task_id": task.id,
+            "attempt": attempt,
+            "attempts": attempts,
+            "reason": reason,
+            "rerun_on_continue": True,
+        }
+        for task, attempt in task_attempts
+    ]
 
 
 def _usage_token_counts(usage: Any) -> tuple[int | None, int | None, int | None]:
@@ -424,40 +585,45 @@ def run_all(
     """
     _load_env_from_dotenv()
     _ensure_credentials()
+    json_output = normalize_json_output_path(json_output)
 
     if attempts < 1:
         raise ValueError("attempts must be positive")
 
     targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
+    results = _resume_results(json_output, targets, attempts)
+    pending_attempts = _pending_task_attempts(targets, attempts, results)
+    if not pending_attempts:
+        _write_partial_results_json(results, json_output)
+        return results
 
     if concurrency <= 1:
-        results: list[TaskRun] = []
         try:
-            for task in targets:
-                for attempt in range(1, attempts + 1):
-                    label = _task_attempt_label_for(task.id, attempt, attempts)
-                    print(f"[START] {label}: {task.name}")
-                    run = run_task(
-                        task,
-                        keep_workspace=keep_workspace,
-                        recursion_limit=recursion_limit,
-                    )
-                    run = _mark_attempt(run, attempt, attempts)
-                    results.append(run)
-                    _write_partial_results_json(results, json_output)
-                    status = "PASS" if run.passed else "FAIL"
-                    print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
-                    if keep_workspace and run.workspace:
-                        print(f"  workspace: {run.workspace}")
+            for task, attempt in pending_attempts:
+                label = _task_attempt_label_for(task.id, attempt, attempts)
+                print(f"[START] {label}: {task.name}")
+                run = run_task(
+                    task,
+                    keep_workspace=keep_workspace,
+                    recursion_limit=recursion_limit,
+                )
+                run = _mark_attempt(run, attempt, attempts)
+                results.append(run)
+                _write_partial_results_json(results, json_output)
+                status = "PASS" if run.passed else "FAIL"
+                print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
+                if keep_workspace and run.workspace:
+                    print(f"  workspace: {run.workspace}")
         except KeyboardInterrupt:
-            _write_partial_results_json(results, json_output)
+            _write_interrupted_results_json(results, json_output, pending_attempts, attempts)
             raise
+        results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
+        _write_partial_results_json(results, json_output)
         return results
 
     print_lock = threading.Lock()
-    completed = 0
+    completed = len(results)
     total = len(targets) * attempts
-    results = []
     executor = ThreadPoolExecutor(max_workers=concurrency)
     interrupted = False
     future_to_task = {}
@@ -469,8 +635,7 @@ def run_all(
                 keep_workspace=keep_workspace,
                 recursion_limit=recursion_limit,
             ): (task, attempt)
-            for task in targets
-            for attempt in range(1, attempts + 1)
+            for task, attempt in pending_attempts
         }
         for future in as_completed(future_to_task):
             _task, attempt = future_to_task[future]
@@ -491,7 +656,7 @@ def run_all(
         interrupted = True
         for future in future_to_task:
             future.cancel()
-        _write_partial_results_json(results, json_output)
+        _write_interrupted_results_json(results, json_output, pending_attempts, attempts)
         raise
     finally:
         executor.shutdown(wait=not interrupted, cancel_futures=interrupted)
@@ -622,7 +787,12 @@ def _format_table_row(values: list[str], widths: list[int]) -> str:
     return "  ".join(cells)
 
 
-def results_to_payload(results: list[TaskRun]) -> dict[str, Any]:
+def results_to_payload(
+    results: list[TaskRun],
+    *,
+    interrupted_attempts: list[dict[str, Any]] | None = None,
+    command: str | None = None,
+) -> dict[str, Any]:
     """Build a JSON-serializable payload describing a benchmark run.
 
     The payload carries an aggregate (``passed``/``total``/``pass_rate``) plus a
@@ -661,23 +831,45 @@ def results_to_payload(results: list[TaskRun]) -> dict[str, Any]:
                 "agent_total_tokens": r.agent_total_tokens,
             }
         )
-    return {
-        "task_set_version": TASK_SET_VERSION,
-        "total": total,
-        "passed": passed,
-        "pass_rate": (passed / total) if total else 0.0,
-        "tasks": tasks_payload,
-    }
+    payload = {"task_set_version": TASK_SET_VERSION}
+    result_command = command if command is not None else _RESULTS_JSON_COMMAND
+    if result_command:
+        payload["command"] = result_command
+    payload.update(
+        {
+            "total": total,
+            "passed": passed,
+            "pass_rate": (passed / total) if total else 0.0,
+            "tasks": tasks_payload,
+        }
+    )
+    if interrupted_attempts is not None:
+        payload["run_status"] = "interrupted"
+        payload["interrupted"] = True
+        payload["interrupted_attempts"] = interrupted_attempts
+    return payload
 
 
-def write_results_json(results: list[TaskRun], path: str | Path) -> None:
+def write_results_json(
+    results: list[TaskRun],
+    path: str | Path,
+    *,
+    interrupted_attempts: list[dict[str, Any]] | None = None,
+    command: str | None = None,
+) -> None:
     """Serialize a run's results to ``path`` as JSON (parents are created)."""
-    import json
-
     out = Path(path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(
-        json.dumps(results_to_payload(results), ensure_ascii=False, indent=2),
+        json.dumps(
+            results_to_payload(
+                results,
+                interrupted_attempts=interrupted_attempts,
+                command=command,
+            ),
+            ensure_ascii=False,
+            indent=2,
+        ),
         encoding="utf-8",
     )
 
@@ -687,6 +879,32 @@ def _write_partial_results_json(results: list[TaskRun], path: str | Path | None)
         return
     sorted_results = sorted(results, key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
     write_results_json(sorted_results, path)
+
+
+def _write_interrupted_results_json(
+    results: list[TaskRun],
+    path: str | Path | None,
+    pending_attempts: list[tuple[Task, int]],
+    attempts: int,
+) -> None:
+    if path is None:
+        return
+    completed = {(run.task_id, run.attempt) for run in results}
+    interrupted_attempts = [
+        (task, attempt)
+        for task, attempt in pending_attempts
+        if (task.id, attempt) not in completed
+    ]
+    sorted_results = sorted(results, key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
+    write_results_json(
+        sorted_results,
+        path,
+        interrupted_attempts=_task_attempts_payload(
+            interrupted_attempts,
+            attempts,
+            reason="KeyboardInterrupt",
+        ),
+    )
 
 
 # ---------------------------------------------------------------------------

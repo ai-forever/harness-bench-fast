@@ -130,8 +130,14 @@ uv run python -m harness_bench run-cli \
 # plus agent_llm_calls / agent_input_tokens / agent_output_tokens /
 # agent_total_tokens when the backend exposes usage metadata. Codex CLI runs
 # auto-enable `codex exec --json` so those metrics can be read from JSONL.
-# `--json-output` is checkpointed after each completed task, so completed
-# results survive a later hang or interrupted run.
+# `--json-output` is checkpointed after each completed task. If the JSON file
+# already exists, completed task attempts are loaded from it and skipped so the
+# run continues from the checkpoint. Bare filenames such as `results.json` are
+# written under the ignored `jobs/` directory. If `--json-output` is provided
+# without a path, or with a directory path, the filename is generated from the
+# current timestamp. JSON reports also include the command that launched the
+# run. Ctrl-C writes `run_status: "interrupted"` plus `interrupted_attempts`;
+# those attempts are rerun from clean workspaces on the next continue.
 uv run python -m harness_bench run-cli \
     --cli-command 'codex exec -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox' \
     --concurrency 5 --json-output results.json
