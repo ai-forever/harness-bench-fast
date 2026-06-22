@@ -143,7 +143,7 @@ uv run python -m harness_bench run-cli \
     --concurrency 5
 
 # Repeat every selected task 5 times and print pass@K / pass^K
-# task-count metrics for K=1..5. Works for run, run-openrouter,
+# percentage metrics for K=1..5. Works for run, run-openrouter,
 # run-pure, and run-cli.
 uv run python -m harness_bench run-cli \
     --cli-command 'free-code -p --model haiku --dangerously-skip-permissions' \

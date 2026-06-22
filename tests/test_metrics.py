@@ -61,6 +61,25 @@ def test_summary_prints_pass_metrics_for_attempts(capsys: pytest.CaptureFixture[
     assert "Passed attempts: 3/4" in out
     assert "K  pass@K  pass^K" in out
     assert "-  ------  ------" in out
-    assert "1   1.5/2       -" in out
-    assert "2     2/2     1/2" in out
+    assert "1   75.0%       -" in out
+    assert "2  100.0%   50.0%" in out
     assert "task_1 #2/2: bad" in out
+
+
+def test_summary_prints_wave_breakdown_by_unique_task(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    results = [
+        TaskRun("task_01_example", False, "bad", 0.1, attempt=1, attempts=2),
+        TaskRun("task_01_example", True, "ok", 0.1, attempt=2, attempts=2),
+        TaskRun("task_31_example", False, "bad", 0.1, attempt=1, attempts=1),
+    ]
+
+    summarize(results, pass_at_ks=(), pass_hat_ks=())
+
+    out = capsys.readouterr().out
+    assert "Per-wave breakdown:" in out
+    assert "Wave           Tasks  Passed       %" in out
+    assert "core (1-30)        1       1  100.0%" in out
+    assert "extra (31-60)      1       0    0.0%" in out
+    assert "Total              2       1   50.0%" in out

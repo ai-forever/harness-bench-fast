@@ -31,6 +31,35 @@ class TaskSetRevision:
         return f"{start}" if start == end else f"{start}-{end}"
 
 
+@dataclass(frozen=True)
+class TaskWave:
+    """A benchmark wave used for human-readable result breakdowns."""
+
+    name: str
+    start: int
+    end: int
+
+    @property
+    def label(self) -> str:
+        return f"{self.name} ({self.start}-{self.end})"
+
+    def contains(self, task_number: int) -> bool:
+        return self.start <= task_number <= self.end
+
+
+TASK_WAVES: tuple[TaskWave, ...] = (
+    TaskWave("core", 1, 30),
+    TaskWave("extra", 31, 60),
+    TaskWave("more", 61, 100),
+    TaskWave("hard", 101, 150),
+    TaskWave("extreme", 151, 205),
+    TaskWave("diagnostic", 206, 221),
+    TaskWave("memory", 222, 253),
+    TaskWave("agentic", 254, 298),
+    TaskWave("VCS", 299, 313),
+)
+
+
 TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
     TaskSetRevision(
         version="0.1.0",

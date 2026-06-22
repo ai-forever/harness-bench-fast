@@ -4,6 +4,7 @@ from harness_bench.tasks import ALL_TASKS
 from harness_bench.versioning import (
     EXPECTED_TASK_COUNT,
     TASK_SET_VERSION,
+    TASK_WAVES,
     revision_for_task_id,
     validate_task_set_metadata,
 )
@@ -12,6 +13,15 @@ from harness_bench.versioning import (
 def test_task_set_metadata_matches_registry() -> None:
     assert validate_task_set_metadata(ALL_TASKS) == []
     assert len(ALL_TASKS) == EXPECTED_TASK_COUNT
+
+
+def test_task_waves_cover_current_task_set() -> None:
+    covered = [
+        number
+        for wave in TASK_WAVES
+        for number in range(wave.start, wave.end + 1)
+    ]
+    assert covered == list(range(1, EXPECTED_TASK_COUNT + 1))
 
 
 def test_memory_tasks_belong_to_their_revisions() -> None:

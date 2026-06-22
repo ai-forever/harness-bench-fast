@@ -17,6 +17,7 @@ from typing import Any
 from harness_bench.core import Task, VerifyResult
 from harness_bench.metrics import PassMetric, compute_pass_metrics
 from harness_bench.tasks import ALL_TASKS, get_task
+from harness_bench.versioning import TASK_SET_VERSION, TASK_WAVES, TaskWave, task_number
 
 DEFAULT_JOBS_DIR = Path("jobs")
 """Default directory for CLI-specified benchmark JSON/checkpoint files."""
@@ -728,6 +729,12 @@ def summarize(
         print("Metrics:")
         for line in _format_metrics_table(metrics):
             print(f"  {line}")
+    wave_table = _format_wave_breakdown_table(results)
+    if wave_table:
+        print()
+        print("Per-wave breakdown:")
+        for line in wave_table:
+            print(f"  {line}")
     if passed < total:
         print()
         print("Failures:")
@@ -776,10 +783,86 @@ def _format_metrics_table(metrics: list[PassMetric]) -> list[str]:
 def _format_metric_value(metric: PassMetric | None) -> str:
     if metric is None:
         return "-"
-    task_equivalent = metric.value * metric.task_count
-    rounded = round(task_equivalent)
-    count = str(rounded) if abs(task_equivalent - rounded) < 1e-9 else f"{task_equivalent:.1f}"
-    return f"{count}/{metric.task_count}"
+    return f"{metric.value * 100:.1f}%"
+
+
+def _format_wave_breakdown_table(results: list[TaskRun]) -> list[str]:
+    task_results = _task_results_by_id(results)
+    if not task_results:
+        return []
+
+    rows = []
+    for wave in TASK_WAVES:
+        row = _wave_breakdown_row(wave, task_results)
+        if row[1] > 0:
+            rows.append(row)
+    unknown_task_results = {
+        task_id: runs
+        for task_id, runs in task_results.items()
+        if not _wave_for_task_id(task_id)
+    }
+    if unknown_task_results:
+        rows.append(_breakdown_row("unknown", unknown_task_results))
+    rows.append(_breakdown_row("Total", task_results))
+
+    table_rows = [
+        [label, str(tasks), str(passed), f"{passed / tasks * 100:.1f}%"]
+        for label, tasks, passed in rows
+    ]
+    headers = ["Wave", "Tasks", "Passed", "%"]
+    widths = [
+        max(len(row[i]) for row in [headers, *table_rows])
+        for i in range(len(headers))
+    ]
+    lines = [
+        _format_table_row_aligned(headers, widths),
+        _format_table_row_aligned(["-" * width for width in widths], widths),
+    ]
+    lines.extend(_format_table_row_aligned(row, widths) for row in table_rows)
+    return lines
+
+
+def _task_results_by_id(results: list[TaskRun]) -> dict[str, list[TaskRun]]:
+    grouped: dict[str, list[TaskRun]] = {}
+    for result in results:
+        grouped.setdefault(result.task_id, []).append(result)
+    return grouped
+
+
+def _wave_breakdown_row(
+    wave: TaskWave,
+    task_results: dict[str, list[TaskRun]],
+) -> tuple[str, int, int]:
+    matching_task_results = {
+        task_id: runs
+        for task_id, runs in task_results.items()
+        if (number := task_number(task_id)) is not None and wave.contains(number)
+    }
+    return _breakdown_row(wave.label, matching_task_results)
+
+
+def _breakdown_row(
+    label: str,
+    task_results: dict[str, list[TaskRun]],
+) -> tuple[str, int, int]:
+    tasks = len(task_results)
+    passed = sum(1 for runs in task_results.values() if any(run.passed for run in runs))
+    return label, tasks, passed
+
+
+def _wave_for_task_id(task_id: str) -> TaskWave | None:
+    number = task_number(task_id)
+    if number is None:
+        return None
+    return next((wave for wave in TASK_WAVES if wave.contains(number)), None)
+
+
+def _format_table_row_aligned(values: list[str], widths: list[int]) -> str:
+    cells = [
+        value.ljust(width) if index == 0 else value.rjust(width)
+        for index, (value, width) in enumerate(zip(values, widths, strict=True))
+    ]
+    return "  ".join(cells)
 
 
 def _format_table_row(values: list[str], widths: list[int]) -> str:
@@ -800,8 +883,6 @@ def results_to_payload(
     so downstream tooling can compute per-category metrics without re-importing
     the task registry.
     """
-    from harness_bench.versioning import TASK_SET_VERSION, task_number
-
     total = len(results)
     passed = sum(1 for r in results if r.passed)
     tasks_payload: list[dict[str, Any]] = []
