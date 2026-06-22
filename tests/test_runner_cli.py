@@ -6,7 +6,7 @@ from harness_bench.runner_cli import _argv_for_workspace
 def test_opencode_command_gets_explicit_workspace_dir() -> None:
     argv = _argv_for_workspace(["opencode", "run", "--model", "x/y"], Path("/tmp/ws"))
 
-    assert argv == ["opencode", "run", "--model", "x/y", "--dir", "/tmp/ws"]
+    assert argv == ["opencode", "run", "--model", "x/y", "--dir", str(Path("/tmp/ws"))]
 
 
 def test_opencode_command_keeps_user_supplied_dir() -> None:
