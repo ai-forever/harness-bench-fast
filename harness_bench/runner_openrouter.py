@@ -465,35 +465,42 @@ def run_all(
 
     if concurrency <= 1:
         results: list[TaskRun] = []
-        for task in targets:
-            for attempt in range(1, attempts + 1):
-                label = _task_attempt_label_for(task.id, attempt, attempts)
-                print(f"[START] {label}: {task.name}")
-                run = run_task(
-                    task,
-                    model_name=model_name,
-                    keep_workspace=keep_workspace,
-                    recursion_limit=recursion_limit,
-                    max_tokens=max_tokens,
-                    harness_profile=harness_profile,
-                    transient_attempts=transient_attempts,
-                )
-                run = _mark_attempt(run, attempt, attempts)
-                results.append(run)
-                _write_partial_results_json(results, json_output)
-                status = "PASS" if run.passed else "FAIL"
-                print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
-                if keep_workspace and run.workspace:
-                    print(f"  workspace: {run.workspace}")
-                if fail_on_runtime_error and run.error:
-                    return results
+        try:
+            for task in targets:
+                for attempt in range(1, attempts + 1):
+                    label = _task_attempt_label_for(task.id, attempt, attempts)
+                    print(f"[START] {label}: {task.name}")
+                    run = run_task(
+                        task,
+                        model_name=model_name,
+                        keep_workspace=keep_workspace,
+                        recursion_limit=recursion_limit,
+                        max_tokens=max_tokens,
+                        harness_profile=harness_profile,
+                        transient_attempts=transient_attempts,
+                    )
+                    run = _mark_attempt(run, attempt, attempts)
+                    results.append(run)
+                    _write_partial_results_json(results, json_output)
+                    status = "PASS" if run.passed else "FAIL"
+                    print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
+                    if keep_workspace and run.workspace:
+                        print(f"  workspace: {run.workspace}")
+                    if fail_on_runtime_error and run.error:
+                        return results
+        except KeyboardInterrupt:
+            _write_partial_results_json(results, json_output)
+            raise
         return results
 
     print_lock = threading.Lock()
     completed = 0
     total = len(targets) * attempts
     results = []
-    with ThreadPoolExecutor(max_workers=concurrency) as executor:
+    executor = ThreadPoolExecutor(max_workers=concurrency)
+    stop_without_wait = False
+    future_to_task = {}
+    try:
         future_to_task = {
             executor.submit(
                 run_task,
@@ -524,11 +531,21 @@ def run_all(
                 if keep_workspace and run.workspace:
                     print(f"           workspace: {run.workspace}")
             if fail_on_runtime_error and run.error:
+                stop_without_wait = True
                 for pending_future in future_to_task:
                     if pending_future is not future:
                         pending_future.cancel()
                 results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
+                _write_partial_results_json(results, json_output)
                 return results
+    except KeyboardInterrupt:
+        stop_without_wait = True
+        for future in future_to_task:
+            future.cancel()
+        _write_partial_results_json(results, json_output)
+        raise
+    finally:
+        executor.shutdown(wait=not stop_without_wait, cancel_futures=stop_without_wait)
     results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
     _write_partial_results_json(results, json_output)
     return results

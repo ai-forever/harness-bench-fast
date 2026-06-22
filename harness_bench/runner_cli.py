@@ -23,6 +23,7 @@ import json
 import os
 import re
 import shlex
+import signal
 import subprocess
 import sys
 import threading
@@ -102,6 +103,31 @@ _CLEANUP_RETRY_DELAYS = (0.1, 0.25, 0.5, 1.0, 2.0)
 
 _PROCESS_TREE_SHUTDOWN_TIMEOUT = 10
 """Seconds to wait for pipes to close after killing a timed-out CLI tree."""
+
+_INTERRUPT_SHUTDOWN_GRACE_SECONDS = 2.0
+"""Seconds to wait after Ctrl-C TERM before force-killing active CLI trees."""
+
+_ACTIVE_PROCESS_LOCK = threading.Lock()
+_ACTIVE_PROCESSES: set[subprocess.Popen[str]] = set()
+"""CLI subprocesses currently owned by worker threads."""
+
+_STOP_REQUESTED = threading.Event()
+"""Set when the main runner is interrupted so worker retries/backoffs stop."""
+
+
+def _is_opencode_run_command(argv: list[str]) -> bool:
+    if len(argv) < 2:
+        return False
+    return Path(argv[0]).name == "opencode" and argv[1] == "run"
+
+
+def _argv_for_workspace(argv: list[str], workspace: Path) -> list[str]:
+    """Return argv with an explicit workspace argument when the CLI needs one."""
+    if not _is_opencode_run_command(argv):
+        return list(argv)
+    if any(arg == "--dir" or arg.startswith("--dir=") for arg in argv):
+        return list(argv)
+    return [*argv, "--dir", str(workspace)]
 
 
 def _is_codex_exec_command(argv: list[str]) -> bool:
@@ -228,11 +254,73 @@ def _terminate_process_tree(proc: subprocess.Popen[str]) -> None:
         return
 
     try:
-        os.killpg(proc.pid, 15)
+        os.killpg(proc.pid, signal.SIGTERM)
     except ProcessLookupError:
         return
     except OSError:
         proc.kill()
+
+
+def _kill_process_tree(proc: subprocess.Popen[str]) -> None:
+    if os.name == "nt":
+        subprocess.run(  # noqa: S603,S607 — Windows process-tree cleanup helper
+            ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+        return
+
+    try:
+        os.killpg(proc.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        return
+    except OSError:
+        proc.kill()
+
+
+def _process_is_running(proc: subprocess.Popen[str]) -> bool:
+    try:
+        return proc.poll() is None
+    except AttributeError:
+        return getattr(proc, "returncode", None) is None
+
+
+def _register_active_process(proc: subprocess.Popen[str]) -> None:
+    with _ACTIVE_PROCESS_LOCK:
+        _ACTIVE_PROCESSES.add(proc)
+
+
+def _unregister_active_process(proc: subprocess.Popen[str]) -> None:
+    with _ACTIVE_PROCESS_LOCK:
+        _ACTIVE_PROCESSES.discard(proc)
+
+
+def _terminate_all_active_processes() -> None:
+    with _ACTIVE_PROCESS_LOCK:
+        procs = list(_ACTIVE_PROCESSES)
+    for proc in procs:
+        try:
+            _terminate_process_tree(proc)
+        except Exception:  # noqa: BLE001 — best-effort interrupt cleanup.
+            continue
+    deadline = time.monotonic() + _INTERRUPT_SHUTDOWN_GRACE_SECONDS
+    while time.monotonic() < deadline:
+        if all(not _process_is_running(proc) for proc in procs):
+            return
+        time.sleep(0.05)
+    for proc in procs:
+        if not _process_is_running(proc):
+            continue
+        try:
+            _kill_process_tree(proc)
+        except Exception:  # noqa: BLE001 — best-effort interrupt cleanup.
+            continue
+
+
+def _sleep_interruptibly(seconds: float) -> None:
+    if _STOP_REQUESTED.wait(seconds):
+        raise KeyboardInterrupt
 
 
 def _run_cli_subprocess(
@@ -263,6 +351,7 @@ def _run_cli_subprocess(
         creationflags=creationflags,
         start_new_session=start_new_session,
     )
+    _register_active_process(proc)
     try:
         stdout, stderr = proc.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
@@ -270,9 +359,14 @@ def _run_cli_subprocess(
         try:
             proc.communicate(timeout=_PROCESS_TREE_SHUTDOWN_TIMEOUT)
         except subprocess.TimeoutExpired:
-            proc.kill()
+            _kill_process_tree(proc)
             proc.communicate()
         raise
+    except BaseException:
+        _terminate_process_tree(proc)
+        raise
+    finally:
+        _unregister_active_process(proc)
     return subprocess.CompletedProcess(argv, proc.returncode, stdout, stderr)
 
 
@@ -506,7 +600,10 @@ def run_task_cli(
 
             task.setup(workspace_path)
 
-            argv = list(base_argv)
+            if _STOP_REQUESTED.is_set():
+                raise KeyboardInterrupt
+
+            argv = _argv_for_workspace(base_argv, workspace_path)
             agents_md = workspace_path / "AGENTS.md"
             if inject_agents_md and agents_md.exists():
                 argv += [
@@ -577,7 +674,7 @@ def run_task_cli(
                     _cleanup_workspace_keepalive(workspace_keepalive, task_id=task.id)
                     workspace_keepalive = None
                 delay = _BACKOFF_SCHEDULE[min(attempt, len(_BACKOFF_SCHEDULE) - 1)]
-                time.sleep(delay)
+                _sleep_interruptibly(delay)
                 continue
 
             # Verifier failed and the error isn't transient (or budget exhausted).
@@ -604,9 +701,9 @@ def run_task_cli(
                 prom_env = _subprocess_env_with_prom_token()
                 if prom_env is not None:
                     prom_model = os.getenv("GIGACHAT_PROM_MODEL", "GigaChat-2-Max")
-                    prom_argv = shlex.split(
-                        _swap_model_in_cli_command(cli_command, prom_model)
-                    ) + [task.prompt]
+                    prom_base_argv = _ensure_codex_json_events(
+                        shlex.split(_swap_model_in_cli_command(cli_command, prom_model))
+                    )
                     # Clean prior workspace and re-set up for PROM attempt.
                     if workspace_keepalive is not None:
                         _cleanup_workspace_keepalive(workspace_keepalive, task_id=task.id)
@@ -619,6 +716,10 @@ def run_task_cli(
                         )
                         workspace_path = Path(workspace_keepalive.name)
                     task.setup(workspace_path)
+                    prom_argv = [
+                        *_argv_for_workspace(prom_base_argv, workspace_path),
+                        task.prompt,
+                    ]
                     try:
                         prom_result = _run_cli_subprocess(
                             prom_argv,
@@ -674,6 +775,7 @@ def run_all_cli(
 ) -> list[TaskRun]:
     """Run a subset (or all) of the benchmark via the CLI agent."""
     _load_env_from_dotenv()
+    _STOP_REQUESTED.clear()
     if attempts < 1:
         raise ValueError("attempts must be positive")
 
@@ -681,30 +783,39 @@ def run_all_cli(
 
     if concurrency <= 1:
         results: list[TaskRun] = []
-        for task in targets:
-            for attempt in range(1, attempts + 1):
-                label = _task_attempt_label_for(task.id, attempt, attempts)
-                print(f"[START] {label}: {task.name}")
-                run = run_task_cli(
-                    task,
-                    cli_command=cli_command,
-                    timeout=timeout,
-                    keep_workspace=keep_workspace,
-                )
-                run = _mark_attempt(run, attempt, attempts)
-                results.append(run)
-                _write_partial_results_json(results, json_output)
-                status = "PASS" if run.passed else "FAIL"
-                print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
-                if keep_workspace and run.workspace:
-                    print(f"  workspace: {run.workspace}")
+        try:
+            for task in targets:
+                for attempt in range(1, attempts + 1):
+                    label = _task_attempt_label_for(task.id, attempt, attempts)
+                    print(f"[START] {label}: {task.name}")
+                    run = run_task_cli(
+                        task,
+                        cli_command=cli_command,
+                        timeout=timeout,
+                        keep_workspace=keep_workspace,
+                    )
+                    run = _mark_attempt(run, attempt, attempts)
+                    results.append(run)
+                    _write_partial_results_json(results, json_output)
+                    status = "PASS" if run.passed else "FAIL"
+                    print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
+                    if keep_workspace and run.workspace:
+                        print(f"  workspace: {run.workspace}")
+        except KeyboardInterrupt:
+            _STOP_REQUESTED.set()
+            _terminate_all_active_processes()
+            _write_partial_results_json(results, json_output)
+            raise
         return results
 
     print_lock = threading.Lock()
     completed = 0
     total = len(targets) * attempts
     results = []
-    with ThreadPoolExecutor(max_workers=concurrency) as executor:
+    executor = ThreadPoolExecutor(max_workers=concurrency)
+    interrupted = False
+    future_to_task = {}
+    try:
         future_to_task = {
             executor.submit(
                 run_task_cli,
@@ -731,6 +842,16 @@ def run_all_cli(
                 )
                 if keep_workspace and run.workspace:
                     print(f"           workspace: {run.workspace}")
+    except KeyboardInterrupt:
+        interrupted = True
+        _STOP_REQUESTED.set()
+        _terminate_all_active_processes()
+        for future in future_to_task:
+            future.cancel()
+        _write_partial_results_json(results, json_output)
+        raise
+    finally:
+        executor.shutdown(wait=not interrupted, cancel_futures=interrupted)
     results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
     _write_partial_results_json(results, json_output)
     return results
@@ -739,6 +860,7 @@ def run_all_cli(
 __all__ = [
     "DEFAULT_CLI_COMMAND",
     "DEFAULT_TIMEOUT_SECONDS",
+    "_argv_for_workspace",
     "run_all_cli",
     "run_task_cli",
     "summarize",

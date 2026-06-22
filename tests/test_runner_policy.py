@@ -69,6 +69,16 @@ def test_allow_task_failures_returns_zero_when_harness_completed(monkeypatch) ->
     assert bench_main.main(["run", "--task", "task_fake", "--allow-task-failures"]) == 0
 
 
+def test_main_keyboard_interrupt_returns_130(monkeypatch, capsys) -> None:
+    def _interrupting_run_all_cli(**_kwargs: object) -> list[TaskRun]:
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(bench_main, "run_all_cli", _interrupting_run_all_cli)
+
+    assert bench_main.main(["run-cli", "--task", "task_fake"]) == 130
+    assert "Interrupted by user; shutdown complete." in capsys.readouterr().err
+
+
 def test_openrouter_fail_on_runtime_error_returns_nonzero_with_allowed_task_failures(
     monkeypatch,
 ) -> None:
@@ -114,7 +124,7 @@ def test_openrouter_run_all_stops_on_runtime_error(monkeypatch) -> None:
     calls: list[str] = []
 
     def _fake_run_task(task: object, **_kwargs: object) -> TaskRun:
-        task_id = cast(str, getattr(task, "id"))
+        task_id = cast(SimpleNamespace, task).id
         calls.append(task_id)
         if task_id == "task_01_fake":
             return TaskRun(
@@ -184,6 +194,40 @@ def test_cli_timeout_kills_windows_process_tree(monkeypatch, tmp_path: Path) -> 
         )
 
     assert taskkill_calls == [["taskkill", "/F", "/T", "/PID", "4242"]]
+
+
+def test_cli_keyboard_interrupt_terminates_process(monkeypatch, tmp_path: Path) -> None:
+    from harness_bench import runner_cli
+
+    terminated_pids: list[int] = []
+
+    class _InterruptingProcess:
+        pid = 4242
+        returncode = None
+
+        def communicate(self, timeout: int | None = None) -> tuple[str, str]:
+            raise KeyboardInterrupt
+
+    monkeypatch.setattr(
+        runner_cli.subprocess,
+        "Popen",
+        lambda *_args, **_kwargs: _InterruptingProcess(),
+    )
+    monkeypatch.setattr(
+        runner_cli,
+        "_terminate_process_tree",
+        lambda proc: terminated_pids.append(proc.pid),
+    )
+
+    with pytest.raises(KeyboardInterrupt):
+        runner_cli._run_cli_subprocess(
+            ["fake-cli"],
+            cwd=tmp_path,
+            timeout=600,
+            env=None,
+        )
+
+    assert terminated_pids == [4242]
 
 
 def test_cli_subprocess_reader_replaces_invalid_utf8(monkeypatch, tmp_path: Path) -> None:

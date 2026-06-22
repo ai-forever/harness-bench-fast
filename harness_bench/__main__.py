@@ -583,7 +583,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    return int(args.func(args))
+    try:
+        return int(args.func(args))
+    except KeyboardInterrupt:
+        print("\nInterrupted by user; shutdown complete.", file=sys.stderr)
+        return 130
 
 
 if __name__ == "__main__":
