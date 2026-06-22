@@ -27,6 +27,8 @@ from pathlib import Path
 from harness_bench.harbor_export import export_harbor_dataset
 from harness_bench.metrics import default_metric_ks
 from harness_bench.runner import (
+    TaskRun,
+    load_results_json,
     normalize_json_output_path,
     run_all,
     set_results_json_command,
@@ -218,6 +220,42 @@ def _cmd_run_cli(args: argparse.Namespace) -> int:
     return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
 
+def _infer_attempts_from_results(results: Sequence[TaskRun]) -> int:
+    if not results:
+        return 1
+    attempts_by_task: dict[str, int] = {}
+    for result in results:
+        attempts_by_task[result.task_id] = attempts_by_task.get(result.task_id, 0) + 1
+    observed_attempts = max(attempts_by_task.values(), default=1)
+    declared_attempts = max(
+        (getattr(result, "attempts", 1) or 1 for result in results),
+        default=1,
+    )
+    return max(observed_attempts, declared_attempts)
+
+
+def _metric_ks_for_results(
+    args: argparse.Namespace,
+    results: Sequence[TaskRun],
+) -> tuple[tuple[int, ...], tuple[int, ...]]:
+    attempts = _infer_attempts_from_results(results)
+    if attempts == 1 and not args.pass_at and not args.pass_hat:
+        return (1,), ()
+    return _resolve_metric_ks_for_attempts(attempts, args.pass_at, args.pass_hat)
+
+
+def _cmd_summarize_json(args: argparse.Namespace) -> int:
+    results = load_results_json(args.json_path)
+    pass_at_ks, pass_hat_ks = _metric_ks_for_results(args, results)
+    summarize(
+        results,
+        pass_at_ks=pass_at_ks,
+        pass_hat_ks=pass_hat_ks,
+        include_failures=False,
+    )
+    return 0
+
+
 def _cmd_verify_gold(args: argparse.Namespace) -> int:
     results = verify_gold(task_ids=args.task)
     failed = [r for r in results if not r.passed]
@@ -321,6 +359,10 @@ def _add_metric_args(parser: argparse.ArgumentParser) -> None:
             "Use N > 1 to compute pass@K / pass^K for K=1..N."
         ),
     )
+    _add_pass_metric_args(parser)
+
+
+def _add_pass_metric_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--pass-at",
         "--pass@",
@@ -348,17 +390,30 @@ def _add_metric_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
-def _resolve_metric_ks(args: argparse.Namespace) -> tuple[tuple[int, ...], tuple[int, ...]]:
-    default_pass_at, default_pass_hat = default_metric_ks(args.attempts)
-    pass_at_ks = tuple(args.pass_at) if args.pass_at else default_pass_at
-    pass_hat_ks = tuple(args.pass_hat) if args.pass_hat else default_pass_hat
-    too_large = [k for k in (*pass_at_ks, *pass_hat_ks) if k > args.attempts]
+def _resolve_metric_ks_for_attempts(
+    attempts: int,
+    pass_at: Sequence[int] | None,
+    pass_hat: Sequence[int] | None,
+    *,
+    attempts_label: str = "attempts",
+) -> tuple[tuple[int, ...], tuple[int, ...]]:
+    default_pass_at, default_pass_hat = default_metric_ks(attempts)
+    pass_at_ks = tuple(pass_at) if pass_at else default_pass_at
+    pass_hat_ks = tuple(pass_hat) if pass_hat else default_pass_hat
+    too_large = [k for k in (*pass_at_ks, *pass_hat_ks) if k > attempts]
     if too_large:
         joined = ", ".join(str(k) for k in too_large)
-        raise SystemExit(
-            f"Metric k cannot exceed --attempts ({args.attempts}); got: {joined}"
-        )
+        raise SystemExit(f"Metric k cannot exceed {attempts_label} ({attempts}); got: {joined}")
     return pass_at_ks, pass_hat_ks
+
+
+def _resolve_metric_ks(args: argparse.Namespace) -> tuple[tuple[int, ...], tuple[int, ...]]:
+    return _resolve_metric_ks_for_attempts(
+        args.attempts,
+        args.pass_at,
+        args.pass_hat,
+        attempts_label="--attempts",
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -376,6 +431,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Exit non-zero if task registry and version metadata disagree",
     )
     p_version.set_defaults(func=_cmd_version)
+
+    p_summarize_json = sub.add_parser(
+        "summarize-json",
+        help="Summarize an existing benchmark results JSON",
+    )
+    p_summarize_json.add_argument("json_path", type=Path, help="Path to a results JSON")
+    _add_pass_metric_args(p_summarize_json)
+    p_summarize_json.set_defaults(func=_cmd_summarize_json)
 
     p_run = sub.add_parser("run", help="Run benchmark with the GigaChat agent")
     p_run.add_argument(

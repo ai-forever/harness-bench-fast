@@ -156,6 +156,11 @@ uv run python -m harness_bench run-cli \
     --attempts 5 --pass@ 1 --pass@ 5 --pass^ 5 \
     --json-output results.json
 
+# Summarize an existing completed JSON run without rerunning tasks. For a
+# 313-task run with --attempts 5, this prints Passed attempts, pass@K/pass^K
+# for K=1..5, and the per-wave breakdown.
+uv run python -m harness_bench summarize-json jobs/results.json
+
 # Drive `opencode` against any OpenAI-compatible deployment (example:
 # Qwen3.6-27B-FP8 served by vLLM). Point OPENCODE_CONFIG at a config
 # that registers a custom openai-compatible provider, sets the thinking

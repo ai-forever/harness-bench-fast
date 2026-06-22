@@ -715,13 +715,16 @@ def summarize(
     *,
     pass_at_ks: tuple[int, ...] = (1,),
     pass_hat_ks: tuple[int, ...] = (),
+    include_failures: bool = True,
 ) -> None:
     """Print a pass/fail summary block at the end of a run."""
     total = len(results)
     passed = sum(1 for r in results if r.passed)
     print()
     print("=" * 64)
-    label = "Passed" if all(r.attempts == 1 for r in results) else "Passed attempts"
+    repeated_task_ids = len(_task_results_by_id(results)) < len(results)
+    repeated_attempts = repeated_task_ids or any(r.attempts != 1 for r in results)
+    label = "Passed attempts" if repeated_attempts else "Passed"
     print(f"{label}: {passed}/{total}")
     metrics = compute_pass_metrics(results, pass_at_ks=pass_at_ks, pass_hat_ks=pass_hat_ks)
     if metrics:
@@ -735,7 +738,7 @@ def summarize(
         print("Per-wave breakdown:")
         for line in wave_table:
             print(f"  {line}")
-    if passed < total:
+    if include_failures and passed < total:
         print()
         print("Failures:")
         show_tracebacks = os.getenv("HARNESS_BENCH_SHOW_TRACEBACK", "").lower() in (

@@ -11,7 +11,7 @@ from langgraph.errors import GraphRecursionError
 
 from harness_bench import __main__ as bench_main
 from harness_bench.core import Task, VerifyResult
-from harness_bench.runner import TaskRun, run_task
+from harness_bench.runner import TaskRun, run_task, write_results_json
 from harness_bench.tasks import get_task
 from harness_bench.verifiers import file_text_equals
 
@@ -585,6 +585,33 @@ def test_main_records_command_in_results_json(monkeypatch, tmp_path: Path) -> No
     payload = json.loads(out.read_text(encoding="utf-8"))
     assert list(payload)[:2] == ["task_set_version", "command"]
     assert payload["command"] == bench_main._command_for_argv(argv)
+
+
+def test_summarize_json_reports_existing_repeated_attempt_run(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    out = tmp_path / "results.json"
+    results = [
+        TaskRun("task_01_fake", attempt == 1, "detail", 0.01, attempt=attempt, attempts=5)
+        for attempt in range(1, 6)
+    ]
+    results.extend(
+        TaskRun("task_31_fake", attempt < 5, "detail", 0.01, attempt=attempt, attempts=5)
+        for attempt in range(1, 6)
+    )
+    write_results_json(results, out)
+
+    assert bench_main.main(["summarize-json", str(out)]) == 0
+
+    output = capsys.readouterr().out
+    assert "Passed attempts: 5/10" in output
+    assert "K  pass@K  pass^K" in output
+    assert "1   50.0%   50.0%" in output
+    assert "5  100.0%    0.0%" in output
+    assert "core (1-30)        1       1  100.0%" in output
+    assert "extra (31-60)      1       1  100.0%" in output
+    assert "Failures:" not in output
 
 
 def test_run_all_continues_from_existing_json(monkeypatch, tmp_path: Path, capsys) -> None:
