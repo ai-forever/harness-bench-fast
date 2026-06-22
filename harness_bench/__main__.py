@@ -32,7 +32,6 @@ from harness_bench.runner import (
     set_results_json_command,
     summarize,
     verify_gold,
-    write_results_json,
 )
 from harness_bench.runner_cli import DEFAULT_CLI_COMMAND, DEFAULT_TIMEOUT_SECONDS, run_all_cli
 from harness_bench.runner_openrouter import DEFAULT_OPENROUTER_MODEL
@@ -114,11 +113,16 @@ def _cmd_version(args: argparse.Namespace) -> int:
     return 1 if args.check and errors else 0
 
 
-def _maybe_write_json(args: argparse.Namespace, results: list) -> None:
+def _maybe_report_json(args: argparse.Namespace, _results: list) -> None:
     json_output = getattr(args, "json_output", None)
     if json_output:
-        write_results_json(results, json_output)
         print(f"\nWrote results JSON to {json_output}")
+
+
+def _announce_json_output(args: argparse.Namespace) -> None:
+    json_output = getattr(args, "json_output", None)
+    if json_output:
+        print(f"Writing results JSON to {json_output}")
 
 
 def _metric_ks_for_args(
@@ -142,6 +146,7 @@ def _summarize_run(
 
 def _cmd_run(args: argparse.Namespace) -> int:
     metric_ks = _metric_ks_for_args(args)
+    _announce_json_output(args)
     results = run_all(
         task_ids=args.task,
         keep_workspace=args.keep,
@@ -151,12 +156,13 @@ def _cmd_run(args: argparse.Namespace) -> int:
         json_output=args.json_output,
     )
     _summarize_run(results, metric_ks)
-    _maybe_write_json(args, results)
+    _maybe_report_json(args, results)
     return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
 
 def _cmd_run_openrouter(args: argparse.Namespace) -> int:
     metric_ks = _metric_ks_for_args(args)
+    _announce_json_output(args)
     results = run_all_openrouter(
         task_ids=args.task,
         model_name=args.model,
@@ -171,7 +177,7 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         fail_on_runtime_error=args.fail_on_runtime_error,
     )
     _summarize_run(results, metric_ks)
-    _maybe_write_json(args, results)
+    _maybe_report_json(args, results)
     return _exit_code(
         results,
         allow_task_failures=args.allow_task_failures,
@@ -181,6 +187,7 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
 
 def _cmd_run_pure(args: argparse.Namespace) -> int:
     metric_ks = _metric_ks_for_args(args)
+    _announce_json_output(args)
     results = run_all_pure(
         task_ids=args.task,
         keep_workspace=args.keep,
@@ -190,12 +197,13 @@ def _cmd_run_pure(args: argparse.Namespace) -> int:
         json_output=args.json_output,
     )
     _summarize_run(results, metric_ks)
-    _maybe_write_json(args, results)
+    _maybe_report_json(args, results)
     return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
 
 def _cmd_run_cli(args: argparse.Namespace) -> int:
     metric_ks = _metric_ks_for_args(args)
+    _announce_json_output(args)
     results = run_all_cli(
         task_ids=args.task,
         cli_command=args.cli_command,
@@ -206,7 +214,7 @@ def _cmd_run_cli(args: argparse.Namespace) -> int:
         json_output=args.json_output,
     )
     _summarize_run(results, metric_ks)
-    _maybe_write_json(args, results)
+    _maybe_report_json(args, results)
     return _exit_code(results, allow_task_failures=args.allow_task_failures)
 
 
@@ -276,15 +284,16 @@ def _add_json_output(p: argparse.ArgumentParser) -> None:
         dest="json_output",
         nargs="?",
         const="",
-        default=None,
+        default="",
         type=normalize_json_output_path,
         metavar="PATH",
         help=(
             "Write a machine-readable JSON report (aggregate pass_rate plus a "
             "per-task breakdown with tags) to this path. Bare filenames are "
-            "stored under jobs/. If PATH is omitted, a timestamped JSON file "
-            "is created under jobs/. If the file exists, completed task "
-            "attempts are loaded from it and skipped."
+            "stored under jobs/. Enabled by default with a timestamped JSON "
+            "file under jobs/; if PATH is omitted or is a directory path, the "
+            "filename is generated from the current timestamp. If the file "
+            "exists, completed task attempts are loaded from it and skipped."
         ),
     )
 

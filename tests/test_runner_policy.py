@@ -550,6 +550,9 @@ def test_json_output_bare_filename_defaults_to_jobs(tmp_path: Path) -> None:
     assert generated_in_dir.suffix == ".json"
 
     parser = bench_main.build_parser()
+    args = parser.parse_args(["run-cli"])
+    assert args.json_output.parent == Path("jobs")
+    assert args.json_output.suffix == ".json"
     args = parser.parse_args(["run-cli", "--json-output", "results.json"])
     assert args.json_output == Path("jobs/results.json")
     args = parser.parse_args(["run-cli", "--json-output"])
@@ -560,11 +563,19 @@ def test_json_output_bare_filename_defaults_to_jobs(tmp_path: Path) -> None:
 def test_main_records_command_in_results_json(monkeypatch, tmp_path: Path) -> None:
     import json
 
+    from harness_bench.runner import write_results_json
+
     out = tmp_path / "results.json"
+
+    def _fake_run_all(**kwargs: object) -> list[TaskRun]:
+        results = [TaskRun("task_fake", True, "ok", 0.01)]
+        write_results_json(results, cast(Path, kwargs["json_output"]))
+        return results
+
     monkeypatch.setattr(
         bench_main,
         "run_all",
-        lambda **_kwargs: [TaskRun("task_fake", True, "ok", 0.01)],
+        _fake_run_all,
     )
     monkeypatch.setattr(bench_main, "summarize", lambda _results: None)
 
