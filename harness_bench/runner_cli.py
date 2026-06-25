@@ -118,6 +118,18 @@ _ACTIVE_PROCESSES: set[subprocess.Popen[str]] = set()
 _STOP_REQUESTED = threading.Event()
 """Set when the main runner is interrupted so worker retries/backoffs stop."""
 
+_AGENT_METRIC_KEYS = (
+    "agent_steps",
+    "agent_tool_calls",
+    "agent_shell_commands",
+    "agent_events",
+    "agent_llm_calls",
+    "agent_input_tokens",
+    "agent_output_tokens",
+    "agent_total_tokens",
+)
+"""Per-task effort metrics written to result JSON when a parser recognizes a run."""
+
 
 def _is_opencode_run_command(argv: list[str]) -> bool:
     if len(argv) < 2:
@@ -149,6 +161,370 @@ def _ensure_codex_json_events(argv: list[str]) -> list[str]:
     return [*argv[:2], "--json", *argv[2:]]
 
 
+def _is_claude_print_command(argv: list[str]) -> bool:
+    if not argv:
+        return False
+    executable = Path(argv[0]).name
+    return executable == "claude" and any(arg in ("-p", "--print") for arg in argv)
+
+
+def _is_gemini_prompt_command(argv: list[str]) -> bool:
+    if not argv:
+        return False
+    executable = Path(argv[0]).name
+    return executable == "gemini" and any(
+        arg in ("-p", "--prompt") or arg.startswith("--prompt=") for arg in argv
+    )
+
+
+def _argv_with_output_format(
+    argv: list[str],
+    output_format: str,
+    *,
+    insert_before: tuple[str, ...] = (),
+) -> list[str]:
+    """Return argv with --output-format set without mutating the caller's list."""
+    result = list(argv)
+    for i, arg in enumerate(result):
+        if arg in ("--output-format", "-o"):
+            if i + 1 < len(result):
+                result[i + 1] = output_format
+                return result
+            return [*result, output_format]
+        if arg.startswith("--output-format="):
+            result[i] = f"--output-format={output_format}"
+            return result
+        if arg.startswith("-o="):
+            result[i] = f"-o={output_format}"
+            return result
+
+    insert_at = len(result)
+    for i, arg in enumerate(result):
+        if arg in insert_before:
+            insert_at = i
+            break
+    return [*result[:insert_at], "--output-format", output_format, *result[insert_at:]]
+
+
+def _ensure_claude_verbose(argv: list[str]) -> list[str]:
+    result = [
+        "--verbose" if arg in ("—verbose", "–verbose") else arg
+        for arg in argv
+    ]
+    if "--verbose" in result:
+        return result
+    return [*result, "--verbose"]
+
+
+def _ensure_claude_json_events(argv: list[str]) -> list[str]:
+    """Ask Claude Code for stream-json events when it is used in print mode."""
+    if not _is_claude_print_command(argv):
+        return argv
+    argv = _argv_with_output_format(argv, "stream-json")
+    return _ensure_claude_verbose(argv)
+
+
+def _ensure_gemini_json_events(argv: list[str]) -> list[str]:
+    """Ask Gemini CLI for stream-json events when it is used in prompt mode."""
+    if not _is_gemini_prompt_command(argv):
+        return argv
+    return _argv_with_output_format(
+        argv,
+        "stream-json",
+        insert_before=("-p", "--prompt"),
+    )
+
+
+def _ensure_cli_json_events(argv: list[str]) -> list[str]:
+    """Enable machine-readable CLI output for CLIs that expose it."""
+    argv = _ensure_codex_json_events(argv)
+    argv = _ensure_claude_json_events(argv)
+    return _ensure_gemini_json_events(argv)
+
+
+def _iter_json_payloads(stdout: str) -> list[dict[str, object]]:
+    payloads: list[dict[str, object]] = []
+    for line in stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, dict):
+            payloads.append(payload)
+    if payloads:
+        return payloads
+
+    stripped = stdout.strip()
+    if not stripped:
+        return []
+    try:
+        payload = json.loads(stripped)
+    except json.JSONDecodeError:
+        return []
+    if isinstance(payload, dict):
+        return [payload]
+    if isinstance(payload, list):
+        return [item for item in payload if isinstance(item, dict)]
+    return []
+
+
+def _add_metric_count(stats: dict[str, int], key: str, value: object) -> None:
+    parsed = _int_or_none(value)
+    if parsed is not None:
+        stats[key] = stats.get(key, 0) + parsed
+
+
+def _set_metric_max(stats: dict[str, int], key: str, value: object) -> None:
+    parsed = _int_or_none(value)
+    if parsed is not None:
+        stats[key] = max(stats.get(key, 0), parsed)
+
+
+def _usage_stats_from_mapping(usage: object) -> dict[str, int]:
+    stats: dict[str, int] = {}
+    if not isinstance(usage, dict):
+        return stats
+
+    _add_usage_counts(stats, usage)
+
+    if "agent_input_tokens" not in stats:
+        for key in ("inputTokens", "promptTokenCount", "prompt_token_count"):
+            if key in usage:
+                _add_metric_count(stats, "agent_input_tokens", usage[key])
+                break
+    if "agent_output_tokens" not in stats:
+        for key in ("outputTokens", "candidatesTokenCount", "candidates_token_count"):
+            if key in usage:
+                _add_metric_count(stats, "agent_output_tokens", usage[key])
+                break
+
+    for key in ("totalTokens", "totalTokenCount", "total_token_count"):
+        if key in usage:
+            parsed = _int_or_none(usage[key])
+            if parsed is not None:
+                stats["agent_total_tokens"] = parsed
+                break
+
+    return stats
+
+
+def _merge_metric_counts(stats: dict[str, int], extra: dict[str, int]) -> None:
+    for key, value in extra.items():
+        stats[key] = stats.get(key, 0) + value
+
+
+def _with_default_agent_metrics(stats: dict[str, int]) -> dict[str, int]:
+    return {key: stats.get(key, 0) for key in _AGENT_METRIC_KEYS}
+
+
+def _tool_name_is_shell(name: object) -> bool:
+    if not isinstance(name, str):
+        return False
+    return name.lower() in {
+        "bash",
+        "shell",
+        "run_shell_command",
+        "execute_shell_command",
+    }
+
+
+def _claude_tool_use_names(content: object) -> list[str]:
+    if not isinstance(content, list):
+        return []
+    names: list[str] = []
+    for part in content:
+        if not isinstance(part, dict):
+            continue
+        if part.get("type") != "tool_use":
+            continue
+        name = part.get("name")
+        if isinstance(name, str):
+            names.append(name)
+    return names
+
+
+def _looks_like_claude_payload(payload: dict[str, object]) -> bool:
+    payload_type = payload.get("type")
+    if any(key in payload for key in ("totalToolUseCount", "totalTokens", "toolStats")):
+        return True
+    if payload_type == "assistant":
+        return isinstance(payload.get("message"), dict) or "message" in payload
+    if payload_type == "user":
+        return isinstance(payload.get("message"), dict)
+    if payload_type == "system":
+        return "subtype" in payload or "session_id" in payload
+    if payload_type == "result":
+        return "stats" not in payload and any(
+            key in payload
+            for key in (
+                "subtype",
+                "is_error",
+                "num_turns",
+                "duration_ms",
+                "duration_api_ms",
+                "total_cost_usd",
+                "usage",
+            )
+        )
+    return False
+
+
+def _claude_json_event_stats(stdout: str) -> dict[str, int] | None:
+    """Extract effort metrics from Claude Code JSON / stream-json output."""
+    payloads = _iter_json_payloads(stdout)
+    if not payloads:
+        return None
+
+    saw_claude_event = False
+    events = 0
+    tool_calls = 0
+    shell_commands = 0
+    llm_calls = 0
+    stream_usage_stats: dict[str, int] = {}
+    result_usage_stats: dict[str, int] = {}
+    result_tool_calls: int | None = None
+    result_shell_commands: int | None = None
+
+    for payload in payloads:
+        payload_type = payload.get("type")
+        if not _looks_like_claude_payload(payload):
+            continue
+
+        saw_claude_event = True
+        events += 1
+
+        if payload_type == "assistant":
+            llm_calls += 1
+            message = payload.get("message")
+            if isinstance(message, dict):
+                _merge_metric_counts(
+                    stream_usage_stats,
+                    _usage_stats_from_mapping(message.get("usage")),
+                )
+                names = _claude_tool_use_names(message.get("content"))
+            else:
+                names = _claude_tool_use_names(payload.get("content"))
+            tool_calls += len(names)
+            shell_commands += sum(1 for name in names if _tool_name_is_shell(name))
+        elif payload_type == "result":
+            _set_metric_max(result_usage_stats, "agent_total_tokens", payload.get("totalTokens"))
+            turns = _int_or_none(payload.get("num_turns"))
+            if turns is not None:
+                llm_calls = max(llm_calls, turns)
+
+        _merge_metric_counts(
+            result_usage_stats,
+            _usage_stats_from_mapping(payload.get("usage")),
+        )
+        _set_metric_max(result_usage_stats, "agent_total_tokens", payload.get("totalTokens"))
+
+        total_tool_use_count = _int_or_none(payload.get("totalToolUseCount"))
+        if total_tool_use_count is not None:
+            result_tool_calls = max(result_tool_calls or 0, total_tool_use_count)
+        tool_stats = payload.get("toolStats")
+        if isinstance(tool_stats, dict):
+            bash_count = _int_or_none(tool_stats.get("bashCount"))
+            if bash_count is not None:
+                result_shell_commands = max(result_shell_commands or 0, bash_count)
+
+    if not saw_claude_event:
+        return None
+
+    if result_tool_calls is not None:
+        tool_calls = max(tool_calls, result_tool_calls)
+    if result_shell_commands is not None:
+        shell_commands = max(shell_commands, result_shell_commands)
+
+    stats = {
+        "agent_steps": tool_calls,
+        "agent_tool_calls": tool_calls,
+        "agent_shell_commands": shell_commands,
+        "agent_events": events,
+    }
+    if llm_calls:
+        stats["agent_llm_calls"] = llm_calls
+
+    token_stats = stream_usage_stats or result_usage_stats
+    if result_usage_stats.get("agent_total_tokens", 0) > token_stats.get(
+        "agent_total_tokens",
+        0,
+    ):
+        token_stats = {
+            **token_stats,
+            "agent_total_tokens": result_usage_stats["agent_total_tokens"],
+        }
+    stats.update(token_stats)
+    return _with_default_agent_metrics(stats)
+
+
+def _gemini_json_event_stats(stdout: str) -> dict[str, int] | None:
+    """Extract effort metrics from Gemini CLI JSON / stream-json output."""
+    payloads = _iter_json_payloads(stdout)
+    if not payloads:
+        return None
+
+    saw_gemini_event = False
+    events = 0
+    tool_calls = 0
+    shell_commands = 0
+    llm_calls = 0
+    result_stats: dict[str, int] = {}
+
+    for payload in payloads:
+        payload_type = payload.get("type")
+        looks_gemini = payload_type in {
+            "init",
+            "message",
+            "tool_use",
+            "tool_result",
+            "error",
+            "result",
+        } or "stats" in payload
+        if not looks_gemini:
+            continue
+
+        saw_gemini_event = True
+        events += 1
+
+        if payload_type == "message" and payload.get("role") == "assistant":
+            llm_calls += 1
+        elif payload_type == "tool_use":
+            tool_calls += 1
+            if _tool_name_is_shell(payload.get("tool_name") or payload.get("name")):
+                shell_commands += 1
+
+        stats_payload = payload.get("stats")
+        if isinstance(stats_payload, dict):
+            _merge_metric_counts(
+                result_stats,
+                _usage_stats_from_mapping(stats_payload),
+            )
+            _set_metric_max(result_stats, "agent_steps", stats_payload.get("tool_calls"))
+            _set_metric_max(
+                result_stats,
+                "agent_tool_calls",
+                stats_payload.get("tool_calls"),
+            )
+
+    if not saw_gemini_event:
+        return None
+
+    tool_calls = max(tool_calls, result_stats.get("agent_tool_calls", 0))
+    stats = {
+        "agent_steps": max(tool_calls, result_stats.get("agent_steps", 0)),
+        "agent_tool_calls": tool_calls,
+        "agent_shell_commands": shell_commands,
+        "agent_events": events,
+    }
+    if llm_calls:
+        stats["agent_llm_calls"] = llm_calls
+    stats.update(result_stats)
+    return _with_default_agent_metrics(stats)
+
+
 def _codex_json_event_stats(stdout: str) -> dict[str, int] | None:
     """Count Codex JSONL action events emitted by `codex exec --json`.
 
@@ -174,6 +550,16 @@ def _codex_json_event_stats(stdout: str) -> dict[str, int] | None:
         except json.JSONDecodeError:
             continue
         if not isinstance(payload, dict) or not isinstance(payload.get("type"), str):
+            continue
+        if payload["type"] not in {
+            "thread.started",
+            "turn.started",
+            "turn.completed",
+            "turn.failed",
+            "item.started",
+            "item.completed",
+            "error",
+        }:
             continue
         saw_codex_event = True
         events += 1
@@ -212,7 +598,7 @@ def _codex_json_event_stats(stdout: str) -> dict[str, int] | None:
         result["agent_output_tokens"] = output_tokens
     if total_tokens:
         result["agent_total_tokens"] = total_tokens
-    return result
+    return _with_default_agent_metrics(result)
 
 
 def _int_or_none(value: object) -> int | None:
@@ -315,6 +701,10 @@ def _task_run_with_cli_stats(
     stats_workspace: Path | None = None,
 ) -> TaskRun:
     stats = _codex_json_event_stats(result.stdout or "") if result is not None else None
+    if stats is None and result is not None:
+        stats = _claude_json_event_stats(result.stdout or "")
+    if stats is None and result is not None:
+        stats = _gemini_json_event_stats(result.stdout or "")
     if stats is None:
         stats = _mini_swe_agent_traj_stats(stats_workspace or workspace)
     return TaskRun(
@@ -665,7 +1055,7 @@ def run_task_cli(
     """
     _load_env_from_dotenv()
     workspace_keepalive: TemporaryDirectory | None = None
-    base_argv = _ensure_codex_json_events(shlex.split(cli_command))
+    base_argv = _ensure_cli_json_events(shlex.split(cli_command))
     last_result: subprocess.CompletedProcess[str] | None = None
     last_transient_excerpt: str | None = None
     started = time.monotonic()

@@ -313,6 +313,7 @@ def test_codex_json_event_stats_count_agent_steps() -> None:
         "agent_tool_calls": 1,
         "agent_shell_commands": 1,
         "agent_events": 6,
+        "agent_llm_calls": 0,
         "agent_input_tokens": 10,
         "agent_output_tokens": 5,
         "agent_total_tokens": 15,

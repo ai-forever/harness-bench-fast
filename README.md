@@ -128,8 +128,9 @@ uv run python -m harness_bench run-cli \
 # Runner JSON writes best-effort per-task effort metrics:
 # agent_steps / agent_tool_calls / agent_shell_commands / agent_events,
 # plus agent_llm_calls / agent_input_tokens / agent_output_tokens /
-# agent_total_tokens when the backend exposes usage metadata. Codex CLI runs
-# auto-enable `codex exec --json` so those metrics can be read from JSONL.
+# agent_total_tokens when the backend exposes usage metadata. Codex, Claude
+# Code, and Gemini CLI runs auto-enable JSON/stream-json output so those metrics
+# can be read from machine-readable events.
 # JSON checkpointing is enabled by default for run commands. A fresh run writes
 # to `jobs/<timestamp>.json`; pass `--json-output results.json` to use
 # `jobs/results.json`, or pass an explicit path. If the JSON file already
