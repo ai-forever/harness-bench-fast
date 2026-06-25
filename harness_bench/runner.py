@@ -125,6 +125,22 @@ def _coerce_float(value: Any) -> float:
     return 0.0
 
 
+def _is_cli_timeout_error(error: Any) -> bool:
+    return isinstance(error, str) and error.startswith("CLI timed out after ")
+
+
+def _payload_reruns_on_continue(item: dict[str, Any]) -> bool:
+    if item.get("rerun_on_continue") is True:
+        return True
+    if item.get("failure_kind") == "timeout":
+        return True
+    return _is_cli_timeout_error(item.get("error"))
+
+
+def _task_run_reruns_on_continue(run: TaskRun) -> bool:
+    return _is_cli_timeout_error(run.error)
+
+
 def set_results_json_command(command: str | None) -> None:
     """Set the command recorded in subsequently written benchmark JSON files."""
     global _RESULTS_JSON_COMMAND
@@ -179,7 +195,12 @@ def task_run_from_payload(item: dict[str, Any], *, attempts: int | None = None) 
     )
 
 
-def load_results_json(path: str | Path, *, attempts: int | None = None) -> list[TaskRun]:
+def load_results_json(
+    path: str | Path,
+    *,
+    attempts: int | None = None,
+    include_rerun_on_continue: bool = True,
+) -> list[TaskRun]:
     """Load a previously written benchmark JSON report back into ``TaskRun`` rows."""
     result_path = Path(path)
     try:
@@ -192,6 +213,8 @@ def load_results_json(path: str | Path, *, attempts: int | None = None) -> list[
     for item in payload["tasks"]:
         if not isinstance(item, dict):
             raise ValueError(f"{result_path} contains a non-object task entry")
+        if not include_rerun_on_continue and _payload_reruns_on_continue(item):
+            continue
         runs.append(task_run_from_payload(item, attempts=attempts))
     return runs
 
@@ -206,7 +229,11 @@ def _resume_results(
         return []
 
     target_ids = {task.id for task in targets}
-    loaded = load_results_json(json_output_path, attempts=attempts)
+    loaded = load_results_json(
+        json_output_path,
+        attempts=attempts,
+        include_rerun_on_continue=False,
+    )
     by_key: dict[tuple[str, int], TaskRun] = {}
     for run in loaded:
         if run.task_id not in target_ids:
@@ -894,28 +921,30 @@ def results_to_payload(
             tags = list(get_task(r.task_id).tags)
         except Exception:  # noqa: BLE001 — tags are best-effort metadata
             tags = []
-        tasks_payload.append(
-            {
-                "task_id": r.task_id,
-                "number": task_number(r.task_id),
-                "passed": r.passed,
-                "message": r.message,
-                "elapsed_seconds": r.elapsed_seconds,
-                "error": r.error,
-                "tags": tags,
-                "attempt": r.attempt,
-                "attempts": r.attempts,
-                "agent_steps": r.agent_steps,
-                "agent_tool_calls": r.agent_tool_calls,
-                "agent_shell_commands": r.agent_shell_commands,
-                "agent_events": r.agent_events,
-                "agent_llm_calls": r.agent_llm_calls,
-                "agent_input_tokens": r.agent_input_tokens,
-                "agent_output_tokens": r.agent_output_tokens,
-                "agent_total_tokens": r.agent_total_tokens,
-            }
-        )
-    payload = {"task_set_version": TASK_SET_VERSION}
+        task_payload: dict[str, Any] = {
+            "task_id": r.task_id,
+            "number": task_number(r.task_id),
+            "passed": r.passed,
+            "message": r.message,
+            "elapsed_seconds": r.elapsed_seconds,
+            "error": r.error,
+            "tags": tags,
+            "attempt": r.attempt,
+            "attempts": r.attempts,
+            "agent_steps": r.agent_steps,
+            "agent_tool_calls": r.agent_tool_calls,
+            "agent_shell_commands": r.agent_shell_commands,
+            "agent_events": r.agent_events,
+            "agent_llm_calls": r.agent_llm_calls,
+            "agent_input_tokens": r.agent_input_tokens,
+            "agent_output_tokens": r.agent_output_tokens,
+            "agent_total_tokens": r.agent_total_tokens,
+        }
+        if _task_run_reruns_on_continue(r):
+            task_payload["failure_kind"] = "timeout"
+            task_payload["rerun_on_continue"] = True
+        tasks_payload.append(task_payload)
+    payload: dict[str, Any] = {"task_set_version": TASK_SET_VERSION}
     result_command = command if command is not None else _RESULTS_JSON_COMMAND
     if result_command:
         payload["command"] = result_command

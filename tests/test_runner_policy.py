@@ -660,6 +660,83 @@ def test_run_all_continues_from_existing_json(monkeypatch, tmp_path: Path, capsy
     assert [task["message"] for task in payload["tasks"]] == ["already done", "newly done"]
 
 
+def test_cli_timeout_results_are_tagged_for_continue(tmp_path: Path) -> None:
+    import json
+
+    out = tmp_path / "results.json"
+
+    write_results_json(
+        [TaskRun("task_01_fake", False, "", 1.0, error="CLI timed out after 1s")],
+        out,
+    )
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    task = payload["tasks"][0]
+    assert task["failure_kind"] == "timeout"
+    assert task["rerun_on_continue"] is True
+
+
+def test_run_all_cli_continues_from_existing_json_reruns_cli_timeout(
+    monkeypatch,
+    tmp_path: Path,
+    capsys,
+) -> None:
+    import json
+
+    from harness_bench import runner, runner_cli
+
+    out = tmp_path / "results.json"
+    runner.write_results_json(
+        [
+            TaskRun(
+                "task_01_fake",
+                False,
+                "",
+                1.0,
+                error="CLI timed out after 1s",
+            ),
+            TaskRun("task_02_fake", True, "already done", 0.01),
+        ],
+        out,
+    )
+    fake_tasks = [
+        SimpleNamespace(id="task_01_fake", name="Fake one"),
+        SimpleNamespace(id="task_02_fake", name="Fake two"),
+    ]
+    calls: list[str] = []
+
+    def _fake_run_task_cli(task: object, **_kwargs: object) -> TaskRun:
+        task_id = cast(SimpleNamespace, task).id
+        calls.append(task_id)
+        return TaskRun(
+            task_id=task_id,
+            passed=True,
+            message="rerun ok",
+            elapsed_seconds=0.01,
+        )
+
+    monkeypatch.setattr(runner_cli, "_load_env_from_dotenv", lambda: None)
+    monkeypatch.setattr(
+        runner_cli,
+        "get_task",
+        lambda tid: next(t for t in fake_tasks if t.id == tid),
+    )
+    monkeypatch.setattr(runner_cli, "run_task_cli", _fake_run_task_cli)
+
+    results = runner_cli.run_all_cli(
+        task_ids=["task_01_fake", "task_02_fake"],
+        concurrency=1,
+        json_output=out,
+    )
+
+    assert calls == ["task_01_fake"]
+    assert [result.task_id for result in results] == ["task_01_fake", "task_02_fake"]
+    assert "[CONTINUE] loaded 1/2 completed task attempt(s)" in capsys.readouterr().out
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert [task["message"] for task in payload["tasks"]] == ["rerun ok", "already done"]
+    assert "rerun_on_continue" not in payload["tasks"][0]
+
+
 def test_run_all_records_keyboard_interrupt_in_json(monkeypatch, tmp_path: Path) -> None:
     import json
 

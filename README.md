@@ -138,7 +138,9 @@ uv run python -m harness_bench run-cli \
 # continues from the checkpoint. JSON reports also include the command that
 # launched the run. Ctrl-C writes `run_status: "interrupted"` plus
 # `interrupted_attempts`; those attempts are rerun from clean workspaces on the
-# next continue when you rerun with the same JSON path.
+# next continue when you rerun with the same JSON path. CLI per-task timeouts
+# are also marked `rerun_on_continue` and rerun from clean workspaces on the
+# next launch with the same `--json-output` file.
 uv run python -m harness_bench run-cli \
     --cli-command 'codex exec -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox' \
     --concurrency 5
