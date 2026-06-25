@@ -382,9 +382,19 @@ def test_results_json_includes_agent_step_metrics() -> None:
                 agent_input_tokens=10,
                 agent_output_tokens=5,
                 agent_total_tokens=15,
-            )
+            ),
+            TaskRun(
+                "task_other",
+                False,
+                "bad",
+                0.02,
+                agent_steps=3,
+            ),
         ]
     )
+
+    assert payload["steps"] == 5
+    assert payload["tokens"] == 15
 
     task = payload["tasks"][0]
     assert task["agent_steps"] == 2

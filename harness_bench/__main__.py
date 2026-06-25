@@ -326,12 +326,13 @@ def _add_json_output(p: argparse.ArgumentParser) -> None:
         type=normalize_json_output_path,
         metavar="PATH",
         help=(
-            "Write a machine-readable JSON report (aggregate pass_rate plus a "
-            "per-task breakdown with tags) to this path. Bare filenames are "
-            "stored under jobs/. Enabled by default with a timestamped JSON "
-            "file under jobs/; if PATH is omitted or is a directory path, the "
-            "filename is generated from the current timestamp. If the file "
-            "exists, completed task attempts are loaded from it and skipped."
+            "Write a machine-readable JSON report (aggregate pass_rate, steps, "
+            "tokens, plus a per-task breakdown with tags) to this path. Bare "
+            "filenames are stored under jobs/. Enabled by default with a "
+            "timestamped JSON file under jobs/; if PATH is omitted or is a "
+            "directory path, the filename is generated from the current "
+            "timestamp. If the file exists, completed task attempts are loaded "
+            "from it and skipped."
         ),
     )
 

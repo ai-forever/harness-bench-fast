@@ -900,6 +900,10 @@ def _format_table_row(values: list[str], widths: list[int]) -> str:
     return "  ".join(cells)
 
 
+def _sum_run_metric(results: list[TaskRun], field: str) -> int:
+    return sum(value for run in results if isinstance(value := getattr(run, field), int))
+
+
 def results_to_payload(
     results: list[TaskRun],
     *,
@@ -953,6 +957,8 @@ def results_to_payload(
             "total": total,
             "passed": passed,
             "pass_rate": (passed / total) if total else 0.0,
+            "steps": _sum_run_metric(results, "agent_steps"),
+            "tokens": _sum_run_metric(results, "agent_total_tokens"),
             "tasks": tasks_payload,
         }
     )
