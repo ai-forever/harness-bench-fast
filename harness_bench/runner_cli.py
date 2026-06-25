@@ -215,6 +215,94 @@ def _codex_json_event_stats(stdout: str) -> dict[str, int] | None:
     return result
 
 
+def _int_or_none(value: object) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    return None
+
+
+def _mini_swe_agent_traj_candidates(workspace: Path) -> list[Path]:
+    """Return possible mini-SWE-agent trajectory paths for a task workspace."""
+    candidates = [workspace / "mini-swe-agent.traj.json"]
+    configured = os.getenv("MSWEA_OUTPUT_PATH")
+    if configured:
+        configured_path = Path(configured)
+        if not configured_path.is_absolute():
+            configured_path = workspace / configured_path
+        if configured_path not in candidates:
+            candidates.append(configured_path)
+    return candidates
+
+
+def _mini_swe_agent_traj_stats(workspace: Path | None) -> dict[str, int] | None:
+    """Extract effort metrics from a mini-SWE-agent trajectory JSON file."""
+    if workspace is None:
+        return None
+
+    payload = None
+    for path in _mini_swe_agent_traj_candidates(workspace):
+        if not path.exists():
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return None
+        break
+    if not isinstance(payload, dict):
+        return None
+
+    messages = payload.get("messages")
+    if not isinstance(messages, list):
+        return None
+
+    stats: dict[str, int] = {"agent_events": len(messages)}
+    info = payload.get("info")
+    if isinstance(info, dict):
+        model_stats = info.get("model_stats")
+        if isinstance(model_stats, dict):
+            api_calls = _int_or_none(model_stats.get("api_calls"))
+            if api_calls is not None:
+                stats["agent_llm_calls"] = api_calls
+
+    steps = 0
+    tool_calls = 0
+    shell_commands = 0
+    llm_calls = 0
+    for message in messages:
+        if not isinstance(message, dict) or message.get("role") != "assistant":
+            continue
+        llm_calls += 1
+        extra = message.get("extra")
+        if not isinstance(extra, dict):
+            continue
+        actions = extra.get("actions")
+        if isinstance(actions, list):
+            steps += len(actions)
+            tool_calls += len(actions)
+            shell_commands += sum(
+                1
+                for action in actions
+                if isinstance(action, dict) and isinstance(action.get("command"), str)
+            )
+        response = extra.get("response")
+        if isinstance(response, dict):
+            _add_usage_counts(stats, response.get("usage"))
+            _add_usage_counts(stats, response.get("usage_metadata"))
+
+    if steps:
+        stats["agent_steps"] = steps
+    if tool_calls:
+        stats["agent_tool_calls"] = tool_calls
+    if shell_commands:
+        stats["agent_shell_commands"] = shell_commands
+    stats.setdefault("agent_llm_calls", llm_calls)
+    return stats
+
+
 def _task_run_with_cli_stats(
     *,
     task_id: str,
@@ -224,8 +312,11 @@ def _task_run_with_cli_stats(
     result: subprocess.CompletedProcess[str] | None,
     error: str | None = None,
     workspace: Path | None = None,
+    stats_workspace: Path | None = None,
 ) -> TaskRun:
     stats = _codex_json_event_stats(result.stdout or "") if result is not None else None
+    if stats is None:
+        stats = _mini_swe_agent_traj_stats(stats_workspace or workspace)
     return TaskRun(
         task_id=task_id,
         passed=passed,
@@ -660,6 +751,7 @@ def run_task_cli(
                     elapsed_seconds=time.monotonic() - started,
                     result=last_result,
                     workspace=workspace_path if keep_workspace else None,
+                    stats_workspace=workspace_path,
                 )
 
             # Decide whether to retry. We retry on any transient network error
@@ -746,6 +838,7 @@ def run_task_cli(
                                 elapsed_seconds=time.monotonic() - started,
                                 result=prom_result,
                                 workspace=workspace_path if keep_workspace else None,
+                                stats_workspace=workspace_path,
                             )
                         # PROM-fallback also failed — surface its message for visibility.
                         message = f"{message} | PROM-fallback({prom_model}): {prom_outcome.message}"
@@ -757,6 +850,7 @@ def run_task_cli(
                 elapsed_seconds=time.monotonic() - started,
                 result=last_result,
                 workspace=workspace_path if keep_workspace else None,
+                stats_workspace=workspace_path,
             )
 
         # Unreachable — the loop above always returns. Keep a deterministic

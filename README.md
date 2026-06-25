@@ -142,6 +142,26 @@ uv run python -m harness_bench run-cli \
     --cli-command 'codex exec -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox' \
     --concurrency 5
 
+# Drive mini-SWE-agent through any OpenAI-compatible gateway, including local
+# gpt2giga. Install `mini-swe-agent` once for faster startup; the wrapper can
+# also fall back to `uvx` when `mini` is not installed. Keep the wrapper path
+# absolute because `run-cli` launches the agent from each per-task temp
+# workspace. The wrapper runs mini-SWE-agent's non-interactive DefaultAgent
+# directly and writes `mini-swe-agent.traj.json`; `run-cli` parses that
+# trajectory for agent_steps / agent_llm_calls / token metrics.
+uv tool install mini-swe-agent
+HB_MINI_SWE_AGENT="$(pwd -P)/scripts/hb-mini-swe-agent"
+OPENAI_API_KEY=0 \
+OPENAI_API_BASE=http://127.0.0.1:8090/v1 \
+MSWEA_MODEL_NAME='openai/GigaChat-3-Ultra' \
+MSWEA_COST_TRACKING=ignore_errors \
+uv run python -m harness_bench run-cli \
+    --cli-command "$HB_MINI_SWE_AGENT" \
+    --timeout 900 --concurrency 5 \
+    --json-output mini_swe_agent_gigachat_3_ultra.json
+# Smoke-test one task first by adding:
+#     --task task_01_create_hello --keep
+
 # Repeat every selected task 5 times and print pass@K / pass^K
 # percentage metrics for K=1..5. Works for run, run-openrouter,
 # run-pure, and run-cli.
