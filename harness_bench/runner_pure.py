@@ -75,6 +75,9 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
         retry_backoff_factor=1.0,
         retry_on_status_codes=(403, 429, 500, 502, 503, 504),
     )
+    # `run-pure` is the deliberately barebones baseline: stock deepagents with
+    # no harness profile, no memory, and no skills. Skill/memory tasks fail on
+    # it by design and are measured on `run` / `run-openrouter` instead.
     agent = create_deep_agent(model=model, backend=backend)
     return agent.with_config({"recursion_limit": recursion_limit})
 

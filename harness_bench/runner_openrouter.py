@@ -358,7 +358,12 @@ def build_agent(
     # tasks do not. `LocalShellBackend(virtual_mode=True)` maps
     # `/AGENTS.md` to `<workspace>/AGENTS.md`.
     memory_sources = ["/AGENTS.md"] if (workspace / "AGENTS.md").exists() else None
-    agent = create_deep_agent(model=model, backend=backend, memory=memory_sources)
+    # Skill tasks ship `.agents/skills/`; wire SkillsMiddleware in only when
+    # present so the skill-less tasks stay unchanged (see runner.build_agent).
+    skill_sources = ["/.agents/skills"] if (workspace / ".agents" / "skills").is_dir() else None
+    agent = create_deep_agent(
+        model=model, backend=backend, memory=memory_sources, skills=skill_sources
+    )
     return agent.with_config({"recursion_limit": recursion_limit})
 
 
