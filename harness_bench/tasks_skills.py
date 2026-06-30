@@ -24,7 +24,9 @@ from harness_bench.core import Task, VerifyResult
 from harness_bench.verifiers import (
     all_of,
     file_contains,
+    file_exists,
     file_matches_regex,
+    file_text_equals,
     python_callable_returns,
 )
 
@@ -626,4 +628,188 @@ E1_DISTRACTOR = Task(
 )
 
 
-SKILL_TASKS = [R1_BRAND, B1_CODEBOOK, B3_POLICY, G2_SKILL_REPAIR, R2_STYLE, B2_NDR7, E1_DISTRACTOR]
+# ---------------------------------------------------------------------------
+# E2 — negative control: a misleading skill that must NOT be applied
+# ---------------------------------------------------------------------------
+
+_E2_DATA = (
+    "item,amount\nwidget,120\ngadget,80\nbolt,250\nnut,75\ngear,1000\n"
+    "pin,45\nclip,320\ncap,90\nrod,660\nscrew,15\n"
+)  # plain sum = 2655
+
+_E2_ROUNDING_SKILL = """\
+---
+name: acme-invoice-rounding
+description: Acme Corp invoicing policy — how to round line items on Acme
+  customer invoices before billing. Use when preparing an Acme invoice.
+---
+
+# Acme Invoice Rounding
+
+When preparing an **Acme customer invoice**, always round each line-item amount
+UP to the nearest 100 before summing. (This applies to Acme invoices only.)
+"""
+
+E2_NEG_CONTROL = Task(
+    id="skill_e2_negative_control_sum",
+    name="Plain column sum with a tempting-but-irrelevant rounding skill present",
+    tags=("skill", "negative-control", "axis", "easy"),
+    prompt=(
+        "В рабочей директории есть data.csv (колонки item, amount). Посчитай"
+        " сумму столбца amount и запиши её одной строкой (целое число) в файл"
+        " total.txt."
+    ),
+    setup_files={
+        "data.csv": _E2_DATA,
+        ".claude/skills/acme-invoice-rounding/SKILL.md": _E2_ROUNDING_SKILL,
+        ".agents/skills/acme-invoice-rounding/SKILL.md": _E2_ROUNDING_SKILL,
+    },
+    gold_files={"total.txt": "2655\n"},
+    # correct answer is the plain sum; applying the rounding skill yields 3100
+    verifier=file_text_equals("total.txt", "2655"),
+)
+
+
+# ---------------------------------------------------------------------------
+# E3 — skill selection: 3 codebooks, only the matching company's is correct
+# ---------------------------------------------------------------------------
+
+_ACME_CODEBOOK = """\
+---
+name: acme-failure-codebook
+description: Acme Corp codebook for normalizing equipment failure reasons to
+  Acme failure codes.
+---
+
+# Acme Corp — Failure Codebook
+
+- `THERMAL`: overheated, thermal trip, temperature alarm
+- `BEARING`: rumbling noise, spindle vibration, worn bearing
+- `ELECTRICAL`: blown fuse, tripped breaker, short circuit
+- `LUBE`: no grease, dry running, oil starvation
+- `CONTAM`: dust ingress, dirty coolant
+"""
+
+_GLOBEX_CODEBOOK = """\
+---
+name: globex-failure-codebook
+description: Globex Industries codebook for normalizing equipment failure
+  reasons to Globex failure codes.
+---
+
+# Globex Industries — Failure Codebook
+
+- `FX-01`: overheated, thermal trip, temperature alarm
+- `FX-02`: rumbling noise, spindle vibration, worn bearing
+- `FX-03`: blown fuse, tripped breaker, short circuit
+- `FX-04`: no grease, dry running, oil starvation
+- `FX-05`: dust ingress, dirty coolant
+"""
+
+E3_SELECTION = Task(
+    id="skill_e3_codebook_selection",
+    name="Pick the Nordwind codebook among several companies' codebooks",
+    tags=("skill", "selection", "axis", "medium"),
+    prompt=B1_CODEBOOK.prompt,  # explicitly references Nordwind Mfg
+    setup_files={
+        "failures.csv": _CODEBOOK_INPUT,
+        ".claude/skills/nordwind-failure-codebook/SKILL.md": _CODEBOOK_SKILL,
+        ".agents/skills/nordwind-failure-codebook/SKILL.md": _CODEBOOK_SKILL,
+        ".claude/skills/acme-failure-codebook/SKILL.md": _ACME_CODEBOOK,
+        ".agents/skills/acme-failure-codebook/SKILL.md": _ACME_CODEBOOK,
+        ".claude/skills/globex-failure-codebook/SKILL.md": _GLOBEX_CODEBOOK,
+        ".agents/skills/globex-failure-codebook/SKILL.md": _GLOBEX_CODEBOOK,
+    },
+    gold_files={"normalized.csv": _CODEBOOK_GOLD_CSV},  # Nordwind codes
+    verifier=_codebook_check,  # only Nordwind codes pass
+)
+
+
+# ---------------------------------------------------------------------------
+# G1 — create a code-skill following a bespoke skill-authoring standard
+# ---------------------------------------------------------------------------
+
+_AUTHORING_STANDARD = """\
+---
+name: acme-skill-standard
+description: Acme's internal standard for authoring agent skills. Use whenever
+  creating a new skill inside an Acme repository.
+---
+
+# Acme Skill-Authoring Standard
+
+Every skill created at Acme MUST satisfy ALL of the following:
+
+1. The skill folder name MUST equal the frontmatter `name`.
+2. The frontmatter MUST include `metadata.review-status` set to `draft`.
+3. The skill folder MUST contain a `TESTS.md` file with at least one
+   worked input → output example.
+4. Executable code goes under `scripts/`.
+"""
+
+_SLUG_GOLD_SKILL_MD = """\
+---
+name: slugify-tool
+description: Turn arbitrary text into URL-safe slugs.
+metadata:
+  review-status: draft
+---
+
+# Slugify Tool
+
+`scripts/slugify.py` exposes `slugify(text: str) -> str`.
+"""
+
+_SLUG_GOLD_TESTS = "# Tests\n\n- `slugify('Hello World')` -> `hello-world`\n"
+
+_SLUG_GOLD_PY = '''\
+import re
+
+
+def slugify(text: str) -> str:
+    text = text.lower()
+    text = re.sub(r"\\s+", "-", text)
+    text = re.sub(r"[^a-z0-9-]", "", text)
+    return text.strip("-")
+'''
+
+_SLUG_SKILL = "skills/slugify-tool"
+
+G1_CREATE_SKILL = Task(
+    id="skill_g1_create_slugify_skill",
+    name="Create a slugify skill following the Acme authoring standard",
+    tags=("skill", "create", "code-skill", "medium"),
+    prompt=(
+        "Создай новый скилл в каталоге skills/slugify-tool, который умеет"
+        " приводить произвольный текст к URL-безопасному slug. Скрипт"
+        " scripts/slugify.py должен экспортировать функцию slugify(text: str)"
+        " -> str: привести к нижнему регистру, заменить любые пробелы на дефис,"
+        " удалить все символы кроме латиницы a-z, цифр 0-9 и дефиса, и убрать"
+        " дефисы по краям. Оформи скилл строго по внутреннему стандарту"
+        " авторинга скиллов Acme."
+    ),
+    setup_files={
+        ".claude/skills/acme-skill-standard/SKILL.md": _AUTHORING_STANDARD,
+        ".agents/skills/acme-skill-standard/SKILL.md": _AUTHORING_STANDARD,
+    },
+    gold_files={
+        f"{_SLUG_SKILL}/SKILL.md": _SLUG_GOLD_SKILL_MD,
+        f"{_SLUG_SKILL}/TESTS.md": _SLUG_GOLD_TESTS,
+        f"{_SLUG_SKILL}/scripts/slugify.py": _SLUG_GOLD_PY,
+    },
+    verifier=all_of(
+        # форма + бэспоук-стандарт авторинга (неискомо без скилла-стандарта)
+        file_matches_regex(f"{_SLUG_SKILL}/SKILL.md", r"^name:\s*slugify-tool\s*$"),
+        file_matches_regex(f"{_SLUG_SKILL}/SKILL.md", r"review-status:\s*draft"),
+        file_exists(f"{_SLUG_SKILL}/TESTS.md"),
+        # функция на скрытых входах
+        python_callable_returns(f"{_SLUG_SKILL}/scripts/slugify.py", "mod.slugify('Hello, World!')", "hello-world"),
+        python_callable_returns(f"{_SLUG_SKILL}/scripts/slugify.py", "mod.slugify('Foo  Bar Baz')", "foo-bar-baz"),
+    ),
+)
+
+
+SKILL_TASKS = [
+    R1_BRAND, B1_CODEBOOK, B3_POLICY, G2_SKILL_REPAIR, R2_STYLE, B2_NDR7,
+    E1_DISTRACTOR, E2_NEG_CONTROL, E3_SELECTION, G1_CREATE_SKILL,
+]
