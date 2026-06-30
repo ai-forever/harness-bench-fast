@@ -81,7 +81,10 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     # conditional way — otherwise the run-vs-run-pure comparison would be
     # confounded by missing memory/skills rather than isolating the profile.
     memory_sources = ["/AGENTS.md"] if (workspace / "AGENTS.md").exists() else None
-    skill_sources = ["/.agents/skills"] if (workspace / ".agents" / "skills").is_dir() else None
+    skill_sources = [
+        p for p in ("/.claude/skills", "/.agents/skills")
+        if (workspace / p.lstrip("/")).is_dir()
+    ] or None
     agent = create_deep_agent(
         model=model, backend=backend, memory=memory_sources, skills=skill_sources
     )

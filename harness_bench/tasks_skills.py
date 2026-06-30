@@ -95,7 +95,13 @@ R1_BRAND = Task(
         " СТРОГО по фирменному стилю Halcyon Freight (цвета, шрифты, правила)."
         " Всё в одном файле, стили инлайн в <style>."
     ),
-    setup_files={".agents/skills/halcyon-brand/SKILL.md": _BRAND_SKILL},
+    # Ship the skill in BOTH standard discovery dirs so every harness sees it:
+    # `.claude/skills` (Claude Code — verified it ignores `.agents/skills`) and
+    # `.agents/skills` (codex/openhands; opencode reads either). Same content.
+    setup_files={
+        ".claude/skills/halcyon-brand/SKILL.md": _BRAND_SKILL,
+        ".agents/skills/halcyon-brand/SKILL.md": _BRAND_SKILL,
+    },
     gold_files={"index.html": _BRAND_GOLD_HTML},
     verifier=all_of(
         # фирменные токены — их неоткуда взять, кроме скилла (hex регистронезависимо)

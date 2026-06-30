@@ -360,7 +360,10 @@ def build_agent(
     memory_sources = ["/AGENTS.md"] if (workspace / "AGENTS.md").exists() else None
     # Skill tasks ship `.agents/skills/`; wire SkillsMiddleware in only when
     # present so the skill-less tasks stay unchanged (see runner.build_agent).
-    skill_sources = ["/.agents/skills"] if (workspace / ".agents" / "skills").is_dir() else None
+    skill_sources = [
+        p for p in ("/.claude/skills", "/.agents/skills")
+        if (workspace / p.lstrip("/")).is_dir()
+    ] or None
     agent = create_deep_agent(
         model=model, backend=backend, memory=memory_sources, skills=skill_sources
     )
