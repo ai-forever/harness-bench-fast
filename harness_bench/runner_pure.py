@@ -75,10 +75,16 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
         retry_backoff_factor=1.0,
         retry_on_status_codes=(403, 429, 500, 502, 503, 504),
     )
-    # `run-pure` is the deliberately barebones baseline: stock deepagents with
-    # no harness profile, no memory, and no skills. Skill/memory tasks fail on
-    # it by design and are measured on `run` / `run-openrouter` instead.
-    agent = create_deep_agent(model=model, backend=backend)
+    # `run-pure` differs from `run` ONLY by not registering the
+    # deepagents-gigachat harness profile. Memory and skills are generic
+    # deepagents features independent of that profile, so wire them the same
+    # conditional way — otherwise the run-vs-run-pure comparison would be
+    # confounded by missing memory/skills rather than isolating the profile.
+    memory_sources = ["/AGENTS.md"] if (workspace / "AGENTS.md").exists() else None
+    skill_sources = ["/.agents/skills"] if (workspace / ".agents" / "skills").is_dir() else None
+    agent = create_deep_agent(
+        model=model, backend=backend, memory=memory_sources, skills=skill_sources
+    )
     return agent.with_config({"recursion_limit": recursion_limit})
 
 
