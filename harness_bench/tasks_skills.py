@@ -492,7 +492,10 @@ R2_STYLE = Task(
     },
     gold_files={"report.txt": _STYLE_GOLD},
     verifier=all_of(
-        file_matches_regex("report.txt", r"^QUARTERLY RESULTS\s*$"),
+        # style rule: a section title rendered in ALL CAPS on its own line
+        # (content-agnostic — the skill is the formatting, not which title)
+        file_matches_regex("report.txt", r"^[A-Z][A-Z ]+$", flags=re.MULTILINE),
+        # the non-recoverable Vortex conventions (the actual discriminators)
         file_contains("report.txt", "2026.03.14"),
         file_contains("report.txt", "1'234'567 USD"),
         file_contains("report.txt", "— Vortex Corp · Confidential"),
@@ -542,7 +545,7 @@ def _ndr7_check(ws) -> VerifyResult:
     p = ws / "parsed.csv"
     if not p.exists():
         return VerifyResult(False, "parsed.csv missing")
-    got: dict[str, int] = {}
+    got: dict[int, int] = {}
     try:
         with p.open(encoding="utf-8", newline="") as f:
             for row in csv.DictReader(f):
@@ -550,10 +553,11 @@ def _ndr7_check(ws) -> VerifyResult:
                 rid, amt = norm.get("id"), norm.get("amount")
                 if rid is None or amt is None:
                     return VerifyResult(False, "parsed.csv must have columns id,amount")
-                got[rid] = int(amt)
+                got[int(rid)] = int(amt)  # normalize ids (leading zeros) by int
     except (csv.Error, ValueError, UnicodeDecodeError) as exc:
         return VerifyResult(False, f"could not read parsed.csv: {exc}")
-    wrong = [f"{k}={got.get(k)}≠{v}" for k, v in _NDR7_GOLD.items() if got.get(k) != v]
+    exp = {int(k): v for k, v in _NDR7_GOLD.items()}
+    wrong = [f"{k}={got.get(k)}≠{v}" for k, v in exp.items() if got.get(k) != v]
     if wrong:
         return VerifyResult(False, "wrong amounts: " + "; ".join(wrong))
     return VerifyResult(True, "all NDR-7 records parsed with correct signed amounts")
