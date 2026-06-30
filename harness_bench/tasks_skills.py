@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import csv
 import re
+import sys
 
 from harness_bench.core import Task, VerifyResult
 from harness_bench.verifiers import all_of, file_contains, file_matches_regex
@@ -234,4 +235,122 @@ B1_CODEBOOK = Task(
 )
 
 
-SKILL_TASKS = [R1_BRAND, B1_CODEBOOK]
+# ---------------------------------------------------------------------------
+# B3 — policy as a decision function (fictional insurer, precedence rules)
+# ---------------------------------------------------------------------------
+
+# Invented thresholds + a strict precedence order. Not recoverable: the agent
+# must read the skill to get the numbers AND the order they apply in.
+_POLICY_SKILL = """\
+---
+name: helios-claim-triage
+description: Helios Insurance auto-triage policy for motor claims. Use to decide
+  whether a claim is auto-approved, sent to manual review, or auto-rejected.
+---
+
+# Helios Insurance — Motor Claim Auto-Triage Policy
+
+You receive one claim as a dict with these keys:
+
+- `claim_amount` (int, RUB)
+- `incident_type` (str): one of `collision`, `theft`, `flood`, `vandalism`
+- `policy_age_days` (int): days since the policy started
+- `prior_claims` (int): number of previous claims on this policy
+- `documentation_complete` (bool)
+
+Return exactly one decision string: `AUTO_APPROVE`, `MANUAL_REVIEW`, or
+`AUTO_REJECT`.
+
+## Rules — apply STRICTLY in this order (1 wins over 2, etc.)
+
+1. If `documentation_complete` is false → `MANUAL_REVIEW` (nothing else matters
+   until paperwork is complete).
+2. Else if `incident_type` is `flood` → `AUTO_REJECT` (flood is not covered).
+3. Else if `policy_age_days` < 30 → `MANUAL_REVIEW` (new-policy fraud check).
+4. Else if `claim_amount` <= 1000 and `prior_claims` == 0 → `AUTO_APPROVE`.
+5. Else if `claim_amount` <= 5000 and `prior_claims` <= 2 → `AUTO_APPROVE`.
+6. Else → `MANUAL_REVIEW`.
+"""
+
+_POLICY_GOLD = '''\
+def decide(case: dict) -> str:
+    if not case.get("documentation_complete", False):
+        return "MANUAL_REVIEW"
+    if case["incident_type"] == "flood":
+        return "AUTO_REJECT"
+    if case["policy_age_days"] < 30:
+        return "MANUAL_REVIEW"
+    if case["claim_amount"] <= 1000 and case["prior_claims"] == 0:
+        return "AUTO_APPROVE"
+    if case["claim_amount"] <= 5000 and case["prior_claims"] <= 2:
+        return "AUTO_APPROVE"
+    return "MANUAL_REVIEW"
+'''
+
+# Held-out cases the agent never sees. Cases 4-8 probe the precedence order.
+_POLICY_CASES = [
+    ({"claim_amount": 500, "incident_type": "collision", "policy_age_days": 200, "prior_claims": 0, "documentation_complete": True}, "AUTO_APPROVE"),
+    ({"claim_amount": 3000, "incident_type": "theft", "policy_age_days": 400, "prior_claims": 1, "documentation_complete": True}, "AUTO_APPROVE"),
+    ({"claim_amount": 8000, "incident_type": "collision", "policy_age_days": 400, "prior_claims": 0, "documentation_complete": True}, "MANUAL_REVIEW"),
+    ({"claim_amount": 500, "incident_type": "flood", "policy_age_days": 400, "prior_claims": 0, "documentation_complete": True}, "AUTO_REJECT"),       # flood overrides auto-approve
+    ({"claim_amount": 8000, "incident_type": "flood", "policy_age_days": 400, "prior_claims": 3, "documentation_complete": True}, "AUTO_REJECT"),      # flood overrides manual review
+    ({"claim_amount": 500, "incident_type": "collision", "policy_age_days": 400, "prior_claims": 0, "documentation_complete": False}, "MANUAL_REVIEW"),# doc overrides auto-approve
+    ({"claim_amount": 500, "incident_type": "collision", "policy_age_days": 10, "prior_claims": 0, "documentation_complete": True}, "MANUAL_REVIEW"),  # new policy overrides auto-approve
+    ({"claim_amount": 200, "incident_type": "flood", "policy_age_days": 10, "prior_claims": 0, "documentation_complete": False}, "MANUAL_REVIEW"),     # doc (rule 1) overrides flood (rule 2)
+    ({"claim_amount": 3000, "incident_type": "theft", "policy_age_days": 400, "prior_claims": 5, "documentation_complete": True}, "MANUAL_REVIEW"),
+    ({"claim_amount": 1000, "incident_type": "vandalism", "policy_age_days": 400, "prior_claims": 0, "documentation_complete": True}, "AUTO_APPROVE"),
+]
+
+
+def _policy_check(ws) -> VerifyResult:
+    sol = ws / "solution.py"
+    if not sol.exists():
+        return VerifyResult(False, "solution.py missing")
+    import importlib.util as _ilu
+
+    for name in [m for m in list(sys.modules) if m == "solution"]:
+        del sys.modules[name]
+    spec = _ilu.spec_from_file_location("solution", sol)
+    mod = _ilu.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)
+    except Exception as exc:  # noqa: BLE001
+        return VerifyResult(False, f"solution.py failed to import: {type(exc).__name__}: {exc}")
+    if not hasattr(mod, "decide"):
+        return VerifyResult(False, "function decide(case) not defined")
+    wrong = []
+    for case, expected in _POLICY_CASES:
+        try:
+            got = mod.decide(dict(case))
+        except Exception as exc:  # noqa: BLE001
+            return VerifyResult(False, f"decide() raised on a case: {type(exc).__name__}: {exc}")
+        if got != expected:
+            wrong.append(f"{case['incident_type']}/{case['claim_amount']}/doc={case['documentation_complete']}: {got!r}≠{expected}")
+    if wrong:
+        return VerifyResult(False, "wrong decisions: " + "; ".join(wrong[:4]))
+    return VerifyResult(True, f"all {len(_POLICY_CASES)} triage decisions correct (incl. precedence)")
+
+
+B3_POLICY = Task(
+    id="skill_b3_claim_triage_policy",
+    name="Implement Helios claim-triage decision function from policy skill",
+    tags=("skill", "domain-procedure", "policy", "medium"),
+    prompt=(
+        "Создай в корне рабочей директории файл solution.py с функцией"
+        " decide(case: dict) -> str, которая классифицирует страховую заявку"
+        " согласно политике авто-триажа компании Helios Insurance. На вход —"
+        " словарь с ключами claim_amount, incident_type, policy_age_days,"
+        " prior_claims, documentation_complete. Верни ровно одну из строк:"
+        " AUTO_APPROVE, MANUAL_REVIEW, AUTO_REJECT. Строго соблюдай порядок"
+        " приоритета правил из политики."
+    ),
+    setup_files={
+        ".claude/skills/helios-claim-triage/SKILL.md": _POLICY_SKILL,
+        ".agents/skills/helios-claim-triage/SKILL.md": _POLICY_SKILL,
+    },
+    gold_files={"solution.py": _POLICY_GOLD},
+    verifier=_policy_check,
+)
+
+
+SKILL_TASKS = [R1_BRAND, B1_CODEBOOK, B3_POLICY]
