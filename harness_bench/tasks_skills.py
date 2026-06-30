@@ -10,14 +10,17 @@ The carried knowledge is intentionally NON-recoverable: a fictional company's
 exact brand tokens that are not in any model's weights, not on the web, and not
 introspectable. The agent can only get them by reading the skill.
 
-Not yet registered in `ALL_TASKS` (that needs a TASK_SET_VERSION bump); kept
-importable for review and validation runs.
+Registered in `ALL_TASKS` as task_314..task_330 (task-set v0.10.0). The
+C1/C1b debugging prototypes remain defined for local controls, but are not part
+of `SKILL_TASKS` because no-skill runs showed no skill uplift.
 """
 
 from __future__ import annotations
 
 import csv
+import os
 import re
+import subprocess
 import sys
 
 from harness_bench.core import Task, VerifyResult
@@ -94,7 +97,7 @@ _BRAND_GOLD_HTML = """\
 """
 
 R1_BRAND = Task(
-    id="skill_r1_brand_landing",
+    id="task_314_skill_r1_brand_landing",
     name="Build a landing page following Halcyon Freight brand guidelines",
     tags=("skill", "brand", "office", "html", "medium"),
     prompt=(
@@ -221,7 +224,7 @@ def _codebook_check(ws) -> VerifyResult:
 
 
 B1_CODEBOOK = Task(
-    id="skill_b1_failure_codebook",
+    id="task_315_skill_b1_failure_codebook",
     name="Normalize failure reasons to the Nordwind internal codebook",
     tags=("skill", "data-cleaning", "codebook", "medium"),
     prompt=(
@@ -339,7 +342,7 @@ def _policy_check(ws) -> VerifyResult:
 
 
 B3_POLICY = Task(
-    id="skill_b3_claim_triage_policy",
+    id="task_316_skill_b3_claim_triage_policy",
     name="Implement Helios claim-triage decision function from policy skill",
     tags=("skill", "domain-procedure", "policy", "medium"),
     prompt=(
@@ -415,7 +418,7 @@ def normalize_phone(s: str) -> str:
 _PHONE_SCRIPT = "skills/phone-normalizer/scripts/normalize.py"
 
 G2_SKILL_REPAIR = Task(
-    id="skill_g2_repair_phone_skill",
+    id="task_317_skill_g2_repair_phone_skill",
     name="Repair the phone-normalizer skill's script (E.164, international)",
     tags=("skill", "edit", "code-skill", "medium"),
     prompt=(
@@ -476,7 +479,7 @@ _STYLE_GOLD = (
 )
 
 R2_STYLE = Task(
-    id="skill_r2_style_guide_report",
+    id="task_318_skill_r2_style_guide_report",
     name="Format a report to the Vortex Corp style guide",
     tags=("skill", "office", "formatting", "medium"),
     prompt=(
@@ -564,7 +567,7 @@ def _ndr7_check(ws) -> VerifyResult:
 
 
 B2_NDR7 = Task(
-    id="skill_b2_ndr7_parse",
+    id="task_319_skill_b2_ndr7_parse",
     name="Parse Nordwind NDR-7 records with sign-overpunch",
     tags=("skill", "file-format", "parsing", "medium"),
     prompt=(
@@ -612,7 +615,7 @@ Pick WCAG-AA color pairs and emit hex tokens for background/foreground.
 """
 
 E1_DISTRACTOR = Task(
-    id="skill_e1_codebook_with_distractors",
+    id="task_320_skill_e1_codebook_with_distractors",
     name="Normalize failure reasons with irrelevant skills also present",
     tags=("skill", "data-cleaning", "distractor", "medium"),
     prompt=B1_CODEBOOK.prompt,
@@ -655,7 +658,7 @@ UP to the nearest 100 before summing. (This applies to Acme invoices only.)
 """
 
 E2_NEG_CONTROL = Task(
-    id="skill_e2_negative_control_sum",
+    id="task_321_skill_e2_negative_control_sum",
     name="Plain column sum with a tempting-but-irrelevant rounding skill present",
     tags=("skill", "negative-control", "axis", "easy"),
     prompt=(
@@ -711,7 +714,7 @@ description: Globex Industries codebook for normalizing equipment failure
 """
 
 E3_SELECTION = Task(
-    id="skill_e3_codebook_selection",
+    id="task_322_skill_e3_codebook_selection",
     name="Pick the Nordwind codebook among several companies' codebooks",
     tags=("skill", "selection", "axis", "medium"),
     prompt=B1_CODEBOOK.prompt,  # explicitly references Nordwind Mfg
@@ -780,7 +783,7 @@ def slugify(text: str) -> str:
 _SLUG_SKILL = "skills/slugify-tool"
 
 G1_CREATE_SKILL = Task(
-    id="skill_g1_create_slugify_skill",
+    id="task_323_skill_g1_create_slugify_skill",
     name="Create a slugify skill following the Acme authoring standard",
     tags=("skill", "create", "code-skill", "medium"),
     prompt=(
@@ -894,7 +897,7 @@ def _lumen_check(ws) -> VerifyResult:
 
 
 A1_LUMEN_DSL = Task(
-    id="skill_a1_lumen_recipe_dsl",
+    id="task_324_skill_a1_lumen_recipe_dsl",
     name="Write a Lumen Recipe DSL program from the fictional LQ1 spec",
     tags=("skill", "dsl", "file-format", "medium"),
     prompt=(
@@ -1037,7 +1040,7 @@ def _q9_check(ws) -> VerifyResult:
 
 
 A2_Q9_PROTOCOL = Task(
-    id="skill_a2_q9_binary_protocol",
+    id="task_325_skill_a2_q9_binary_protocol",
     name="Implement a codec for the fictional Quasar Q9 binary protocol",
     tags=("skill", "binary-protocol", "code", "hard"),
     prompt=(
@@ -1150,7 +1153,7 @@ def _quokka_check(ws) -> VerifyResult:
 
 
 A3_QUOKKA_LIBRARY = Task(
-    id="skill_a3_quokka_library_quirk",
+    id="task_326_skill_a3_quokka_library_quirk",
     name="Use a fictional library with a non-obvious warm-up/calibration protocol",
     tags=("skill", "library-api", "code", "medium"),
     prompt=(
@@ -1258,7 +1261,7 @@ def _act4_check(ws) -> VerifyResult:
 
 
 R3_ACT4_TEMPLATE = Task(
-    id="skill_r3_act4_compliance_notice",
+    id="task_327_skill_r3_act4_compliance_notice",
     name="Draft an Aster ACT-4 compliance notice with exact block order",
     tags=("skill", "template", "compliance", "medium"),
     prompt=(
@@ -1377,7 +1380,7 @@ def _meridian_check(ws) -> VerifyResult:
 
 
 D2_MERIDIAN_RECONCILE = Task(
-    id="skill_d2_meridian_reconcile_xlsx",
+    id="task_328_skill_d2_meridian_reconcile_xlsx",
     name="Reconcile two xlsx ledgers with Meridian bespoke matching rules",
     tags=("skill", "spreadsheet", "data-cleaning", "hard"),
     prompt=(
@@ -1395,10 +1398,602 @@ D2_MERIDIAN_RECONCILE = Task(
     verifier=_meridian_check,
 )
 
+# ---------------------------------------------------------------------------
+# D1 — bespoke scientific/engineering calculation method
+# ---------------------------------------------------------------------------
+
+_ARCFLUX_SKILL = """\
+---
+name: arcflux-exposure-method
+description: Valeo ArcFlux AF-3 exposure calculation method. Use when computing
+  calibrated exposure from ArcFlux sensor CSV readings.
+---
+
+# Valeo ArcFlux AF-3 Exposure Method
+
+Implement `compute_exposure(csv_path: str) -> float` for CSV files with columns:
+`minute,raw,dark,temp_c,gain_code`.
+
+For each row:
+
+1. Look up gain multiplier:
+   - `L` -> `0.75`
+   - `M` -> `1.10`
+   - `H` -> `1.60`
+2. Compute corrected intensity:
+   `intensity = (raw - dark) * gain * (1 - 0.004 * (temp_c - 20))`
+3. Integrate intensity over time using the trapezoidal rule over `minute`.
+4. Convert integrated intensity to exposure by dividing by `60`.
+5. Return the final exposure rounded to 3 decimal places.
+
+Rows may be irregularly spaced in time and are already in chronological order.
+"""
+
+_ARCFLUX_INPUT = """\
+minute,raw,dark,temp_c,gain_code
+0,120,10,20,L
+10,150,12,25,M
+25,170,11,18,H
+40,160,10,21,M
+"""
+
+_ARCFLUX_GOLD = '''\
+import csv
+
+
+_GAIN = {"L": 0.75, "M": 1.10, "H": 1.60}
+
+
+def _intensity(row: dict) -> float:
+    raw = float(row["raw"])
+    dark = float(row["dark"])
+    temp_c = float(row["temp_c"])
+    gain = _GAIN[row["gain_code"]]
+    return (raw - dark) * gain * (1 - 0.004 * (temp_c - 20))
+
+
+def compute_exposure(csv_path: str) -> float:
+    with open(csv_path, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    if len(rows) < 2:
+        return 0.0
+    points = [(float(row["minute"]), _intensity(row)) for row in rows]
+    area = 0.0
+    for (t0, y0), (t1, y1) in zip(points, points[1:]):
+        area += (t1 - t0) * (y0 + y1) / 2
+    return round(area / 60, 3)
+'''
+
+
+def _arcflux_expected(csv_path) -> float:
+    gain = {"L": 0.75, "M": 1.10, "H": 1.60}
+    with open(csv_path, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    points = []
+    for row in rows:
+        intensity = (float(row["raw"]) - float(row["dark"])) * gain[row["gain_code"]] * (
+            1 - 0.004 * (float(row["temp_c"]) - 20)
+        )
+        points.append((float(row["minute"]), intensity))
+    area = 0.0
+    for (t0, y0), (t1, y1) in zip(points, points[1:], strict=False):
+        area += (t1 - t0) * (y0 + y1) / 2
+    return round(area / 60, 3)
+
+
+def _arcflux_check(ws) -> VerifyResult:
+    sol = ws / "solution.py"
+    if not sol.exists():
+        return VerifyResult(False, "solution.py missing")
+    hidden = ws / "hidden_arcflux.csv"
+    hidden.write_text(
+        "minute,raw,dark,temp_c,gain_code\n"
+        "0,210,14,19,M\n"
+        "7,240,15,24,H\n"
+        "19,230,13,22,L\n"
+        "31,260,16,18,H\n",
+        encoding="utf-8",
+    )
+    import importlib.util as _ilu
+
+    sys.modules.pop("solution", None)
+    spec = _ilu.spec_from_file_location("solution", sol)
+    mod = _ilu.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)
+    except Exception as exc:  # noqa: BLE001
+        return VerifyResult(False, f"solution.py failed to import: {type(exc).__name__}: {exc}")
+    if not hasattr(mod, "compute_exposure"):
+        return VerifyResult(False, "compute_exposure(csv_path) missing")
+    wrong = []
+    for rel in ("readings.csv", "hidden_arcflux.csv"):
+        path = ws / rel
+        try:
+            got = mod.compute_exposure(str(path))
+        except Exception as exc:  # noqa: BLE001
+            return VerifyResult(False, f"compute_exposure raised for {rel}: {type(exc).__name__}: {exc}")
+        exp = _arcflux_expected(path)
+        if got != exp:
+            wrong.append(f"{rel}: {got!r} != {exp!r}")
+    if wrong:
+        return VerifyResult(False, "; ".join(wrong))
+    return VerifyResult(True, "ArcFlux exposure matches trapezoidal AF-3 method on visible and hidden data")
+
+
+D1_ARCFLUX_EXPOSURE = Task(
+    id="task_329_skill_d1_arcflux_exposure",
+    name="Compute ArcFlux exposure with a bespoke calibration method",
+    tags=("skill", "mathematical-method", "calculation", "medium"),
+    prompt=(
+        "В рабочей директории есть readings.csv с показаниями ArcFlux AF-3. "
+        "Создай solution.py с функцией compute_exposure(csv_path: str) -> float, "
+        "которая считает calibrated exposure строго по методу Valeo ArcFlux AF-3 "
+        "из скилла: gain table, temperature correction, trapezoidal integration, "
+        "conversion и rounding."
+    ),
+    setup_files={
+        "readings.csv": _ARCFLUX_INPUT,
+        ".claude/skills/arcflux-exposure-method/SKILL.md": _ARCFLUX_SKILL,
+        ".agents/skills/arcflux-exposure-method/SKILL.md": _ARCFLUX_SKILL,
+    },
+    gold_files={"solution.py": _ARCFLUX_GOLD},
+    verifier=_arcflux_check,
+)
+
+
+# ---------------------------------------------------------------------------
+# C1 — repair a flaky test by applying a debugging heuristic
+# ---------------------------------------------------------------------------
+
+_DET_SELECT_SKILL = """\
+---
+name: deterministic-tie-debugging
+description: Debugging checklist for flaky Python tests caused by unordered
+  collections, hash seed, and missing tie-breakers.
+---
+
+# Deterministic Tie Debugging
+
+When a test is flaky across runs or environments:
+
+1. Look for unordered collections (`set`, plain iteration over set-like data,
+   dicts built from sets) in selection/ranking code.
+2. Reproduce with different `PYTHONHASHSEED` values.
+3. Any ranking function must define an explicit total order.
+4. For candidate selection, sort by the primary score first, then by the
+   documented tie-breaker. For this repository's router, ties on score MUST be
+   broken by lexicographically smallest candidate name.
+5. Do not weaken tests; make production code deterministic.
+"""
+
+_SELECTOR_BUGGY = '''\
+def choose_primary(candidates):
+    """Return the primary candidate name from a list of {'name', 'score'} dicts."""
+    best_score = max(c["score"] for c in candidates)
+    tied_names = {c["name"] for c in candidates if c["score"] == best_score}
+    return next(iter(tied_names))
+'''
+
+_SELECTOR_TEST = '''\
+from selector import choose_primary
+
+
+def test_unique_best_candidate():
+    assert choose_primary([
+        {"name": "gamma", "score": 4},
+        {"name": "alpha", "score": 9},
+        {"name": "beta", "score": 5},
+    ]) == "alpha"
+
+
+def test_tie_breaks_lexicographically_smallest_name():
+    assert choose_primary([
+        {"name": "zulu", "score": 8},
+        {"name": "alpha", "score": 8},
+        {"name": "mango", "score": 8},
+    ]) == "alpha"
+'''
+
+_SELECTOR_GOLD = '''\
+def choose_primary(candidates):
+    """Return the primary candidate name from a list of {'name', 'score'} dicts."""
+    if not candidates:
+        raise ValueError("candidates must not be empty")
+    return sorted(candidates, key=lambda c: (-c["score"], c["name"]))[0]["name"]
+'''
+
+
+def _seeded_pytest_check(ws) -> VerifyResult:
+    seeds = ["1", "2", "3", "4", "5", "123"]
+    failures = []
+    for seed in seeds:
+        env = os.environ.copy()
+        env["PYTHONHASHSEED"] = seed
+        try:
+            result = subprocess.run(  # noqa: S603 — benchmark only
+                [sys.executable, "-m", "pytest", "-q", "tests"],
+                cwd=ws,
+                env=env,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=30,
+                check=False,
+            )
+        except subprocess.TimeoutExpired:
+            return VerifyResult(False, f"pytest timed out with PYTHONHASHSEED={seed}")
+        if result.returncode != 0:
+            failures.append(f"seed={seed}: {(result.stdout + result.stderr).strip()[-240:]}")
+    if failures:
+        return VerifyResult(False, "flaky pytest failure(s): " + " | ".join(failures[:2]))
+    return VerifyResult(True, f"pytest passed under {len(seeds)} PYTHONHASHSEED values")
+
+
+C1_FLAKY_TIE_BREAK = Task(
+    id="skill_c1_deterministic_tie_break",
+    name="Fix a flaky selector test by adding an explicit deterministic tie-breaker",
+    tags=("skill", "debugging-heuristic", "pytest", "flaky", "medium"),
+    prompt=(
+        "В проекте есть selector.py и tests/test_selector.py. Тест на выбор primary "
+        "candidate флакает между окружениями. Почини production code, не ослабляя "
+        "тесты: выбор должен быть детерминированным по диагностическому скиллу. "
+        "Сохрани публичную функцию choose_primary(candidates)."
+    ),
+    setup_files={
+        "selector.py": _SELECTOR_BUGGY,
+        "tests/test_selector.py": _SELECTOR_TEST,
+        ".claude/skills/deterministic-tie-debugging/SKILL.md": _DET_SELECT_SKILL,
+        ".agents/skills/deterministic-tie-debugging/SKILL.md": _DET_SELECT_SKILL,
+    },
+    gold_files={"selector.py": _SELECTOR_GOLD},
+    verifier=_seeded_pytest_check,
+)
+
+# ---------------------------------------------------------------------------
+# D1b — harder multi-file scientific calculation with units and piecewise rules
+# ---------------------------------------------------------------------------
+
+_ARCFLUX4_SKILL = """\
+---
+name: arcflux-af4-multifile-method
+description: Valeo ArcFlux AF-4 multi-sensor exposure method. Use when computing
+  exposure from ArcFlux readings plus calibration files.
+---
+
+# Valeo ArcFlux AF-4 Multi-Sensor Exposure Method
+
+Implement `compute_total_exposure(readings_csv: str, calibration_csv: str) -> float`.
+
+`readings_csv` columns:
+`minute,sensor_id,raw,dark,unit,temp_c`
+
+`calibration_csv` columns:
+`sensor_id,gain,offset`
+
+## Method
+
+1. Join readings to calibration by `sensor_id`.
+2. Convert `raw` and `dark` to base flux units before subtracting:
+   - `base` -> value as-is
+   - `centi` -> value / 100
+   - `milli` -> value / 1000
+3. Compute base signal: `signal = max(0, raw_base - dark_base)`.
+4. Apply calibration: `calibrated = signal * gain + offset`.
+5. Apply temperature factor:
+   - if `temp_c < 15`: `factor = 1 + 0.006 * (15 - temp_c)`
+   - if `15 <= temp_c <= 25`: `factor = 1 - 0.003 * (temp_c - 20)`
+   - if `temp_c > 25`: `factor = max(0.85, 1 - 0.008 * (temp_c - 25))`
+6. Corrected intensity is `calibrated * factor`.
+7. Integrate with the trapezoidal rule **separately per sensor_id** using that
+   sensor's chronological readings. Sum sensor areas.
+8. Convert total area to exposure by dividing by `60`.
+9. Return the final value rounded to 4 decimal places.
+"""
+
+_AF4_READINGS = """\
+minute,sensor_id,raw,dark,unit,temp_c
+0,S-A,1200,100,centi,14
+10,S-A,15.0,1.0,base,20
+25,S-A,17000,900,milli,28
+0,S-B,900,100,centi,18
+12,S-B,11.5,0.5,base,26
+30,S-B,15000,2000,milli,12
+"""
+
+_AF4_CALIBRATION = """\
+sensor_id,gain,offset
+S-A,1.20,0.50
+S-B,0.85,-0.20
+"""
+
+_AF4_GOLD = '''\
+import csv
+from collections import defaultdict
+
+
+def _unit_value(value: str, unit: str) -> float:
+    value_f = float(value)
+    if unit == "base":
+        return value_f
+    if unit == "centi":
+        return value_f / 100
+    if unit == "milli":
+        return value_f / 1000
+    raise ValueError(f"unknown unit {unit!r}")
+
+
+def _temp_factor(temp_c: float) -> float:
+    if temp_c < 15:
+        return 1 + 0.006 * (15 - temp_c)
+    if temp_c <= 25:
+        return 1 - 0.003 * (temp_c - 20)
+    return max(0.85, 1 - 0.008 * (temp_c - 25))
+
+
+def compute_total_exposure(readings_csv: str, calibration_csv: str) -> float:
+    with open(calibration_csv, newline="", encoding="utf-8") as f:
+        calibration = {row["sensor_id"]: row for row in csv.DictReader(f)}
+    by_sensor = defaultdict(list)
+    with open(readings_csv, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            cal = calibration[row["sensor_id"]]
+            raw = _unit_value(row["raw"], row["unit"])
+            dark = _unit_value(row["dark"], row["unit"])
+            signal = max(0.0, raw - dark)
+            calibrated = signal * float(cal["gain"]) + float(cal["offset"])
+            corrected = calibrated * _temp_factor(float(row["temp_c"]))
+            by_sensor[row["sensor_id"]].append((float(row["minute"]), corrected))
+    total_area = 0.0
+    for points in by_sensor.values():
+        points.sort(key=lambda p: p[0])
+        for (t0, y0), (t1, y1) in zip(points, points[1:], strict=False):
+            total_area += (t1 - t0) * (y0 + y1) / 2
+    return round(total_area / 60, 4)
+'''
+
+
+def _af4_reference(readings_csv, calibration_csv) -> float:
+    from collections import defaultdict
+
+    def unit_value(value, unit):
+        value = float(value)
+        return value if unit == "base" else value / 100 if unit == "centi" else value / 1000
+
+    def temp_factor(temp):
+        temp = float(temp)
+        if temp < 15:
+            return 1 + 0.006 * (15 - temp)
+        if temp <= 25:
+            return 1 - 0.003 * (temp - 20)
+        return max(0.85, 1 - 0.008 * (temp - 25))
+
+    with open(calibration_csv, newline="", encoding="utf-8") as f:
+        cal = {r["sensor_id"]: r for r in csv.DictReader(f)}
+    by_sensor = defaultdict(list)
+    with open(readings_csv, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            signal = max(0.0, unit_value(row["raw"], row["unit"]) - unit_value(row["dark"], row["unit"]))
+            corrected = (signal * float(cal[row["sensor_id"]]["gain"]) + float(cal[row["sensor_id"]]["offset"])) * temp_factor(row["temp_c"])
+            by_sensor[row["sensor_id"]].append((float(row["minute"]), corrected))
+    area = 0.0
+    for pts in by_sensor.values():
+        pts.sort(key=lambda p: p[0])
+        for (t0, y0), (t1, y1) in zip(pts, pts[1:], strict=False):
+            area += (t1 - t0) * (y0 + y1) / 2
+    return round(area / 60, 4)
+
+
+def _af4_check(ws) -> VerifyResult:
+    sol = ws / "solution.py"
+    if not sol.exists():
+        return VerifyResult(False, "solution.py missing")
+    hidden_r = ws / "hidden_af4_readings.csv"
+    hidden_c = ws / "hidden_af4_calibration.csv"
+    hidden_r.write_text(
+        "minute,sensor_id,raw,dark,unit,temp_c\n"
+        "0,S-X,20000,3000,milli,10\n"
+        "8,S-X,18.0,1.5,base,20\n"
+        "21,S-X,1900,250,centi,31\n"
+        "3,S-Y,500,900,centi,18\n"
+        "17,S-Y,22000,1000,milli,27\n",
+        encoding="utf-8",
+    )
+    hidden_c.write_text("sensor_id,gain,offset\nS-X,1.05,0.30\nS-Y,0.70,0.10\n", encoding="utf-8")
+    import importlib.util as _ilu
+
+    sys.modules.pop("solution", None)
+    spec = _ilu.spec_from_file_location("solution", sol)
+    mod = _ilu.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)
+    except Exception as exc:  # noqa: BLE001
+        return VerifyResult(False, f"solution.py failed to import: {type(exc).__name__}: {exc}")
+    if not hasattr(mod, "compute_total_exposure"):
+        return VerifyResult(False, "compute_total_exposure(readings_csv, calibration_csv) missing")
+    wrong = []
+    for readings, calibration in [(ws / "readings.csv", ws / "calibration.csv"), (hidden_r, hidden_c)]:
+        try:
+            got = mod.compute_total_exposure(str(readings), str(calibration))
+        except Exception as exc:  # noqa: BLE001
+            return VerifyResult(False, f"compute_total_exposure raised: {type(exc).__name__}: {exc}")
+        exp = _af4_reference(readings, calibration)
+        if got != exp:
+            wrong.append(f"{readings.name}: {got!r} != {exp!r}")
+    if wrong:
+        return VerifyResult(False, "; ".join(wrong))
+    return VerifyResult(True, "AF-4 exposure matches multi-file unit conversion and per-sensor integration")
+
+
+D1B_ARCFLUX_AF4 = Task(
+    id="task_330_skill_d1b_arcflux_multifile",
+    name="Compute AF-4 multi-sensor exposure with units and calibration joins",
+    tags=("skill", "mathematical-method", "calculation", "hard"),
+    prompt=(
+        "В рабочей директории есть readings.csv и calibration.csv. Создай solution.py "
+        "с функцией compute_total_exposure(readings_csv: str, calibration_csv: str) "
+        "-> float. Метод AF-4 бери строго из скилла: join по sensor_id, unit "
+        "conversion, max(0) signal, piecewise temperature factor, trapezoidal "
+        "integration separately per sensor_id, sum и rounding."
+    ),
+    setup_files={
+        "readings.csv": _AF4_READINGS,
+        "calibration.csv": _AF4_CALIBRATION,
+        ".claude/skills/arcflux-af4-multifile-method/SKILL.md": _ARCFLUX4_SKILL,
+        ".agents/skills/arcflux-af4-multifile-method/SKILL.md": _ARCFLUX4_SKILL,
+    },
+    gold_files={"solution.py": _AF4_GOLD},
+    verifier=_af4_check,
+)
+
+
+# ---------------------------------------------------------------------------
+# C1b — harder flaky async/order bug
+# ---------------------------------------------------------------------------
+
+_STABLE_ASYNC_SKILL = """\
+---
+name: stable-async-debugging
+description: Debugging checklist for flaky concurrent Python results caused by
+  as_completed ordering and missing output ordering contracts.
+---
+
+# Stable Async Debugging
+
+When tests fail intermittently around concurrent code:
+
+1. Look for `concurrent.futures.as_completed`, queues, callbacks, or worker
+   completion order being used as output order.
+2. Reproduce with several input orders and delay patterns, not just one run.
+3. Preserve the caller's input order unless the function contract explicitly
+   says completion order is desired.
+4. Do not remove concurrency just to make the test pass. Keep `ThreadPoolExecutor`
+   but store each future's input index and reassemble results by that index.
+5. Do not weaken or rewrite tests.
+"""
+
+_PIPELINE_BUGGY = '''\
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+
+
+def _render(item):
+    name, delay = item
+    time.sleep(delay)
+    return name.upper()
+
+
+def render_all(items):
+    """Render all (name, delay) items concurrently, preserving input order."""
+    results = []
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        futures = [pool.submit(_render, item) for item in items]
+        for fut in as_completed(futures):
+            results.append(fut.result())
+    return results
+'''
+
+_PIPELINE_TEST = '''\
+from pipeline import render_all
+
+
+def test_render_all_preserves_input_order_despite_delays():
+    items = [("slow", 0.04), ("fast", 0.0), ("mid", 0.02), ("last", 0.01)]
+    assert render_all(items) == ["SLOW", "FAST", "MID", "LAST"]
+
+
+def test_render_all_preserves_input_order_for_reverse_delays():
+    items = [("a", 0.03), ("b", 0.02), ("c", 0.01), ("d", 0.0)]
+    assert render_all(items) == ["A", "B", "C", "D"]
+'''
+
+_PIPELINE_GOLD = '''\
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+
+
+def _render(item):
+    name, delay = item
+    time.sleep(delay)
+    return name.upper()
+
+
+def render_all(items):
+    """Render all (name, delay) items concurrently, preserving input order."""
+    ordered = [None] * len(items)
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        future_to_index = {pool.submit(_render, item): idx for idx, item in enumerate(items)}
+        for fut in as_completed(future_to_index):
+            ordered[future_to_index[fut]] = fut.result()
+    return ordered
+'''
+
+
+def _stable_async_check(ws) -> VerifyResult:
+    test_path = ws / "tests" / "test_pipeline.py"
+    if not test_path.exists() or test_path.read_text(encoding="utf-8") != _PIPELINE_TEST:
+        return VerifyResult(False, "tests/test_pipeline.py was changed or is missing")
+    failures = []
+    for _i in range(4):
+        try:
+            result = subprocess.run(  # noqa: S603 — benchmark only
+                [sys.executable, "-m", "pytest", "-q", "tests"],
+                cwd=ws,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=30,
+                check=False,
+            )
+        except subprocess.TimeoutExpired:
+            return VerifyResult(False, "pytest timed out")
+        if result.returncode != 0:
+            failures.append((result.stdout + result.stderr).strip()[-300:])
+    if failures:
+        return VerifyResult(False, "pytest failed: " + failures[0])
+    import importlib.util as _ilu
+
+    sys.modules.pop("pipeline", None)
+    spec = _ilu.spec_from_file_location("pipeline", ws / "pipeline.py")
+    mod = _ilu.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)
+        got = mod.render_all([("z", 0.02), ("a", 0.0), ("m", 0.01)])
+    except Exception as exc:  # noqa: BLE001
+        return VerifyResult(False, f"render_all hidden check raised: {type(exc).__name__}: {exc}")
+    if got != ["Z", "A", "M"]:
+        return VerifyResult(False, f"hidden order check returned {got!r}")
+    return VerifyResult(True, "pytest and hidden order checks preserve input order under concurrent completion")
+
+
+C1B_STABLE_ASYNC_ORDER = Task(
+    id="skill_c1b_stable_async_order",
+    name="Fix flaky concurrent output ordering without removing ThreadPoolExecutor",
+    tags=("skill", "debugging-heuristic", "pytest", "concurrency", "hard"),
+    prompt=(
+        "В проекте есть pipeline.py и tests/test_pipeline.py. Тесты флакают из-за "
+        "порядка завершения concurrent workers. Почини production code, не меняя "
+        "tests/test_pipeline.py и не удаляя ThreadPoolExecutor: render_all(items) "
+        "должен сохранять порядок входного списка. Используй debugging skill."
+    ),
+    setup_files={
+        "pipeline.py": _PIPELINE_BUGGY,
+        "tests/test_pipeline.py": _PIPELINE_TEST,
+        ".claude/skills/stable-async-debugging/SKILL.md": _STABLE_ASYNC_SKILL,
+        ".agents/skills/stable-async-debugging/SKILL.md": _STABLE_ASYNC_SKILL,
+    },
+    gold_files={"pipeline.py": _PIPELINE_GOLD},
+    verifier=_stable_async_check,
+)
+
 
 SKILL_TASKS = [
     R1_BRAND, B1_CODEBOOK, B3_POLICY, G2_SKILL_REPAIR, R2_STYLE, B2_NDR7,
     E1_DISTRACTOR, E2_NEG_CONTROL, E3_SELECTION, G1_CREATE_SKILL,
     A1_LUMEN_DSL, A2_Q9_PROTOCOL, A3_QUOKKA_LIBRARY, R3_ACT4_TEMPLATE,
-    D2_MERIDIAN_RECONCILE,
+    D2_MERIDIAN_RECONCILE, D1_ARCFLUX_EXPOSURE, D1B_ARCFLUX_AF4,
+    # C1_FLAKY_TIE_BREAK and C1B_STABLE_ASYNC_ORDER are intentionally not in
+    # SKILL_TASKS: no-skill control runs showed both are solvable without the
+    # skill, so they are standard debugging controls rather than discriminators.
 ]

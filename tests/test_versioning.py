@@ -39,8 +39,14 @@ def test_vcs_tasks_belong_to_their_revisions() -> None:
     assert revision_for_task_id("task_308_detect_unresolved_conflicts").version == "0.8.0"
 
 
-def test_current_multifile_vcs_tasks_belong_to_current_revision() -> None:
-    assert TASK_SET_VERSION == "0.9.0"
+def test_current_multifile_vcs_tasks_belong_to_their_revision() -> None:
     # 0.9.0 adds multi-file / multi-step VCS workflows 309-313.
     assert revision_for_task_id("task_309_rename_refactor_scale").version == "0.9.0"
     assert revision_for_task_id("task_313_aggregate_config_fragments").version == "0.9.0"
+
+
+def test_current_skill_tasks_belong_to_current_revision() -> None:
+    assert TASK_SET_VERSION == "0.10.0"
+    # 0.10.0 adds skill-discriminator workflows 314-330.
+    assert revision_for_task_id("task_314_skill_r1_brand_landing").version == "0.10.0"
+    assert revision_for_task_id("task_330_skill_d1b_arcflux_multifile").version == "0.10.0"

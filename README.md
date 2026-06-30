@@ -2,7 +2,7 @@
 
 ## Current Results
 
-Current benchmark results use the 313-task set (`task-set v0.9.0`). `Steps`
+Published benchmark results below use the 313-task set (`task-set v0.9.0`). `Steps`
 and `Tokens` are shown when the runner exposes them; `—` means the metric is
 absent from the run artifact, not that nothing was spent. Each row is the
 latest run for that harness + model setup, except GigaChat-3-Ultra PROM
@@ -46,7 +46,7 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | OpenHands | yandex/gpt5.1-pro | 140/313 | 44.7% | 1,774 | — |
 | deepagents | yandex/gpt5-lite | 41/313 | 13.1% | 1,737 | 95,965,560 |
 
-A self-contained **313-task agent benchmark** (`task-set v0.9.0`) for evaluating LLM-backed
+A self-contained **330-task agent benchmark** (`task-set v0.10.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -83,7 +83,7 @@ uv venv && uv pip install -e ".[gigachat,openrouter]"
 # to the public profile.
 uv pip install -e ".[gigachat-profile]"
 
-# List all 313 tasks
+# List all 330 tasks
 uv run python -m harness_bench list
 
 # Show the benchmark task-set version and revision history
@@ -201,7 +201,7 @@ uv run python -m harness_bench apply-gold \
 
 ## What's inside
 
-### Tasks (313 total, task-set v0.9.0)
+### Tasks (330 total, task-set v0.10.0)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -214,6 +214,7 @@ uv run python -m harness_bench apply-gold \
 | `tasks_memory.py` | 222–253 | memory discipline: read / write / forget / refuse facts in `MEMORY.md` along with the auxiliary deliverable (LICENSE, `requirements-dev.txt`, `bio.txt`, `profile.json`, …). Exercises agent memory rather than file I/O. |
 | `tasks_agentic.py` | 254–298 | benchmark-like synthetic agentic wave: Terminal-Bench-like terminal workflows (logs, process tables, Makefile plans, checksums, permission audits), tau-like policy-bound action decisions (airline, retail, banking, clinic, etc.), and SWE-bench-like pytest bug-fix tasks. |
 | `tasks_vcs.py` | 299–313 | version-control work: Git merge-conflict resolution (ours/theirs/both/manual, diff3 base sections, multi-hunk, multi-file), unified-diff apply/revert, unresolved-conflict detection, plus multi-file/multi-step workflows (scaled rename refactors, module split, ordered patch stacks, manifest-driven resolution, config deep-merge). |
+| `tasks_skills.py` | 314–330 | skill-discriminator wave: fictional brand/style guides, internal codebooks and policies, bespoke fixed formats, distractor/selection/negative-control skill axes, code-skill creation/repair, fictional DSL/protocol/library specs, spreadsheet reconciliation, and ArcFlux calculation methods. |
 
 Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
@@ -237,6 +238,7 @@ changes do not need a task-set bump.
 | `0.7.0` | 2026-06-02 | 284–298 | 298 | Agentic wave expanded to 15 Terminal-Bench-like / 15 tau-like / 15 SWE-bench-like tasks |
 | `0.8.0` | 2026-06-05 | 299–308 | 308 | Version-control tasks: Git merge-conflict resolution, multi-hunk unified-diff apply/revert, unresolved-conflict detection |
 | `0.9.0` | 2026-06-05 | 309–313 | 313 | Multi-file / multi-step version-control workflows (rename refactor, module split, patch stack, manifest-driven resolution, config deep-merge) |
+| `0.10.0` | 2026-06-30 | 314–330 | 330 | Skill-discriminator wave with fictional skills, codebooks, policies, bespoke formats, selection/distractor axes, code-skill authoring/repair, and ArcFlux methods |
 
 ### Infrastructure
 
@@ -294,15 +296,16 @@ needed when invoking Harbor's own local runner.
 
 ## Results
 
-The current 313-task results table is kept at the top of this README. Only
+The latest published 313-task (`v0.9.0`) results table is kept at the top of this README. Only
 the latest run per harness + model setup is listed; superseded and
-older-task-set runs are not carried over.
+older-task-set runs are not carried over. New `v0.10.0` / 330-task results should
+be added once full reruns are available.
 
 ## Adding a task
 
 1. In one of the task modules (`tasks.py`, `tasks_extra.py`,
    `tasks_more.py`, `tasks_hard.py`, `tasks_extreme.py`,
-   `tasks_diagnostic.py`, `tasks_memory.py` — pick the one that fits
+   `tasks_diagnostic.py`, `tasks_memory.py`, `tasks_skills.py` — pick the one that fits
    the wave / difficulty) describe a `Task(...)` — id, prompt,
    `setup_files`, `gold_files`, `verifier`.
 2. Wire it into the corresponding module's `*_TASKS` list — it gets
