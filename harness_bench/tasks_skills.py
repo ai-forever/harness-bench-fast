@@ -812,8 +812,593 @@ G1_CREATE_SKILL = Task(
     ),
 )
 
+# ---------------------------------------------------------------------------
+# A1 — fictional DSL/config language: Lumen Recipe DSL
+# ---------------------------------------------------------------------------
+
+_LUMEN_SKILL = """\
+---
+name: lumen-recipe-dsl
+description: Specification for the fictional Lumen Recipe DSL (LQ1). Use when
+  creating .lq recipe files for Lumen manifest calculations.
+---
+
+# Lumen Recipe DSL — LQ1
+
+A valid recipe file is named `recipe.lq` and has exactly these command forms,
+one per line:
+
+1. `BEGIN LQ1`
+2. `LOAD start=<integer>`
+3. `APPLY routine=<routine-name>`
+4. `SEAL token=<seal-name>`
+5. `END`
+
+## Routine table
+
+- `crane`: multiply the loaded start value by 13, then add 5.
+- `moth`: multiply by 7, then subtract 4.
+- `tide`: add 19, then multiply by 2.
+
+## Seal table
+
+- `amber` emits seal code `S-47K`.
+- `cobalt` emits seal code `S-22C`.
+- `ivory` emits seal code `S-91I`.
+
+The interpreter output is a manifest with `score=<number>` and `seal=<code>`.
+"""
+
+_LUMEN_REQUEST = "start=7\nroutine=crane\nseal=amber\n"
+_LUMEN_GOLD = "BEGIN LQ1\nLOAD start=7\nAPPLY routine=crane\nSEAL token=amber\nEND\n"
+
+
+def _lumen_interpret(text: str) -> tuple[int, str]:
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if len(lines) != 5 or lines[0] != "BEGIN LQ1" or lines[-1] != "END":
+        raise ValueError("recipe.lq must have BEGIN LQ1, three commands, END")
+    if not lines[1].startswith("LOAD start="):
+        raise ValueError("missing LOAD start=<integer>")
+    start = int(lines[1].split("=", 1)[1])
+    if not lines[2].startswith("APPLY routine="):
+        raise ValueError("missing APPLY routine=<name>")
+    routine = lines[2].split("=", 1)[1]
+    if not lines[3].startswith("SEAL token="):
+        raise ValueError("missing SEAL token=<name>")
+    seal_name = lines[3].split("=", 1)[1]
+    if routine == "crane":
+        score = start * 13 + 5
+    elif routine == "moth":
+        score = start * 7 - 4
+    elif routine == "tide":
+        score = (start + 19) * 2
+    else:
+        raise ValueError(f"unknown routine {routine!r}")
+    seals = {"amber": "S-47K", "cobalt": "S-22C", "ivory": "S-91I"}
+    if seal_name not in seals:
+        raise ValueError(f"unknown seal {seal_name!r}")
+    return score, seals[seal_name]
+
+
+def _lumen_check(ws) -> VerifyResult:
+    p = ws / "recipe.lq"
+    if not p.exists():
+        return VerifyResult(False, "recipe.lq missing")
+    try:
+        score, seal = _lumen_interpret(p.read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        return VerifyResult(False, f"recipe.lq invalid: {type(exc).__name__}: {exc}")
+    if (score, seal) != (96, "S-47K"):
+        return VerifyResult(False, f"wrong manifest: score={score}, seal={seal}")
+    return VerifyResult(True, "LQ1 recipe produces score=96 and seal=S-47K")
+
+
+A1_LUMEN_DSL = Task(
+    id="skill_a1_lumen_recipe_dsl",
+    name="Write a Lumen Recipe DSL program from the fictional LQ1 spec",
+    tags=("skill", "dsl", "file-format", "medium"),
+    prompt=(
+        "В рабочей директории есть request.txt с параметрами Lumen manifest. "
+        "Создай файл recipe.lq на выдуманном языке Lumen Recipe DSL версии LQ1, "
+        "который реализует этот запрос. Синтаксис, routine table и seal table "
+        "бери строго из скилла Lumen Recipe DSL."
+    ),
+    setup_files={
+        "request.txt": _LUMEN_REQUEST,
+        ".claude/skills/lumen-recipe-dsl/SKILL.md": _LUMEN_SKILL,
+        ".agents/skills/lumen-recipe-dsl/SKILL.md": _LUMEN_SKILL,
+    },
+    gold_files={"recipe.lq": _LUMEN_GOLD},
+    verifier=_lumen_check,
+)
+
+
+# ---------------------------------------------------------------------------
+# A2 — fictional binary protocol: Q9 frames
+# ---------------------------------------------------------------------------
+
+_Q9_SKILL = """\
+---
+name: q9-binary-protocol
+description: Encoder/decoder specification for Quasar Q9 binary frames. Use
+  when implementing Q9 frame codecs.
+---
+
+# Quasar Q9 Binary Frame Protocol
+
+Implement two Python functions in `codec.py`:
+
+- `encode_message(kind: str, seq: int, payload: bytes) -> bytes`
+- `decode_message(frame: bytes) -> dict`
+
+## Kind codes
+
+- `PING` -> `0x10`
+- `DATA` -> `0x20`
+- `HALT` -> `0x7F`
+
+## Frame layout
+
+```
+byte 0      magic `0x51` (`Q`)
+byte 1      magic `0x39` (`9`)
+byte 2      encoded sequence: `seq XOR 0xA5` (seq is 0..255)
+byte 3      kind code
+byte 4      payload length in bytes
+bytes 5..N  payload bytes in REVERSE order
+last byte   checksum
+```
+
+Checksum is `(encoded_seq + kind_code + length + sum(reversed_payload)) % 256`,
+then XOR with `0x5A`.
+
+The decoder must validate magic and checksum, undo the payload reversal, and
+return `{"kind": <kind string>, "seq": <int>, "payload": <bytes>}`.
+"""
+
+_Q9_GOLD = '''\
+_KIND_TO_CODE = {"PING": 0x10, "DATA": 0x20, "HALT": 0x7F}
+_CODE_TO_KIND = {v: k for k, v in _KIND_TO_CODE.items()}
+
+
+def _checksum(encoded_seq: int, kind_code: int, payload_rev: bytes) -> int:
+    return ((encoded_seq + kind_code + len(payload_rev) + sum(payload_rev)) % 256) ^ 0x5A
+
+
+def encode_message(kind: str, seq: int, payload: bytes) -> bytes:
+    kind_code = _KIND_TO_CODE[kind]
+    encoded_seq = seq ^ 0xA5
+    payload_rev = bytes(payload[::-1])
+    chk = _checksum(encoded_seq, kind_code, payload_rev)
+    return bytes([0x51, 0x39, encoded_seq, kind_code, len(payload_rev)]) + payload_rev + bytes([chk])
+
+
+def decode_message(frame: bytes) -> dict:
+    if len(frame) < 6 or frame[:2] != b"Q9":
+        raise ValueError("bad magic")
+    encoded_seq, kind_code, length = frame[2], frame[3], frame[4]
+    payload_rev = frame[5:-1]
+    if len(payload_rev) != length:
+        raise ValueError("bad length")
+    if frame[-1] != _checksum(encoded_seq, kind_code, payload_rev):
+        raise ValueError("bad checksum")
+    return {"kind": _CODE_TO_KIND[kind_code], "seq": encoded_seq ^ 0xA5, "payload": bytes(payload_rev[::-1])}
+'''
+
+
+def _q9_reference_encode(kind: str, seq: int, payload: bytes) -> bytes:
+    kind_code = {"PING": 0x10, "DATA": 0x20, "HALT": 0x7F}[kind]
+    encoded_seq = seq ^ 0xA5
+    payload_rev = payload[::-1]
+    chk = ((encoded_seq + kind_code + len(payload_rev) + sum(payload_rev)) % 256) ^ 0x5A
+    return bytes([0x51, 0x39, encoded_seq, kind_code, len(payload_rev)]) + payload_rev + bytes([chk])
+
+
+def _q9_check(ws) -> VerifyResult:
+    sol = ws / "codec.py"
+    if not sol.exists():
+        return VerifyResult(False, "codec.py missing")
+    import importlib.util as _ilu
+
+    sys.modules.pop("codec", None)
+    spec = _ilu.spec_from_file_location("codec", sol)
+    mod = _ilu.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)
+    except Exception as exc:  # noqa: BLE001
+        return VerifyResult(False, f"codec.py failed to import: {type(exc).__name__}: {exc}")
+    for name in ("encode_message", "decode_message"):
+        if not hasattr(mod, name):
+            return VerifyResult(False, f"{name} missing")
+    cases = [("PING", 0, b""), ("DATA", 42, b"abc"), ("HALT", 255, b"stop"), ("DATA", 7, bytes([1, 2, 250]))]
+    wrong = []
+    for kind, seq, payload in cases:
+        exp = _q9_reference_encode(kind, seq, payload)
+        try:
+            got = mod.encode_message(kind, seq, payload)
+            decoded = mod.decode_message(exp)
+        except Exception as exc:  # noqa: BLE001
+            return VerifyResult(False, f"codec raised on {kind}/{seq}: {type(exc).__name__}: {exc}")
+        if got != exp:
+            wrong.append(f"encode {kind}/{seq}: {got!r} != {exp!r}")
+        if decoded != {"kind": kind, "seq": seq, "payload": payload}:
+            wrong.append(f"decode {kind}/{seq}: {decoded!r}")
+    if wrong:
+        return VerifyResult(False, "; ".join(wrong[:3]))
+    try:
+        bad = bytearray(_q9_reference_encode("DATA", 3, b"xy"))
+        bad[-1] ^= 1
+        mod.decode_message(bytes(bad))
+    except Exception:
+        pass
+    else:
+        return VerifyResult(False, "decode_message must reject a bad checksum")
+    return VerifyResult(True, "Q9 codec encodes/decodes hidden frames and rejects bad checksum")
+
+
+A2_Q9_PROTOCOL = Task(
+    id="skill_a2_q9_binary_protocol",
+    name="Implement a codec for the fictional Quasar Q9 binary protocol",
+    tags=("skill", "binary-protocol", "code", "hard"),
+    prompt=(
+        "Создай codec.py с функциями encode_message(kind: str, seq: int, payload: bytes) "
+        "-> bytes и decode_message(frame: bytes) -> dict для выдуманного бинарного "
+        "протокола Quasar Q9. Все байтовые поля, таблицы kind-кодов, reversal и "
+        "checksum бери строго из скилла Q9 binary protocol."
+    ),
+    setup_files={
+        ".claude/skills/q9-binary-protocol/SKILL.md": _Q9_SKILL,
+        ".agents/skills/q9-binary-protocol/SKILL.md": _Q9_SKILL,
+    },
+    gold_files={"codec.py": _Q9_GOLD},
+    verifier=_q9_check,
+)
+
+
+# ---------------------------------------------------------------------------
+# A3 — fake library with a non-obvious protocol quirk
+# ---------------------------------------------------------------------------
+
+_QUOKKA_SKILL = """\
+---
+name: quokka-meter-protocol
+description: Internal protocol for using the fictional quokka_meter library.
+  Use when measuring Quokka Flux readings.
+---
+
+# Quokka Meter Protocol
+
+The local `quokka_meter.Meter` API is quirky. To compute a calibrated flux:
+
+1. Create `Meter()`.
+2. Call `meter.arm("solstice")` before reading. Any other token is invalid.
+3. Discard exactly one warm-up reading from `read_centi_flux()`.
+4. Read the requested number of samples with `read_centi_flux()`.
+5. Convert centi-flux to flux by dividing each sample by 100.
+6. Return the arithmetic mean of the samples, then apply calibration:
+   `mean * 0.82 + 3.0`.
+7. Round the final value to 3 decimal places.
+"""
+
+_QUOKKA_LIB = '''\
+class Meter:
+    def __init__(self):
+        self._armed = False
+        self._i = 0
+        self._values = [9999, 1200, 1250, 1300, 1350, 1400, 1450]
+
+    def arm(self, token):
+        if token != "solstice":
+            raise RuntimeError("bad arm token")
+        self._armed = True
+
+    def read_centi_flux(self):
+        if not self._armed:
+            raise RuntimeError("meter is not armed")
+        value = self._values[self._i % len(self._values)]
+        self._i += 1
+        return value
+'''
+
+_QUOKKA_GOLD = '''\
+from quokka_meter import Meter
+
+
+def calibrated_flux(samples: int) -> float:
+    meter = Meter()
+    meter.arm("solstice")
+    meter.read_centi_flux()  # discard warm-up
+    vals = [meter.read_centi_flux() / 100 for _ in range(samples)]
+    return round((sum(vals) / len(vals)) * 0.82 + 3.0, 3)
+'''
+
+
+def _quokka_expected(samples: int) -> float:
+    vals = [1200, 1250, 1300, 1350, 1400, 1450][:samples]
+    return round((sum(v / 100 for v in vals) / samples) * 0.82 + 3.0, 3)
+
+
+def _quokka_check(ws) -> VerifyResult:
+    sol = ws / "solution.py"
+    if not sol.exists():
+        return VerifyResult(False, "solution.py missing")
+    import importlib.util as _ilu
+
+    sys.path.insert(0, str(ws))
+    try:
+        sys.modules.pop("solution", None)
+        sys.modules.pop("quokka_meter", None)
+        spec = _ilu.spec_from_file_location("solution", sol)
+        mod = _ilu.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        if not hasattr(mod, "calibrated_flux"):
+            return VerifyResult(False, "calibrated_flux(samples) missing")
+        wrong = []
+        for samples in (3, 5):
+            got = mod.calibrated_flux(samples)
+            exp = _quokka_expected(samples)
+            if got != exp:
+                wrong.append(f"samples={samples}: {got!r} != {exp!r}")
+        if wrong:
+            return VerifyResult(False, "; ".join(wrong))
+    except Exception as exc:  # noqa: BLE001
+        return VerifyResult(False, f"solution failed: {type(exc).__name__}: {exc}")
+    finally:
+        if str(ws) in sys.path:
+            sys.path.remove(str(ws))
+    return VerifyResult(True, "quokka_meter protocol followed for hidden sample counts")
+
+
+A3_QUOKKA_LIBRARY = Task(
+    id="skill_a3_quokka_library_quirk",
+    name="Use a fictional library with a non-obvious warm-up/calibration protocol",
+    tags=("skill", "library-api", "code", "medium"),
+    prompt=(
+        "В рабочей директории есть локальная библиотека quokka_meter.py. Создай "
+        "solution.py с функцией calibrated_flux(samples: int) -> float, которая "
+        "считает калиброванный Quokka Flux. Протокол использования библиотеки, "
+        "warm-up, единицы и формулу калибровки бери из скилла Quokka Meter Protocol."
+    ),
+    setup_files={
+        "quokka_meter.py": _QUOKKA_LIB,
+        ".claude/skills/quokka-meter-protocol/SKILL.md": _QUOKKA_SKILL,
+        ".agents/skills/quokka-meter-protocol/SKILL.md": _QUOKKA_SKILL,
+    },
+    gold_files={"solution.py": _QUOKKA_GOLD},
+    verifier=_quokka_check,
+)
+
+
+# ---------------------------------------------------------------------------
+# R3 — compliance template with exact blocks and order
+# ---------------------------------------------------------------------------
+
+_ACT4_SKILL = """\
+---
+name: aster-compliance-template
+description: Aster Labs ACT-4 compliance notice template. Use when drafting any
+  Aster compliance notice.
+---
+
+# Aster Labs ACT-4 Compliance Notice Template
+
+The output file must be `notice.md` and must use exactly this block order:
+
+1. First line: `COMPLIANCE NOTICE`
+2. `Record ID: <record id>`
+3. blank line
+4. heading `SCOPE`
+5. heading `CONTROL SUMMARY`
+6. heading `OWNER`
+7. heading `DEADLINE`
+8. heading `RETENTION`
+9. final line exactly: `This notice follows Aster Compliance Template ACT-4.`
+
+Rules:
+
+- Use the record id from the source facts.
+- The RETENTION block must contain exactly `Retention class: R-9 / 7 years`.
+- Do not rename headings and do not add extra headings.
+"""
+
+_ACT4_FACTS = "record_id=QX-17\nscope=Edge telemetry export\nowner=Mira Chen\ndeadline=2026-07-15\ncontrol=Disable raw-token logging before pilot expansion\n"
+_ACT4_GOLD = """\
+COMPLIANCE NOTICE
+Record ID: QX-17
+
+SCOPE
+Edge telemetry export
+
+CONTROL SUMMARY
+Disable raw-token logging before pilot expansion
+
+OWNER
+Mira Chen
+
+DEADLINE
+2026-07-15
+
+RETENTION
+Retention class: R-9 / 7 years
+
+This notice follows Aster Compliance Template ACT-4.
+"""
+
+
+def _act4_check(ws) -> VerifyResult:
+    p = ws / "notice.md"
+    if not p.exists():
+        return VerifyResult(False, "notice.md missing")
+    text = p.read_text(encoding="utf-8").strip()
+    required = [
+        "COMPLIANCE NOTICE",
+        "Record ID: QX-17",
+        "SCOPE",
+        "CONTROL SUMMARY",
+        "OWNER",
+        "DEADLINE",
+        "RETENTION",
+        "Retention class: R-9 / 7 years",
+        "This notice follows Aster Compliance Template ACT-4.",
+    ]
+    missing = [s for s in required if s not in text]
+    if missing:
+        return VerifyResult(False, "missing required text: " + "; ".join(missing))
+    positions = [text.index(s) for s in required[:7]]
+    if positions != sorted(positions):
+        return VerifyResult(False, "ACT-4 headings are not in required order")
+    if not text.endswith("This notice follows Aster Compliance Template ACT-4."):
+        return VerifyResult(False, "mandatory ACT-4 final line missing or not last")
+    headings = re.findall(r"^(COMPLIANCE NOTICE|SCOPE|CONTROL SUMMARY|OWNER|DEADLINE|RETENTION|[A-Z][A-Z -]{2,})$", text, flags=re.MULTILINE)
+    allowed = ["COMPLIANCE NOTICE", "SCOPE", "CONTROL SUMMARY", "OWNER", "DEADLINE", "RETENTION"]
+    extra = [h for h in headings if h not in allowed]
+    if extra:
+        return VerifyResult(False, "extra heading(s): " + "; ".join(extra))
+    return VerifyResult(True, "ACT-4 notice has exact required blocks, order, and final line")
+
+
+R3_ACT4_TEMPLATE = Task(
+    id="skill_r3_act4_compliance_notice",
+    name="Draft an Aster ACT-4 compliance notice with exact block order",
+    tags=("skill", "template", "compliance", "medium"),
+    prompt=(
+        "В рабочей директории есть facts.txt. Создай notice.md — compliance notice "
+        "для Aster Labs строго по шаблону ACT-4: точный порядок блоков, record id, "
+        "retention rule и обязательная последняя строка должны соответствовать скиллу."
+    ),
+    setup_files={
+        "facts.txt": _ACT4_FACTS,
+        ".claude/skills/aster-compliance-template/SKILL.md": _ACT4_SKILL,
+        ".agents/skills/aster-compliance-template/SKILL.md": _ACT4_SKILL,
+    },
+    gold_files={"notice.md": _ACT4_GOLD},
+    verifier=_act4_check,
+)
+
+
+# ---------------------------------------------------------------------------
+# D2 — bespoke spreadsheet reconciliation rules
+# ---------------------------------------------------------------------------
+
+_MERIDIAN_SKILL = """\
+---
+name: meridian-reconciliation-rules
+description: Meridian Finance bespoke spreadsheet reconciliation rules. Use
+  when reconciling Meridian ledger exports.
+---
+
+# Meridian Ledger Reconciliation Rules
+
+Input files are `ledger_a.xlsx` and `ledger_b.xlsx`, each with columns:
+`invoice_id`, `amount_cents`, `currency`, `date`.
+
+Produce `reconciliation.csv` with columns:
+`invoice_id,status,matched_id,variance_cents`.
+
+Rules:
+
+1. Normalize invoice IDs by removing hyphens and spaces and uppercasing.
+   Example: `INV-001` and `inv001` are the same invoice.
+2. Match each row in ledger A to the row in ledger B with the same normalized id
+   and same currency.
+3. `variance_cents = amount_b - amount_a`.
+4. If no B row exists, status is `MISSING`, matched_id is blank, variance is blank.
+5. If a B row exists and `abs(variance_cents) <= 2`, status is `MATCH`.
+6. If a B row exists but the absolute variance is greater than 2, status is
+   `REVIEW`.
+7. Output rows in the same order as ledger A.
+"""
+
+
+def _write_meridian_xlsx(path, rows):
+    from openpyxl import Workbook
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "ledger"
+    ws.append(["invoice_id", "amount_cents", "currency", "date"])
+    for row in rows:
+        ws.append(row)
+    wb.save(path)
+
+
+def _meridian_setup(ws) -> None:
+    _write_meridian_xlsx(
+        ws / "ledger_a.xlsx",
+        [
+            ["INV-001", 10000, "USD", "2026-06-01"],
+            ["INV-002", 7550, "USD", "2026-06-02"],
+            ["INV-003", 12000, "EUR", "2026-06-03"],
+            ["INV-004", 9999, "USD", "2026-06-04"],
+        ],
+    )
+    _write_meridian_xlsx(
+        ws / "ledger_b.xlsx",
+        [
+            ["inv001", 10001, "USD", "2026-06-01"],
+            ["INV002", 7600, "USD", "2026-06-02"],
+            ["INV 003", 11998, "EUR", "2026-06-03"],
+            ["INV-004", 9999, "EUR", "2026-06-04"],
+        ],
+    )
+
+
+_MERIDIAN_GOLD = "invoice_id,status,matched_id,variance_cents\nINV-001,MATCH,inv001,1\nINV-002,REVIEW,INV002,50\nINV-003,MATCH,INV 003,-2\nINV-004,MISSING,,\n"
+
+
+def _meridian_check(ws) -> VerifyResult:
+    p = ws / "reconciliation.csv"
+    if not p.exists():
+        return VerifyResult(False, "reconciliation.csv missing")
+    expected = {
+        "INV-001": ("MATCH", "inv001", "1"),
+        "INV-002": ("REVIEW", "INV002", "50"),
+        "INV-003": ("MATCH", "INV 003", "-2"),
+        "INV-004": ("MISSING", "", ""),
+    }
+    try:
+        with p.open(encoding="utf-8", newline="") as f:
+            rows = list(csv.DictReader(f))
+    except (csv.Error, UnicodeDecodeError) as exc:
+        return VerifyResult(False, f"could not read reconciliation.csv: {exc}")
+    if [c.strip() for c in (rows[0].keys() if rows else [])] != ["invoice_id", "status", "matched_id", "variance_cents"]:
+        return VerifyResult(False, "reconciliation.csv must have columns invoice_id,status,matched_id,variance_cents")
+    if [r.get("invoice_id", "").strip() for r in rows] != list(expected):
+        return VerifyResult(False, "rows must be in ledger A order")
+    wrong = []
+    for row in rows:
+        inv = row.get("invoice_id", "").strip()
+        got = (row.get("status", "").strip().upper(), row.get("matched_id", "").strip(), row.get("variance_cents", "").strip())
+        if got != expected.get(inv):
+            wrong.append(f"{inv}: {got!r} != {expected.get(inv)!r}")
+    if wrong:
+        return VerifyResult(False, "; ".join(wrong))
+    return VerifyResult(True, "Meridian ledgers reconciled with normalized ids, tolerance, and same-currency rule")
+
+
+D2_MERIDIAN_RECONCILE = Task(
+    id="skill_d2_meridian_reconcile_xlsx",
+    name="Reconcile two xlsx ledgers with Meridian bespoke matching rules",
+    tags=("skill", "spreadsheet", "data-cleaning", "hard"),
+    prompt=(
+        "В рабочей директории есть ledger_a.xlsx и ledger_b.xlsx. По правилам "
+        "Meridian Finance из скилла сверни их в reconciliation.csv с колонками "
+        "invoice_id,status,matched_id,variance_cents. Соблюдай нормализацию id, "
+        "same-currency matching, tolerance и порядок строк ledger A."
+    ),
+    setup_files={
+        ".claude/skills/meridian-reconciliation-rules/SKILL.md": _MERIDIAN_SKILL,
+        ".agents/skills/meridian-reconciliation-rules/SKILL.md": _MERIDIAN_SKILL,
+    },
+    setup_callback=_meridian_setup,
+    gold_files={"reconciliation.csv": _MERIDIAN_GOLD},
+    verifier=_meridian_check,
+)
+
 
 SKILL_TASKS = [
     R1_BRAND, B1_CODEBOOK, B3_POLICY, G2_SKILL_REPAIR, R2_STYLE, B2_NDR7,
     E1_DISTRACTOR, E2_NEG_CONTROL, E3_SELECTION, G1_CREATE_SKILL,
+    A1_LUMEN_DSL, A2_Q9_PROTOCOL, A3_QUOKKA_LIBRARY, R3_ACT4_TEMPLATE,
+    D2_MERIDIAN_RECONCILE,
 ]
