@@ -21,7 +21,12 @@ import re
 import sys
 
 from harness_bench.core import Task, VerifyResult
-from harness_bench.verifiers import all_of, file_contains, file_matches_regex
+from harness_bench.verifiers import (
+    all_of,
+    file_contains,
+    file_matches_regex,
+    python_callable_returns,
+)
 
 # ---------------------------------------------------------------------------
 # R1 — brand-styling under a fictional company's brand guide
@@ -353,4 +358,272 @@ B3_POLICY = Task(
 )
 
 
-SKILL_TASKS = [R1_BRAND, B1_CODEBOOK, B3_POLICY]
+# ---------------------------------------------------------------------------
+# G2 — repair a broken code-skill (the skill is the deliverable)
+# ---------------------------------------------------------------------------
+
+_PHONE_SKILL_MD = """\
+---
+name: phone-normalizer
+description: Normalize messy phone numbers to E.164 (+<country><number>).
+allowed-tools: Read Edit
+---
+
+# Phone Normalizer
+
+`scripts/normalize.py` exposes `normalize_phone(s: str) -> str`.
+
+Specification:
+- Strip all non-digit characters.
+- If the input begins with `+`, keep its digits as-is: `+<digits>`.
+- Else if there are 11 digits starting with `1`, it's US with country code: `+<digits>`.
+- Else if there are exactly 10 digits, assume US: `+1<digits>`.
+- Else prepend `+` to the digits.
+"""
+
+# Broken: always prepends +1, ignores a leading + / country code.
+_PHONE_BUGGY = '''\
+import re
+
+
+def normalize_phone(s: str) -> str:
+    digits = re.sub(r"\\D", "", s)
+    if len(digits) == 11 and digits.startswith("1"):
+        return "+" + digits
+    return "+1" + digits
+'''
+
+_PHONE_GOLD = '''\
+import re
+
+
+def normalize_phone(s: str) -> str:
+    s = s.strip()
+    has_plus = s.startswith("+")
+    digits = re.sub(r"\\D", "", s)
+    if has_plus:
+        return "+" + digits
+    if len(digits) == 11 and digits.startswith("1"):
+        return "+" + digits
+    if len(digits) == 10:
+        return "+1" + digits
+    return "+" + digits
+'''
+
+_PHONE_SCRIPT = "skills/phone-normalizer/scripts/normalize.py"
+
+G2_SKILL_REPAIR = Task(
+    id="skill_g2_repair_phone_skill",
+    name="Repair the phone-normalizer skill's script (E.164, international)",
+    tags=("skill", "edit", "code-skill", "medium"),
+    prompt=(
+        "В каталоге skills/phone-normalizer лежит скилл нормализации телефонных"
+        " номеров к формату E.164. Его скрипт scripts/normalize.py работает"
+        " неверно для международных номеров (с явным кодом страны или ведущим"
+        " '+'): он всегда подставляет код США. Почини scripts/normalize.py"
+        " строго по спецификации из SKILL.md. Сигнатуру функции не меняй."
+    ),
+    setup_files={
+        "skills/phone-normalizer/SKILL.md": _PHONE_SKILL_MD,
+        _PHONE_SCRIPT: _PHONE_BUGGY,
+    },
+    gold_files={_PHONE_SCRIPT: _PHONE_GOLD},
+    verifier=all_of(
+        # форма: фронтматтер скилла остался валиден
+        file_matches_regex("skills/phone-normalizer/SKILL.md", r"^name:\s*phone-normalizer\s*$"),
+        # функция: на скрытых входах (включая международные)
+        python_callable_returns(_PHONE_SCRIPT, "mod.normalize_phone('(415) 555-2671')", "+14155552671"),
+        python_callable_returns(_PHONE_SCRIPT, "mod.normalize_phone('1-415-555-2671')", "+14155552671"),
+        python_callable_returns(_PHONE_SCRIPT, "mod.normalize_phone('+1 (415) 555-2671')", "+14155552671"),
+        python_callable_returns(_PHONE_SCRIPT, "mod.normalize_phone('+44 20 7946 0958')", "+442079460958"),
+        python_callable_returns(_PHONE_SCRIPT, "mod.normalize_phone('+49-30-901820')", "+4930901820"),
+    ),
+)
+
+
+# ---------------------------------------------------------------------------
+# R2 — format a report to a fictional company's style guide (exact conventions)
+# ---------------------------------------------------------------------------
+
+_STYLE_SKILL = """\
+---
+name: vortex-style-guide
+description: Vortex Corp document style guide — exact date, money, heading, and
+  footer conventions. Use when formatting any Vortex Corp report or document.
+---
+
+# Vortex Corp — Document Style Guide
+
+Apply these conventions EXACTLY.
+
+- **Dates**: `YYYY.MM.DD` (dot-separated). Example: `2026.03.14`.
+- **Money**: digits grouped in threes with an apostrophe, suffixed ` USD`.
+  Example: `1'234'567 USD`.
+- **Section title**: rendered in ALL CAPS on its own first line.
+- **Mandatory footer** (exact, last line): `— Vortex Corp · Confidential`
+"""
+
+_STYLE_INPUT = "title: quarterly results\ndate: 2026-03-14\nrevenue: 1234567\n"
+
+_STYLE_GOLD = (
+    "QUARTERLY RESULTS\n"
+    "Date: 2026.03.14\n"
+    "Revenue: 1'234'567 USD\n"
+    "\n"
+    "— Vortex Corp · Confidential\n"
+)
+
+R2_STYLE = Task(
+    id="skill_r2_style_guide_report",
+    name="Format a report to the Vortex Corp style guide",
+    tags=("skill", "office", "formatting", "medium"),
+    prompt=(
+        "В рабочей директории есть draft.txt с полями title, date, revenue."
+        " Свёрстай из него report.txt строго по фирменному style-guide компании"
+        " Vortex Corp: заголовок секции, формат даты, формат денежной суммы и"
+        " обязательный футер — всё ровно по правилам гайда."
+    ),
+    setup_files={
+        "draft.txt": _STYLE_INPUT,
+        ".claude/skills/vortex-style-guide/SKILL.md": _STYLE_SKILL,
+        ".agents/skills/vortex-style-guide/SKILL.md": _STYLE_SKILL,
+    },
+    gold_files={"report.txt": _STYLE_GOLD},
+    verifier=all_of(
+        file_matches_regex("report.txt", r"^QUARTERLY RESULTS\s*$"),
+        file_contains("report.txt", "2026.03.14"),
+        file_contains("report.txt", "1'234'567 USD"),
+        file_contains("report.txt", "— Vortex Corp · Confidential"),
+    ),
+)
+
+
+# ---------------------------------------------------------------------------
+# B2 — parse a bespoke fixed-width format with an invented sign-overpunch
+# ---------------------------------------------------------------------------
+
+_NDR7_SKILL = """\
+---
+name: ndr7-format
+description: Parser spec for the Nordwind NDR-7 fixed record format with
+  sign-overpunch on the amount. Use when reading NDR-7 records.
+---
+
+# Nordwind NDR-7 Record Format
+
+Each record is one line, no separators:
+
+- chars 1-3: record id (3 digits)
+- chars 4..end: amount field
+
+The amount field's LAST character is a **sign-overpunch letter** that encodes
+the final digit AND the sign. The characters before it are literal digits.
+
+Overpunch letters:
+
+- `A`..`J` → final digit `0`..`9`, **positive**
+- `K`..`T` → final digit `0`..`9`, **negative**
+
+Example: `00112C` → id `001`, amount digits `12` + overpunch `C` (=digit 2,
+positive) → `+122`. `00245M` → id `002`, `45` + `M` (=digit 2, negative) →
+`-452`.
+"""
+
+_NDR7_INPUT = "00112C\n00245M\n00307A\n01199T\n"
+
+# id -> signed amount
+_NDR7_GOLD = {"001": 122, "002": -452, "003": 70, "011": -999}
+_NDR7_GOLD_CSV = "id,amount\n" + "".join(f"{k},{v}\n" for k, v in _NDR7_GOLD.items())
+
+
+def _ndr7_check(ws) -> VerifyResult:
+    p = ws / "parsed.csv"
+    if not p.exists():
+        return VerifyResult(False, "parsed.csv missing")
+    got: dict[str, int] = {}
+    try:
+        with p.open(encoding="utf-8", newline="") as f:
+            for row in csv.DictReader(f):
+                norm = {(k or "").strip().lower(): (v or "").strip() for k, v in row.items()}
+                rid, amt = norm.get("id"), norm.get("amount")
+                if rid is None or amt is None:
+                    return VerifyResult(False, "parsed.csv must have columns id,amount")
+                got[rid] = int(amt)
+    except (csv.Error, ValueError, UnicodeDecodeError) as exc:
+        return VerifyResult(False, f"could not read parsed.csv: {exc}")
+    wrong = [f"{k}={got.get(k)}≠{v}" for k, v in _NDR7_GOLD.items() if got.get(k) != v]
+    if wrong:
+        return VerifyResult(False, "wrong amounts: " + "; ".join(wrong))
+    return VerifyResult(True, "all NDR-7 records parsed with correct signed amounts")
+
+
+B2_NDR7 = Task(
+    id="skill_b2_ndr7_parse",
+    name="Parse Nordwind NDR-7 records with sign-overpunch",
+    tags=("skill", "file-format", "parsing", "medium"),
+    prompt=(
+        "В рабочей директории есть records.txt — записи во внутреннем формате"
+        " Nordwind NDR-7. Распарси их согласно спецификации формата и запиши"
+        " результат в parsed.csv с колонками id,amount (amount — целое число со"
+        " знаком). По одной строке на запись."
+    ),
+    setup_files={
+        "records.txt": _NDR7_INPUT,
+        ".claude/skills/ndr7-format/SKILL.md": _NDR7_SKILL,
+        ".agents/skills/ndr7-format/SKILL.md": _NDR7_SKILL,
+    },
+    gold_files={"parsed.csv": _NDR7_GOLD_CSV},
+    verifier=_ndr7_check,
+)
+
+
+# ---------------------------------------------------------------------------
+# E1 — B1 with irrelevant distractor skills present (robustness/selection)
+# ---------------------------------------------------------------------------
+
+_DISTRACTOR_WEATHER = """\
+---
+name: weather-forecast-api
+description: Fetch and format weather forecasts from the SkyCast API. Use when
+  the user asks about weather, temperature, or forecasts.
+---
+
+# SkyCast Weather
+
+Call `GET /v1/forecast?city=...` and format the daily highs and lows.
+"""
+
+_DISTRACTOR_COLORS = """\
+---
+name: palette-picker
+description: Generate accessible color palettes for UI design. Use when choosing
+  colors, contrast ratios, or theme tokens for an interface.
+---
+
+# Palette Picker
+
+Pick WCAG-AA color pairs and emit hex tokens for background/foreground.
+"""
+
+E1_DISTRACTOR = Task(
+    id="skill_e1_codebook_with_distractors",
+    name="Normalize failure reasons with irrelevant skills also present",
+    tags=("skill", "data-cleaning", "distractor", "medium"),
+    prompt=B1_CODEBOOK.prompt,
+    setup_files={
+        "failures.csv": _CODEBOOK_INPUT,
+        # релевантный скилл
+        ".claude/skills/nordwind-failure-codebook/SKILL.md": _CODEBOOK_SKILL,
+        ".agents/skills/nordwind-failure-codebook/SKILL.md": _CODEBOOK_SKILL,
+        # дистракторы — должны быть проигнорированы
+        ".claude/skills/weather-forecast-api/SKILL.md": _DISTRACTOR_WEATHER,
+        ".agents/skills/weather-forecast-api/SKILL.md": _DISTRACTOR_WEATHER,
+        ".claude/skills/palette-picker/SKILL.md": _DISTRACTOR_COLORS,
+        ".agents/skills/palette-picker/SKILL.md": _DISTRACTOR_COLORS,
+    },
+    gold_files={"normalized.csv": _CODEBOOK_GOLD_CSV},
+    verifier=_codebook_check,
+)
+
+
+SKILL_TASKS = [R1_BRAND, B1_CODEBOOK, B3_POLICY, G2_SKILL_REPAIR, R2_STYLE, B2_NDR7, E1_DISTRACTOR]
