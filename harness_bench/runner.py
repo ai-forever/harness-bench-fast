@@ -339,10 +339,7 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     # same agent/system-prompt and their published results stay reproducible.
     # `LocalShellBackend(virtual_mode=True)` maps `/.agents/skills` to
     # `<workspace>/.agents/skills`.
-    skill_sources = [
-        p for p in ("/.claude/skills", "/.agents/skills")
-        if (workspace / p.lstrip("/")).is_dir()
-    ] or None
+    skill_sources = ["/.agents/skills"] if (workspace / ".agents" / "skills").is_dir() else None
     agent = create_deep_agent(
         model=model, backend=backend, memory=memory_sources, skills=skill_sources
     )
