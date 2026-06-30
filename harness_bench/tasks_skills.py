@@ -16,9 +16,10 @@ importable for review and validation runs.
 
 from __future__ import annotations
 
+import csv
 import re
 
-from harness_bench.core import Task
+from harness_bench.core import Task, VerifyResult
 from harness_bench.verifiers import all_of, file_contains, file_matches_regex
 
 # ---------------------------------------------------------------------------
@@ -115,4 +116,122 @@ R1_BRAND = Task(
 )
 
 
-SKILL_TASKS = [R1_BRAND]
+# ---------------------------------------------------------------------------
+# B1 — normalize free-text to a fictional company's internal codebook
+# ---------------------------------------------------------------------------
+
+# Invented taxonomy: codes, synonyms, and a non-obvious precedence rule for
+# ambiguous descriptions. Not recoverable without the skill.
+_CODEBOOK_SKILL = """\
+---
+name: nordwind-failure-codebook
+description: Nordwind Mfg internal codebook for normalizing free-text equipment
+  failure reasons to canonical codes. Use when mapping failure descriptions to
+  Nordwind standard failure codes.
+---
+
+# Nordwind Mfg — Failure-Reason Codebook
+
+Map each free-text failure description to exactly one canonical code.
+
+## Canonical codes and their synonyms
+
+- `TH-OVR` (Thermal overload): overheated, ran too hot, thermal trip,
+  temperature alarm, overtemperature
+- `BRG-WEAR` (Bearing wear): noisy bearing, spindle vibration, rumbling noise,
+  play in shaft, worn bearing
+- `ELE-FLT` (Electrical fault): short circuit, blown fuse, tripped breaker,
+  power surge, earth fault
+- `LUB-FAIL` (Lubrication failure): no grease, dry running, oil starvation,
+  low lubricant
+- `CNT-CONTAM` (Contamination): dust ingress, dirty coolant, swarf in housing,
+  particle contamination
+
+## Precedence rules for ambiguous descriptions
+
+Apply in this order (a description matching two categories):
+
+1. If it mentions BOTH an electrical symptom and a thermal symptom, code it
+   `ELE-FLT` — at Nordwind electrical is treated as the root cause.
+2. If it mentions BOTH a bearing symptom and a lubrication symptom, code it
+   `LUB-FAIL` — lubrication failure is the root cause of the bearing damage.
+
+If still ambiguous after the rules, pick the category with the earliest match
+in the text.
+"""
+
+# Rows the agent sees. Rows 4 & 5 trigger the precedence rules.
+_CODEBOOK_INPUT = (
+    "id,free_text\n"
+    "1,Motor overheated during a long production run\n"
+    "2,Loud rumbling noise coming from the spindle\n"
+    "3,Blown fuse on the main control panel\n"
+    "4,Bearing seized up and no grease was found inside\n"
+    "5,Spindle overheated and tripped the breaker\n"
+    "6,Dust ingress into the gearbox housing\n"
+    "7,Dry running damaged the pump\n"
+    "8,Temperature alarm triggered an emergency shutdown\n"
+)
+
+# Hidden gold codes (the agent never sees these).
+_CODEBOOK_GOLD = {
+    "1": "TH-OVR",
+    "2": "BRG-WEAR",
+    "3": "ELE-FLT",
+    "4": "LUB-FAIL",     # bearing + lubrication -> LUB-FAIL (rule 2)
+    "5": "ELE-FLT",      # thermal + electrical -> ELE-FLT (rule 1)
+    "6": "CNT-CONTAM",
+    "7": "LUB-FAIL",
+    "8": "TH-OVR",
+}
+
+_CODEBOOK_GOLD_CSV = "id,code\n" + "".join(
+    f"{k},{v}\n" for k, v in _CODEBOOK_GOLD.items()
+)
+
+
+def _codebook_check(ws) -> VerifyResult:
+    p = ws / "normalized.csv"
+    if not p.exists():
+        return VerifyResult(False, "normalized.csv missing")
+    got: dict[str, str] = {}
+    try:
+        with p.open(encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                norm = {(k or "").strip().lower(): (v or "").strip() for k, v in row.items()}
+                rid, code = norm.get("id"), norm.get("code")
+                if rid is None or code is None:
+                    return VerifyResult(False, "normalized.csv must have columns id,code")
+                got[rid] = code.upper()
+    except (csv.Error, UnicodeDecodeError) as exc:
+        return VerifyResult(False, f"could not read normalized.csv: {exc}")
+    wrong = [f"{k}={got.get(k)!r}≠{v}" for k, v in _CODEBOOK_GOLD.items() if got.get(k) != v]
+    if wrong:
+        return VerifyResult(False, "wrong codes: " + "; ".join(wrong[:6]))
+    return VerifyResult(True, "all 8 failure reasons normalized to the correct codes")
+
+
+B1_CODEBOOK = Task(
+    id="skill_b1_failure_codebook",
+    name="Normalize failure reasons to the Nordwind internal codebook",
+    tags=("skill", "data-cleaning", "codebook", "medium"),
+    prompt=(
+        "В рабочей директории есть файл failures.csv (колонки id, free_text) —"
+        " вольные описания отказов оборудования. Приведи каждое описание к"
+        " каноническому коду отказа по внутреннему кодбуку компании Nordwind Mfg"
+        " и запиши результат в normalized.csv с колонками id,code (по одной"
+        " строке на каждую запись из failures.csv). Учитывай правила приоритета"
+        " для неоднозначных описаний."
+    ),
+    setup_files={
+        "failures.csv": _CODEBOOK_INPUT,
+        ".claude/skills/nordwind-failure-codebook/SKILL.md": _CODEBOOK_SKILL,
+        ".agents/skills/nordwind-failure-codebook/SKILL.md": _CODEBOOK_SKILL,
+    },
+    gold_files={"normalized.csv": _CODEBOOK_GOLD_CSV},
+    verifier=_codebook_check,
+)
+
+
+SKILL_TASKS = [R1_BRAND, B1_CODEBOOK]
