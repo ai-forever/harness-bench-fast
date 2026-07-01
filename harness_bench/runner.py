@@ -333,7 +333,16 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     # present. `LocalShellBackend(virtual_mode=True)` maps `/AGENTS.md` to
     # `<workspace>/AGENTS.md`.
     memory_sources = ["/AGENTS.md"] if (workspace / "AGENTS.md").exists() else None
-    agent = create_deep_agent(model=model, backend=backend, memory=memory_sources)
+    # Skill tasks ship an Agent Skills folder at `<workspace>/.agents/skills`
+    # (the cross-harness standard path). Wire SkillsMiddleware in only when that
+    # folder is present, so the 313 pre-existing skill-less tasks keep the exact
+    # same agent/system-prompt and their published results stay reproducible.
+    # `LocalShellBackend(virtual_mode=True)` maps `/.agents/skills` to
+    # `<workspace>/.agents/skills`.
+    skill_sources = ["/.agents/skills"] if (workspace / ".agents" / "skills").is_dir() else None
+    agent = create_deep_agent(
+        model=model, backend=backend, memory=memory_sources, skills=skill_sources
+    )
     return agent.with_config({"recursion_limit": recursion_limit})
 
 

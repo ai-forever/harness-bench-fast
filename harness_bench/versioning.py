@@ -138,6 +138,22 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "frontier-solvable (Opus 4.8 and GPT-5.5 pass); gold verified."
         ),
     ),
+
+    TaskSetRevision(
+        version="0.10.0",
+        introduced="2026-06-30",
+        total_tasks=330,
+        added_task_numbers=(314, 330),
+        modules=("tasks_skills.py",),
+        notes=(
+            "Added seventeen skill-discriminator tasks covering fictional brand "
+            "and style guides, internal codebooks and policies, bespoke formats, "
+            "skill selection/distractor axes, code-skill creation/repair, "
+            "fictional DSL/protocol/library specs, spreadsheet reconciliation, "
+            "and ArcFlux calculation methods. C1/C1b debugging prototypes were "
+            "kept out after no-skill controls showed no skill uplift."
+        ),
+    ),
 )
 
 CURRENT_TASK_SET_REVISION = TASK_SET_REVISIONS[-1]
