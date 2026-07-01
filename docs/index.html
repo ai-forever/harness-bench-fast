@@ -103,13 +103,39 @@
           <h2 id="leaderboard-title">Leaderboard</h2>
           <p>
             Results below use the latest 313-task set. Only the latest run per
-            harness + model setup is listed. Steps and tokens are shown only
-            when the harness exposes them.
+            harness + model setup is listed. Filter by model group or a single
+            harness; steps and tokens are shown only when the harness exposes
+            them.
           </p>
         </div>
 
+        <div class="filter-bar" role="group" aria-label="Leaderboard filters">
+          <div class="filter-chips" role="group" aria-label="Model group">
+            <button type="button" class="chip is-active" data-filter-group="all" aria-pressed="true">All models</button>
+            <button type="button" class="chip" data-filter-group="gigachat" aria-pressed="false">GigaChat</button>
+            <button type="button" class="chip" data-filter-group="other" aria-pressed="false">Other models</button>
+          </div>
+          <label class="filter-select">
+            <span>Harness</span>
+            <select id="harness-filter">
+              <option value="all">All harnesses</option>
+              <option value="claude-code">Claude Code CLI</option>
+              <option value="codex">Codex CLI</option>
+              <option value="openclaude">openclaude</option>
+              <option value="deepagents">deepagents</option>
+              <option value="giga_agent">giga_agent</option>
+              <option value="openhands">OpenHands</option>
+              <option value="pi-mono">pi-mono</option>
+              <option value="ouroboros">ouroboros</option>
+              <option value="flat_harness">flat_harness</option>
+              <option value="opencode">opencode</option>
+            </select>
+          </label>
+          <p class="filter-count" aria-live="polite"><strong id="shown-count">37</strong> of 37 shown</p>
+        </div>
+
         <div class="leaderboard">
-          <article class="result-row perfect">
+          <article class="result-row perfect" data-harness="claude-code" data-group="other">
             <div class="rank">1</div>
             <div class="who">
               <h3>Claude Code CLI</h3>
@@ -121,7 +147,7 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="claude-code" data-group="other">
             <div class="rank">2</div>
             <div class="who">
               <h3>Claude Code CLI</h3>
@@ -133,7 +159,7 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="codex" data-group="other">
             <div class="rank">2</div>
             <div class="who">
               <h3>Codex CLI</h3>
@@ -145,7 +171,7 @@
             <div class="meta">Steps 1,769 · Tokens 52,762,732</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="claude-code" data-group="other">
             <div class="rank">4</div>
             <div class="who">
               <h3>Claude Code CLI</h3>
@@ -157,7 +183,7 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="openclaude" data-group="other">
             <div class="rank">4</div>
             <div class="who">
               <h3>openclaude</h3>
@@ -169,7 +195,7 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="openclaude" data-group="other">
             <div class="rank">6</div>
             <div class="who">
               <h3>openclaude</h3>
@@ -181,7 +207,7 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="openclaude" data-group="other">
             <div class="rank">6</div>
             <div class="who">
               <h3>openclaude</h3>
@@ -193,7 +219,7 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">8</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -205,7 +231,7 @@
             <div class="meta">Steps 3,331 · Tokens 35,792,778</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">9</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -217,7 +243,7 @@
             <div class="meta">Steps 3,792 · Tokens 40,869,831</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">10</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -229,11 +255,11 @@
             <div class="meta">Steps 3,452 · Tokens 39,210,903</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat">
             <div class="rank">11</div>
             <div class="who">
               <h3>deepagents + GigaChat profile</h3>
-              <p>GigaChat-3.5-430B-A28B (IFT, v32.9.23.6)</p>
+              <p>GigaChat 3.5</p>
             </div>
             <div class="score">278/313</div>
             <div class="percent">88.8%</div>
@@ -241,7 +267,7 @@
             <div class="meta">Steps 2,471 · Tokens 2,793,162</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">12</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -253,11 +279,11 @@
             <div class="meta">Steps 3,920 · Tokens 44,332,968</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="giga_agent" data-group="gigachat">
             <div class="rank">13</div>
             <div class="who">
               <h3>giga_agent (CLI)</h3>
-              <p>GigaChat-3.5-430B-A28B (IFT, v32.9.23.6)</p>
+              <p>GigaChat 3.5</p>
             </div>
             <div class="score">276/313</div>
             <div class="percent">88.2%</div>
@@ -265,7 +291,7 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">14</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -277,11 +303,11 @@
             <div class="meta">Steps 3,390 · Tokens 43,151,046</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat">
             <div class="rank">15</div>
             <div class="who">
               <h3>deepagents + GigaChat profile</h3>
-              <p>GigaChat-3-Ultra (IFT, v32.3.18.5)</p>
+              <p>GigaChat Ultra</p>
             </div>
             <div class="score">269/313</div>
             <div class="percent">85.9%</div>
@@ -289,11 +315,11 @@
             <div class="meta">Steps 2,432 · Tokens 2,297,304</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="openhands" data-group="gigachat">
             <div class="rank">16</div>
             <div class="who">
               <h3>OpenHands</h3>
-              <p>GigaChat-3-Ultra (PROM)</p>
+              <p>GigaChat Ultra</p>
             </div>
             <div class="score">264/313</div>
             <div class="percent">84.3%</div>
@@ -301,7 +327,7 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">16</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -313,7 +339,7 @@
             <div class="meta">Steps 2,852 · Tokens 28,581,495</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">18</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -325,11 +351,11 @@
             <div class="meta">Steps 2,470 · Tokens 30,506,484</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat">
             <div class="rank">19</div>
             <div class="who">
               <h3>deepagents (gpt2giga)</h3>
-              <p>GigaChat-3.5-430B-A28B (IFT, v32.9.23.6)</p>
+              <p>GigaChat 3.5</p>
             </div>
             <div class="score">254/313</div>
             <div class="percent">81.2%</div>
@@ -337,7 +363,7 @@
             <div class="meta">Steps 3,014 · Tokens 26,045,799</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">20</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -349,11 +375,11 @@
             <div class="meta">Steps 3,251 · Tokens 38,507,310</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat">
             <div class="rank">21</div>
             <div class="who">
               <h3>deepagents + GigaChat profile</h3>
-              <p>GigaChat-2-Max (PROM)</p>
+              <p>GigaChat 2 Max</p>
             </div>
             <div class="score">249/313</div>
             <div class="percent">79.6%</div>
@@ -361,11 +387,11 @@
             <div class="meta">Steps 2,743 · Tokens 22,150,602</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="pi-mono" data-group="gigachat">
             <div class="rank">22</div>
             <div class="who">
               <h3>pi-mono</h3>
-              <p>GigaChat-3-Ultra (PROM)</p>
+              <p>GigaChat Ultra</p>
             </div>
             <div class="score">248/313</div>
             <div class="percent">79.2%</div>
@@ -373,7 +399,7 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">23</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -385,11 +411,11 @@
             <div class="meta">Steps 3,868 · Tokens 50,149,521</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat">
             <div class="rank">24</div>
             <div class="who">
               <h3>deepagents, no profile</h3>
-              <p>GigaChat-3.5-430B-A28B (IFT, v32.9.20.6)</p>
+              <p>GigaChat 3.5</p>
             </div>
             <div class="score">238/313</div>
             <div class="percent">76.0%</div>
@@ -397,11 +423,11 @@
             <div class="meta">Steps 2,580 · Tokens 4,145,217</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="ouroboros" data-group="gigachat">
             <div class="rank">25</div>
             <div class="who">
               <h3>ouroboros</h3>
-              <p>GigaChat-3.5-430B-A28B (IFT)</p>
+              <p>GigaChat 3.5</p>
             </div>
             <div class="score">231/313</div>
             <div class="percent">73.8%</div>
@@ -409,11 +435,11 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="flat_harness" data-group="gigachat">
             <div class="rank">26</div>
             <div class="who">
               <h3>flat_harness (gpt2giga)</h3>
-              <p>GigaChat-3.5-430B-A28B (IFT, mean of 2 runs)</p>
+              <p>GigaChat 3.5 (mean of 2 runs)</p>
             </div>
             <div class="score">219.5/313</div>
             <div class="percent">70.1%</div>
@@ -421,11 +447,11 @@
             <div class="meta">Steps — · Tokens 4,303,047</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat">
             <div class="rank">27</div>
             <div class="who">
               <h3>deepagents, no profile</h3>
-              <p>GigaChat-3-Ultra PROM (v32.3.18.5, mean of 3 runs)</p>
+              <p>GigaChat Ultra (mean of 3 runs)</p>
             </div>
             <div class="score">204.7/313</div>
             <div class="percent">65.4%</div>
@@ -433,11 +459,11 @@
             <div class="meta">Steps 2,774 · Tokens 16,257,658</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat">
             <div class="rank">28</div>
             <div class="who">
               <h3>deepagents + GigaChat profile</h3>
-              <p>GigaChat-3-Pro (PROM)</p>
+              <p>GigaChat 3 Pro</p>
             </div>
             <div class="score">204/313</div>
             <div class="percent">65.2%</div>
@@ -445,7 +471,7 @@
             <div class="meta">Steps 2,588 · Tokens 5,568,426</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">29</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -457,11 +483,11 @@
             <div class="meta">Steps 3,569 · Tokens 36,086,058</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat">
             <div class="rank">30</div>
             <div class="who">
               <h3>deepagents + GigaChat profile</h3>
-              <p>GigaChat-3-Lightning (IFT, v32.4.16.3)</p>
+              <p>GigaChat Lightning</p>
             </div>
             <div class="score">172/313</div>
             <div class="percent">55.0%</div>
@@ -469,7 +495,7 @@
             <div class="meta">Steps 2,116 · Tokens 873,123</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">31</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -481,7 +507,7 @@
             <div class="meta">Steps 2,262 · Tokens 18,864,729</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">32</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -493,7 +519,7 @@
             <div class="meta">Steps 2,695 · Tokens 36,218,469</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">33</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -505,7 +531,7 @@
             <div class="meta">Steps 1,815 · Tokens 19,550,796</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">34</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -517,11 +543,11 @@
             <div class="meta">Steps 2,962 · Tokens 38,503,644</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="opencode" data-group="gigachat">
             <div class="rank">35</div>
             <div class="who">
               <h3>opencode</h3>
-              <p>GigaChat-3-Ultra (IFT, v32.3.18.5)</p>
+              <p>GigaChat Ultra</p>
             </div>
             <div class="score">147/313</div>
             <div class="percent">47.0%</div>
@@ -529,7 +555,7 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="openhands" data-group="other">
             <div class="rank">36</div>
             <div class="who">
               <h3>OpenHands</h3>
@@ -541,7 +567,7 @@
             <div class="meta">Steps 1,774 · Tokens —</div>
           </article>
 
-          <article class="result-row">
+          <article class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">37</div>
             <div class="who">
               <h3>deepagents</h3>
@@ -553,6 +579,8 @@
             <div class="meta">Steps 1,737 · Tokens 95,965,560</div>
           </article>
         </div>
+
+        <p class="filter-empty" id="filter-empty" hidden>No runs match these filters.</p>
       </section>
 
       <section class="section compact" aria-labelledby="method-title">
@@ -574,5 +602,58 @@
       <span>harness-bench · latest results for task-set v0.9.0</span>
       <a href="https://github.com/ai-forever/harness-bench-fast">Source on GitHub</a>
     </footer>
+
+    <script>
+      (function () {
+        var rows = Array.prototype.slice.call(
+          document.querySelectorAll(".leaderboard .result-row")
+        );
+        var chips = Array.prototype.slice.call(
+          document.querySelectorAll(".filter-chips .chip")
+        );
+        var harnessSelect = document.getElementById("harness-filter");
+        var shownCount = document.getElementById("shown-count");
+        var emptyState = document.getElementById("filter-empty");
+        var activeGroup = "all";
+
+        function apply() {
+          var harness = harnessSelect ? harnessSelect.value : "all";
+          var shown = 0;
+          rows.forEach(function (row) {
+            var okGroup = activeGroup === "all" || row.dataset.group === activeGroup;
+            var okHarness = harness === "all" || row.dataset.harness === harness;
+            var visible = okGroup && okHarness;
+            row.classList.toggle("is-hidden", !visible);
+            if (visible) {
+              shown += 1;
+            }
+          });
+          if (shownCount) {
+            shownCount.textContent = String(shown);
+          }
+          if (emptyState) {
+            emptyState.hidden = shown !== 0;
+          }
+        }
+
+        chips.forEach(function (chip) {
+          chip.addEventListener("click", function () {
+            activeGroup = chip.getAttribute("data-filter-group");
+            chips.forEach(function (other) {
+              var isActive = other === chip;
+              other.classList.toggle("is-active", isActive);
+              other.setAttribute("aria-pressed", isActive ? "true" : "false");
+            });
+            apply();
+          });
+        });
+
+        if (harnessSelect) {
+          harnessSelect.addEventListener("change", apply);
+        }
+
+        apply();
+      })();
+    </script>
   </body>
 </html>

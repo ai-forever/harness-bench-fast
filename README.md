@@ -5,11 +5,9 @@
 Published benchmark results below use the 313-task set (`task-set v0.9.0`). `Steps`
 and `Tokens` are shown when the runner exposes them; `—` means the metric is
 absent from the run artifact, not that nothing was spent. Each row is the
-latest run for that harness + model setup, except GigaChat-3-Ultra PROM
-(no profile, mean of 3 runs) and GigaChat-3-Lightning IFT (mean of 9 runs).
-GigaChat rows name the stand (PROM = production, IFT) and the model version
-returned by the API, since weights differ across stands and releases. The
-`Profile` column shows the deepagents harness profile applied: `GigaChat` =
+latest run for that harness + model setup, except GigaChat Ultra
+(no profile, mean of 3 runs) and GigaChat Lightning (mean of 9 runs).
+The `Profile` column shows the deepagents harness profile applied: `GigaChat` =
 the `deepagents-gigachat` tuning profile, `none` = stock deepagents defaults,
 `—` = not applicable (non-deepagents harnesses).
 
@@ -27,31 +25,31 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | deepagents | none | deepseek/deepseek-v4-pro | 304/313 | 97.1% | 3,331 | 35,792,778 |
 | deepagents | none | qwen/qwen3.7-max | 299/313 | 95.5% | 3,792 | 40,869,831 |
 | deepagents | none | Qwen 3.6 Flash | 284/313 | 90.7% | 3,452 | 39,210,903 |
-| deepagents | GigaChat | GigaChat-3.5-430B-A28B (IFT, v32.9.23.6) | 278/313 | 88.8% | 2,471 | 2,793,162 |
+| deepagents | GigaChat | GigaChat 3.5 | 278/313 | 88.8% | 2,471 | 2,793,162 |
 | deepagents | none | DeepSeek V4 Flash | 277/313 | 88.5% | 3,920 | 44,332,968 |
-| giga_agent (CLI) | — | GigaChat-3.5-430B-A28B (IFT, v32.9.23.6) | 276/313 | 88.2% | — | — |
+| giga_agent (CLI) | — | GigaChat 3.5 | 276/313 | 88.2% | — | — |
 | deepagents | none | GPT-5 Mini | 274/313 | 87.5% | 3,390 | 43,151,046 |
-| deepagents | GigaChat | GigaChat-3-Ultra (IFT, v32.3.18.5) | 269/313 | 85.9% | 2,432 | 2,297,304 |
-| OpenHands | — | GigaChat-3-Ultra (PROM) | 264/313 | 84.3% | — | — |
+| deepagents | GigaChat | GigaChat Ultra | 269/313 | 85.9% | 2,432 | 2,297,304 |
+| OpenHands | — | GigaChat Ultra | 264/313 | 84.3% | — | — |
 | deepagents | none | GPT-4.1 | 264/313 | 84.3% | 2,852 | 28,581,495 |
 | deepagents | none | GPT-4.1 Mini | 255/313 | 81.5% | 2,470 | 30,506,484 |
-| deepagents (gpt2giga) | none | GigaChat-3.5-430B-A28B (IFT, v32.9.23.6) | 254/313 | 81.2% | 3,014 | 26,045,799 |
+| deepagents (gpt2giga) | none | GigaChat 3.5 | 254/313 | 81.2% | 3,014 | 26,045,799 |
 | deepagents | none | Qwen 3.5 Flash | 252/313 | 80.5% | 3,251 | 38,507,310 |
-| deepagents | GigaChat | GigaChat-2-Max (PROM) | 249/313 | 79.6% | 2,743 | 22,150,602 |
-| pi-mono | — | GigaChat-3-Ultra (PROM) | 248/313 | 79.2% | — | — |
+| deepagents | GigaChat | GigaChat 2 Max | 249/313 | 79.6% | 2,743 | 22,150,602 |
+| pi-mono | — | GigaChat Ultra | 248/313 | 79.2% | — | — |
 | deepagents | none | GPT-5 Nano | 240/313 | 76.7% | 3,868 | 50,149,521 |
-| deepagents | none | GigaChat-3.5-430B-A28B (IFT, v32.9.20.6) | 238/313 | 76.0% | 2,580 | 4,145,217 |
-| ouroboros | — | GigaChat-3.5-430B-A28B (IFT) | 231/313 | 73.8% | — | — |
-| flat_harness (gpt2giga) | — | GigaChat-3.5-430B-A28B (IFT, mean of 2 runs) | 219.5/313 | 70.1% | — | 4,303,047 |
-| deepagents | none | GigaChat-3-Ultra PROM (v32.3.18.5) | 204.7/313 | 65.4% | 2,774 | 16,257,658 |
-| deepagents | GigaChat | GigaChat-3-Pro (PROM) | 204/313 | 65.2% | 2,588 | 5,568,426 |
+| deepagents | none | GigaChat 3.5 | 238/313 | 76.0% | 2,580 | 4,145,217 |
+| ouroboros | — | GigaChat 3.5 | 231/313 | 73.8% | — | — |
+| flat_harness (gpt2giga) | — | GigaChat 3.5 (mean of 2 runs) | 219.5/313 | 70.1% | — | 4,303,047 |
+| deepagents | none | GigaChat Ultra (mean of 3 runs) | 204.7/313 | 65.4% | 2,774 | 16,257,658 |
+| deepagents | GigaChat | GigaChat 3 Pro | 204/313 | 65.2% | 2,588 | 5,568,426 |
 | deepagents | none | yandex/gpt5.1-pro | 198/313 | 63.3% | 3,569 | 36,086,058 |
-| deepagents | GigaChat | GigaChat-3-Lightning (IFT, v32.4.16.3) | 172/313 | 55.0% | 2,116 | 873,123 |
+| deepagents | GigaChat | GigaChat Lightning | 172/313 | 55.0% | 2,116 | 873,123 |
 | deepagents | none | yandex/gpt5-pro | 171/313 | 54.6% | 2,262 | 18,864,729 |
 | deepagents | none | GPT-4.1 Nano | 162/313 | 51.8% | 2,695 | 36,218,469 |
 | deepagents | none | GPT-OSS-120B | 155/313 | 49.5% | 1,815 | 19,550,796 |
 | deepagents | none | GPT-3.5 Turbo | 150/313 | 47.9% | 2,962 | 38,503,644 |
-| opencode | — | GigaChat-3-Ultra (IFT, v32.3.18.5) | 147/313 | 47.0% | — | — |
+| opencode | — | GigaChat Ultra | 147/313 | 47.0% | — | — |
 | OpenHands | — | yandex/gpt5.1-pro | 140/313 | 44.7% | 1,774 | — |
 | deepagents | none | yandex/gpt5-lite | 41/313 | 13.1% | 1,737 | 95,965,560 |
 
