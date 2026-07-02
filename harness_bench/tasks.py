@@ -20,6 +20,7 @@ import json
 from pathlib import Path
 
 from harness_bench.core import Task, VerifyResult
+from harness_bench.tasks_adversarial import ADVERSARIAL_TASKS
 from harness_bench.tasks_agentic import AGENTIC_TASKS
 from harness_bench.tasks_diagnostic import DIAGNOSTIC_TASKS
 from harness_bench.tasks_extra import EXTRA_TASKS
@@ -823,6 +824,7 @@ ALL_TASKS: list[Task] = [
     *AGENTIC_TASKS,
     *VCS_TASKS,
     *SKILL_TASKS,
+    *ADVERSARIAL_TASKS,
 ]
 
 _TASK_INDEX: dict[str, Task] = {t.id: t for t in ALL_TASKS}

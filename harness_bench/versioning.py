@@ -154,6 +154,62 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "kept out after no-skill controls showed no skill uplift."
         ),
     ),
+
+    TaskSetRevision(
+        version="0.11.0",
+        introduced="2026-07-02",
+        total_tasks=337,
+        added_task_numbers=(331, 337),
+        modules=("tasks_adversarial.py",),
+        notes=(
+            "Added an adversarial/robustness pilot: the agent must diagnose and "
+            "work around a hostile environment rather than execute a clean task. "
+            "Seven obstacle families — Python 2 source to port, a broken "
+            "documented build command, a Windows-1251 data file, a "
+            "permission-locked (chmod 000) file, an instruction naming a "
+            "nonexistent file, a hardcoded absolute path that does not resolve, "
+            "and a skill whose referenced template is missing (documented "
+            "inline fallback). Verifiers stay mechanical and gold-verified; the "
+            "permission task loses discrimination under root (documented)."
+        ),
+    ),
+
+    TaskSetRevision(
+        version="0.12.0",
+        introduced="2026-07-02",
+        total_tasks=350,
+        added_task_numbers=(338, 350),
+        modules=("tasks_adversarial.py",),
+        notes=(
+            "Completed the adversarial/robustness wave with thirteen more "
+            "obstacles: a removed-stdlib import (collections.abc), a misleading "
+            ".python-version distractor, an unneeded uninstallable dependency, a "
+            "set -e script aborting on a missing command, a documented npm build "
+            "in a Python project, a gzip stream disguised as .txt, a BOM/NUL-"
+            "polluted log to sanitize, an AGENTS.md that lies about the src "
+            "layout, a wrong tests-dir misdirection, a broken import path, a "
+            "submodule missing from its package, a SKILL.md with unclosed "
+            "frontmatter, and two contradictory (deprecated vs authoritative) "
+            "skills. All gold-verified and offline."
+        ),
+    ),
+
+    TaskSetRevision(
+        version="0.13.0",
+        introduced="2026-07-02",
+        total_tasks=351,
+        added_task_numbers=(351, 351),
+        modules=("tasks_adversarial.py",),
+        notes=(
+            "Added a context-discipline-at-scale task: a ~100 MB log generated "
+            "at runtime that the agent must NOT read whole (it would overflow "
+            "context). Success requires streaming / targeted tools (grep, wc, "
+            "python) to recover a needle token from the single MARKER line and "
+            "count ERROR-level lines. The big file is materialised via "
+            "setup_callback (never committed); gold writes only the tiny "
+            "answer.json."
+        ),
+    ),
 )
 
 CURRENT_TASK_SET_REVISION = TASK_SET_REVISIONS[-1]
