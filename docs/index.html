@@ -49,7 +49,7 @@
               <span class="label">tasks</span>
             </div>
             <div>
-              <span class="metric">37</span>
+              <span class="metric">31</span>
               <span class="label">runs listed</span>
             </div>
             <div>
@@ -123,15 +123,12 @@
               <option value="codex">Codex CLI</option>
               <option value="openclaude">openclaude</option>
               <option value="deepagents">deepagents</option>
-              <option value="giga_agent">giga_agent</option>
               <option value="openhands">OpenHands</option>
               <option value="pi-mono">pi-mono</option>
-              <option value="ouroboros">ouroboros</option>
-              <option value="flat_harness">flat_harness</option>
               <option value="opencode">opencode</option>
             </select>
           </label>
-          <p class="filter-count" aria-live="polite"><strong id="shown-count">37</strong> of 37 shown</p>
+          <p class="filter-count" aria-live="polite"><strong id="shown-count">31</strong> of 31 shown</p>
         </div>
 
         <div class="leaderboard">
@@ -255,7 +252,7 @@
             <div class="meta">Steps 3,452 · Tokens 39,210,903</div>
           </article>
 
-          <article class="result-row" data-harness="deepagents" data-group="gigachat">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat" data-hidden="true">
             <div class="rank">11</div>
             <div class="who">
               <h3>deepagents + GigaChat profile</h3>
@@ -279,7 +276,7 @@
             <div class="meta">Steps 3,920 · Tokens 44,332,968</div>
           </article>
 
-          <article class="result-row" data-harness="giga_agent" data-group="gigachat">
+          <article class="result-row" data-harness="giga_agent" data-group="gigachat" data-hidden="true">
             <div class="rank">13</div>
             <div class="who">
               <h3>giga_agent (CLI)</h3>
@@ -351,7 +348,7 @@
             <div class="meta">Steps 2,470 · Tokens 30,506,484</div>
           </article>
 
-          <article class="result-row" data-harness="deepagents" data-group="gigachat">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat" data-hidden="true">
             <div class="rank">19</div>
             <div class="who">
               <h3>deepagents (gpt2giga)</h3>
@@ -411,7 +408,7 @@
             <div class="meta">Steps 3,868 · Tokens 50,149,521</div>
           </article>
 
-          <article class="result-row" data-harness="deepagents" data-group="gigachat">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat" data-hidden="true">
             <div class="rank">24</div>
             <div class="who">
               <h3>deepagents, no profile</h3>
@@ -423,7 +420,7 @@
             <div class="meta">Steps 2,580 · Tokens 4,145,217</div>
           </article>
 
-          <article class="result-row" data-harness="ouroboros" data-group="gigachat">
+          <article class="result-row" data-harness="ouroboros" data-group="gigachat" data-hidden="true">
             <div class="rank">25</div>
             <div class="who">
               <h3>ouroboros</h3>
@@ -435,7 +432,7 @@
             <div class="meta">Steps — · Tokens —</div>
           </article>
 
-          <article class="result-row" data-harness="flat_harness" data-group="gigachat">
+          <article class="result-row" data-harness="flat_harness" data-group="gigachat" data-hidden="true">
             <div class="rank">26</div>
             <div class="who">
               <h3>flat_harness (gpt2giga)</h3>
@@ -620,6 +617,12 @@
           var harness = harnessSelect ? harnessSelect.value : "all";
           var shown = 0;
           rows.forEach(function (row) {
+            // Rows tagged data-hidden stay in the source (data preserved) but
+            // are never displayed or counted, regardless of the active filters.
+            if (row.dataset.hidden === "true") {
+              row.classList.add("is-hidden");
+              return;
+            }
             var okGroup = activeGroup === "all" || row.dataset.group === activeGroup;
             var okHarness = harness === "all" || row.dataset.harness === harness;
             var visible = okGroup && okHarness;
