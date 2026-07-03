@@ -2,56 +2,39 @@
 
 ## Current Results
 
-Published benchmark results below use the 313-task set (`task-set v0.9.0`). `Steps`
-and `Tokens` are shown when the runner exposes them; `—` means the metric is
-absent from the run artifact, not that nothing was spent. Each row is the
-latest run for that harness + model setup, except GigaChat Ultra
-(no profile, mean of 3 runs) and GigaChat Lightning (mean of 9 runs).
-The `Profile` column shows the deepagents harness profile applied: `GigaChat` =
-the `deepagents-gigachat` tuning profile, `none` = stock deepagents defaults,
-`—` = not applicable (non-deepagents harnesses).
+Published benchmark results below use the full 351-task set (`task-set v0.13.0`).
+`Steps` and `Tokens` are shown when the runner exposes them; `—` means the metric
+is absent from the run artifact, not that nothing was spent. Each row is one run
+per harness + model setup. The `Profile` column shows the deepagents harness
+profile applied: `GigaChat` = the `deepagents-gigachat` tuning profile, `none` =
+stock deepagents defaults, `—` = not applicable (non-deepagents harnesses).
+GigaChat rows are the IFT stand, build `32.9.23.6`.
 
 Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 
 | Harness | Profile | Model | Result | % | Steps | Tokens |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
-| Claude Code CLI | — | Claude Opus 4.8 | 313/313 | 100.0% | — | — |
-| Claude Code CLI | — | Claude Sonnet 4.6 | 311/313 | 99.4% | — | — |
-| Codex CLI | — | GPT-5.5 | 311/313 | 99.4% | 1,769 | 52,762,732 |
-| Claude Code CLI | — | Claude Haiku 4.5 | 309/313 | 98.7% | — | — |
-| openclaude | — | GLM 5.2 | 309/313 | 98.7% | — | — |
-| openclaude | — | Claude Haiku 4.5 | 306/313 | 97.8% | — | — |
-| openclaude | — | Claude Sonnet 4.6 | 306/313 | 97.8% | — | — |
-| deepagents | none | deepseek/deepseek-v4-pro | 304/313 | 97.1% | 3,331 | 35,792,778 |
-| deepagents | none | qwen/qwen3.7-max | 299/313 | 95.5% | 3,792 | 40,869,831 |
-| deepagents | none | Qwen 3.6 Flash | 284/313 | 90.7% | 3,452 | 39,210,903 |
-| deepagents | GigaChat | GigaChat 3.5 | 278/313 | 88.8% | 2,471 | 2,793,162 |
-| deepagents | none | DeepSeek V4 Flash | 277/313 | 88.5% | 3,920 | 44,332,968 |
-| giga_agent (CLI) | — | GigaChat 3.5 | 276/313 | 88.2% | — | — |
-| deepagents | none | GPT-5 Mini | 274/313 | 87.5% | 3,390 | 43,151,046 |
-| deepagents | GigaChat | GigaChat Ultra | 269/313 | 85.9% | 2,432 | 2,297,304 |
-| OpenHands | — | GigaChat Ultra | 264/313 | 84.3% | — | — |
-| deepagents | none | GPT-4.1 | 264/313 | 84.3% | 2,852 | 28,581,495 |
-| deepagents | none | GPT-4.1 Mini | 255/313 | 81.5% | 2,470 | 30,506,484 |
-| deepagents (gpt2giga) | none | GigaChat 3.5 | 254/313 | 81.2% | 3,014 | 26,045,799 |
-| deepagents | none | Qwen 3.5 Flash | 252/313 | 80.5% | 3,251 | 38,507,310 |
-| deepagents | GigaChat | GigaChat 2 Max | 249/313 | 79.6% | 2,743 | 22,150,602 |
-| pi-mono | — | GigaChat Ultra | 248/313 | 79.2% | — | — |
-| deepagents | none | GPT-5 Nano | 240/313 | 76.7% | 3,868 | 50,149,521 |
-| deepagents | none | GigaChat 3.5 | 238/313 | 76.0% | 2,580 | 4,145,217 |
-| ouroboros | — | GigaChat 3.5 | 231/313 | 73.8% | — | — |
-| flat_harness (gpt2giga) | — | GigaChat 3.5 (mean of 2 runs) | 219.5/313 | 70.1% | — | 4,303,047 |
-| deepagents | none | GigaChat Ultra (mean of 3 runs) | 204.7/313 | 65.4% | 2,774 | 16,257,658 |
-| deepagents | GigaChat | GigaChat 3 Pro | 204/313 | 65.2% | 2,588 | 5,568,426 |
-| deepagents | none | yandex/gpt5.1-pro | 198/313 | 63.3% | 3,569 | 36,086,058 |
-| deepagents | GigaChat | GigaChat Lightning | 172/313 | 55.0% | 2,116 | 873,123 |
-| deepagents | none | yandex/gpt5-pro | 171/313 | 54.6% | 2,262 | 18,864,729 |
-| deepagents | none | GPT-4.1 Nano | 162/313 | 51.8% | 2,695 | 36,218,469 |
-| deepagents | none | GPT-OSS-120B | 155/313 | 49.5% | 1,815 | 19,550,796 |
-| deepagents | none | GPT-3.5 Turbo | 150/313 | 47.9% | 2,962 | 38,503,644 |
-| opencode | — | GigaChat Ultra | 147/313 | 47.0% | — | — |
-| OpenHands | — | yandex/gpt5.1-pro | 140/313 | 44.7% | 1,774 | — |
-| deepagents | none | yandex/gpt5-lite | 41/313 | 13.1% | 1,737 | 95,965,560 |
+| Claude Code CLI | — | Claude Sonnet 4.6 | 341/351 | 97.2% | — | — |
+| Claude Code CLI | — | Claude Haiku 4.5 | 340/351 | 96.9% | — | — |
+| deepagents | none | GLM-5.2 | 340/351 | 96.9% | 3,966 | 41,664,423 |
+| deepagents | none | DeepSeek V4 Pro | 339/351 | 96.6% | 4,014 | 44,552,076 |
+| deepagents | none | GLM-5.1 | 335/351 | 95.4% | 3,802 | 39,320,469 |
+| deepagents | none | DeepSeek V3.2 | 326/351 | 92.9% | 6,413 | 98,708,199 |
+| deepagents | none | Qwen 3.6 Flash | 325/351 | 92.6% | 4,334 | 49,387,938 |
+| deepagents | GigaChat | GigaChat 3.5 | 317/351 | 90.3% | 2,912 | 4,648,044 |
+| deepagents | none | DeepSeek V4 Flash | 310/351 | 88.3% | 4,082 | 46,732,794 |
+| deepagents | GigaChat | GigaChat 3 Ultra | 303/351 | 86.3% | 2,776 | 3,424,473 |
+| deepagents | none | GPT-4.1 | 300/351 | 85.5% | 3,382 | 34,199,277 |
+| opencode (gpt2giga) | — | GigaChat 3.5 | 298/351 | 84.9% | — | — |
+| deepagents | GigaChat | GigaChat 2 Max | 292/351 | 83.2% | 2,714 | 3,209,751 |
+| deepagents | none | Qwen 3.5 Flash | 288/351 | 82.1% | 3,507 | 44,553,189 |
+| deepagents | none | GigaChat 3.5 | 287/351 | 81.8% | 3,374 | 8,486,826 |
+| deepagents | GigaChat | GigaChat 3 Pro | 241/351 | 68.7% | 2,823 | 2,400,507 |
+| deepagents | none | yandex/gpt5.1-pro | 220/351 | 62.7% | 4,030 | 42,623,784 |
+| deepagents | none | GPT-OSS-120B | 185/351 | 52.7% | 2,054 | 22,079,085 |
+| deepagents | none | yandex/gpt5-pro | 180/351 | 51.3% | 2,407 | 20,845,269 |
+| deepagents | GigaChat | GigaChat 3 Lightning | 179/351 | 51.0% | 2,232 | 1,739,949 |
+| deepagents | none | yandex/gpt5-lite | 37/351 | 10.5% | 1,666 | 118,843,500 |
 
 A self-contained **351-task agent benchmark** (`task-set v0.13.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
@@ -306,10 +289,9 @@ needed when invoking Harbor's own local runner.
 
 ## Results
 
-The latest published 313-task (`v0.9.0`) results table is kept at the top of this README. Only
-the latest run per harness + model setup is listed; superseded and
-older-task-set runs are not carried over. New `v0.13.0` / 351-task results should
-be added once full reruns are available.
+The published results table (full 351-task set, `v0.13.0`) is kept at the top of
+this README. Only one run per harness + model setup is listed; superseded and
+older-task-set (313-task) runs are not carried over.
 
 ## Adding a task
 
