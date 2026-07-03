@@ -175,13 +175,13 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
     ),
 
     TaskSetRevision(
-        version="0.12.0",
+        version="0.13.0",
         introduced="2026-07-02",
-        total_tasks=350,
-        added_task_numbers=(338, 350),
+        total_tasks=351,
+        added_task_numbers=(338, 351),
         modules=("tasks_adversarial.py",),
         notes=(
-            "Completed the adversarial/robustness wave with thirteen more "
+            "Completed the adversarial/robustness wave with fourteen more "
             "obstacles: a removed-stdlib import (collections.abc), a misleading "
             ".python-version distractor, an unneeded uninstallable dependency, a "
             "set -e script aborting on a missing command, a documented npm build "
@@ -189,25 +189,10 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "polluted log to sanitize, an AGENTS.md that lies about the src "
             "layout, a wrong tests-dir misdirection, a broken import path, a "
             "submodule missing from its package, a SKILL.md with unclosed "
-            "frontmatter, and two contradictory (deprecated vs authoritative) "
-            "skills. All gold-verified and offline."
-        ),
-    ),
-
-    TaskSetRevision(
-        version="0.13.0",
-        introduced="2026-07-02",
-        total_tasks=351,
-        added_task_numbers=(351, 351),
-        modules=("tasks_adversarial.py",),
-        notes=(
-            "Added a context-discipline-at-scale task: a ~100 MB log generated "
-            "at runtime that the agent must NOT read whole (it would overflow "
-            "context). Success requires streaming / targeted tools (grep, wc, "
-            "python) to recover a needle token from the single MARKER line and "
-            "count ERROR-level lines. The big file is materialised via "
-            "setup_callback (never committed); gold writes only the tiny "
-            "answer.json."
+            "frontmatter, two contradictory (deprecated vs authoritative) "
+            "skills, and a context-discipline-at-scale task (a ~100 MB log the "
+            "agent must stream/grep rather than read whole). All gold-verified "
+            "and offline."
         ),
     ),
 )
