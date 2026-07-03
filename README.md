@@ -53,7 +53,7 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | OpenHands | — | yandex/gpt5.1-pro | 140/313 | 44.7% | 1,774 | — |
 | deepagents | none | yandex/gpt5-lite | 41/313 | 13.1% | 1,737 | 95,965,560 |
 
-A self-contained **330-task agent benchmark** (`task-set v0.10.0`) for evaluating LLM-backed
+A self-contained **351-task agent benchmark** (`task-set v0.13.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -208,7 +208,7 @@ uv run python -m harness_bench apply-gold \
 
 ## What's inside
 
-### Tasks (330 total, task-set v0.10.0)
+### Tasks (351 total, task-set v0.13.0)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -222,6 +222,7 @@ uv run python -m harness_bench apply-gold \
 | `tasks_agentic.py` | 254–298 | benchmark-like synthetic agentic wave: Terminal-Bench-like terminal workflows (logs, process tables, Makefile plans, checksums, permission audits), tau-like policy-bound action decisions (airline, retail, banking, clinic, etc.), and SWE-bench-like pytest bug-fix tasks. |
 | `tasks_vcs.py` | 299–313 | version-control work: Git merge-conflict resolution (ours/theirs/both/manual, diff3 base sections, multi-hunk, multi-file), unified-diff apply/revert, unresolved-conflict detection, plus multi-file/multi-step workflows (scaled rename refactors, module split, ordered patch stacks, manifest-driven resolution, config deep-merge). |
 | `tasks_skills.py` | 314–330 | skill-discriminator wave: fictional brand/style guides, internal codebooks and policies, bespoke fixed formats, distractor/selection/negative-control skill axes, code-skill creation/repair, fictional DSL/protocol/library specs, spreadsheet reconciliation, and ArcFlux calculation methods. |
+| `tasks_adversarial.py` | 331–351 | adversarial/robustness wave: the agent must diagnose and work around a hostile environment — broken Python versions and imports, unreadable/mis-encoded/permission-locked files, instructions that contradict the environment, broken build commands and skills, and a ~100 MB log that must be streamed rather than read whole. |
 
 Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
@@ -246,6 +247,9 @@ changes do not need a task-set bump.
 | `0.8.0` | 2026-06-05 | 299–308 | 308 | Version-control tasks: Git merge-conflict resolution, multi-hunk unified-diff apply/revert, unresolved-conflict detection |
 | `0.9.0` | 2026-06-05 | 309–313 | 313 | Multi-file / multi-step version-control workflows (rename refactor, module split, patch stack, manifest-driven resolution, config deep-merge) |
 | `0.10.0` | 2026-06-30 | 314–330 | 330 | Skill-discriminator wave with fictional skills, codebooks, policies, bespoke formats, selection/distractor axes, code-skill authoring/repair, and ArcFlux methods |
+| `0.11.0` | 2026-07-02 | 331–337 | 337 | Adversarial/robustness pilot: Python 2 port, broken build command, Windows-1251 file, permission-locked file, instruction naming a nonexistent file, hardcoded path, skill with missing template |
+| `0.12.0` | 2026-07-02 | 338–350 | 350 | Adversarial wave completed: removed-stdlib import, misleading `.python-version`, unneeded uninstallable dependency, `set -e` abort, npm-in-a-Python-project, gzip-masquerade, BOM/NUL log, AGENTS.md wrong layout, wrong tests dir, broken import path, broken package layout, malformed SKILL.md frontmatter, contradictory skills |
+| `0.13.0` | 2026-07-02 | 351 | 351 | Context-discipline-at-scale: a ~100 MB log the agent must stream/grep rather than read whole |
 
 ### Infrastructure
 
@@ -305,7 +309,7 @@ needed when invoking Harbor's own local runner.
 
 The latest published 313-task (`v0.9.0`) results table is kept at the top of this README. Only
 the latest run per harness + model setup is listed; superseded and
-older-task-set runs are not carried over. New `v0.10.0` / 330-task results should
+older-task-set runs are not carried over. New `v0.13.0` / 351-task results should
 be added once full reruns are available.
 
 ## Adding a task
