@@ -90,7 +90,7 @@ uv venv && uv pip install -e ".[gigachat,openrouter]"
 # to the public profile.
 uv pip install -e ".[gigachat-profile]"
 
-# List all 330 tasks
+# List all 351 tasks
 uv run python -m harness_bench list
 
 # Show the benchmark task-set version and revision history
