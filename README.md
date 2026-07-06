@@ -30,11 +30,14 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | deepagents | GigaChat | GigaChat 2 Max | 292/351 | 83.2% | 2,714 | 3,209,751 |
 | deepagents | none | Qwen 3.5 Flash | 288/351 | 82.1% | 3,507 | 44,553,189 |
 | deepagents | none | GigaChat 3.5 | 287/351 | 81.8% | 3,374 | 8,486,826 |
+| deepagents | none | MiniMax M2.7 | 282/351 | 80.3% | 3,387 | 38,231,538 |
+| deepagents | none | Qwen3-Coder-30B-A3B | 258/351 | 73.5% | 3,849 | 57,997,536 |
 | deepagents | GigaChat | GigaChat 3 Pro | 241/351 | 68.7% | 2,823 | 2,400,507 |
 | deepagents | none | yandex/gpt5.1-pro | 220/351 | 62.7% | 4,030 | 42,623,784 |
 | deepagents | none | GPT-OSS-120B | 185/351 | 52.7% | 2,054 | 22,079,085 |
 | deepagents | none | yandex/gpt5-pro | 180/351 | 51.3% | 2,407 | 20,845,269 |
 | deepagents | GigaChat | GigaChat 3 Lightning | 179/351 | 51.0% | 2,232 | 1,739,949 |
+| deepagents | none | Llama 4 Maverick | 57/351 | 16.2% | 1,391 | 17,065,878 |
 | deepagents | none | yandex/gpt5-lite | 37/351 | 10.5% | 1,666 | 118,843,500 |
 
 A self-contained **351-task agent benchmark** (`task-set v0.13.0`) for evaluating LLM-backed
