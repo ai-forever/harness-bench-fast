@@ -14,6 +14,7 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 
 | Harness | Profile | Model | Result | % | Steps | Tokens |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
+| Claude Code CLI | — | Claude Opus 4.8 | 351/351 | 100.0% | — | — |
 | Claude Code CLI | — | Claude Sonnet 4.6 | 341/351 | 97.2% | — | — |
 | Claude Code CLI | — | Claude Haiku 4.5 | 340/351 | 96.9% | — | — |
 | deepagents | none | GLM-5.2 | 340/351 | 96.9% | 3,966 | 41,664,423 |
@@ -292,6 +293,18 @@ needed when invoking Harbor's own local runner.
 The published results table (full 351-task set, `v0.13.0`) is kept at the top of
 this README. Only one run per harness + model setup is listed; superseded and
 older-task-set (313-task) runs are not carried over.
+
+### Scoring rules
+
+- A task that hits the per-task wall-clock timeout or hangs counts as a
+  normal fail: it stays in the denominator and gets no partial credit.
+- Transient infrastructure errors are **not** model failures. If a task dies
+  on a network failure or an API infrastructure response (HTTP 5xx, 429,
+  `529 Overloaded`, connection reset, gateway timeout) rather than on the
+  model's own behavior, the task may be rerun and the retried result is
+  recorded. Runners may also auto-retry such errors in-flight
+  (`run-openrouter` already retries up to 5 attempts per task); a retried
+  task is scored the same as any other task.
 
 ## Adding a task
 
