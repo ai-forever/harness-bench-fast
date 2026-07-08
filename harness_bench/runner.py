@@ -35,6 +35,29 @@ _AGENT_METRIC_FIELDS = (
 
 _RESULTS_JSON_COMMAND: str | None = None
 
+# Per-task wall-clock cap. The benchmark requires that no single task run longer
+# than this; a model whose request hangs on a dead socket, or that loops just
+# under the recursion cap, must not be able to freeze the whole run. Override
+# with the ``HARNESS_BENCH_TASK_TIMEOUT`` env var (seconds).
+DEFAULT_TASK_TIMEOUT_SECONDS = 600.0
+
+
+class TaskTimeoutError(Exception):
+    """Raised when a single task exceeds the per-task wall-clock timeout."""
+
+
+def _task_timeout_seconds() -> float:
+    """Per-task wall-clock timeout in seconds (env override, else 10 minutes)."""
+    raw = os.getenv("HARNESS_BENCH_TASK_TIMEOUT")
+    if raw:
+        try:
+            value = float(raw)
+        except ValueError:
+            return DEFAULT_TASK_TIMEOUT_SECONDS
+        if value > 0:
+            return value
+    return DEFAULT_TASK_TIMEOUT_SECONDS
+
 
 def _is_graph_recursion_error(exc: BaseException) -> bool:
     """Return True when ``exc`` is LangGraph's recursion-limit failure."""
@@ -54,6 +77,14 @@ def _agent_exception_task_run(
     workspace: Path | None,
 ) -> TaskRun:
     """Convert an agent/runtime exception into a normal task failure."""
+    if isinstance(exc, TaskTimeoutError):
+        return TaskRun(
+            task_id=task_id,
+            passed=False,
+            message=str(exc),
+            elapsed_seconds=elapsed_seconds,
+            workspace=workspace,
+        )
     if _is_graph_recursion_error(exc):
         return TaskRun(
             task_id=task_id,
@@ -442,15 +473,44 @@ class AgentRunStatsCollector:
 
 
 def invoke_agent_with_stats(agent: Any, payload: dict[str, Any], stats: AgentRunStatsCollector) -> Any:
+    """Invoke the agent under the per-task wall-clock timeout.
+
+    The invocation runs in a daemon thread and is joined for at most
+    ``_task_timeout_seconds()``. On timeout the caller is freed and a
+    ``TaskTimeoutError`` is raised (recorded as a normal task failure); the
+    orphaned daemon thread cannot block process exit. This is what stops one
+    hung request — e.g. a dead socket with no read-timeout — from freezing the
+    whole run, which is a benchmark requirement.
+    """
     callbacks = [cb] if (cb := stats.as_callback()) is not None else None
-    if not callbacks:
-        return agent.invoke(payload)
-    try:
-        return agent.invoke(payload, config={"callbacks": callbacks})
-    except TypeError as exc:
-        if "config" not in str(exc):
-            raise
-        return agent.invoke(payload)
+
+    def _call() -> Any:
+        if not callbacks:
+            return agent.invoke(payload)
+        try:
+            return agent.invoke(payload, config={"callbacks": callbacks})
+        except TypeError as exc:
+            if "config" not in str(exc):
+                raise
+            return agent.invoke(payload)
+
+    timeout = _task_timeout_seconds()
+    box: dict[str, Any] = {}
+
+    def _worker() -> None:
+        try:
+            box["result"] = _call()
+        except BaseException as exc:  # noqa: BLE001 — re-raised in the caller thread
+            box["error"] = exc
+
+    thread = threading.Thread(target=_worker, name="hb-agent-invoke", daemon=True)
+    thread.start()
+    thread.join(timeout)
+    if thread.is_alive():
+        raise TaskTimeoutError(f"task exceeded the {timeout:.0f}s per-task timeout")
+    if "error" in box:
+        raise box["error"]
+    return box.get("result")
 
 
 def _task_run_with_agent_stats(
@@ -522,7 +582,16 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     # present. `LocalShellBackend(virtual_mode=True)` maps `/AGENTS.md` to
     # `<workspace>/AGENTS.md`.
     memory_sources = ["/AGENTS.md"] if (workspace / "AGENTS.md").exists() else None
-    agent = create_deep_agent(model=model, backend=backend, memory=memory_sources)
+    # Skill tasks ship an Agent Skills folder at `<workspace>/.agents/skills`
+    # (the cross-harness standard path). Wire SkillsMiddleware in only when that
+    # folder is present, so the 313 pre-existing skill-less tasks keep the exact
+    # same agent/system-prompt and their published results stay reproducible.
+    # `LocalShellBackend(virtual_mode=True)` maps `/.agents/skills` to
+    # `<workspace>/.agents/skills`.
+    skill_sources = ["/.agents/skills"] if (workspace / ".agents" / "skills").is_dir() else None
+    agent = create_deep_agent(
+        model=model, backend=backend, memory=memory_sources, skills=skill_sources
+    )
     return agent.with_config({"recursion_limit": recursion_limit})
 
 

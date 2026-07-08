@@ -20,6 +20,7 @@ import json
 from pathlib import Path
 
 from harness_bench.core import Task, VerifyResult
+from harness_bench.tasks_adversarial import ADVERSARIAL_TASKS
 from harness_bench.tasks_agentic import AGENTIC_TASKS
 from harness_bench.tasks_diagnostic import DIAGNOSTIC_TASKS
 from harness_bench.tasks_extra import EXTRA_TASKS
@@ -27,6 +28,7 @@ from harness_bench.tasks_extreme import EXTREME_TASKS
 from harness_bench.tasks_hard import HARD_TASKS
 from harness_bench.tasks_memory import MEMORY_TASKS
 from harness_bench.tasks_more import MORE_TASKS
+from harness_bench.tasks_skills import SKILL_TASKS
 from harness_bench.tasks_vcs import VCS_TASKS
 from harness_bench.verifiers import (
     all_of,
@@ -821,6 +823,8 @@ ALL_TASKS: list[Task] = [
     *MEMORY_TASKS,
     *AGENTIC_TASKS,
     *VCS_TASKS,
+    *SKILL_TASKS,
+    *ADVERSARIAL_TASKS,
 ]
 
 _TASK_INDEX: dict[str, Task] = {t.id: t for t in ALL_TASKS}

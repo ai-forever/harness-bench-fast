@@ -167,6 +167,63 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "frontier-solvable (Opus 4.8 and GPT-5.5 pass); gold verified."
         ),
     ),
+
+    TaskSetRevision(
+        version="0.10.0",
+        introduced="2026-06-30",
+        total_tasks=330,
+        added_task_numbers=(314, 330),
+        modules=("tasks_skills.py",),
+        notes=(
+            "Added seventeen skill-discriminator tasks covering fictional brand "
+            "and style guides, internal codebooks and policies, bespoke formats, "
+            "skill selection/distractor axes, code-skill creation/repair, "
+            "fictional DSL/protocol/library specs, spreadsheet reconciliation, "
+            "and ArcFlux calculation methods. C1/C1b debugging prototypes were "
+            "kept out after no-skill controls showed no skill uplift."
+        ),
+    ),
+
+    TaskSetRevision(
+        version="0.11.0",
+        introduced="2026-07-02",
+        total_tasks=337,
+        added_task_numbers=(331, 337),
+        modules=("tasks_adversarial.py",),
+        notes=(
+            "Added an adversarial/robustness pilot: the agent must diagnose and "
+            "work around a hostile environment rather than execute a clean task. "
+            "Seven obstacle families — Python 2 source to port, a broken "
+            "documented build command, a Windows-1251 data file, a "
+            "permission-locked (chmod 000) file, an instruction naming a "
+            "nonexistent file, a hardcoded absolute path that does not resolve, "
+            "and a skill whose referenced template is missing (documented "
+            "inline fallback). Verifiers stay mechanical and gold-verified; the "
+            "permission task loses discrimination under root (documented)."
+        ),
+    ),
+
+    TaskSetRevision(
+        version="0.13.0",
+        introduced="2026-07-02",
+        total_tasks=351,
+        added_task_numbers=(338, 351),
+        modules=("tasks_adversarial.py",),
+        notes=(
+            "Completed the adversarial/robustness wave with fourteen more "
+            "obstacles: a removed-stdlib import (collections.abc), a misleading "
+            ".python-version distractor, an unneeded uninstallable dependency, a "
+            "set -e script aborting on a missing command, a documented npm build "
+            "in a Python project, a gzip stream disguised as .txt, a BOM/NUL-"
+            "polluted log to sanitize, an AGENTS.md that lies about the src "
+            "layout, a wrong tests-dir misdirection, a broken import path, a "
+            "submodule missing from its package, a SKILL.md with unclosed "
+            "frontmatter, two contradictory (deprecated vs authoritative) "
+            "skills, and a context-discipline-at-scale task (a ~100 MB log the "
+            "agent must stream/grep rather than read whole). All gold-verified "
+            "and offline."
+        ),
+    ),
 )
 
 CURRENT_TASK_SET_REVISION = TASK_SET_REVISIONS[-1]

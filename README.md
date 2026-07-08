@@ -2,39 +2,45 @@
 
 ## Current Results
 
-Current benchmark results use the 313-task set (`task-set v0.9.0`). `Steps`
-and `Tokens` are shown when the runner exposes them. Each row is the latest
-run for that harness + model setup.
+Published benchmark results below use the full 351-task set (`task-set v0.13.0`).
+`Steps` and `Tokens` are shown when the runner exposes them; `—` means the metric
+is absent from the run artifact, not that nothing was spent. Each row is one run
+per harness + model setup. The `Profile` column shows the deepagents harness
+profile applied: `GigaChat` = the `deepagents-gigachat` tuning profile, `none` =
+stock deepagents defaults, `—` = not applicable (non-deepagents harnesses).
+GigaChat rows are the IFT stand, build `32.9.23.6`.
 
 Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 
-| Harness | Model | Result | % | Steps | Tokens |
-| --- | --- | ---: | ---: | ---: | ---: |
-| Claude Code CLI | Claude Opus 4.8 | 313/313 | 100.0% | — | — |
-| Claude Code CLI | Claude Sonnet 4.6 | 311/313 | 99.4% | — | — |
-| Codex CLI | GPT-5.5 | 311/313 | 99.4% | 1,769 | 52,762,732 |
-| Claude Code CLI | Claude Haiku 4.5 | 309/313 | 98.7% | — | — |
-| openclaude | GLM 5.2 | 309/313 | 98.7% | — | — |
-| openclaude | Claude Haiku 4.5 | 306/313 | 97.8% | — | — |
-| openclaude | Claude Sonnet 4.6 | 306/313 | 97.8% | — | — |
-| deepagents | Qwen 3.6 Flash | 284/313 | 90.7% | 3,452 | 39,210,903 |
-| deepagents | DeepSeek V4 Flash | 277/313 | 88.5% | 3,920 | 44,332,968 |
-| deepagents | GPT-5 Mini | 274/313 | 87.5% | 3,390 | 43,151,046 |
-| deepagents + GigaChat profile | GigaChat-3-Ultra (IFT) | 269/313 | 85.9% | 2,432 | 2,297,304 |
-| deepagents | GPT-4.1 | 264/313 | 84.3% | 2,852 | 28,581,495 |
-| OpenHands | GigaChat-3-Ultra | 264/313 | 84.3% | — | — |
-| deepagents | GPT-4.1 Mini | 255/313 | 81.5% | 2,470 | 30,506,484 |
-| deepagents | Qwen 3.5 Flash | 252/313 | 80.5% | 3,251 | 38,507,310 |
-| deepagents + GigaChat profile | GigaChat-2-Max | 249/313 | 79.6% | 2,743 | 22,150,602 |
-| pi-mono | GigaChat-3-Ultra | 248/313 | 79.2% | — | — |
-| deepagents | GPT-5 Nano | 240/313 | 76.7% | 3,868 | 50,149,521 |
-| deepagents + GigaChat profile | GigaChat-3-Pro | 204/313 | 65.2% | 2,588 | 5,568,426 |
-| deepagents, no profile | GigaChat-3-Ultra | 189/313 | 60.4% | 2,730 | 69,675,294 |
-| deepagents | GPT-4.1 Nano | 162/313 | 51.8% | 2,695 | 36,218,469 |
-| deepagents | GPT-OSS-120B | 155/313 | 49.5% | 1,815 | 19,550,796 |
-| deepagents | GPT-3.5 Turbo | 150/313 | 47.9% | 2,962 | 38,503,644 |
+| Harness | Profile | Model | Result | % | Steps | Tokens |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| Claude Code CLI | — | Claude Opus 4.8 | 351/351 | 100.0% | — | — |
+| Claude Code CLI | — | Claude Sonnet 4.6 | 341/351 | 97.2% | — | — |
+| Claude Code CLI | — | Claude Haiku 4.5 | 340/351 | 96.9% | — | — |
+| deepagents | none | GLM-5.2 | 340/351 | 96.9% | 3,966 | 41,664,423 |
+| deepagents | none | DeepSeek V4 Pro | 339/351 | 96.6% | 4,014 | 44,552,076 |
+| deepagents | none | GLM-5.1 | 335/351 | 95.4% | 3,802 | 39,320,469 |
+| deepagents | none | DeepSeek V3.2 | 326/351 | 92.9% | 6,413 | 98,708,199 |
+| deepagents | none | Qwen 3.6 Flash | 325/351 | 92.6% | 4,334 | 49,387,938 |
+| deepagents | GigaChat | GigaChat 3.5 | 317/351 | 90.3% | 2,912 | 4,648,044 |
+| deepagents | none | DeepSeek V4 Flash | 310/351 | 88.3% | 4,082 | 46,732,794 |
+| deepagents | GigaChat | GigaChat 3 Ultra | 303/351 | 86.3% | 2,776 | 3,424,473 |
+| deepagents | none | GPT-4.1 | 300/351 | 85.5% | 3,382 | 34,199,277 |
+| opencode (gpt2giga) | — | GigaChat 3.5 | 298/351 | 84.9% | — | — |
+| deepagents | GigaChat | GigaChat 2 Max | 292/351 | 83.2% | 2,714 | 3,209,751 |
+| deepagents | none | Qwen 3.5 Flash | 288/351 | 82.1% | 3,507 | 44,553,189 |
+| deepagents | none | GigaChat 3.5 | 287/351 | 81.8% | 3,374 | 8,486,826 |
+| deepagents | none | MiniMax M2.7 | 282/351 | 80.3% | 3,387 | 38,231,538 |
+| deepagents | none | Qwen3-Coder-30B-A3B | 258/351 | 73.5% | 3,849 | 57,997,536 |
+| deepagents | GigaChat | GigaChat 3 Pro | 241/351 | 68.7% | 2,823 | 2,400,507 |
+| deepagents | none | yandex/gpt5.1-pro | 220/351 | 62.7% | 4,030 | 42,623,784 |
+| deepagents | none | GPT-OSS-120B | 185/351 | 52.7% | 2,054 | 22,079,085 |
+| deepagents | none | yandex/gpt5-pro | 180/351 | 51.3% | 2,407 | 20,845,269 |
+| deepagents | GigaChat | GigaChat 3 Lightning | 179/351 | 51.0% | 2,232 | 1,739,949 |
+| deepagents | none | Llama 4 Maverick | 57/351 | 16.2% | 1,391 | 17,065,878 |
+| deepagents | none | yandex/gpt5-lite | 37/351 | 10.5% | 1,666 | 118,843,500 |
 
-A self-contained **313-task agent benchmark** (`task-set v0.9.0`) for evaluating LLM-backed
+A self-contained **351-task agent benchmark** (`task-set v0.13.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -71,7 +77,7 @@ uv venv && uv pip install -e ".[gigachat,openrouter]"
 # to the public profile.
 uv pip install -e ".[gigachat-profile]"
 
-# List all 313 tasks
+# List all 351 tasks
 uv run python -m harness_bench list
 
 # Show the benchmark task-set version and revision history
@@ -224,7 +230,7 @@ uv run python -m harness_bench apply-gold \
 
 ## What's inside
 
-### Tasks (313 total, task-set v0.9.0)
+### Tasks (351 total, task-set v0.13.0)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -237,6 +243,8 @@ uv run python -m harness_bench apply-gold \
 | `tasks_memory.py` | 222–253 | memory discipline: read / write / forget / refuse facts in `MEMORY.md` along with the auxiliary deliverable (LICENSE, `requirements-dev.txt`, `bio.txt`, `profile.json`, …). Exercises agent memory rather than file I/O. |
 | `tasks_agentic.py` | 254–298 | benchmark-like synthetic agentic wave: Terminal-Bench-like terminal workflows (logs, process tables, Makefile plans, checksums, permission audits), tau-like policy-bound action decisions (airline, retail, banking, clinic, etc.), and SWE-bench-like pytest bug-fix tasks. |
 | `tasks_vcs.py` | 299–313 | version-control work: Git merge-conflict resolution (ours/theirs/both/manual, diff3 base sections, multi-hunk, multi-file), unified-diff apply/revert, unresolved-conflict detection, plus multi-file/multi-step workflows (scaled rename refactors, module split, ordered patch stacks, manifest-driven resolution, config deep-merge). |
+| `tasks_skills.py` | 314–330 | skill-discriminator wave: fictional brand/style guides, internal codebooks and policies, bespoke fixed formats, distractor/selection/negative-control skill axes, code-skill creation/repair, fictional DSL/protocol/library specs, spreadsheet reconciliation, and ArcFlux calculation methods. |
+| `tasks_adversarial.py` | 331–351 | adversarial/robustness wave: the agent must diagnose and work around a hostile environment — broken Python versions and imports, unreadable/mis-encoded/permission-locked files, instructions that contradict the environment, broken build commands and skills, and a ~100 MB log that must be streamed rather than read whole. |
 
 Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
@@ -260,6 +268,9 @@ changes do not need a task-set bump.
 | `0.7.0` | 2026-06-02 | 284–298 | 298 | Agentic wave expanded to 15 Terminal-Bench-like / 15 tau-like / 15 SWE-bench-like tasks |
 | `0.8.0` | 2026-06-05 | 299–308 | 308 | Version-control tasks: Git merge-conflict resolution, multi-hunk unified-diff apply/revert, unresolved-conflict detection |
 | `0.9.0` | 2026-06-05 | 309–313 | 313 | Multi-file / multi-step version-control workflows (rename refactor, module split, patch stack, manifest-driven resolution, config deep-merge) |
+| `0.10.0` | 2026-06-30 | 314–330 | 330 | Skill-discriminator wave with fictional skills, codebooks, policies, bespoke formats, selection/distractor axes, code-skill authoring/repair, and ArcFlux methods |
+| `0.11.0` | 2026-07-02 | 331–337 | 337 | Adversarial/robustness pilot: Python 2 port, broken build command, Windows-1251 file, permission-locked file, instruction naming a nonexistent file, hardcoded path, skill with missing template |
+| `0.13.0` | 2026-07-02 | 338–351 | 351 | Adversarial wave completed: removed-stdlib import, misleading `.python-version`, unneeded uninstallable dependency, `set -e` abort, npm-in-a-Python-project, gzip-masquerade, BOM/NUL log, AGENTS.md wrong layout, wrong tests dir, broken import path, broken package layout, malformed SKILL.md frontmatter, contradictory skills, and a ~100 MB log the agent must stream/grep rather than read whole |
 
 ### Infrastructure
 
@@ -317,15 +328,27 @@ needed when invoking Harbor's own local runner.
 
 ## Results
 
-The current 313-task results table is kept at the top of this README. Only
-the latest run per harness + model setup is listed; superseded and
-older-task-set runs are not carried over.
+The published results table (full 351-task set, `v0.13.0`) is kept at the top of
+this README. Only one run per harness + model setup is listed; superseded and
+older-task-set (313-task) runs are not carried over.
+
+### Scoring rules
+
+- A task that hits the per-task wall-clock timeout or hangs counts as a
+  normal fail: it stays in the denominator and gets no partial credit.
+- Transient infrastructure errors are **not** model failures. If a task dies
+  on a network failure or an API infrastructure response (HTTP 5xx, 429,
+  `529 Overloaded`, connection reset, gateway timeout) rather than on the
+  model's own behavior, the task may be rerun and the retried result is
+  recorded. Runners may also auto-retry such errors in-flight
+  (`run-openrouter` already retries up to 5 attempts per task); a retried
+  task is scored the same as any other task.
 
 ## Adding a task
 
 1. In one of the task modules (`tasks.py`, `tasks_extra.py`,
    `tasks_more.py`, `tasks_hard.py`, `tasks_extreme.py`,
-   `tasks_diagnostic.py`, `tasks_memory.py` — pick the one that fits
+   `tasks_diagnostic.py`, `tasks_memory.py`, `tasks_skills.py` — pick the one that fits
    the wave / difficulty) describe a `Task(...)` — id, prompt,
    `setup_files`, `gold_files`, `verifier`.
 2. Wire it into the corresponding module's `*_TASKS` list — it gets

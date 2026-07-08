@@ -49,8 +49,28 @@ def test_vcs_tasks_belong_to_their_revisions() -> None:
     assert revision_for_task_id("task_308_detect_unresolved_conflicts").version == "0.8.0"
 
 
-def test_current_multifile_vcs_tasks_belong_to_current_revision() -> None:
-    assert TASK_SET_VERSION == "0.9.0"
+def test_current_multifile_vcs_tasks_belong_to_their_revision() -> None:
     # 0.9.0 adds multi-file / multi-step VCS workflows 309-313.
     assert revision_for_task_id("task_309_rename_refactor_scale").version == "0.9.0"
     assert revision_for_task_id("task_313_aggregate_config_fragments").version == "0.9.0"
+
+
+def test_skill_tasks_belong_to_their_revision() -> None:
+    # 0.10.0 adds skill-discriminator workflows 314-330.
+    assert revision_for_task_id("task_314_skill_r1_brand_landing").version == "0.10.0"
+    assert revision_for_task_id("task_330_skill_d1b_arcflux_multifile").version == "0.10.0"
+
+
+def test_adversarial_pilot_belongs_to_its_revision() -> None:
+    # 0.11.0 adds the adversarial / robustness pilot, tasks 331-337.
+    assert revision_for_task_id("task_331_adv_py2_to_py3").version == "0.11.0"
+    assert revision_for_task_id("task_337_adv_skill_missing_template").version == "0.11.0"
+
+
+def test_current_adversarial_completion_belongs_to_current_revision() -> None:
+    assert TASK_SET_VERSION == "0.13.0"
+    # 0.13.0 completes the adversarial wave, tasks 338-351 (incl. the ~100 MB
+    # context-discipline task 351).
+    assert revision_for_task_id("task_338_adv_removed_stdlib").version == "0.13.0"
+    assert revision_for_task_id("task_350_adv_contradictory_skills").version == "0.13.0"
+    assert revision_for_task_id("task_351_adv_huge_file_no_slurp").version == "0.13.0"

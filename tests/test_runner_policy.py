@@ -124,7 +124,7 @@ def test_openrouter_run_all_stops_on_runtime_error(monkeypatch) -> None:
     calls: list[str] = []
 
     def _fake_run_task(task: object, **_kwargs: object) -> TaskRun:
-        task_id = cast(SimpleNamespace, task).id
+        task_id = cast(str, task.id)
         calls.append(task_id)
         if task_id == "task_01_fake":
             return TaskRun(

@@ -18,7 +18,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "deepagents>=0.6.10",
+    "deepagents>=0.6.11",
     # Several benchmark tasks are verified by running `python -m pytest`.
     "pytest>=9.0.2",
     "python-dotenv>=1.2.2",
@@ -41,7 +41,7 @@ gigachat = [
 # matching local deepagents-gigachat wheel/source described in README.md.
 gigachat-profile = [
     "langchain-gigachat>=0.5.0",
-    "deepagents-gigachat>=0.0.2",
+    "deepagents-gigachat>=0.0.3",
 ]
 # `uv pip install harness-bench-fast[openrouter]` for `runner_openrouter.py`
 # against any OpenAI-compatible OpenRouter model.
@@ -85,7 +85,7 @@ dev = [
     "ruff>=0.15.12",
     "langchain-openai>=1.2.1",
     "langchain-gigachat>=0.5.0",
-    "deepagents-gigachat>=0.0.2",
+    "deepagents-gigachat>=0.0.3",
 ]
 
 [tool.ruff]
