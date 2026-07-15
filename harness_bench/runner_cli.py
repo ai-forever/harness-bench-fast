@@ -32,6 +32,7 @@ import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from tempfile import TemporaryDirectory, mkdtemp
+from urllib.parse import quote
 
 from harness_bench.core import Task
 from harness_bench.runner import (
@@ -177,6 +178,15 @@ def _is_gemini_prompt_command(argv: list[str]) -> bool:
     )
 
 
+def _is_grok_single_command(argv: list[str]) -> bool:
+    if not argv:
+        return False
+    executable = Path(argv[0]).name
+    return executable == "grok" and any(
+        arg in ("-p", "--single") or arg.startswith("--single=") for arg in argv
+    )
+
+
 def _argv_with_output_format(
     argv: list[str],
     output_format: str,
@@ -235,11 +245,23 @@ def _ensure_gemini_json_events(argv: list[str]) -> list[str]:
     )
 
 
+def _ensure_grok_json_events(argv: list[str]) -> list[str]:
+    """Ask Grok Build for JSONL events while keeping its prompt flag last."""
+    if not _is_grok_single_command(argv):
+        return argv
+    return _argv_with_output_format(
+        argv,
+        "streaming-json",
+        insert_before=("-p", "--single"),
+    )
+
+
 def _ensure_cli_json_events(argv: list[str]) -> list[str]:
     """Enable machine-readable CLI output for CLIs that expose it."""
     argv = _ensure_codex_json_events(argv)
     argv = _ensure_claude_json_events(argv)
-    return _ensure_gemini_json_events(argv)
+    argv = _ensure_gemini_json_events(argv)
+    return _ensure_grok_json_events(argv)
 
 
 def _iter_json_payloads(stdout: str) -> list[dict[str, object]]:
@@ -327,8 +349,140 @@ def _tool_name_is_shell(name: object) -> bool:
         "bash",
         "shell",
         "run_shell_command",
+        "run_terminal_command",
         "execute_shell_command",
     }
+
+
+def _grok_session_updates_path(workspace: Path, session_id: str) -> Path | None:
+    """Locate Grok's persisted ACP updates for a completed workspace session."""
+    grok_home = Path(os.getenv("GROK_HOME", Path.home() / ".grok")).expanduser()
+    candidates: list[Path] = []
+    for workspace_variant in (workspace.resolve(), workspace.absolute()):
+        encoded_cwd = quote(str(workspace_variant), safe="")
+        candidate = grok_home / "sessions" / encoded_cwd / session_id / "updates.jsonl"
+        if candidate not in candidates:
+            candidates.append(candidate)
+    return next((path for path in candidates if path.is_file()), None)
+
+
+def _grok_session_tool_stats(
+    *,
+    workspace: Path | None,
+    session_id: str,
+) -> tuple[int, int]:
+    """Return unique tool calls and shell calls from a persisted Grok session."""
+    if workspace is None:
+        return 0, 0
+    updates_path = _grok_session_updates_path(workspace, session_id)
+    if updates_path is None:
+        return 0, 0
+
+    try:
+        payloads = _iter_json_payloads(updates_path.read_text(encoding="utf-8"))
+    except OSError:
+        return 0, 0
+
+    tool_call_ids: set[str] = set()
+    shell_call_ids: set[str] = set()
+    anonymous_tool_calls = 0
+    anonymous_shell_calls = 0
+    for payload in payloads:
+        if payload.get("method") != "session/update":
+            continue
+        params = payload.get("params")
+        if not isinstance(params, dict):
+            continue
+        update = params.get("update")
+        if not isinstance(update, dict) or update.get("sessionUpdate") != "tool_call":
+            continue
+
+        tool_call_id = update.get("toolCallId")
+        meta = update.get("_meta")
+        tool_meta = meta.get("x.ai/tool") if isinstance(meta, dict) else None
+        tool_name: object = update.get("title")
+        tool_kind: object = None
+        if isinstance(tool_meta, dict):
+            tool_name = tool_meta.get("name") or tool_name
+            tool_kind = tool_meta.get("kind")
+        is_shell = tool_kind == "execute" or _tool_name_is_shell(tool_name)
+
+        if isinstance(tool_call_id, str) and tool_call_id:
+            tool_call_ids.add(tool_call_id)
+            if is_shell:
+                shell_call_ids.add(tool_call_id)
+        else:
+            anonymous_tool_calls += 1
+            if is_shell:
+                anonymous_shell_calls += 1
+
+    return (
+        len(tool_call_ids) + anonymous_tool_calls,
+        len(shell_call_ids) + anonymous_shell_calls,
+    )
+
+
+def _grok_json_event_stats(
+    stdout: str,
+    *,
+    workspace: Path | None = None,
+) -> dict[str, int] | None:
+    """Extract Grok Build metrics from streaming-json and its saved session."""
+    payloads = _iter_json_payloads(stdout)
+    end_payload: dict[str, object] | None = None
+    for payload in payloads:
+        if (
+            payload.get("type") == "end"
+            and isinstance(payload.get("sessionId"), str)
+            and any(key in payload for key in ("usage", "modelUsage", "num_turns"))
+        ):
+            end_payload = payload
+    if end_payload is None:
+        return None
+
+    grok_event_types = {
+        "thought",
+        "text",
+        "tool_call",
+        "tool_result",
+        "error",
+        "end",
+    }
+    events = sum(1 for payload in payloads if payload.get("type") in grok_event_types)
+    session_id = end_payload["sessionId"]
+    assert isinstance(session_id, str)
+    tool_calls, shell_commands = _grok_session_tool_stats(
+        workspace=workspace,
+        session_id=session_id,
+    )
+
+    stats = {
+        "agent_steps": tool_calls,
+        "agent_tool_calls": tool_calls,
+        "agent_shell_commands": shell_commands,
+        "agent_events": events,
+    }
+
+    usage = end_payload.get("usage")
+    usage_stats = _usage_stats_from_mapping(usage)
+    if isinstance(usage, dict):
+        cached_input_tokens = _int_or_none(usage.get("cache_read_input_tokens"))
+        if cached_input_tokens is not None:
+            usage_stats["agent_input_tokens"] = (
+                usage_stats.get("agent_input_tokens", 0) + cached_input_tokens
+            )
+    stats.update(usage_stats)
+
+    llm_calls = 0
+    model_usage = end_payload.get("modelUsage")
+    if isinstance(model_usage, dict):
+        for model_stats in model_usage.values():
+            if isinstance(model_stats, dict):
+                llm_calls += _int_or_none(model_stats.get("modelCalls")) or 0
+    if not llm_calls:
+        llm_calls = _int_or_none(end_payload.get("num_turns")) or 0
+    stats["agent_llm_calls"] = llm_calls
+    return _with_default_agent_metrics(stats)
 
 
 def _claude_tool_use_names(content: object) -> list[str]:
@@ -705,6 +859,11 @@ def _task_run_with_cli_stats(
         stats = _claude_json_event_stats(result.stdout or "")
     if stats is None and result is not None:
         stats = _gemini_json_event_stats(result.stdout or "")
+    if stats is None and result is not None:
+        stats = _grok_json_event_stats(
+            result.stdout or "",
+            workspace=stats_workspace or workspace,
+        )
     if stats is None:
         stats = _mini_swe_agent_traj_stats(stats_workspace or workspace)
     return TaskRun(

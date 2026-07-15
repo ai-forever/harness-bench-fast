@@ -1,5 +1,6 @@
 import subprocess
 from pathlib import Path
+from urllib.parse import quote
 
 from harness_bench.runner_cli import (
     _argv_for_workspace,
@@ -7,6 +8,7 @@ from harness_bench.runner_cli import (
     _codex_json_event_stats,
     _ensure_cli_json_events,
     _gemini_json_event_stats,
+    _grok_json_event_stats,
     _mini_swe_agent_traj_stats,
     _task_run_with_cli_stats,
 )
@@ -110,6 +112,32 @@ def test_cli_json_events_inserts_gemini_output_before_prompt_flag() -> None:
     ]
 
 
+def test_cli_json_events_inserts_grok_output_before_prompt_flag() -> None:
+    argv = _ensure_cli_json_events(["grok", "-m", "grok-4.5", "-p"])
+
+    assert argv == [
+        "grok",
+        "-m",
+        "grok-4.5",
+        "--output-format",
+        "streaming-json",
+        "-p",
+    ]
+
+
+def test_cli_json_events_rewrites_grok_json_output() -> None:
+    argv = _ensure_cli_json_events(
+        ["grok", "--output-format", "json", "--single"]
+    )
+
+    assert argv == [
+        "grok",
+        "--output-format",
+        "streaming-json",
+        "--single",
+    ]
+
+
 def test_claude_json_event_stats_count_tools_and_tokens() -> None:
     stdout = "\n".join(
         [
@@ -168,6 +196,101 @@ def test_gemini_json_event_stats_count_tools_and_tokens() -> None:
         "agent_output_tokens": 8,
         "agent_total_tokens": 38,
     }
+
+
+def test_grok_json_event_stats_count_session_tools_and_tokens(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    grok_home = tmp_path / "grok-home"
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    session_id = "019f65a5-6201-7562-8e7d-94b7d80a512d"
+    session_dir = (
+        grok_home
+        / "sessions"
+        / quote(str(workspace.resolve()), safe="")
+        / session_id
+    )
+    session_dir.mkdir(parents=True)
+    (session_dir / "updates.jsonl").write_text(
+        "\n".join(
+            [
+                (
+                    '{"method":"session/update","params":{"update":{'
+                    '"sessionUpdate":"tool_call","toolCallId":"shell-1",'
+                    '"title":"run_terminal_command","_meta":{"x.ai/tool":{'
+                    '"name":"run_terminal_command","kind":"execute"}}}}}'
+                ),
+                (
+                    '{"method":"session/update","params":{"update":{'
+                    '"sessionUpdate":"tool_call_update","toolCallId":"shell-1"}}}'
+                ),
+                (
+                    '{"method":"session/update","params":{"update":{'
+                    '"sessionUpdate":"tool_call","toolCallId":"write-1",'
+                    '"title":"write","_meta":{"x.ai/tool":{'
+                    '"name":"write","kind":"write"}}}}}'
+                ),
+            ]
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("GROK_HOME", str(grok_home))
+    stdout = "\n".join(
+        [
+            '{"type":"thought","data":"Working"}',
+            '{"type":"text","data":"DONE"}',
+            (
+                '{"type":"end","stopReason":"EndTurn",'
+                f'"sessionId":"{session_id}",'
+                '"usage":{"input_tokens":2713,"cache_read_input_tokens":23552,'
+                '"output_tokens":68,"reasoning_tokens":60,"total_tokens":26333},'
+                '"num_turns":2,"modelUsage":{"grok-4.5":{'
+                '"inputTokens":2713,"outputTokens":68,'
+                '"cacheReadInputTokens":23552,"modelCalls":2}}}'
+            ),
+        ]
+    )
+
+    assert _grok_json_event_stats(stdout, workspace=workspace) == {
+        "agent_steps": 2,
+        "agent_tool_calls": 2,
+        "agent_shell_commands": 1,
+        "agent_events": 3,
+        "agent_llm_calls": 2,
+        "agent_input_tokens": 26265,
+        "agent_output_tokens": 68,
+        "agent_total_tokens": 26333,
+    }
+
+
+def test_task_run_stats_dispatches_to_grok_parser() -> None:
+    stdout = "\n".join(
+        [
+            '{"type":"text","data":"OK"}',
+            (
+                '{"type":"end","sessionId":"session-1",'
+                '"usage":{"input_tokens":10,"cache_read_input_tokens":20,'
+                '"output_tokens":3,"total_tokens":33},'
+                '"num_turns":1}'
+            ),
+        ]
+    )
+
+    run = _task_run_with_cli_stats(
+        task_id="task_fake",
+        passed=True,
+        message="ok",
+        elapsed_seconds=0.1,
+        result=subprocess.CompletedProcess(["grok"], 0, stdout, ""),
+    )
+
+    assert run.agent_steps == 0
+    assert run.agent_llm_calls == 1
+    assert run.agent_input_tokens == 30
+    assert run.agent_output_tokens == 3
+    assert run.agent_total_tokens == 33
 
 
 def test_codex_and_claude_parsers_ignore_gemini_events() -> None:
