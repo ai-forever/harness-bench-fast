@@ -5,7 +5,9 @@
 Published benchmark results below use the full 351-task set (`task-set v0.13.0`).
 `Steps` and `Tokens` are shown when the runner exposes them; `—` means the metric
 is absent from the run artifact, not that nothing was spent. Each row is one run
-per harness + model setup. The `Profile` column shows the deepagents harness
+per harness + model setup, except where marked as a multi-run mean: the
+`deepagents + GigaChat profile / GigaChat 3.5` row averages 3 independent full
+runs (317, 311, 308 passed), with Steps/Tokens as the mean of per-run sums. The `Profile` column shows the deepagents harness
 profile applied: `GigaChat` = the `deepagents-gigachat` tuning profile,
 `Anthropic` = the Anthropic harness profile built into deepagents, `none` =
 stock deepagents defaults, `—` = not applicable (non-deepagents harnesses).
@@ -25,7 +27,7 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | deepagents | none | Qwen 3.7 Max | 326/351 | 92.9% | 4,154 | 48,563,241 |
 | deepagents | none | DeepSeek V3.2 | 326/351 | 92.9% | 6,413 | 98,708,199 |
 | deepagents | none | Qwen 3.6 Flash | 325/351 | 92.6% | 4,334 | 49,387,938 |
-| deepagents | GigaChat | GigaChat 3.5 | 317/351 | 90.3% | 2,912 | 4,648,044 |
+| deepagents | GigaChat | GigaChat 3.5 | 312/351 | 88.9% | 2,887 | 4,715,017 |
 | deepagents | none | DeepSeek V4 Flash | 310/351 | 88.3% | 4,082 | 46,732,794 |
 | deepagents | GigaChat | GigaChat 3 Ultra | 303/351 | 86.3% | 2,776 | 3,424,473 |
 | deepagents | none | GPT-4.1 | 300/351 | 85.5% | 3,382 | 34,199,277 |
