@@ -57,6 +57,8 @@ TASK_WAVES: tuple[TaskWave, ...] = (
     TaskWave("memory", 222, 253),
     TaskWave("agentic", 254, 298),
     TaskWave("VCS", 299, 313),
+    TaskWave("skills", 314, 330),
+    TaskWave("adversarial", 331, 351),
 )
 
 
