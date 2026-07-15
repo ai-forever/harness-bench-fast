@@ -254,6 +254,8 @@ def _resume_results(
     json_output: str | Path | None,
     targets: list[Task],
     attempts: int,
+    *,
+    rerun_on_fail: bool = False,
 ) -> list[TaskRun]:
     json_output_path = normalize_json_output_path(json_output)
     if json_output_path is None or not json_output_path.exists():
@@ -270,6 +272,8 @@ def _resume_results(
         if run.task_id not in target_ids:
             continue
         if run.attempt < 1 or run.attempt > attempts:
+            continue
+        if rerun_on_fail and not run.passed:
             continue
         by_key[(run.task_id, run.attempt)] = replace(
             run,
@@ -669,6 +673,7 @@ def run_all(
     concurrency: int = 1,
     attempts: int = 1,
     json_output: str | Path | None = None,
+    rerun_on_fail: bool = False,
 ) -> list[TaskRun]:
     """Run a subset (or all) of the benchmark tasks.
 
@@ -688,7 +693,12 @@ def run_all(
         raise ValueError("attempts must be positive")
 
     targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
-    results = _resume_results(json_output, targets, attempts)
+    results = _resume_results(
+        json_output,
+        targets,
+        attempts,
+        rerun_on_fail=rerun_on_fail,
+    )
     pending_attempts = _pending_task_attempts(targets, attempts, results)
     if not pending_attempts:
         _write_partial_results_json(results, json_output)

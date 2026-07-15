@@ -149,6 +149,7 @@ def run_all(
     concurrency: int = 1,
     attempts: int = 1,
     json_output: str | Path | None = None,
+    rerun_on_fail: bool = False,
 ) -> list[TaskRun]:
     _load_env_from_dotenv()
     _ensure_credentials()
@@ -158,7 +159,12 @@ def run_all(
         raise ValueError("attempts must be positive")
 
     targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
-    results = _resume_results(json_output, targets, attempts)
+    results = _resume_results(
+        json_output,
+        targets,
+        attempts,
+        rerun_on_fail=rerun_on_fail,
+    )
     pending_attempts = _pending_task_attempts(targets, attempts, results)
     if not pending_attempts:
         _write_partial_results_json(results, json_output)

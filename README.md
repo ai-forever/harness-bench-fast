@@ -157,6 +157,9 @@ uv run python -m harness_bench run-cli \
 # next continue when you rerun with the same JSON path. CLI per-task timeouts
 # are also marked `rerun_on_continue` and rerun from clean workspaces on the
 # next launch with the same `--json-output` file.
+# Add `--rerun-on-fail` when continuing to rerun every saved task attempt whose
+# `passed` field is false. Passing attempts stay checkpointed. With `-k N`, only
+# the failed attempt numbers are rerun, once per invocation.
 uv run python -m harness_bench run-cli \
     --cli-command 'codex exec -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox' \
     --concurrency 5
