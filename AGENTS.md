@@ -27,6 +27,15 @@ Rules:
   auto-retries of transient errors by runners are allowed and do not need
   to be disclosed per task.
 
+## Model Identification
+
+- When recording or reporting any benchmark run, always save not only the
+  exact model (id/version/build) but also the reasoning level used, when the
+  model or API supports one (e.g. `reasoning_effort`, `thinking` budget,
+  effort presets like low/medium/high). If no level was set explicitly,
+  record it as `default` — reasoning level materially changes both scores
+  and token spend, so a result without it is not reproducible.
+
 ## GigaChat Models
 
 - For any GigaChat model, always state the stand (gateway) explicitly: PROM (production, `gigachat.sberdevices.ru`) or IFT (`gigachat.ift.sberdevices.ru`). The two stands can serve different model weights, so a GigaChat score is only meaningful with the stand named.
