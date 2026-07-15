@@ -32,12 +32,16 @@ from harness_bench.runner import (
     _load_env_from_dotenv,
     _mark_attempt,
     _one_line_detail,
+    _pending_task_attempts,
+    _resume_results,
     _task_attempt_label,
     _task_attempt_label_for,
     _task_run_with_agent_stats,
     _task_sort_key,
+    _write_interrupted_results_json,
     _write_partial_results_json,
     invoke_agent_with_stats,
+    normalize_json_output_path,
 )
 from harness_bench.tasks import ALL_TASKS, get_task
 
@@ -462,16 +466,24 @@ def run_all(
 ) -> list[TaskRun]:
     _load_env_from_dotenv()
     _ensure_openrouter_key()
+    json_output = normalize_json_output_path(json_output)
 
     if attempts < 1:
         raise ValueError("attempts must be positive")
 
     targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
+    results = _resume_results(json_output, targets, attempts)
+    if fail_on_runtime_error and any(run.error for run in results):
+        _write_partial_results_json(results, json_output)
+        return results
+    pending_attempts = _pending_task_attempts(targets, attempts, results)
+    if not pending_attempts:
+        _write_partial_results_json(results, json_output)
+        return results
 
     if concurrency <= 1:
-        results: list[TaskRun] = []
-        for task in targets:
-            for attempt in range(1, attempts + 1):
+        try:
+            for task, attempt in pending_attempts:
                 label = _task_attempt_label_for(task.id, attempt, attempts)
                 print(f"[START] {label}: {task.name}")
                 run = run_task(
@@ -491,14 +503,23 @@ def run_all(
                 if keep_workspace and run.workspace:
                     print(f"  workspace: {run.workspace}")
                 if fail_on_runtime_error and run.error:
+                    results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
+                    _write_partial_results_json(results, json_output)
                     return results
+        except KeyboardInterrupt:
+            _write_interrupted_results_json(results, json_output, pending_attempts, attempts)
+            raise
+        results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
+        _write_partial_results_json(results, json_output)
         return results
 
     print_lock = threading.Lock()
-    completed = 0
+    completed = len(results)
     total = len(targets) * attempts
-    results = []
-    with ThreadPoolExecutor(max_workers=concurrency) as executor:
+    executor = ThreadPoolExecutor(max_workers=concurrency)
+    stop_without_wait = False
+    future_to_task = {}
+    try:
         future_to_task = {
             executor.submit(
                 run_task,
@@ -510,8 +531,7 @@ def run_all(
                 harness_profile=harness_profile,
                 transient_attempts=transient_attempts,
             ): (task, attempt)
-            for task in targets
-            for attempt in range(1, attempts + 1)
+            for task, attempt in pending_attempts
         }
         for future in as_completed(future_to_task):
             _task, attempt = future_to_task[future]
@@ -529,11 +549,21 @@ def run_all(
                 if keep_workspace and run.workspace:
                     print(f"           workspace: {run.workspace}")
             if fail_on_runtime_error and run.error:
+                stop_without_wait = True
                 for pending_future in future_to_task:
                     if pending_future is not future:
                         pending_future.cancel()
                 results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
+                _write_partial_results_json(results, json_output)
                 return results
+    except KeyboardInterrupt:
+        stop_without_wait = True
+        for future in future_to_task:
+            future.cancel()
+        _write_interrupted_results_json(results, json_output, pending_attempts, attempts)
+        raise
+    finally:
+        executor.shutdown(wait=not stop_without_wait, cancel_futures=stop_without_wait)
     results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
     _write_partial_results_json(results, json_output)
     return results

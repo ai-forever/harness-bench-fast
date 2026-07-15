@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+prompt="${1:?benchmark prompt missing}"
+mini_python=()
+
+if [[ -n "${MSWEA_PYTHON:-}" ]]; then
+  # Supports either an executable path or a short command with args.
+  read -r -a mini_python <<<"$MSWEA_PYTHON"
+else
+  mini_bin="${MSWEA_MINI_BIN:-}"
+  if [[ -z "$mini_bin" ]]; then
+    mini_bin="$(command -v mini || true)"
+  fi
+  if [[ -n "$mini_bin" ]]; then
+    shebang="$(head -n 1 "$mini_bin")"
+    shebang="${shebang#\#!}"
+    if [[ "$shebang" == /usr/bin/env\ -S\ * ]]; then
+      read -r -a mini_python <<<"${shebang#/usr/bin/env -S }"
+    elif [[ "$shebang" == /usr/bin/env\ * ]]; then
+      read -r -a mini_python <<<"${shebang#/usr/bin/env }"
+    else
+      mini_python=("$shebang")
+    fi
+  elif command -v uv >/dev/null 2>&1; then
+    mini_python=(uvx --from mini-swe-agent python)
+  else
+    echo "mini executable not found; install it with: uv tool install mini-swe-agent" >&2
+    exit 127
+  fi
+fi
+
+exec "${mini_python[@]}" - "$prompt" <<'PY'
+from __future__ import annotations
+
+import json
+import os
+import sys
+from pathlib import Path
+
+from minisweagent.agents import get_agent
+from minisweagent.config import builtin_config_dir, get_config_from_spec
+from minisweagent.environments import get_environment
+from minisweagent.models import get_model
+from minisweagent.utils.serialize import recursive_merge
+
+
+def _as_bool(value: str | None, *, default: bool = False) -> bool:
+    if value is None:
+        return default
+    return value.lower() not in {"", "0", "false", "no", "off"}
+
+
+def _as_int(value: str | None, *, default: int = 0) -> int:
+    if value is None or value == "":
+        return default
+    return int(value)
+
+
+def _as_float(value: str | None, *, default: float = 0.0) -> float:
+    if value is None or value == "":
+        return default
+    return float(value)
+
+
+def _openai_base_url() -> str:
+    return (
+        os.getenv("OPENAI_API_BASE")
+        or os.getenv("OPENAI_BASE_URL")
+        or "http://127.0.0.1:8090/v1"
+    )
+
+
+def _model_kwargs() -> dict:
+    kwargs = {
+        "custom_llm_provider": os.getenv("MSWEA_CUSTOM_LLM_PROVIDER", "openai"),
+        "api_base": _openai_base_url(),
+        "api_key": os.getenv("OPENAI_API_KEY", "0"),
+        "drop_params": _as_bool(os.getenv("MSWEA_DROP_PARAMS"), default=True),
+    }
+    extra = os.getenv("MSWEA_MODEL_KWARGS_JSON")
+    if extra:
+        kwargs.update(json.loads(extra))
+    return kwargs
+
+
+def _model_config() -> dict:
+    config = {
+        "model_class": os.getenv("MSWEA_MODEL_CLASS", "litellm"),
+        "model_name": os.getenv("MSWEA_MODEL_NAME", "openai/GigaChat-3-Ultra"),
+        "model_kwargs": _model_kwargs(),
+        "cost_tracking": os.getenv("MSWEA_COST_TRACKING", "ignore_errors"),
+    }
+    extra = os.getenv("MSWEA_MODEL_CONFIG_JSON")
+    if extra:
+        config.update(json.loads(extra))
+    return config
+
+
+def main() -> int:
+    if len(sys.argv) != 2:
+        print("usage: hb-mini-swe-agent '<benchmark prompt>'", file=sys.stderr)
+        return 2
+
+    task = sys.argv[1]
+    config = recursive_merge(
+        get_config_from_spec(str(builtin_config_dir / "mini.yaml")),
+        {
+            "agent": {
+                "agent_class": "default",
+                "cost_limit": _as_float(os.getenv("MSWEA_COST_LIMIT"), default=0.0),
+                "step_limit": _as_int(os.getenv("MSWEA_STEP_LIMIT"), default=0),
+                "wall_time_limit_seconds": _as_int(
+                    os.getenv("MSWEA_WALL_TIME_LIMIT_SECONDS"),
+                    default=0,
+                ),
+                "output_path": Path(os.getenv("MSWEA_OUTPUT_PATH", "mini-swe-agent.traj.json")),
+            },
+            "environment": {
+                "environment_class": os.getenv("MSWEA_ENVIRONMENT_CLASS", "local"),
+                "timeout": _as_int(os.getenv("MSWEA_COMMAND_TIMEOUT"), default=30),
+            },
+            "model": _model_config(),
+        },
+    )
+
+    # These keys belong to InteractiveAgent. DefaultAgent is the right class for
+    # benchmark subprocesses because runner_cli.py runs with stdin=/dev/null.
+    for key in ("mode", "confirm_exit", "whitelist_actions"):
+        config["agent"].pop(key, None)
+
+    model = get_model(config=config["model"])
+    env = get_environment(config["environment"], default_type="local")
+    agent = get_agent(model, env, config["agent"], default_type="default")
+    info = agent.run(task)
+    print(f"mini-swe-agent exit_status={info.get('exit_status', '')}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+PY

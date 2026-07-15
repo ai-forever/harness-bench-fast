@@ -11,7 +11,7 @@ from langgraph.errors import GraphRecursionError
 
 from harness_bench import __main__ as bench_main
 from harness_bench.core import Task, VerifyResult
-from harness_bench.runner import TaskRun, run_task
+from harness_bench.runner import TaskRun, run_task, write_results_json
 from harness_bench.tasks import get_task
 from harness_bench.verifiers import file_text_equals
 
@@ -67,6 +67,16 @@ def test_allow_task_failures_returns_zero_when_harness_completed(monkeypatch) ->
     monkeypatch.setattr(bench_main, "summarize", lambda _results: None)
 
     assert bench_main.main(["run", "--task", "task_fake", "--allow-task-failures"]) == 0
+
+
+def test_main_keyboard_interrupt_returns_130(monkeypatch, capsys) -> None:
+    def _interrupting_run_all_cli(**_kwargs: object) -> list[TaskRun]:
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(bench_main, "run_all_cli", _interrupting_run_all_cli)
+
+    assert bench_main.main(["run-cli", "--task", "task_fake"]) == 130
+    assert "Interrupted by user; shutdown complete." in capsys.readouterr().err
 
 
 def test_openrouter_fail_on_runtime_error_returns_nonzero_with_allowed_task_failures(
@@ -186,6 +196,40 @@ def test_cli_timeout_kills_windows_process_tree(monkeypatch, tmp_path: Path) -> 
     assert taskkill_calls == [["taskkill", "/F", "/T", "/PID", "4242"]]
 
 
+def test_cli_keyboard_interrupt_terminates_process(monkeypatch, tmp_path: Path) -> None:
+    from harness_bench import runner_cli
+
+    terminated_pids: list[int] = []
+
+    class _InterruptingProcess:
+        pid = 4242
+        returncode = None
+
+        def communicate(self, timeout: int | None = None) -> tuple[str, str]:
+            raise KeyboardInterrupt
+
+    monkeypatch.setattr(
+        runner_cli.subprocess,
+        "Popen",
+        lambda *_args, **_kwargs: _InterruptingProcess(),
+    )
+    monkeypatch.setattr(
+        runner_cli,
+        "_terminate_process_tree",
+        lambda proc: terminated_pids.append(proc.pid),
+    )
+
+    with pytest.raises(KeyboardInterrupt):
+        runner_cli._run_cli_subprocess(
+            ["fake-cli"],
+            cwd=tmp_path,
+            timeout=600,
+            env=None,
+        )
+
+    assert terminated_pids == [4242]
+
+
 def test_cli_subprocess_reader_replaces_invalid_utf8(monkeypatch, tmp_path: Path) -> None:
     from harness_bench import runner_cli
 
@@ -269,6 +313,7 @@ def test_codex_json_event_stats_count_agent_steps() -> None:
         "agent_tool_calls": 1,
         "agent_shell_commands": 1,
         "agent_events": 6,
+        "agent_llm_calls": 0,
         "agent_input_tokens": 10,
         "agent_output_tokens": 5,
         "agent_total_tokens": 15,
@@ -337,9 +382,19 @@ def test_results_json_includes_agent_step_metrics() -> None:
                 agent_input_tokens=10,
                 agent_output_tokens=5,
                 agent_total_tokens=15,
-            )
+            ),
+            TaskRun(
+                "task_other",
+                False,
+                "bad",
+                0.02,
+                agent_steps=3,
+            ),
         ]
     )
+
+    assert payload["steps"] == 5
+    assert payload["tokens"] == 15
 
     task = payload["tasks"][0]
     assert task["agent_steps"] == 2
@@ -489,6 +544,256 @@ def test_run_all_writes_incremental_json(monkeypatch, tmp_path: Path) -> None:
     payload = json.loads(out.read_text(encoding="utf-8"))
     assert payload["total"] == 2
     assert [task["task_id"] for task in payload["tasks"]] == ["task_01_fake", "task_02_fake"]
+
+
+def test_json_output_bare_filename_defaults_to_jobs(tmp_path: Path) -> None:
+    from harness_bench.runner import normalize_json_output_path
+
+    assert normalize_json_output_path("results.json") == Path("jobs/results.json")
+    assert normalize_json_output_path("reports/results.json") == Path("reports/results.json")
+    generated_in_named_dir = normalize_json_output_path("reports/")
+    assert generated_in_named_dir is not None
+    assert generated_in_named_dir.parent == Path("reports")
+    assert generated_in_named_dir.suffix == ".json"
+    generated_in_dir = normalize_json_output_path(tmp_path)
+    assert generated_in_dir is not None
+    assert generated_in_dir.parent == tmp_path
+    assert generated_in_dir.suffix == ".json"
+
+    parser = bench_main.build_parser()
+    args = parser.parse_args(["run-cli"])
+    assert args.json_output.parent == Path("jobs")
+    assert args.json_output.suffix == ".json"
+    args = parser.parse_args(["run-cli", "--json-output", "results.json"])
+    assert args.json_output == Path("jobs/results.json")
+    args = parser.parse_args(["run-cli", "--json-output"])
+    assert args.json_output.parent == Path("jobs")
+    assert args.json_output.suffix == ".json"
+
+
+def test_main_records_command_in_results_json(monkeypatch, tmp_path: Path) -> None:
+    import json
+
+    from harness_bench.runner import write_results_json
+
+    out = tmp_path / "results.json"
+
+    def _fake_run_all(**kwargs: object) -> list[TaskRun]:
+        results = [TaskRun("task_fake", True, "ok", 0.01)]
+        write_results_json(results, cast(Path, kwargs["json_output"]))
+        return results
+
+    monkeypatch.setattr(
+        bench_main,
+        "run_all",
+        _fake_run_all,
+    )
+    monkeypatch.setattr(bench_main, "summarize", lambda _results: None)
+
+    argv = ["run", "--json-output", str(out)]
+    assert bench_main.main(argv) == 0
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert list(payload)[:2] == ["task_set_version", "command"]
+    assert payload["command"] == bench_main._command_for_argv(argv)
+
+
+def test_summarize_json_reports_existing_repeated_attempt_run(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    out = tmp_path / "results.json"
+    results = [
+        TaskRun("task_01_fake", attempt == 1, "detail", 0.01, attempt=attempt, attempts=5)
+        for attempt in range(1, 6)
+    ]
+    results.extend(
+        TaskRun("task_31_fake", attempt < 5, "detail", 0.01, attempt=attempt, attempts=5)
+        for attempt in range(1, 6)
+    )
+    write_results_json(results, out)
+
+    assert bench_main.main(["summarize-json", str(out)]) == 0
+
+    output = capsys.readouterr().out
+    assert "Passed attempts: 5/10" in output
+    assert "K  pass@K  pass^K" in output
+    assert "1   50.0%   50.0%" in output
+    assert "5  100.0%    0.0%" in output
+    assert "core (1-30)        1       1  100.0%" in output
+    assert "extra (31-60)      1       1  100.0%" in output
+    assert "Failures:" not in output
+
+
+def test_run_all_continues_from_existing_json(monkeypatch, tmp_path: Path, capsys) -> None:
+    import json
+
+    from harness_bench import runner
+
+    out = tmp_path / "results.json"
+    runner.write_results_json(
+        [TaskRun("task_01_fake", True, "already done", 0.01)],
+        out,
+    )
+    fake_tasks = [
+        SimpleNamespace(id="task_01_fake", name="Fake one"),
+        SimpleNamespace(id="task_02_fake", name="Fake two"),
+    ]
+    calls: list[str] = []
+
+    def _fake_run_task(task: object, **_kwargs: object) -> TaskRun:
+        task_id = cast(SimpleNamespace, task).id
+        calls.append(task_id)
+        return TaskRun(
+            task_id=task_id,
+            passed=True,
+            message="newly done",
+            elapsed_seconds=0.01,
+        )
+
+    monkeypatch.setattr(runner, "_load_env_from_dotenv", lambda: None)
+    monkeypatch.setattr(runner, "_ensure_credentials", lambda: None)
+    monkeypatch.setattr(runner, "get_task", lambda tid: next(t for t in fake_tasks if t.id == tid))
+    monkeypatch.setattr(runner, "run_task", _fake_run_task)
+
+    results = runner.run_all(
+        task_ids=["task_01_fake", "task_02_fake"],
+        concurrency=1,
+        json_output=out,
+    )
+
+    assert calls == ["task_02_fake"]
+    assert [result.task_id for result in results] == ["task_01_fake", "task_02_fake"]
+    assert "[CONTINUE] loaded 1/2 completed task attempt(s)" in capsys.readouterr().out
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["total"] == 2
+    assert [task["message"] for task in payload["tasks"]] == ["already done", "newly done"]
+
+
+def test_cli_timeout_results_are_tagged_for_continue(tmp_path: Path) -> None:
+    import json
+
+    out = tmp_path / "results.json"
+
+    write_results_json(
+        [TaskRun("task_01_fake", False, "", 1.0, error="CLI timed out after 1s")],
+        out,
+    )
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    task = payload["tasks"][0]
+    assert task["failure_kind"] == "timeout"
+    assert task["rerun_on_continue"] is True
+
+
+def test_run_all_cli_continues_from_existing_json_reruns_cli_timeout(
+    monkeypatch,
+    tmp_path: Path,
+    capsys,
+) -> None:
+    import json
+
+    from harness_bench import runner, runner_cli
+
+    out = tmp_path / "results.json"
+    runner.write_results_json(
+        [
+            TaskRun(
+                "task_01_fake",
+                False,
+                "",
+                1.0,
+                error="CLI timed out after 1s",
+            ),
+            TaskRun("task_02_fake", True, "already done", 0.01),
+        ],
+        out,
+    )
+    fake_tasks = [
+        SimpleNamespace(id="task_01_fake", name="Fake one"),
+        SimpleNamespace(id="task_02_fake", name="Fake two"),
+    ]
+    calls: list[str] = []
+
+    def _fake_run_task_cli(task: object, **_kwargs: object) -> TaskRun:
+        task_id = cast(SimpleNamespace, task).id
+        calls.append(task_id)
+        return TaskRun(
+            task_id=task_id,
+            passed=True,
+            message="rerun ok",
+            elapsed_seconds=0.01,
+        )
+
+    monkeypatch.setattr(runner_cli, "_load_env_from_dotenv", lambda: None)
+    monkeypatch.setattr(
+        runner_cli,
+        "get_task",
+        lambda tid: next(t for t in fake_tasks if t.id == tid),
+    )
+    monkeypatch.setattr(runner_cli, "run_task_cli", _fake_run_task_cli)
+
+    results = runner_cli.run_all_cli(
+        task_ids=["task_01_fake", "task_02_fake"],
+        concurrency=1,
+        json_output=out,
+    )
+
+    assert calls == ["task_01_fake"]
+    assert [result.task_id for result in results] == ["task_01_fake", "task_02_fake"]
+    assert "[CONTINUE] loaded 1/2 completed task attempt(s)" in capsys.readouterr().out
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert [task["message"] for task in payload["tasks"]] == ["rerun ok", "already done"]
+    assert "rerun_on_continue" not in payload["tasks"][0]
+
+
+def test_run_all_records_keyboard_interrupt_in_json(monkeypatch, tmp_path: Path) -> None:
+    import json
+
+    from harness_bench import runner
+
+    out = tmp_path / "results.json"
+    fake_tasks = [
+        SimpleNamespace(id="task_01_fake", name="Fake one"),
+        SimpleNamespace(id="task_02_fake", name="Fake two"),
+    ]
+
+    def _fake_run_task(task: object, **_kwargs: object) -> TaskRun:
+        task_id = cast(SimpleNamespace, task).id
+        if task_id == "task_02_fake":
+            raise KeyboardInterrupt
+        return TaskRun(
+            task_id=task_id,
+            passed=True,
+            message="done before interrupt",
+            elapsed_seconds=0.01,
+        )
+
+    monkeypatch.setattr(runner, "_load_env_from_dotenv", lambda: None)
+    monkeypatch.setattr(runner, "_ensure_credentials", lambda: None)
+    monkeypatch.setattr(runner, "get_task", lambda tid: next(t for t in fake_tasks if t.id == tid))
+    monkeypatch.setattr(runner, "run_task", _fake_run_task)
+
+    with pytest.raises(KeyboardInterrupt):
+        runner.run_all(
+            task_ids=["task_01_fake", "task_02_fake"],
+            concurrency=1,
+            json_output=out,
+        )
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["run_status"] == "interrupted"
+    assert payload["interrupted"] is True
+    assert [task["task_id"] for task in payload["tasks"]] == ["task_01_fake"]
+    assert payload["interrupted_attempts"] == [
+        {
+            "task_id": "task_02_fake",
+            "attempt": 1,
+            "attempts": 1,
+            "reason": "KeyboardInterrupt",
+            "rerun_on_continue": True,
+        }
+    ]
 
 
 def test_task_203_accepts_valid_markdown_alignment(tmp_path: Path) -> None:

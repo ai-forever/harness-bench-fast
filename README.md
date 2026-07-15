@@ -137,16 +137,46 @@ uv run python -m harness_bench run-cli \
 # Runner JSON writes best-effort per-task effort metrics:
 # agent_steps / agent_tool_calls / agent_shell_commands / agent_events,
 # plus agent_llm_calls / agent_input_tokens / agent_output_tokens /
-# agent_total_tokens when the backend exposes usage metadata. Codex CLI runs
-# auto-enable `codex exec --json` so those metrics can be read from JSONL.
-# `--json-output` is checkpointed after each completed task, so completed
-# results survive a later hang or interrupted run.
+# agent_total_tokens when the backend exposes usage metadata. Codex, Claude
+# Code, and Gemini CLI runs auto-enable JSON/stream-json output so those metrics
+# can be read from machine-readable events. The top-level JSON summary also
+# includes `steps` and `tokens` totals for README-style result tables.
+# JSON checkpointing is enabled by default for run commands. A fresh run writes
+# to `jobs/<timestamp>.json`; pass `--json-output results.json` to use
+# `jobs/results.json`, or pass an explicit path. If the JSON file already
+# exists, completed task attempts are loaded from it and skipped so the run
+# continues from the checkpoint. JSON reports also include the command that
+# launched the run. Ctrl-C writes `run_status: "interrupted"` plus
+# `interrupted_attempts`; those attempts are rerun from clean workspaces on the
+# next continue when you rerun with the same JSON path. CLI per-task timeouts
+# are also marked `rerun_on_continue` and rerun from clean workspaces on the
+# next launch with the same `--json-output` file.
 uv run python -m harness_bench run-cli \
     --cli-command 'codex exec -m gpt-5.5 --dangerously-bypass-approvals-and-sandbox' \
-    --concurrency 5 --json-output results.json
+    --concurrency 5
+
+# Drive mini-SWE-agent through any OpenAI-compatible gateway, including local
+# gpt2giga. Install `mini-swe-agent` once for faster startup; the wrapper can
+# also fall back to `uvx` when `mini` is not installed. Keep the wrapper path
+# absolute because `run-cli` launches the agent from each per-task temp
+# workspace. The wrapper runs mini-SWE-agent's non-interactive DefaultAgent
+# directly and writes `mini-swe-agent.traj.json`; `run-cli` parses that
+# trajectory for agent_steps / agent_llm_calls / token metrics.
+uv tool install mini-swe-agent
+HB_MINI_SWE_AGENT="$(pwd -P)/scripts/hb-mini-swe-agent"
+OPENAI_API_KEY=0 \
+OPENAI_API_BASE=http://127.0.0.1:8090/v1 \
+MSWEA_MODEL_NAME='openai/GigaChat-3-Ultra' \
+MSWEA_COST_TRACKING=ignore_errors \
+uv run python -m harness_bench run-cli \
+    --cli-command "$HB_MINI_SWE_AGENT" \
+    --timeout 900 --concurrency 5 \
+    --json-output mini_swe_agent_gigachat_3_ultra.json
+# Smoke-test one task first by adding:
+#     --task task_01_create_hello --keep
 
 # Repeat every selected task 5 times and print pass@K / pass^K
-# task-count metrics for K=1..5. Works for run, run-openrouter,
+# percentage metrics for K=1..5. Works for run, run-openrouter,
 # run-pure, and run-cli.
 uv run python -m harness_bench run-cli \
     --cli-command 'free-code -p --model haiku --dangerously-skip-permissions' \
@@ -158,6 +188,11 @@ uv run python -m harness_bench run-cli \
     --cli-command 'free-code -p --model haiku --dangerously-skip-permissions' \
     --attempts 5 --pass@ 1 --pass@ 5 --pass^ 5 \
     --json-output results.json
+
+# Summarize an existing completed JSON run without rerunning tasks. For a
+# 313-task run with --attempts 5, this prints Passed attempts, pass@K/pass^K
+# for K=1..5, and the per-wave breakdown.
+uv run python -m harness_bench summarize-json jobs/results.json
 
 # Drive `opencode` against any OpenAI-compatible deployment (example:
 # Qwen3.6-27B-FP8 served by vLLM). Point OPENCODE_CONFIG at a config
