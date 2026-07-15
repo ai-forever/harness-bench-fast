@@ -20,6 +20,7 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | Harness | Profile | Model | Result | % | Steps | Tokens |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
 | Claude Code CLI | — | Claude Opus 4.8 | 351/351 | 100.0% | — | — |
+| deepagents | none | grok-4.5 | 346/351 | 98.6% | 3,164 | 30,776,418 |
 | Claude Code CLI | — | Claude Sonnet 4.6 | 341/351 | 97.2% | — | — |
 | Claude Code CLI | — | Claude Haiku 4.5 | 340/351 | 96.9% | — | — |
 | deepagents | none | GLM-5.2 | 340/351 | 96.9% | 3,966 | 41,664,423 |
