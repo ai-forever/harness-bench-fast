@@ -9,8 +9,10 @@ per harness + model setup, except where marked as a multi-run mean: the
 `deepagents + GigaChat profile / GigaChat 3.5` row averages 3 independent full
 runs (317, 311, 308 passed), with Steps/Tokens as the mean of per-run sums. The `Profile` column shows the deepagents harness
 profile applied: `GigaChat` = the `deepagents-gigachat` tuning profile,
-`Anthropic` = the Anthropic harness profile built into deepagents, `none` =
-stock deepagents defaults, `—` = not applicable (non-deepagents harnesses).
+`Anthropic` = the Anthropic harness profile built into deepagents, `OpenAI` =
+the OpenAI harness profile built into deepagents (`openai:gpt-5.3-codex`, the
+newest available, bridged onto the model), `none` = stock deepagents defaults,
+`—` = not applicable (non-deepagents harnesses).
 GigaChat rows are the IFT stand, build `32.9.23.6`.
 
 Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
@@ -23,6 +25,7 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | deepagents | none | GLM-5.2 | 340/351 | 96.9% | 3,966 | 41,664,423 |
 | deepagents | none | DeepSeek V4 Pro | 339/351 | 96.6% | 4,014 | 44,552,076 |
 | deepagents | none | GLM-5.1 | 335/351 | 95.4% | 3,802 | 39,320,469 |
+| deepagents | OpenAI | GPT-5.6 Luna | 330/351 | 94.0% | 4,392 | 40,181,133 |
 | deepagents | Anthropic | Claude Haiku 4.5 | 328/351 | 93.4% | 3,682 | 50,549,085 |
 | deepagents | none | Qwen 3.7 Max | 326/351 | 92.9% | 4,154 | 48,563,241 |
 | deepagents | none | DeepSeek V3.2 | 326/351 | 92.9% | 6,413 | 98,708,199 |
