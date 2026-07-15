@@ -69,6 +69,25 @@ def test_allow_task_failures_returns_zero_when_harness_completed(monkeypatch) ->
     assert bench_main.main(["run", "--task", "task_fake", "--allow-task-failures"]) == 0
 
 
+def test_rerun_on_fail_cli_option_is_forwarded(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    def _fake_run_all_cli(**kwargs: object) -> list[TaskRun]:
+        captured.update(kwargs)
+        return [TaskRun("task_fake", True, "ok", 0.01)]
+
+    monkeypatch.setattr(bench_main, "run_all_cli", _fake_run_all_cli)
+    monkeypatch.setattr(bench_main, "summarize", lambda _results: None)
+
+    assert (
+        bench_main.main(
+            ["run-cli", "--task", "task_fake", "--rerun-on-fail"]
+        )
+        == 0
+    )
+    assert captured["rerun_on_fail"] is True
+
+
 def test_main_keyboard_interrupt_returns_130(monkeypatch, capsys) -> None:
     def _interrupting_run_all_cli(**_kwargs: object) -> list[TaskRun]:
         raise KeyboardInterrupt
@@ -745,6 +764,75 @@ def test_run_all_cli_continues_from_existing_json_reruns_cli_timeout(
     payload = json.loads(out.read_text(encoding="utf-8"))
     assert [task["message"] for task in payload["tasks"]] == ["rerun ok", "already done"]
     assert "rerun_on_continue" not in payload["tasks"][0]
+
+
+def test_run_all_cli_rerun_on_fail_replaces_only_failed_attempts(
+    monkeypatch,
+    tmp_path: Path,
+    capsys,
+) -> None:
+    import json
+
+    from harness_bench import runner, runner_cli
+
+    out = tmp_path / "results.json"
+    runner.write_results_json(
+        [
+            TaskRun(
+                "task_01_fake",
+                False,
+                "failed first attempt",
+                0.01,
+                attempt=1,
+                attempts=2,
+            ),
+            TaskRun(
+                "task_01_fake",
+                True,
+                "passed second attempt",
+                0.01,
+                attempt=2,
+                attempts=2,
+            ),
+        ],
+        out,
+    )
+    fake_task = SimpleNamespace(id="task_01_fake", name="Fake one")
+    calls: list[str] = []
+
+    def _fake_run_task_cli(task: object, **_kwargs: object) -> TaskRun:
+        task_id = cast(SimpleNamespace, task).id
+        calls.append(task_id)
+        return TaskRun(
+            task_id=task_id,
+            passed=True,
+            message="rerun passed",
+            elapsed_seconds=0.01,
+        )
+
+    monkeypatch.setattr(runner_cli, "_load_env_from_dotenv", lambda: None)
+    monkeypatch.setattr(runner_cli, "get_task", lambda _tid: fake_task)
+    monkeypatch.setattr(runner_cli, "run_task_cli", _fake_run_task_cli)
+
+    results = runner_cli.run_all_cli(
+        task_ids=["task_01_fake"],
+        concurrency=1,
+        attempts=2,
+        json_output=out,
+        rerun_on_fail=True,
+    )
+
+    assert calls == ["task_01_fake"]
+    assert [(result.attempt, result.passed) for result in results] == [
+        (1, True),
+        (2, True),
+    ]
+    assert "[CONTINUE] loaded 1/2 completed task attempt(s)" in capsys.readouterr().out
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert [task["message"] for task in payload["tasks"]] == [
+        "rerun passed",
+        "passed second attempt",
+    ]
 
 
 def test_run_all_records_keyboard_interrupt_in_json(monkeypatch, tmp_path: Path) -> None:

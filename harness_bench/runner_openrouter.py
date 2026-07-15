@@ -463,6 +463,7 @@ def run_all(
     json_output: str | Path | None = None,
     transient_attempts: int = DEFAULT_TRANSIENT_ATTEMPTS,
     fail_on_runtime_error: bool = False,
+    rerun_on_fail: bool = False,
 ) -> list[TaskRun]:
     _load_env_from_dotenv()
     _ensure_openrouter_key()
@@ -472,7 +473,12 @@ def run_all(
         raise ValueError("attempts must be positive")
 
     targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
-    results = _resume_results(json_output, targets, attempts)
+    results = _resume_results(
+        json_output,
+        targets,
+        attempts,
+        rerun_on_fail=rerun_on_fail,
+    )
     if fail_on_runtime_error and any(run.error for run in results):
         _write_partial_results_json(results, json_output)
         return results

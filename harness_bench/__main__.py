@@ -156,6 +156,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
         attempts=args.attempts,
         json_output=args.json_output,
+        rerun_on_fail=args.rerun_on_fail,
     )
     _summarize_run(results, metric_ks)
     _maybe_report_json(args, results)
@@ -177,6 +178,7 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         json_output=args.json_output,
         transient_attempts=args.transient_attempts,
         fail_on_runtime_error=args.fail_on_runtime_error,
+        rerun_on_fail=args.rerun_on_fail,
     )
     _summarize_run(results, metric_ks)
     _maybe_report_json(args, results)
@@ -197,6 +199,7 @@ def _cmd_run_pure(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
         attempts=args.attempts,
         json_output=args.json_output,
+        rerun_on_fail=args.rerun_on_fail,
     )
     _summarize_run(results, metric_ks)
     _maybe_report_json(args, results)
@@ -214,6 +217,7 @@ def _cmd_run_cli(args: argparse.Namespace) -> int:
         concurrency=args.concurrency,
         attempts=args.attempts,
         json_output=args.json_output,
+        rerun_on_fail=args.rerun_on_fail,
     )
     _summarize_run(results, metric_ks)
     _maybe_report_json(args, results)
@@ -333,6 +337,15 @@ def _add_json_output(p: argparse.ArgumentParser) -> None:
             "directory path, the filename is generated from the current "
             "timestamp. If the file exists, completed task attempts are loaded "
             "from it and skipped."
+        ),
+    )
+    p.add_argument(
+        "--rerun-on-fail",
+        action="store_true",
+        help=(
+            "When continuing from an existing JSON report, rerun saved task "
+            "attempts whose passed field is false. Successful attempts remain "
+            "checkpointed; each failed attempt is rerun once per invocation."
         ),
     )
 
