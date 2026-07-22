@@ -1,0 +1,596 @@
+{
+ "model": "GigaChat-3.5-430B-A28B (IFT)",
+ "total_tasks": 313,
+ "failed_tasks": 65,
+ "failed_with_zero_mutating_tool_calls": 11,
+ "failed_hit_loop_cap": 6,
+ "note": "failed_with_zero_mutating_tool_calls counts failures where the model never called write_file/edit_file/execute — i.e. it narrated instead of acting. hit_loop_cap = no terminal assistant answer (recursion limit).",
+ "rows": [
+  {
+   "task_id": "task_140_grep_emails",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 0,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "emails.txt [] differs from expected ['alice@example.com', 'bob@team.org', 'carol@team.org'"
+  },
+  {
+   "task_id": "task_153_xlsx_to_markdown_report",
+   "real_tool_calls": 1,
+   "mutating_tool_calls": 0,
+   "ai_turns": 2,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "report.md missing pieces: ['225', '175']"
+  },
+  {
+   "task_id": "task_158_xlsx_split_sheets",
+   "real_tool_calls": 4,
+   "mutating_tool_calls": 0,
+   "ai_turns": 5,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "Q1.csv missing"
+  },
+  {
+   "task_id": "task_227_memory_profile_json",
+   "real_tool_calls": 0,
+   "mutating_tool_calls": 0,
+   "ai_turns": 1,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "profile.json missing"
+  },
+  {
+   "task_id": "task_228_memory_style_refactor",
+   "real_tool_calls": 0,
+   "mutating_tool_calls": 0,
+   "ai_turns": 1,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "src/utils.py still contains forbidden: ['getUserName', 'buildGreeting', 'setUserEmail']"
+  },
+  {
+   "task_id": "task_231_memory_refuse_secrets",
+   "real_tool_calls": 0,
+   "mutating_tool_calls": 0,
+   "ai_turns": 1,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "MEMORY.md doesn't note that the user uses Anthropic / Антропик"
+  },
+  {
+   "task_id": "task_233_memory_endpoints_json",
+   "real_tool_calls": 0,
+   "mutating_tool_calls": 0,
+   "ai_turns": 1,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "endpoints.json missing"
+  },
+  {
+   "task_id": "task_237_memory_preference_following_weekend_plan",
+   "real_tool_calls": 0,
+   "mutating_tool_calls": 0,
+   "ai_turns": 1,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "weekend_plan.json missing"
+  },
+  {
+   "task_id": "task_239_memory_multi_hop_salary",
+   "real_tool_calls": 0,
+   "mutating_tool_calls": 0,
+   "ai_turns": 1,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "salary.json missing"
+  },
+  {
+   "task_id": "task_243_memory_multi_session_packing_list",
+   "real_tool_calls": 0,
+   "mutating_tool_calls": 0,
+   "ai_turns": 1,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "packing_list.json missing"
+  },
+  {
+   "task_id": "task_247_memory_preference_dockerfile",
+   "real_tool_calls": 0,
+   "mutating_tool_calls": 0,
+   "ai_turns": 1,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "Dockerfile missing"
+  },
+  {
+   "task_id": "task_106_csv_group_count",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "counts.csv content differs"
+  },
+  {
+   "task_id": "task_110_csv_count_above",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "count.txt content differs"
+  },
+  {
+   "task_id": "task_114_jsonl_sum_amount",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "total.txt content differs"
+  },
+  {
+   "task_id": "task_135_grep_count_imports",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "count.txt content differs"
+  },
+  {
+   "task_id": "task_139_grep_log_errors",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "errors_count.txt content differs"
+  },
+  {
+   "task_id": "task_141_grep_classnames",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "classes.txt lines differ"
+  },
+  {
+   "task_id": "task_146_log_count_5xx",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "err_count.txt content differs"
+  },
+  {
+   "task_id": "task_151_pipeline_csv_to_json",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "summary.json JSON mismatch"
+  },
+  {
+   "task_id": "task_161_gzip_compress",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "input.txt.gz missing"
+  },
+  {
+   "task_id": "task_177_csv_histogram",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "histogram.json JSON mismatch"
+  },
+  {
+   "task_id": "task_186_find_call_sites",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "callers.txt missing"
+  },
+  {
+   "task_id": "task_189_log_hourly_counts",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "hourly.csv {'08': 5, '09': 13, '10': 20, '11': 7, '12': 3} differs from {'08': 5, '09': 12"
+  },
+  {
+   "task_id": "task_201_reconcile_vip_users",
+   "real_tool_calls": 5,
+   "mutating_tool_calls": 1,
+   "ai_turns": 6,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "vip_users.json JSON mismatch"
+  },
+  {
+   "task_id": "task_214_customer_data_quality_report",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "dq_report mismatch: {'row_count': 5, 'duplicate_ids': ['2'], 'invalid_emails': ['2'], 'inv"
+  },
+  {
+   "task_id": "task_222_memory_name_pyproject",
+   "real_tool_calls": 1,
+   "mutating_tool_calls": 1,
+   "ai_turns": 2,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "MEMORY.md doesn't have a '- Имя: Анна Петрова' entry in list format"
+  },
+  {
+   "task_id": "task_223_memory_city_timezone_script",
+   "real_tool_calls": 1,
+   "mutating_tool_calls": 1,
+   "ai_turns": 2,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "MEMORY.md doesn't have a '- Город: Москва' line"
+  },
+  {
+   "task_id": "task_224_memory_mit_license",
+   "real_tool_calls": 1,
+   "mutating_tool_calls": 1,
+   "ai_turns": 2,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "LICENSE does not match /Иван\\s+Иванов|Иванов\\s+Иван|Ivan\\s+Ivanov|Ivanov\\s+Ivan/"
+  },
+  {
+   "task_id": "task_225_memory_compute_age_bio",
+   "real_tool_calls": 1,
+   "mutating_tool_calls": 1,
+   "ai_turns": 2,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "bio.txt should match 'Пётр Сидоров, 36 …' (age as digit right after the name)"
+  },
+  {
+   "task_id": "task_232_memory_focus_day_schedule_rules",
+   "real_tool_calls": 1,
+   "mutating_tool_calls": 1,
+   "ai_turns": 2,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "MEMORY.md doesn't contain '- Фокус-день: пятница'"
+  },
+  {
+   "task_id": "task_235_memory_event_ordering_timeline",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "kickoff_to_release = 116, expected 115"
+  },
+  {
+   "task_id": "task_244_memory_save_multi_facts_env",
+   "real_tool_calls": 1,
+   "mutating_tool_calls": 1,
+   "ai_turns": 2,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "MEMORY.md missing fact: PostgreSQL"
+  },
+  {
+   "task_id": "task_251_memory_save_height_unit_convert",
+   "real_tool_calls": 1,
+   "mutating_tool_calls": 1,
+   "ai_turns": 2,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "MEMORY.md should store height fact"
+  },
+  {
+   "task_id": "task_253_memory_mixed_save_refuse_use",
+   "real_tool_calls": 1,
+   "mutating_tool_calls": 1,
+   "ai_turns": 2,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "MEMORY.md missing company FerrisCorp"
+  },
+  {
+   "task_id": "task_263_terminal_du_top_dirs",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "reports/top_dirs.tsv lines differ"
+  },
+  {
+   "task_id": "task_265_terminal_makefile_plan",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "build_order.txt lines differ"
+  },
+  {
+   "task_id": "task_269_terminal_markdown_index",
+   "real_tool_calls": 5,
+   "mutating_tool_calls": 1,
+   "ai_turns": 6,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "docs_index.tsv lines differ"
+  },
+  {
+   "task_id": "task_285_terminal_patch_stat_summary",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "patch_summary.tsv lines differ"
+  },
+  {
+   "task_id": "task_32_count_words",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "words.txt content differs"
+  },
+  {
+   "task_id": "task_34_filter_errors",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "errors.log lines differ"
+  },
+  {
+   "task_id": "task_38_trim_trailing_ws",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "trimmed.txt lines differ"
+  },
+  {
+   "task_id": "task_41_count_todos",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "count.txt content differs"
+  },
+  {
+   "task_id": "task_51_count_total_lines",
+   "real_tool_calls": 6,
+   "mutating_tool_calls": 1,
+   "ai_turns": 7,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "total.txt content differs"
+  },
+  {
+   "task_id": "task_56_move_to_subdir",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "utils.py still exists"
+  },
+  {
+   "task_id": "task_89_create_pre_commit",
+   "real_tool_calls": 1,
+   "mutating_tool_calls": 1,
+   "ai_turns": 2,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": ".pre-commit-config.yaml lines differ"
+  },
+  {
+   "task_id": "task_92_count_chars",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "count.txt content differs"
+  },
+  {
+   "task_id": "task_156_csv_validate_split",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 2,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "good.csv content differs"
+  },
+  {
+   "task_id": "task_202_zip_sales_consolidation",
+   "real_tool_calls": 11,
+   "mutating_tool_calls": 2,
+   "ai_turns": 12,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "region_totals.csv content differs"
+  },
+  {
+   "task_id": "task_230_memory_forget_telegram",
+   "real_tool_calls": 5,
+   "mutating_tool_calls": 2,
+   "ai_turns": 6,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "contacts.json invalid JSON: Expecting property name enclosed in double quotes: line 6 colu"
+  },
+  {
+   "task_id": "task_234_memory_messenger_migration",
+   "real_tool_calls": 4,
+   "mutating_tool_calls": 2,
+   "ai_turns": 5,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "MEMORY.md still contains Telegram facts"
+  },
+  {
+   "task_id": "task_241_memory_instruction_reformat_json",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 2,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "config.json should use tabs for indentation"
+  },
+  {
+   "task_id": "task_250_memory_abstention_dataclass",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 2,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "name = ''"
+  },
+  {
+   "task_id": "task_252_memory_event_ordering_next_milestone",
+   "real_tool_calls": 5,
+   "mutating_tool_calls": 3,
+   "ai_turns": 6,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "milestones.py: mod.next_milestone(\"2026-02-15\") → milestones.py: mod.next_milestone(\"2026-"
+  },
+  {
+   "task_id": "task_210_tar_manifest_with_hashes",
+   "real_tool_calls": 5,
+   "mutating_tool_calls": 4,
+   "ai_turns": 6,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "manifest.csv header ['./bundle.tar.gz', '178', 'b15aa438a36b8a356e58f407ede30aa077beab7ebd"
+  },
+  {
+   "task_id": "task_248_memory_forget_work_contacts",
+   "real_tool_calls": 9,
+   "mutating_tool_calls": 4,
+   "ai_turns": 10,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "MEMORY.md still contains work contact info"
+  },
+  {
+   "task_id": "task_60_rename_dir",
+   "real_tool_calls": 17,
+   "mutating_tool_calls": 6,
+   "ai_turns": 18,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "src/old/ still exists"
+  },
+  {
+   "task_id": "task_266_terminal_sha256_manifest",
+   "real_tool_calls": 15,
+   "mutating_tool_calls": 7,
+   "ai_turns": 16,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "SHA256SUMS mismatch: ['1f744cf81142f94f9fe5ebd1b16aec9ab5a67e76834592e0a035dd4f33bdeb06  /"
+  },
+  {
+   "task_id": "task_310_module_split",
+   "real_tool_calls": 15,
+   "mutating_tool_calls": 9,
+   "ai_turns": 16,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "monolith.py still exists"
+  },
+  {
+   "task_id": "task_220_python_import_migration",
+   "real_tool_calls": 23,
+   "mutating_tool_calls": 12,
+   "ai_turns": 24,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "src/app/main.py still contains forbidden: ['utils.math']"
+  },
+  {
+   "task_id": "task_207_inventory_anomaly_report",
+   "real_tool_calls": 27,
+   "mutating_tool_calls": 4,
+   "ai_turns": 27,
+   "reached_final_answer": false,
+   "hit_loop_cap": true,
+   "first_line": "anomalies.json missing"
+  },
+  {
+   "task_id": "task_312_policy_driven_merge",
+   "real_tool_calls": 27,
+   "mutating_tool_calls": 5,
+   "ai_turns": 27,
+   "reached_final_answer": false,
+   "hit_loop_cap": true,
+   "first_line": "m05.py still contains forbidden: ['<<<<<<<', '=======', '>>>>>>>', 'VALUE = 11']"
+  },
+  {
+   "task_id": "task_21_rename_file",
+   "real_tool_calls": 27,
+   "mutating_tool_calls": 14,
+   "ai_turns": 27,
+   "reached_final_answer": false,
+   "hit_loop_cap": true,
+   "first_line": "oldname.txt still exists"
+  },
+  {
+   "task_id": "task_307_resolve_many_files",
+   "real_tool_calls": 27,
+   "mutating_tool_calls": 15,
+   "ai_turns": 27,
+   "reached_final_answer": false,
+   "hit_loop_cap": true,
+   "first_line": "mod08.py still contains forbidden: ['<<<<<<<', '=======', '>>>>>>>', 'WEIGHT = 14']"
+  },
+  {
+   "task_id": "task_150_script_csv_total",
+   "real_tool_calls": 27,
+   "mutating_tool_calls": 19,
+   "ai_turns": 27,
+   "reached_final_answer": false,
+   "hit_loop_cap": true,
+   "first_line": "total.txt is '290.0', expected 290"
+  },
+  {
+   "task_id": "task_48_append_eof_each",
+   "real_tool_calls": 27,
+   "mutating_tool_calls": 22,
+   "ai_turns": 27,
+   "reached_final_answer": false,
+   "hit_loop_cap": true,
+   "first_line": "logs/second.log: last line is 'two beta extra', expected 'EOF'"
+  }
+ ],
+ "model_build": "GigaChat-3.5-430B-A28B:32.9.23.6"
+}

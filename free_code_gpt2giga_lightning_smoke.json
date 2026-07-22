@@ -1,0 +1,78 @@
+{
+  "task_set_version": "0.9.0",
+  "total": 3,
+  "passed": 2,
+  "pass_rate": 0.6666666666666666,
+  "tasks": [
+    {
+      "task_id": "task_05_greet",
+      "number": 5,
+      "passed": true,
+      "message": "greeting.py: mod.greet('Аня') == 'Привет, Аня!'",
+      "elapsed_seconds": 20.67080220800017,
+      "error": null,
+      "tags": [
+        "create",
+        "python",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_06_toggle_debug",
+      "number": 6,
+      "passed": true,
+      "message": "config.py contains all expected substrings; config.py free of forbidden substrings",
+      "elapsed_seconds": 31.660296375001053,
+      "error": null,
+      "tags": [
+        "edit",
+        "python",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_222_memory_name_pyproject",
+      "number": 222,
+      "passed": false,
+      "message": "MEMORY.md doesn't have a '- Имя: Анна Петрова' entry in list format",
+      "elapsed_seconds": 16.535460290999254,
+      "error": null,
+      "tags": [
+        "memory",
+        "save",
+        "toml",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    }
+  ]
+}

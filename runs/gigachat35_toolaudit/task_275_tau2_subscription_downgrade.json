@@ -1,0 +1,142 @@
+{
+ "task_id": "task_275_tau2_subscription_downgrade",
+ "name": "Schedule a subscription downgrade",
+ "prompt": "Пользователь хочет перейти с pro на basic. По subscription.json и policy.md создай subscription_action.json с action, account_id, new_plan, effective_date, refund_now. Значение action — schedule_downgrade. Downgrade вступает в силу в дату billing_anchor из subscription.json (effective_date равен этому полю) и не дает мгновенный refund.",
+ "passed": true,
+ "message": "subscription_action.json matches expected JSON",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Пользователь хочет перейти с pro на basic. По subscription.json и policy.md создай subscription_action.json с action, account_id, new_plan, effective_date, refund_now. Значение action — schedule_downgrade. Downgrade вступает в силу в дату billing_anchor из subscription.json (effective_date равен этому полю) и не дает мгновенный refund.",
+   "content_len": 337
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "subscription.json"
+     },
+     "id": "7f80cc51-d0b6-4fc3-bb78-20b4bde3529a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "subscription.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\n     2\t  \"account_id\": \"sub-19\",\n     3\t  \"current_plan\": \"pro\",\n     4\t  \"billing_anchor\": \"2026-06-01\"\n     5\t}",
+   "content_len": 122,
+   "name": "read_file",
+   "tool_call_id": "7f80cc51-d0b6-4fc3-bb78-20b4bde3529a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "policy.md"
+     },
+     "id": "77452d68-2be7-4593-8146-2a1eacfcf94a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "policy.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t- Downgrades take effect on the billing_anchor date from subscription.json. Immediate refund is 0.",
+   "content_len": 105,
+   "name": "read_file",
+   "tool_call_id": "77452d68-2be7-4593-8146-2a1eacfcf94a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"action\": \"schedule_downgrade\",\n  \"account_id\": \"sub-19\",\n  \"new_plan\": \"basic\",\n  \"effective_date\": \"2026-06-01\",\n  \"refund_now\": false\n}",
+      "file_path": "subscription_action.json"
+     },
+     "id": "4954fce7-a5e0-4221-b196-d612275e201c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"action\": \"schedule_downgrade\",\n  \"account_id\": \"sub-19\",\n  \"new_plan\": \"basic\",\n  \"effective_date\": \"2026-06-01\",\n  \"refund_now\": false\n}",
+     "file_path": "subscription_action.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /subscription_action.json",
+   "content_len": 38,
+   "name": "write_file",
+   "tool_call_id": "4954fce7-a5e0-4221-b196-d612275e201c"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "subscription_action.json"
+     },
+     "id": "b1bd9f87-eadf-44c4-b96a-8b7fd513ac5c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "subscription_action.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\n     2\t  \"action\": \"schedule_downgrade\",\n     3\t  \"account_id\": \"sub-19\",\n     4\t  \"new_plan\": \"basic\",\n     5\t  \"effective_date\": \"2026-06-01\",\n     6\t  \"refund_now\": false\n     7\t}",
+   "content_len": 191,
+   "name": "read_file",
+   "tool_call_id": "b1bd9f87-eadf-44c4-b96a-8b7fd513ac5c"
+  },
+  {
+   "type": "ai",
+   "content": "Файл subscription_action.json создан.\n\n{\n  \"action\": \"schedule_downgrade\",\n  \"account_id\": \"sub-19\",\n  \"new_plan\": \"basic\",\n  \"effective_date\": \"2026-06-01\",\n  \"refund_now\": false\n}",
+   "content_len": 181,
+   "finish_reason": "stop"
+  }
+ ]
+}

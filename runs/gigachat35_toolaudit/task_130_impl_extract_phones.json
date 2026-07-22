@@ -1,0 +1,55 @@
+{
+ "task_id": "task_130_impl_extract_phones",
+ "name": "Implement extract_phones(text) so pytest passes",
+ "prompt": "Создай файл phones.py с функцией extract_phones(text: str) -> list[str]. Она должна возвращать список всех 10-значных подпоследовательностей вида '\\d{3}-\\d{3}-\\d{4}' (три цифры, дефис, три цифры, дефис, четыре цифры) в порядке появления в тексте. В каталоге tests лежит test_phones.py, который проверит работу. Тесты не меняй.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл phones.py с функцией extract_phones(text: str) -> list[str]. Она должна возвращать список всех 10-значных подпоследовательностей вида '\\d{3}-\\d{3}-\\d{4}' (три цифры, дефис, три цифры, дефис, четыре цифры) в порядке появления в тексте. В каталоге tests лежит test_phones.py, который проверит работу. Тесты не меняй.",
+   "content_len": 326
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import re\nfrom typing import List\n\ndef extract_phones(text: str) -> List[str]:\n    \"\"\"\n    Находит все 10-значные телефонные номера в формате XXX-XXX-XXXX.\n\n    Аргументы:\n        text (str): Текст для поиска.\n\n    Возвращает:\n        list[str]: Список найденных номеров телефонов в порядке их появления.\n    \"\"\"\n    # Используем findall, чтобы найти все непересекающиеся совпадения\n    # и сохранить их в порядке нахождения.\n    return re.findall(r'\\d{3}-\\d{3}-\\d{4}', text)\n",
+      "file_path": "phones.py"
+     },
+     "id": "895a9257-a42d-49e5-b52f-ad66fe732f2d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import re\nfrom typing import List\n\ndef extract_phones(text: str) -> List[str]:\n    \"\"\"\n    Находит все 10-значные телефонные номера в формате XXX-XXX-XXXX.\n\n    Аргументы:\n        text (str): Текст для поиска.\n\n    Возвращает:\n        list[str]: Список найденных номеров телефонов в порядке их появления.\n    \"\"\"\n    # Используем findall, чтобы найти все непересекающиеся совпадения\n    # и сохранить их в порядке нахождения.\n    return re.findall(r'\\d{3}-\\d{3}-\\d{4}', text)\n",
+     "file_path": "phones.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /phones.py",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "895a9257-a42d-49e5-b52f-ad66fe732f2d"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `phones.py` с функцией `extract_phones(text: str) -> list[str]` успешно создан. Функция использует регулярное выражение для поиска всех 10-значных телефонных номеров в указанном формате и возвращает их списком в порядке появления в тексте, как того требуют тесты.",
+   "content_len": 268,
+   "finish_reason": "stop"
+  }
+ ]
+}

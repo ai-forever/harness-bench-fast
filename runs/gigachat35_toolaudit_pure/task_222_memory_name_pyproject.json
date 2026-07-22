@@ -1,0 +1,55 @@
+{
+ "task_id": "task_222_memory_name_pyproject",
+ "name": "Memory: save name on first mention, use in pyproject.toml",
+ "prompt": "Привет! Меня зовут Анна Петрова. Помоги мне инициализировать проект — создай pyproject.toml для пакета my-tracker, версия 0.1.0, я хочу быть указана как автор.",
+ "passed": false,
+ "message": "MEMORY.md doesn't have a '- Имя: Анна Петрова' entry in list format",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Привет! Меня зовут Анна Петрова. Помоги мне инициализировать проект — создай pyproject.toml для пакета my-tracker, версия 0.1.0, я хочу быть указана как автор.",
+   "content_len": 159
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "[build-system]\nrequires = [\"setuptools>=45\", \"wheel\"]\nbuild-backend = \"setuptools.build_meta\"\n\n[project]\nname = \"my-tracker\"\nversion = \"0.1.0\"\ndescription = \"\"\nauthors = [{name = \"Анна Петрова\"}]\nreadme = \"README.md\"\nlicense = {text = \"MIT\"}\nrequires-python = \">=3.8\"\nclassifiers = [\n    \"Programming Language :: Python :: 3\",\n    \"License :: OSI Approved :: MIT License\",\n    \"Operating System :: OS Independent\",\n]\n\n[project.urls]\n\"Homepage\" = \"https://github.com/yourusername/my-tracker\"",
+      "file_path": "/pyproject.toml"
+     },
+     "id": "5410f8eb-28cc-40b6-80bc-e504e8359f01"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "[build-system]\nrequires = [\"setuptools>=45\", \"wheel\"]\nbuild-backend = \"setuptools.build_meta\"\n\n[project]\nname = \"my-tracker\"\nversion = \"0.1.0\"\ndescription = \"\"\nauthors = [{name = \"Анна Петрова\"}]\nreadme = \"README.md\"\nlicense = {text = \"MIT\"}\nrequires-python = \">=3.8\"\nclassifiers = [\n    \"Programming Language :: Python :: 3\",\n    \"License :: OSI Approved :: MIT License\",\n    \"Operating System :: OS Independent\",\n]\n\n[project.urls]\n\"Homepage\" = \"https://github.com/yourusername/my-tracker\"",
+     "file_path": "/pyproject.toml"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /pyproject.toml",
+   "content_len": 28,
+   "name": "write_file",
+   "tool_call_id": "5410f8eb-28cc-40b6-80bc-e504e8359f01"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `pyproject.toml` для вашего пакета **my-tracker** успешно создан.\n\nВот его содержимое:\n```toml\n[build-system]\nrequires = [\"setuptools>=45\", \"wheel\"]\nbuild-backend = \"setuptools.build_meta\"\n\n[project]\nname = \"my-tracker\"\nversion = \"0.1.0\"\ndescription = \"\"\nauthors = [{name = \"Анна Петрова\"}]\nreadme = \"README.md\"\nlicense = {text = \"MIT\"}\nrequires-python = \">=3.8\"\nclassifiers = [\n    \"Programming Language :: Python :: 3\",\n    \"License :: OSI Approved :: MIT License\",\n    \"Operating System :: OS Independent\",\n]\n\n[project.urls]\n\"Homepage\" = \"https://github.com/yourusername/my-tracker\"\n```\nВы можете отредактировать поля *description*, *license* и добавить *dependencies* по мере развития проекта.",
+   "content_len": 702,
+   "finish_reason": "stop"
+  }
+ ]
+}

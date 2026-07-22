@@ -1,0 +1,181 @@
+{
+ "task_id": "task_215_source_todo_fixme_triage",
+ "name": "Generate structured TODO/FIXME triage report",
+ "prompt": "Просканируй все .py файлы под src/ и найди строки с TODO и FIXME.\nСоздай:\n  - summary.json с ключами todo_count и fixme_count,\n  - triage.md в формате:\n      ## TODO\n      - <path>:<line> <text>\n      ...\n      ## FIXME\n      - <path>:<line> <text>\n    где <text> — содержимое комментария начиная с маркера TODO:/FIXME:\n    (то есть префикс сохраняется). Пример строки:\n      - src/a.py:2 TODO: refactor\nСекции и порядок строк внутри каждой секции — по path asc, затем line asc.\nМежду секциями ровно одна пустая строка.",
+ "passed": true,
+ "message": "summary.json and triage.md match expected TODO/FIXME inventory",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "grep",
+  "grep",
+  "write_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Просканируй все .py файлы под src/ и найди строки с TODO и FIXME.\nСоздай:\n  - summary.json с ключами todo_count и fixme_count,\n  - triage.md в формате:\n      ## TODO\n      - <path>:<line> <text>\n      ...\n      ## FIXME\n      - <path>:<line> <text>\n    где <text> — содержимое комментария начиная с маркера TODO:/FIXME:\n    (то есть префикс сохраняется). Пример строки:\n      - src/a.py:2 TODO: refactor\nСекции и порядок строк внутри каждой секции — по path asc, затем line asc.\nМежду секциями ровно одна пустая строка.",
+   "content_len": 519
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "pattern": "src/**/*.py"
+     },
+     "id": "46dc7493-03df-44f9-a1b6-2a9e5d766c71"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "pattern": "src/**/*.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/src/a.py', '/src/b.py', '/src/nested/c.py']",
+   "content_len": 46,
+   "name": "glob",
+   "tool_call_id": "46dc7493-03df-44f9-a1b6-2a9e5d766c71"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "grep",
+     "args": {
+      "glob": "**/*.py",
+      "output_mode": "content",
+      "pattern": "TODO"
+     },
+     "id": "06bbd511-518d-45b0-84d5-9b87fd748013"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "grep",
+    "arguments": {
+     "glob": "**/*.py",
+     "output_mode": "content",
+     "pattern": "TODO"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "/src/a.py:\n  2:     pass  # TODO: refactor\n/src/nested/c.py:\n  1: x = 1  # TODO: remove magic number",
+   "content_len": 100,
+   "name": "grep",
+   "tool_call_id": "06bbd511-518d-45b0-84d5-9b87fd748013"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "grep",
+     "args": {
+      "glob": "**/*.py",
+      "output_mode": "content",
+      "pattern": "FIXME"
+     },
+     "id": "aa45c2f9-3314-415d-a5fa-d6222aec8286"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "grep",
+    "arguments": {
+     "glob": "**/*.py",
+     "output_mode": "content",
+     "pattern": "FIXME"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "/src/b.py:\n  1: # FIXME: handle None\n/src/nested/c.py:\n  2: # FIXME: add typing",
+   "content_len": 79,
+   "name": "grep",
+   "tool_call_id": "aa45c2f9-3314-415d-a5fa-d6222aec8286"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\"todo_count\": 2, \"fixme_count\": 2}",
+      "file_path": "/summary.json"
+     },
+     "id": "359753d8-43d3-41c5-9f19-7808a5bf5340"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\"todo_count\": 2, \"fixme_count\": 2}",
+     "file_path": "/summary.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /summary.json",
+   "content_len": 26,
+   "name": "write_file",
+   "tool_call_id": "359753d8-43d3-41c5-9f19-7808a5bf5340"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "## TODO\n- src/a.py:2 TODO: refactor\n- src/nested/c.py:1 TODO: remove magic number\n\n## FIXME\n- src/b.py:1 FIXME: handle None\n- src/nested/c.py:2 FIXME: add typing",
+      "file_path": "/triage.md"
+     },
+     "id": "faa9f5d5-a3a1-4000-9be2-5bf7d503e7c7"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "## TODO\n- src/a.py:2 TODO: refactor\n- src/nested/c.py:1 TODO: remove magic number\n\n## FIXME\n- src/b.py:1 FIXME: handle None\n- src/nested/c.py:2 FIXME: add typing",
+     "file_path": "/triage.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /triage.md",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "faa9f5d5-a3a1-4000-9be2-5bf7d503e7c7"
+  },
+  {
+   "type": "ai",
+   "content": "Готово. Созданы:\n\n- **summary.json** (2 TODO, 2 FIXME)\n- **triage.md** со списком по секциям и сортировкой.\n\nСодержимое файлов:\n\n`/summary.json`\n```json\n{\"todo_count\": 2, \"fixme_count\": 2}\n```\n\n`/triage.md`\n```markdown\n## TODO\n- src/a.py:2 TODO: refactor\n- src/nested/c.py:1 TODO: remove magic number\n\n## FIXME\n- src/b.py:1 FIXME: handle None\n- src/nested/c.py:2 FIXME: add typing\n```",
+   "content_len": 384,
+   "finish_reason": "stop"
+  }
+ ]
+}

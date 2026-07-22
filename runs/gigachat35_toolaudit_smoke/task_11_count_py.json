@@ -1,0 +1,84 @@
+{
+ "task_id": "task_11_count_py",
+ "name": "Count .py files into count.txt",
+ "prompt": "Посчитай, сколько в текущей рабочей директории файлов с расширением .py (включая вложенные подкаталоги). Запиши получившееся число одной строкой в файл count.txt — без лишних пробелов, текста или префиксов.",
+ "passed": true,
+ "message": "count.txt matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Посчитай, сколько в текущей рабочей директории файлов с расширением .py (включая вложенные подкаталоги). Запиши получившееся число одной строкой в файл count.txt — без лишних пробелов, текста или префиксов.",
+   "content_len": 206
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "pattern": "**/*.py"
+     },
+     "id": "c0283d23-30f4-494f-af62-9e8236e99bc8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "pattern": "**/*.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['a/foo.py', '/b/bar.py', '/main.py', '/nested/inner/deep.py']",
+   "content_len": 62,
+   "name": "glob",
+   "tool_call_id": "c0283d23-30f4-494f-af62-9e8236e99bc8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "4",
+      "file_path": "count.txt"
+     },
+     "id": "b17349e3-9d74-4d4d-867d-ca1ef5b07d7e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "4",
+     "file_path": "count.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /count.txt",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "b17349e3-9d74-4d4d-867d-ca1ef5b07d7e"
+  },
+  {
+   "type": "ai",
+   "content": "В текущей рабочей директории найдено 4 файла с расширением .py. Это число записано в файл count.txt",
+   "content_len": 99,
+   "finish_reason": "stop"
+  }
+ ]
+}

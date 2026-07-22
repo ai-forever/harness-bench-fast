@@ -1,0 +1,192 @@
+{
+  "task_set_version": "0.9.0",
+  "total": 8,
+  "passed": 8,
+  "pass_rate": 1.0,
+  "tasks": [
+    {
+      "task_id": "task_01_create_hello",
+      "number": 1,
+      "passed": true,
+      "message": "hello.py ran and produced expected output",
+      "elapsed_seconds": 17.45687204199203,
+      "error": null,
+      "tags": [
+        "create",
+        "python",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_02_write_data_json",
+      "number": 2,
+      "passed": true,
+      "message": "data.json has expected JSON keys",
+      "elapsed_seconds": 22.89507975000015,
+      "error": null,
+      "tags": [
+        "create",
+        "json",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_05_greet",
+      "number": 5,
+      "passed": true,
+      "message": "greeting.py: mod.greet('Аня') == 'Привет, Аня!'",
+      "elapsed_seconds": 17.42119224999624,
+      "error": null,
+      "tags": [
+        "create",
+        "python",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_06_toggle_debug",
+      "number": 6,
+      "passed": true,
+      "message": "config.py contains all expected substrings; config.py free of forbidden substrings",
+      "elapsed_seconds": 20.531192499998724,
+      "error": null,
+      "tags": [
+        "edit",
+        "python",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_08_bump_version",
+      "number": 8,
+      "passed": true,
+      "message": "version.py matches /^VERSION\\s*=\\s*\"1\\.0\\.1\"\\s*$/",
+      "elapsed_seconds": 18.708898875003797,
+      "error": null,
+      "tags": [
+        "edit",
+        "python",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_11_count_py",
+      "number": 11,
+      "passed": true,
+      "message": "count.txt matches expected content",
+      "elapsed_seconds": 14.672749041012139,
+      "error": null,
+      "tags": [
+        "read",
+        "search",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_14_sum_numbers",
+      "number": 14,
+      "passed": true,
+      "message": "sum.txt matches expected content",
+      "elapsed_seconds": 46.730633915998624,
+      "error": null,
+      "tags": [
+        "read",
+        "compute",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_16_add_type_hints",
+      "number": 16,
+      "passed": true,
+      "message": "math_utils.py matches /def\\s+add\\s*\\(\\s*a\\s*:\\s*int\\s*,\\s*b\\s*:\\s*int\\s*\\)\\s*->\\s*int\\s*:/; math_utils.py contains all expected substrings",
+      "elapsed_seconds": 18.80533674999606,
+      "error": null,
+      "tags": [
+        "edit",
+        "python",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    }
+  ]
+}

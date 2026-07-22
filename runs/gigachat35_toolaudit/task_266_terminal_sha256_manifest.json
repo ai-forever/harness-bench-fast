@@ -1,0 +1,171 @@
+{
+ "task_id": "task_266_terminal_sha256_manifest",
+ "name": "Create a deterministic SHA256 manifest",
+ "prompt": "Для всех обычных файлов внутри каталога payload создай SHA256SUMS. Формат каждой строки как у sha256sum: '<hex>  <relative-path>'. Пути должны быть относительно корня рабочей директории и отсортированы лексикографически.",
+ "passed": true,
+ "message": "SHA256SUMS matches payload files",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "ls",
+  "ls",
+  "execute",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Для всех обычных файлов внутри каталога payload создай SHA256SUMS. Формат каждой строки как у sha256sum: '<hex>  <relative-path>'. Пути должны быть относительно корня рабочей директории и отсортированы лексикографически.",
+   "content_len": 220
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "pattern": "payload/**"
+     },
+     "id": "68d449f1-8cf7-477a-b221-f3ec40f56b8b"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "pattern": "payload/**"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "[]",
+   "content_len": 2,
+   "name": "glob",
+   "tool_call_id": "68d449f1-8cf7-477a-b221-f3ec40f56b8b"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "payload"
+     },
+     "id": "67a1c2e5-cb16-4c13-be71-af228473f88a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "payload"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/payload/a.txt', '/payload/b.txt', '/payload/nested/']",
+   "content_len": 56,
+   "name": "ls",
+   "tool_call_id": "67a1c2e5-cb16-4c13-be71-af228473f88a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "payload/nested"
+     },
+     "id": "8be47546-8847-44a2-808e-884db2fbf80e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "payload/nested"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/payload/nested/c.txt']",
+   "content_len": 25,
+   "name": "ls",
+   "tool_call_id": "8be47546-8847-44a2-808e-884db2fbf80e"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "sha256sum payload/a.txt payload/b.txt payload/nested/c.txt"
+     },
+     "id": "7f11adbc-d893-44bf-b81a-238a8a92a7db"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "sha256sum payload/a.txt payload/b.txt payload/nested/c.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  payload/a.txt\n5da8f23decf397b13f4f55b6fb8a61936238bfe08ed9d901132974f1beccc45c  payload/b.txt\n999d1d048ee9123272dd9b718680551c83e867935b47c2650e6906dc22674e47  payload/nested/c.txt\n\n[Command succeeded with exit code 0]",
+   "content_len": 284,
+   "name": "execute",
+   "tool_call_id": "7f11adbc-d893-44bf-b81a-238a8a92a7db"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  payload/a.txt\n5da8f23decf397b13f4f55b6fb8a61936238bfe08ed9d901132974f1beccc45c  payload/b.txt\n999d1d048ee9123272dd9b718680551c83e867935b47c2650e6906dc22674e47  payload/nested/c.txt",
+      "file_path": "SHA256SUMS"
+     },
+     "id": "985145eb-dacd-4b57-8e49-cf8c70096b35"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  payload/a.txt\n5da8f23decf397b13f4f55b6fb8a61936238bfe08ed9d901132974f1beccc45c  payload/b.txt\n999d1d048ee9123272dd9b718680551c83e867935b47c2650e6906dc22674e47  payload/nested/c.txt",
+     "file_path": "SHA256SUMS"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /SHA256SUMS",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "985145eb-dacd-4b57-8e49-cf8c70096b35"
+  },
+  {
+   "type": "ai",
+   "content": "Файл SHA256SUMS создан.\n\n- b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  payload/a.txt\n- 5da8f23decf397b13f4f55b6fb8a61936238bfe08ed9d901132974f1beccc45c  payload/b.txt\n- 999d1d048ee9123272dd9b718680551c83e867935b47c2650e6906dc22674e47  payload/nested/c.txt",
+   "content_len": 277,
+   "finish_reason": "stop"
+  }
+ ]
+}

@@ -1,0 +1,89 @@
+{
+ "task_id": "task_235_memory_event_ordering_timeline",
+ "name": "Memory: event ordering + temporal calculations in timeline JSON",
+ "prompt": "Собери `atlas_timeline.json` на основе памяти.\nФормат:\n- `project`: строка;\n- `events`: массив из объектов `{id, date}`;\n- `durations_days`: объект с полями `kickoff_to_release` и `design_approved_to_beta`.\nТребования:\n1) события должны идти в хронологическом порядке;\n2) даты в ISO `YYYY-MM-DD`;\n3) длительности посчитать в днях.",
+ "passed": true,
+ "message": "timeline ordering and temporal calculations are correct",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Собери `atlas_timeline.json` на основе памяти.\nФормат:\n- `project`: строка;\n- `events`: массив из объектов `{id, date}`;\n- `durations_days`: объект с полями `kickoff_to_release` и `design_approved_to_beta`.\nТребования:\n1) события должны идти в хронологическом порядке;\n2) даты в ISO `YYYY-MM-DD`;\n3) длительности посчитать в днях.",
+   "content_len": 330
+  },
+  {
+   "type": "human",
+   "content": "[MEMORY-TASK] This is a memory task.\n1) read_file MEMORY.md first\n2) complete the requested deliverable using MEMORY facts verbatim\n3) if the user mentioned ANY personal fact, edit_file MEMORY.md before finishing",
+   "content_len": 212
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "MEMORY.md"
+     },
+     "id": "60f11cc5-8523-4521-8ed1-424d54b4bad8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "MEMORY.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t- Проект: Atlas\n     2\t- Проект Atlas — kickoff: 2026-01-15\n     3\t- Проект Atlas — design approved: 2026-02-20\n     4\t- Проект Atlas — beta: 2026-04-05\n     5\t- Проект Atlas — release: 2026-05-10",
+   "content_len": 203,
+   "name": "read_file",
+   "tool_call_id": "60f11cc5-8523-4521-8ed1-424d54b4bad8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"project\": \"Atlas\",\n  \"events\": [\n    {\n      \"id\": \"kickoff\",\n      \"date\": \"2026-01-15\"\n    },\n    {\n      \"id\": \"design_approved\",\n      \"date\": \"2026-02-20\"\n    },\n    {\n      \"id\": \"beta\",\n      \"date\": \"2026-04-05\"\n    },\n    {\n      \"id\": \"release\",\n      \"date\": \"2026-05-10\"\n    }\n  ],\n  \"durations_days\": {\n    \"kickoff_to_release\": 115,\n    \"design_approved_to_beta\": 44\n  }\n}",
+      "file_path": "atlas_timeline.json"
+     },
+     "id": "4fc894de-5095-4777-9cc3-1398a709d58d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"project\": \"Atlas\",\n  \"events\": [\n    {\n      \"id\": \"kickoff\",\n      \"date\": \"2026-01-15\"\n    },\n    {\n      \"id\": \"design_approved\",\n      \"date\": \"2026-02-20\"\n    },\n    {\n      \"id\": \"beta\",\n      \"date\": \"2026-04-05\"\n    },\n    {\n      \"id\": \"release\",\n      \"date\": \"2026-05-10\"\n    }\n  ],\n  \"durations_days\": {\n    \"kickoff_to_release\": 115,\n    \"design_approved_to_beta\": 44\n  }\n}",
+     "file_path": "atlas_timeline.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /atlas_timeline.json",
+   "content_len": 33,
+   "name": "write_file",
+   "tool_call_id": "4fc894de-5095-4777-9cc3-1398a709d58d"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `atlas_timeline.json` создан.\n\n**Содержимое:**\n```json\n{\n  \"project\": \"Atlas\",\n  \"events\": [\n    {\n      \"id\": \"kickoff\",\n      \"date\": \"2026-01-15\"\n    },\n    {\n      \"id\": \"design_approved\",\n      \"date\": \"2026-02-20\"\n    },\n    {\n      \"id\": \"beta\",\n      \"date\": \"2026-04-05\"\n    },\n    {\n      \"id\": \"release\",\n      \"date\": \"2026-05-10\"\n    }\n  ],\n  \"durations_days\": {\n    \"kickoff_to_release\": 115,\n    \"design_approved_to_beta\": 44\n  }\n}\n```\n\nДлительности рассчитаны в днях:\n*   **kickoff_to_release**: с 2026-01-15 по 2026-05-10 — 115 дней.\n*   **design_approved_to_beta**: с 2026-02-20 по 2026-04-05 — 44 дня.",
+   "content_len": 625,
+   "finish_reason": "stop"
+  }
+ ]
+}

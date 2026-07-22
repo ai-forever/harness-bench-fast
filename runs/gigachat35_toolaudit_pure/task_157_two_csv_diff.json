@@ -1,0 +1,144 @@
+{
+ "task_id": "task_157_two_csv_diff",
+ "name": "Diff two name lists into only_in_a.txt and only_in_b.txt",
+ "prompt": "В файлах a.csv и b.csv по одному столбцу 'name'. Создай два файла:\n  - only_in_a.txt — имена, которые есть в a.csv, но не в b.csv;\n  - only_in_b.txt — имена, которые есть в b.csv, но не в a.csv.\nВ каждом файле по одному имени на строку, порядок не важен.",
+ "passed": true,
+ "message": "diff files have the expected names",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "read_file",
+  "write_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файлах a.csv и b.csv по одному столбцу 'name'. Создай два файла:\n  - only_in_a.txt — имена, которые есть в a.csv, но не в b.csv;\n  - only_in_b.txt — имена, которые есть в b.csv, но не в a.csv.\nВ каждом файле по одному имени на строку, порядок не важен.",
+   "content_len": 254
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "a.csv"
+     },
+     "id": "f89fddfc-cbcc-43ba-9e1e-1d2184518214"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "a.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tname\n     2\tcharlie\n     3\tbravo\n     4\techo\n     5\tdelta\n     6\talpha",
+   "content_len": 77,
+   "name": "read_file",
+   "tool_call_id": "f89fddfc-cbcc-43ba-9e1e-1d2184518214"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "b.csv"
+     },
+     "id": "0b6b40e0-56a7-4817-bddc-7838e3122ae9"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "b.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tname\n     2\tcharlie\n     3\tbravo\n     4\tgolf\n     5\techo\n     6\tfoxtrot",
+   "content_len": 78,
+   "name": "read_file",
+   "tool_call_id": "0b6b40e0-56a7-4817-bddc-7838e3122ae9"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "alpha\ndelta",
+      "file_path": "only_in_a.txt"
+     },
+     "id": "244ae863-dcfa-4e06-96be-41390680643d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "alpha\ndelta",
+     "file_path": "only_in_a.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /only_in_a.txt",
+   "content_len": 27,
+   "name": "write_file",
+   "tool_call_id": "244ae863-dcfa-4e06-96be-41390680643d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "foxtrot\ngolf",
+      "file_path": "only_in_b.txt"
+     },
+     "id": "134840c0-83ca-40f2-ba32-df40ffb11a83"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "foxtrot\ngolf",
+     "file_path": "only_in_b.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /only_in_b.txt",
+   "content_len": 27,
+   "name": "write_file",
+   "tool_call_id": "134840c0-83ca-40f2-ba32-df40ffb11a83"
+  },
+  {
+   "type": "ai",
+   "content": "Файлы созданы:\n\n- **only_in_a.txt** содержит имена, которые есть только в `a.csv`:\n  alpha\n  delta\n\n- **only_in_b.txt** содержит имена, которые есть только в `b.csv`:\n  foxtrot\n  golf",
+   "content_len": 183,
+   "finish_reason": "stop"
+  }
+ ]
+}

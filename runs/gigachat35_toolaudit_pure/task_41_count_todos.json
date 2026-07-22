@@ -1,0 +1,90 @@
+{
+ "task_id": "task_41_count_todos",
+ "name": "Count occurrences of TODO across files",
+ "prompt": "Посчитай общее число вхождений слова 'TODO' (с учётом регистра, точное совпадение подстроки) во всех файлах в текущей директории и подкаталогах. Запиши получившееся число одной строкой в файл count.txt.",
+ "passed": false,
+ "message": "count.txt content differs\nExpected: '5'\nActual:   '4'",
+ "error": null,
+ "real_tool_call_names": [
+  "grep",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Посчитай общее число вхождений слова 'TODO' (с учётом регистра, точное совпадение подстроки) во всех файлах в текущей директории и подкаталогах. Запиши получившееся число одной строкой в файл count.txt.",
+   "content_len": 202
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "grep",
+     "args": {
+      "glob": "**/*",
+      "output_mode": "count",
+      "path": ".",
+      "pattern": "TODO"
+     },
+     "id": "6837e8ee-4f7b-45d2-8d8a-c0630f7f2594"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "grep",
+    "arguments": {
+     "glob": "**/*",
+     "output_mode": "count",
+     "path": ".",
+     "pattern": "TODO"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "/a.py: 1\n/b.py: 2\n/c.txt: 1",
+   "content_len": 27,
+   "name": "grep",
+   "tool_call_id": "6837e8ee-4f7b-45d2-8d8a-c0630f7f2594"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "4",
+      "file_path": "/count.txt"
+     },
+     "id": "5eaaa2ce-b22b-41db-b36d-56bb1259157f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "4",
+     "file_path": "/count.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /count.txt",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "5eaaa2ce-b22b-41db-b36d-56bb1259157f"
+  },
+  {
+   "type": "ai",
+   "content": "4",
+   "content_len": 1,
+   "finish_reason": "stop"
+  }
+ ]
+}

@@ -1,0 +1,84 @@
+{
+ "task_id": "task_28_csv_to_json",
+ "name": "Convert users.csv to users.json",
+ "prompt": "Прочитай файл users.csv (первая строка — заголовки name,age; дальше две строки данных) и сохрани его содержимое в файл users.json как JSON-массив объектов. Каждый объект должен содержать ключи name и age. Значения age можно записать как строки или как числа — допустимы оба варианта.",
+ "passed": true,
+ "message": "users.json contains the expected records",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Прочитай файл users.csv (первая строка — заголовки name,age; дальше две строки данных) и сохрани его содержимое в файл users.json как JSON-массив объектов. Каждый объект должен содержать ключи name и age. Значения age можно записать как строки или как числа — допустимы оба варианта.",
+   "content_len": 283
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/users.csv"
+     },
+     "id": "467db03f-141f-46c6-91f3-a3385a586320"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/users.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tname,age\n     2\tAlice,30\n     3\tBob,25",
+   "content_len": 45,
+   "name": "read_file",
+   "tool_call_id": "467db03f-141f-46c6-91f3-a3385a586320"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "[\n  {\n    \"name\": \"Alice\",\n    \"age\": 30\n  },\n  {\n    \"name\": \"Bob\",\n    \"age\": 25\n  }\n]",
+      "file_path": "/users.json"
+     },
+     "id": "773a3b32-43ac-4cc8-a390-6f5f0d86f2ad"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "[\n  {\n    \"name\": \"Alice\",\n    \"age\": 30\n  },\n  {\n    \"name\": \"Bob\",\n    \"age\": 25\n  }\n]",
+     "file_path": "/users.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /users.json",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "773a3b32-43ac-4cc8-a390-6f5f0d86f2ad"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `users.csv` успешно прочитан и его содержимое сохранено в `/users.json` в формате JSON-массива.\n\nСодержимое файла **/users.json**:\n```json\n[\n  {\n    \"name\": \"Alice\",\n    \"age\": 30\n  },\n  {\n    \"name\": \"Bob\",\n    \"age\": 25\n  }\n]\n```",
+   "content_len": 236,
+   "finish_reason": "stop"
+  }
+ ]
+}

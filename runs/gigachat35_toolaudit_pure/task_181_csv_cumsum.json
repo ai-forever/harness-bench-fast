@@ -1,0 +1,113 @@
+{
+ "task_id": "task_181_csv_cumsum",
+ "name": "Add a cumulative-sum column to numbers.csv",
+ "prompt": "В файле numbers.csv 5 строк данных в колонке value. Сделай файл cumulative.csv с двумя колонками 'value,cumsum', в котором cumsum каждой строки — это сумма value этой и всех предыдущих строк.",
+ "passed": true,
+ "message": "cumulative.csv matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле numbers.csv 5 строк данных в колонке value. Сделай файл cumulative.csv с двумя колонками 'value,cumsum', в котором cumsum каждой строки — это сумма value этой и всех предыдущих строк.",
+   "content_len": 191
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/numbers.csv"
+     },
+     "id": "3b0caf17-bf41-43a1-8e89-05a454b9d66a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/numbers.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tvalue\n     2\t10\n     3\t20\n     4\t30\n     5\t40\n     6\t50",
+   "content_len": 62,
+   "name": "read_file",
+   "tool_call_id": "3b0caf17-bf41-43a1-8e89-05a454b9d66a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "value,cumsum\n10,10\n20,30\n30,60\n40,100\n50,150",
+      "file_path": "/cumulative.csv"
+     },
+     "id": "a21f9bd3-a0e0-4de9-90e1-347cd0087e8d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "value,cumsum\n10,10\n20,30\n30,60\n40,100\n50,150",
+     "file_path": "/cumulative.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /cumulative.csv",
+   "content_len": 28,
+   "name": "write_file",
+   "tool_call_id": "a21f9bd3-a0e0-4de9-90e1-347cd0087e8d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/cumulative.csv"
+     },
+     "id": "5dd29e43-8e8c-4e8a-aaf7-0d66730dc514"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/cumulative.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tvalue,cumsum\n     2\t10,10\n     3\t20,30\n     4\t30,60\n     5\t40,100\n     6\t50,150",
+   "content_len": 86,
+   "name": "read_file",
+   "tool_call_id": "5dd29e43-8e8c-4e8a-aaf7-0d66730dc514"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `cumulative.csv` успешно создан. Он содержит две колонки: исходные значения из файла `numbers.csv` и их нарастающую сумму (cumsum).\n\nСодержимое нового файла:\n```\nvalue,cumsum\n10,10\n20,30\n30,60\n40,100\n50,150\n```",
+   "content_len": 215,
+   "finish_reason": "stop"
+  }
+ ]
+}

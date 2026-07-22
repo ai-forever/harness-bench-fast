@@ -1,0 +1,200 @@
+{
+ "task_id": "task_212_merge_config_precedence",
+ "name": "Merge base/env/override configs with precedence",
+ "prompt": "Есть три файла конфигурации:\n  - base.yaml,\n  - env.yaml,\n  - overrides.toml.\nСделай effective_config.json, выполнив глубокое слияние словарей по правилам:\n  1) base — базовый слой,\n  2) env перекрывает base,\n  3) overrides перекрывает env.\nСливать рекурсивно по ключам. Итог сохранить как JSON-объект.",
+ "passed": true,
+ "message": "effective_config.json matches expected merged precedence",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "read_file",
+  "read_file",
+  "write_file",
+  "execute",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Есть три файла конфигурации:\n  - base.yaml,\n  - env.yaml,\n  - overrides.toml.\nСделай effective_config.json, выполнив глубокое слияние словарей по правилам:\n  1) base — базовый слой,\n  2) env перекрывает base,\n  3) overrides перекрывает env.\nСливать рекурсивно по ключам. Итог сохранить как JSON-объект.",
+   "content_len": 302
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "base.yaml"
+     },
+     "id": "7abc354c-03f4-4bb0-a61f-8980f231015f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "base.yaml"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tservice:\n     2\t  host: localhost\n     3\t  port: 8080\n     4\tfeatures:\n     5\t  cache: false\n     6\t  retries: 2",
+   "content_len": 119,
+   "name": "read_file",
+   "tool_call_id": "7abc354c-03f4-4bb0-a61f-8980f231015f"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "env.yaml"
+     },
+     "id": "4d6022b9-6202-4ac2-beda-82a025a7bcd2"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "env.yaml"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tservice:\n     2\t  port: 9090\n     3\tfeatures:\n     4\t  cache: true",
+   "content_len": 73,
+   "name": "read_file",
+   "tool_call_id": "4d6022b9-6202-4ac2-beda-82a025a7bcd2"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "overrides.toml"
+     },
+     "id": "cdf56116-2e9c-4492-a0de-87fa97702227"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "overrides.toml"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t[service]\n     2\thost = 'api.internal'\n     3\t\n     4\t[features]\n     5\tretries = 5",
+   "content_len": 90,
+   "name": "read_file",
+   "tool_call_id": "cdf56116-2e9c-4492-a0de-87fa97702227"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import json\nimport yaml\nimport toml\nfrom collections.abc import Mapping\n\ndef deep_merge(a, b):\n    \"\"\"Рекурсивно сливает два словаря: значения из b перекрывают a.\"\"\"\n    result = dict(a)\n    for key, val in b.items():\n        if (\n            key in result\n            and isinstance(result[key], Mapping)\n            and isinstance(val, Mapping)\n        ):\n            result[key] = deep_merge(result[key], val)\n        else:\n            result[key] = val\n    return result\n\n# Загрузка слоёв в порядке приоритета (от низшего к высшему)\nwith open('base.yaml', 'r', encoding='utf-8') as f:\n    base = yaml.safe_load(f) or {}\n\nwith open('env.yaml', 'r', encoding='utf-8') as f:\n    env = yaml.safe_load(f) or {}\n\nwith open('overrides.toml', 'r', encoding='utf-8') as f:\n    overrides = toml.load(f) or {}\n\neffective = deep_merge(deep_merge(base, env), overrides)\n\nwith open('effective_config.json', 'w', encoding='utf-8') as f:\n    json.dump(effective, f, ensure_ascii=False, indent=2)",
+      "file_path": "merge_config.py"
+     },
+     "id": "c173f997-5dd3-411f-adb4-8065b8d227c3"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import json\nimport yaml\nimport toml\nfrom collections.abc import Mapping\n\ndef deep_merge(a, b):\n    \"\"\"Рекурсивно сливает два словаря: значения из b перекрывают a.\"\"\"\n    result = dict(a)\n    for key, val in b.items():\n        if (\n            key in result\n            and isinstance(result[key], Mapping)\n            and isinstance(val, Mapping)\n        ):\n            result[key] = deep_merge(result[key], val)\n        else:\n            result[key] = val\n    return result\n\n# Загрузка слоёв в порядке приоритета (от низшего к высшему)\nwith open('base.yaml', 'r', encoding='utf-8') as f:\n    base = yaml.safe_load(f) or {}\n\nwith open('env.yaml', 'r', encoding='utf-8') as f:\n    env = yaml.safe_load(f) or {}\n\nwith open('overrides.toml', 'r', encoding='utf-8') as f:\n    overrides = toml.load(f) or {}\n\neffective = deep_merge(deep_merge(base, env), overrides)\n\nwith open('effective_config.json', 'w', encoding='utf-8') as f:\n    json.dump(effective, f, ensure_ascii=False, indent=2)",
+     "file_path": "merge_config.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /merge_config.py",
+   "content_len": 29,
+   "name": "write_file",
+   "tool_call_id": "c173f997-5dd3-411f-adb4-8065b8d227c3"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python merge_config.py"
+     },
+     "id": "db68da16-8718-4315-9d6d-9f1e92873868"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python merge_config.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "db68da16-8718-4315-9d6d-9f1e92873868"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "effective_config.json"
+     },
+     "id": "852c22fb-a296-482f-905a-586be690115e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "effective_config.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\n     2\t  \"service\": {\n     3\t    \"host\": \"api.internal\",\n     4\t    \"port\": 9090\n     5\t  },\n     6\t  \"features\": {\n     7\t    \"cache\": true,\n     8\t    \"retries\": 5\n     9\t  }\n    10\t}",
+   "content_len": 194,
+   "name": "read_file",
+   "tool_call_id": "852c22fb-a296-482f-905a-586be690115e"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `effective_config.json` успешно создан.\n\nИтоговый результат слияния конфигураций:\n```json\n{\n  \"service\": {\n    \"host\": \"api.internal\",\n    \"port\": 9090\n  },\n  \"features\": {\n    \"cache\": true,\n    \"retries\": 5\n  }\n}\n```",
+   "content_len": 223,
+   "finish_reason": "stop"
+  }
+ ]
+}

@@ -1,0 +1,113 @@
+{
+ "task_id": "task_170_impl_lru_cache",
+ "name": "Implement LRUCache class so pytest passes",
+ "prompt": "Создай файл lru.py с классом LRUCache(capacity). Класс должен поддерживать методы get(key) (возвращает значение или None если ключа нет) и put(key, value) (записывает пару). При превышении capacity вытесняется наименее недавно использованный элемент (Least Recently Used). И get, и put обновляют признак 'недавно использованного'. Тесты в tests/test_lru.py должны пройти.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "read_file",
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл lru.py с классом LRUCache(capacity). Класс должен поддерживать методы get(key) (возвращает значение или None если ключа нет) и put(key, value) (записывает пару). При превышении capacity вытесняется наименее недавно использованный элемент (Least Recently Used). И get, и put обновляют признак 'недавно использованного'. Тесты в tests/test_lru.py должны пройти.",
+   "content_len": 371
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "from collections import OrderedDict\n\nclass LRUCache:\n    \"\"\"\n    A Least Recently Used (LRU) cache implementation.\n\n    This class provides a fixed-capacity cache that evicts the least recently\n    accessed item when it exceeds its capacity. Both `get` and `put` operations\n    update the usage order of items.\n    \"\"\"\n\n    def __init__(self, capacity: int):\n        if not isinstance(capacity, int) or capacity <= 0:\n            raise ValueError(\"Capacity must be a positive integer.\")\n        self.capacity = capacity\n        self.cache = OrderedDict()\n\n    def get(self, key):\n        \"\"\"\n        Retrieves an item from the cache by its key.\n\n        If the key exists, the item is moved to the end of the internal ordering\n        to mark it as most recently used, and its value is returned.\n        If the key does not exist, None is returned.\n\n        Args:\n            key: The key of the item to retrieve.\n\n        Returns:\n            The value associated with the key, or None if the key is not found.\n        \"\"\"\n        if key not in self.cache:\n            return None\n        # Move the key to the end to show that it was recently used\n        self.cache.move_to_end(key)\n        return self.cache[key]\n\n    def put(self, key, value):\n        \"\"\"\n        Inserts or updates an item in the cache.\n\n        If the key already exists, its value is updated and it is marked as\n        most recently used. If the key is new and the cache is at full capacity,\n        the least recently used item is removed before inserting the new one.\n\n        Args:\n            key: The key of the item to insert or update.\n            value: The value to associate with the key.\n        \"\"\"\n        if key in self.cache:\n            # Update the existing key's position\n            self.cache.move_to_end(key)\n        self.cache[key] = value\n        # If the cache is over capacity, pop the first item (least recently used)\n        if len(self.cache) > self.capacity:\n            self.cache.popitem(last=False)\n",
+      "file_path": "lru.py"
+     },
+     "id": "10138928-24b8-408f-a18c-eaa0e1194e6d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "from collections import OrderedDict\n\nclass LRUCache:\n    \"\"\"\n    A Least Recently Used (LRU) cache implementation.\n\n    This class provides a fixed-capacity cache that evicts the least recently\n    accessed item when it exceeds its capacity. Both `get` and `put` operations\n    update the usage order of items.\n    \"\"\"\n\n    def __init__(self, capacity: int):\n        if not isinstance(capacity, int) or capacity <= 0:\n            raise ValueError(\"Capacity must be a positive integer.\")\n        self.capacity = capacity\n        self.cache = OrderedDict()\n\n    def get(self, key):\n        \"\"\"\n        Retrieves an item from the cache by its key.\n\n        If the key exists, the item is moved to the end of the internal ordering\n        to mark it as most recently used, and its value is returned.\n        If the key does not exist, None is returned.\n\n        Args:\n            key: The key of the item to retrieve.\n\n        Returns:\n            The value associated with the key, or None if the key is not found.\n        \"\"\"\n        if key not in self.cache:\n            return None\n        # Move the key to the end to show that it was recently used\n        self.cache.move_to_end(key)\n        return self.cache[key]\n\n    def put(self, key, value):\n        \"\"\"\n        Inserts or updates an item in the cache.\n\n        If the key already exists, its value is updated and it is marked as\n        most recently used. If the key is new and the cache is at full capacity,\n        the least recently used item is removed before inserting the new one.\n\n        Args:\n            key: The key of the item to insert or update.\n            value: The value to associate with the key.\n        \"\"\"\n        if key in self.cache:\n            # Update the existing key's position\n            self.cache.move_to_end(key)\n        self.cache[key] = value\n        # If the cache is over capacity, pop the first item (least recently used)\n        if len(self.cache) > self.capacity:\n            self.cache.popitem(last=False)\n",
+     "file_path": "lru.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /lru.py",
+   "content_len": 20,
+   "name": "write_file",
+   "tool_call_id": "10138928-24b8-408f-a18c-eaa0e1194e6d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "tests/test_lru.py"
+     },
+     "id": "4b05acea-aa43-4e68-b264-ea729993229d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "tests/test_lru.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tfrom lru import LRUCache\n     2\t\n     3\t\n     4\tdef test_basic_get_put():\n     5\t    c = LRUCache(2)\n     6\t    c.put('a', 1)\n     7\t    c.put('b', 2)\n     8\t    assert c.get('a') == 1\n     9\t    assert c.get('b') == 2\n    10\t\n    11\t\n    12\tdef test_miss_returns_none():\n    13\t    c = LRUCache(2)\n    14\t    assert c.get('x') is None\n    15\t\n    16\t\n    17\tdef test_eviction():\n    18\t    c = LRUCache(2)\n    19\t    c.put('a', 1)\n    20\t    c.put('b', 2)\n    21\t    c.put('c', 3)\n    22\t    assert c.get('a') is None\n    23\t    assert c.get('b') == 2\n    24\t    assert c.get('c') == 3\n    25\t\n    26\t\n    27\tdef test_recency_updates_on_get():\n    28\t    c = LRUCache(2)\n    29\t    c.put('a', 1)\n    30\t    c.put('b', 2)\n    31\t    c.get('a')\n    32\t    c.put('c', 3)\n    33\t    assert c.get('b') is None\n    34\t    assert c.get('a') == 1",
+   "content_len": 846,
+   "name": "read_file",
+   "tool_call_id": "4b05acea-aa43-4e68-b264-ea729993229d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -m pytest tests/test_lru.py -v"
+     },
+     "id": "6abf196a-937f-4481-b57d-4155cd12b213"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -m pytest tests/test_lru.py -v"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.12, pytest-9.0.3, pluggy-1.6.0 -- /Users/krestnikov/giga/harness-bench-fast/.venv/bin/python\ncachedir: .pytest_cache\nrootdir: /private/var/folders/81/xpcl3q6d0jqf831cy52ltwfm0000gn/T/hbta_task_170_impl_lru_cache_t1asrwtf\nplugins: langsmith-0.9.4, anyio-4.14.1\ncollecting ... collected 4 items\n\ntests/test_lru.py::test_basic_get_put PASSED                             [ 25%]\ntests/test_lru.py::test_miss_returns_none PASSED                         [ 50%]\ntests/test_lru.py::test_eviction PASSED                                  [ 75%]\ntests/test_lru.py::test_recency_updates_on_get PASSED                    [100%]\n\n============================== 4 passed in 0.01s ===============================\n\n[Command succeeded with exit code 0]",
+   "content_len": 845,
+   "name": "execute",
+   "tool_call_id": "6abf196a-937f-4481-b57d-4155cd12b213"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `lru.py` с классом `LRUCache` успешно создан. Все тесты в файле `tests/test_lru.py` пройдены.\n\nКласс использует `collections.OrderedDict` для эффективного отслеживания порядка использования элементов:\n- **get(key)**: возвращает значение и перемещает ключ в конец словаря, помечая его как «недавно использованный». Если ключа нет, возвращает None.\n- **put(key, value)**: добавляет или обновляет пару ключ-значение, также перемещая ключ в конец. При превышении ёмкости вытесняется первый элемент (наименее недавно использовавшийся).\n\nРеализация полностью соответствует требованиям тестов: базовое добавление/получение, возврат None при промахе, правильное вытеснение LRU-элемента и обновление признака недавности при операции get.",
+   "content_len": 733,
+   "finish_reason": "stop"
+  }
+ ]
+}

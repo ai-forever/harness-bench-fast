@@ -1,0 +1,10 @@
+{
+ "model": "GigaChat-3.5-430B-A28B (IFT)",
+ "harness": "deepagents, no profile (pure)",
+ "total_tasks": 4,
+ "tasks_with_tool_as_text": 0,
+ "tool_as_text_total_turns": 0,
+ "pattern_counts": {},
+ "confidence_counts": {},
+ "cases": []
+}

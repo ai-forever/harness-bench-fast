@@ -1,0 +1,88 @@
+{
+ "task_id": "task_12_extract_todos",
+ "name": "Collect TODO lines into todos.txt",
+ "prompt": "Найди во всех .py файлах текущей директории (и подкаталогов) строки, в которых встречается слово TODO. Сохрани эти строки (содержимое самих строк, без указания имён файлов) в файл todos.txt — каждую с новой строки. Порядок строк не имеет значения.",
+ "passed": true,
+ "message": "todos.txt contains all expected substrings; todos.txt free of forbidden substrings",
+ "error": null,
+ "real_tool_call_names": [
+  "grep",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Найди во всех .py файлах текущей директории (и подкаталогов) строки, в которых встречается слово TODO. Сохрани эти строки (содержимое самих строк, без указания имён файлов) в файл todos.txt — каждую с новой строки. Порядок строк не имеет значения.",
+   "content_len": 247
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "grep",
+     "args": {
+      "glob": "*.py",
+      "output_mode": "content",
+      "pattern": "TODO"
+     },
+     "id": "23f53f0c-56dc-471b-a6b2-1201c2386f48"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "grep",
+    "arguments": {
+     "glob": "*.py",
+     "output_mode": "content",
+     "pattern": "TODO"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "/a.py:\n  2: # TODO: do stuff\n/b.py:\n  1: # TODO: refactor this",
+   "content_len": 62,
+   "name": "grep",
+   "tool_call_id": "23f53f0c-56dc-471b-a6b2-1201c2386f48"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "# TODO: do stuff\n# TODO: refactor this",
+      "file_path": "/todos.txt"
+     },
+     "id": "ab77c618-c616-47bc-8864-6ce4caedd2e1"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "# TODO: do stuff\n# TODO: refactor this",
+     "file_path": "/todos.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /todos.txt",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "ab77c618-c616-47bc-8864-6ce4caedd2e1"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `todos.txt` создан. В него записаны все строки из `.py` файлов, содержащие слово \"TODO\".",
+   "content_len": 93,
+   "finish_reason": "stop"
+  }
+ ]
+}

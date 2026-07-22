@@ -1,0 +1,89 @@
+{
+ "task_id": "task_245_memory_temporal_deadline_urgency",
+ "name": "Memory: temporal reasoning — days until deadline → urgency level",
+ "prompt": "Сегодня 26 мая 2026. Собери `urgency.json` из памяти.\nПоля: `project`, `deadline`, `today` (строка YYYY-MM-DD), `days_left` (int), `urgency` (строка: low/medium/high по правилам из памяти).",
+ "passed": true,
+ "message": "deadline urgency computed correctly",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Сегодня 26 мая 2026. Собери `urgency.json` из памяти.\nПоля: `project`, `deadline`, `today` (строка YYYY-MM-DD), `days_left` (int), `urgency` (строка: low/medium/high по правилам из памяти).",
+   "content_len": 189
+  },
+  {
+   "type": "human",
+   "content": "[MEMORY-TASK] This is a memory task.\n1) read_file MEMORY.md first\n2) complete the requested deliverable using MEMORY facts verbatim\n3) if the user mentioned ANY personal fact, edit_file MEMORY.md before finishing",
+   "content_len": 212
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "MEMORY.md"
+     },
+     "id": "c86081ae-f580-4faa-82a2-fe0c5f57f665"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "MEMORY.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t- Проект: Phoenix\n     2\t- Дедлайн проекта Phoenix: 2026-06-10\n     3\t- Уровни срочности: > 30 дней = low, 15-30 = medium, < 15 = high",
+   "content_len": 141,
+   "name": "read_file",
+   "tool_call_id": "c86081ae-f580-4faa-82a2-fe0c5f57f665"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"project\": \"Phoenix\",\n  \"deadline\": \"2026-06-10\",\n  \"today\": \"2026-05-26\",\n  \"days_left\": 15,\n  \"urgency\": \"medium\"\n}",
+      "file_path": "urgency.json"
+     },
+     "id": "2613c62d-0e82-40d2-82d5-49608c2a5274"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"project\": \"Phoenix\",\n  \"deadline\": \"2026-06-10\",\n  \"today\": \"2026-05-26\",\n  \"days_left\": 15,\n  \"urgency\": \"medium\"\n}",
+     "file_path": "urgency.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /urgency.json",
+   "content_len": 26,
+   "name": "write_file",
+   "tool_call_id": "2613c62d-0e82-40d2-82d5-49608c2a5274"
+  },
+  {
+   "type": "ai",
+   "content": "Файл urgency.json создан.\n\n{\n  \"project\": \"Phoenix\",\n  \"deadline\": \"2026-06-10\",\n  \"today\": \"2026-05-26\",\n  \"days_left\": 15,\n  \"urgency\": \"medium\"\n}",
+   "content_len": 148,
+   "finish_reason": "stop"
+  }
+ ]
+}

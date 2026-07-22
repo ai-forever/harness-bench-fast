@@ -1,0 +1,84 @@
+{
+ "task_id": "task_108_csv_dedupe",
+ "name": "Deduplicate events.csv by user_id (first occurrence)",
+ "prompt": "В файле events.csv колонки user_id,event и несколько событий на одного пользователя. Сделай файл unique.csv с теми же колонками, в котором от каждого user_id осталось только первое по порядку событие из events.csv. Заголовок сохрани.",
+ "passed": true,
+ "message": "unique.csv matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле events.csv колонки user_id,event и несколько событий на одного пользователя. Сделай файл unique.csv с теми же колонками, в котором от каждого user_id осталось только первое по порядку событие из events.csv. Заголовок сохрани.",
+   "content_len": 233
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/events.csv"
+     },
+     "id": "beeb153d-4c23-4f06-8c2c-1b7aec7dc299"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/events.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tuser_id,event\n     2\tu1,login\n     3\tu2,login\n     4\tu1,view\n     5\tu3,login\n     6\tu2,click\n     7\tu4,login\n     8\tu1,logout\n     9\tu3,view\n    10\tu5,login",
+   "content_len": 163,
+   "name": "read_file",
+   "tool_call_id": "beeb153d-4c23-4f06-8c2c-1b7aec7dc299"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "user_id,event\nu1,login\nu2,login\nu3,login\nu4,login\nu5,login",
+      "file_path": "/unique.csv"
+     },
+     "id": "ea3306f1-c829-4eef-919c-3263c33ebc50"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "user_id,event\nu1,login\nu2,login\nu3,login\nu4,login\nu5,login",
+     "file_path": "/unique.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /unique.csv",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "ea3306f1-c829-4eef-919c-3263c33ebc50"
+  },
+  {
+   "type": "ai",
+   "content": "Файл unique.csv создан. В нём сохранён заголовок и для каждого user_id оставлено только первое по порядку событие из исходного файла events.csv.\n\nСодержимое нового файла:\nuser_id,event\nu1,login\nu2,login\nu3,login\nu4,login\nu5,login",
+   "content_len": 229,
+   "finish_reason": "stop"
+  }
+ ]
+}

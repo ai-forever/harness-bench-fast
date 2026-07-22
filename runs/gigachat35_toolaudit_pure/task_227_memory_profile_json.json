@@ -1,0 +1,23 @@
+{
+ "task_id": "task_227_memory_profile_json",
+ "name": "Memory: synthesize profile.json from many facts, derive github URL",
+ "prompt": "Сгенерируй для меня profile.json со всеми моими данными. Поля: name, email, github (URL вида https://github.com/<username>), city, stack (массив строк с моими технологиями). Это валидный JSON, без лишних полей.",
+ "passed": false,
+ "message": "profile.json missing",
+ "error": null,
+ "real_tool_call_names": [],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Сгенерируй для меня profile.json со всеми моими данными. Поля: name, email, github (URL вида https://github.com/<username>), city, stack (массив строк с моими технологиями). Это валидный JSON, без лишних полей.",
+   "content_len": 210
+  },
+  {
+   "type": "ai",
+   "content": "Мне не хватает ваших данных для генерации файла. Пожалуйста, предоставьте:\n\n- Имя (name)\n- Email\n- GitHub-пользовательник (только имя, например `username`, а не полный URL)\n- Город (city)\n- Стек технологий (stack) — массив строк, например: `[\"Python\", \"Django\", \"PostgreSQL\"]`\n\nКак только вы их укажете, я создам файл `/profile.json` с нужной структурой.",
+   "content_len": 354,
+   "finish_reason": "stop"
+  }
+ ]
+}

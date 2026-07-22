@@ -1,0 +1,113 @@
+{
+ "task_id": "task_176_csv_rolling_avg",
+ "name": "Add a 3-window rolling average column to numbers.csv",
+ "prompt": "В файле numbers.csv 8 строк данных в колонке value. Сделай файл rolling.csv с двумя колонками: value и rolling_avg. rolling_avg — это среднее значений value в скользящем окне из трёх последних строк (текущей и двух предыдущих). Для первых двух строк, у которых ещё нет трёх значений, оставь поле rolling_avg пустым (то есть строка имеет вид 'value,'). Значение rolling_avg округляй до 2 знаков после запятой.",
+ "passed": true,
+ "message": "rolling.csv has correct rolling averages with empty first two cells",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле numbers.csv 8 строк данных в колонке value. Сделай файл rolling.csv с двумя колонками: value и rolling_avg. rolling_avg — это среднее значений value в скользящем окне из трёх последних строк (текущей и двух предыдущих). Для первых двух строк, у которых ещё нет трёх значений, оставь поле rolling_avg пустым (то есть строка имеет вид 'value,'). Значение rolling_avg округляй до 2 знаков после запятой.",
+   "content_len": 408
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "numbers.csv"
+     },
+     "id": "0ebe771c-2d41-4daa-a83a-b786999cc793"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "numbers.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tvalue\n     2\t10\n     3\t20\n     4\t30\n     5\t40\n     6\t50\n     7\t60\n     8\t70\n     9\t80",
+   "content_len": 92,
+   "name": "read_file",
+   "tool_call_id": "0ebe771c-2d41-4daa-a83a-b786999cc793"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "value,rolling_avg\n10,\n20,\n30,20.00\n40,30.00\n50,40.00\n60,50.00\n70,60.00\n80,70.00",
+      "file_path": "rolling.csv"
+     },
+     "id": "db15cf66-78b7-4ed6-aa96-f431090f0a71"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "value,rolling_avg\n10,\n20,\n30,20.00\n40,30.00\n50,40.00\n60,50.00\n70,60.00\n80,70.00",
+     "file_path": "rolling.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /rolling.csv",
+   "content_len": 25,
+   "name": "write_file",
+   "tool_call_id": "db15cf66-78b7-4ed6-aa96-f431090f0a71"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "rolling.csv"
+     },
+     "id": "486bf2ab-68f0-4d6f-878f-7efe579aa13e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "rolling.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tvalue,rolling_avg\n     2\t10,\n     3\t20,\n     4\t30,20.00\n     5\t40,30.00\n     6\t50,40.00\n     7\t60,50.00\n     8\t70,60.00\n     9\t80,70.00",
+   "content_len": 142,
+   "name": "read_file",
+   "tool_call_id": "486bf2ab-68f0-4d6f-878f-7efe579aa13e"
+  },
+  {
+   "type": "ai",
+   "content": "Файл rolling.csv успешно создан. Он содержит 8 строк данных, соответствующих входному файлу numbers.csv.\n\n- Для первых двух строк (значения 10 и 20) поле `rolling_avg` оставлено пустым.\n- Начиная с третьей строки, значение является средним в скользящем окне из трёх элементов, округлённым до двух знаков после запятой. Например:\n    - Строка со значением `30`: `(10 + 20 + 30) / 3 = 20.00`\n    - Строка со значением `40`: `(20 + 30 + 40) / 3 = 30.00`\n    - ...\n    - Строка со значением `80`: `(60 + 70 + 80) / 3 = 70.00`",
+   "content_len": 521,
+   "finish_reason": "stop"
+  }
+ ]
+}

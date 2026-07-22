@@ -1,0 +1,115 @@
+{
+ "task_id": "task_295_swe_parse_tags",
+ "name": "Fix tag parsing normalization",
+ "prompt": "Почини tags.py: parse_tags должен trim, lower-case, удалить пустые элементы, дедуплицировать и вернуть отсортированный список. Тесты менять нельзя.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "edit_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Почини tags.py: parse_tags должен trim, lower-case, удалить пустые элементы, дедуплицировать и вернуть отсортированный список. Тесты менять нельзя.",
+   "content_len": 147
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "tags.py"
+     },
+     "id": "ab312417-4370-48e5-aac2-ad4301be0010"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "tags.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdef parse_tags(raw: str) -> list[str]:\n     2\t    return raw.split(\",\")",
+   "content_len": 78,
+   "name": "read_file",
+   "tool_call_id": "ab312417-4370-48e5-aac2-ad4301be0010"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "tags.py",
+      "new_string": "def parse_tags(raw: str) -> list[str]:\n    # Разделяем по запятой, приводим к нижнему регистру и убираем пробелы\n    tags = [tag.strip().lower() for tag in raw.split(\",\")]\n    # Фильтруем пустые строки и дедуплицируем через set\n    unique_tags = {tag for tag in tags if tag}\n    # Возвращаем отсортированный список для детерминированного порядка\n    return sorted(unique_tags)",
+      "old_string": "def parse_tags(raw: str) -> list[str]:\n    return raw.split(\",\")"
+     },
+     "id": "6af836fe-ba97-4d1b-baee-ee2ff4b5e22e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "tags.py",
+     "new_string": "def parse_tags(raw: str) -> list[str]:\n    # Разделяем по запятой, приводим к нижнему регистру и убираем пробелы\n    tags = [tag.strip().lower() for tag in raw.split(\",\")]\n    # Фильтруем пустые строки и дедуплицируем через set\n    unique_tags = {tag for tag in tags if tag}\n    # Возвращаем отсортированный список для детерминированного порядка\n    return sorted(unique_tags)",
+     "old_string": "def parse_tags(raw: str) -> list[str]:\n    return raw.split(\",\")"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/tags.py'",
+   "content_len": 63,
+   "name": "edit_file",
+   "tool_call_id": "6af836fe-ba97-4d1b-baee-ee2ff4b5e22e"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "tags.py"
+     },
+     "id": "150f0d40-fcc4-4caa-9a72-4f6c366b6b74"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "tags.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdef parse_tags(raw: str) -> list[str]:\n     2\t    # Разделяем по запятой, приводим к нижнему регистру и убираем пробелы\n     3\t    tags = [tag.strip().lower() for tag in raw.split(\",\")]\n     4\t    # Фильтруем пустые строки и дедуплицируем через set\n     5\t    unique_tags = {tag for tag in tags if tag}\n     6\t    # Возвращаем отсортированный список для детерминированного порядка\n     7\t    return sorted(unique_tags)",
+   "content_len": 425,
+   "name": "read_file",
+   "tool_call_id": "150f0d40-fcc4-4caa-9a72-4f6c366b6b74"
+  },
+  {
+   "type": "ai",
+   "content": "Функция `parse_tags` в файле `tags.py` исправлена. Теперь она выполняет все требуемые операции:\n-   **trim**: удаляет пробелы по краям каждого тега с помощью `.strip()`.\n-   **lower-case**: приводит все теги к нижнему регистру с помощью `.lower()`.\n-   **удалить пустые элементы**: фильтрует пустые строки.\n-   **дедуплицировать**: использует множество (`set`) для удаления дубликатов.\n-   **отсортированный список**: возвращает результат, отсортированный функцией `sorted()` для обеспечения детерминированного порядка.\n\nИзменения внесены без модификации тестов.",
+   "content_len": 562,
+   "finish_reason": "stop"
+  }
+ ]
+}

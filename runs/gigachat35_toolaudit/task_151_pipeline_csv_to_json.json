@@ -1,0 +1,142 @@
+{
+ "task_id": "task_151_pipeline_csv_to_json",
+ "name": "Filter + groupby + sort orders.csv to summary.json",
+ "prompt": "В файле orders.csv 20 строк данных (user,category,amount). Сделай summary.json — JSON-массив объектов с полями category и total. Включай только заказы, у которых amount >= 100; суммируй amount по каждой категории; сортируй итоговый массив по полю total по убыванию (при равенстве — по имени категории по возрастанию). В итоговом массиве должны быть только категории, по которым есть хотя бы одна подходящая строка.",
+ "passed": true,
+ "message": "summary.json matches expected JSON",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "execute",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле orders.csv 20 строк данных (user,category,amount). Сделай summary.json — JSON-массив объектов с полями category и total. Включай только заказы, у которых amount >= 100; суммируй amount по каждой категории; сортируй итоговый массив по полю total по убыванию (при равенстве — по имени категории по возрастанию). В итоговом массиве должны быть только категории, по которым есть хотя бы одна подходящая строка.",
+   "content_len": 414
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "orders.csv"
+     },
+     "id": "a9090c91-3c73-4f0d-b7bb-10f207996e37"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "orders.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tuser,category,amount\n     2\talice,books,120\n     3\tbob,tech,95\n     4\tcarol,books,250\n     5\tdave,food,80\n     6\teve,tech,1100\n     7\tfrank,books,40\n     8\tgrace,food,110\n     9\thenry,tech,105\n    10\tivy,books,300\n    11\tjack,food,200\n    12\tkate,tech,99\n    13\tliam,books,175\n    14\tmia,food,130\n    15\tnoah,tech,1500\n    16\tolive,books,95\n    17\tpaul,food,175\n    18\tquinn,tech,80\n    19\triley,books,220\n    20\tsam,food,60\n    21\ttara,tech,150",
+   "content_len": 452,
+   "name": "read_file",
+   "tool_call_id": "a9090c91-3c73-4f0d-b7bb-10f207996e37"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import csv\nimport json\n\ndata = []\nwith open('orders.csv', 'r', encoding='utf-8') as f:\n    reader = csv.DictReader(f)\n    for row in reader:\n        amount = int(row['amount'])\n        if amount >= 100:\n            data.append({\n                'category': row['category'],\n                'amount': amount\n            })\n\ntotals = {}\nfor item in data:\n    cat = item['category']\n    totals[cat] = totals.get(cat, 0) + item['amount']\n\nresult = [{'category': k, 'total': v} for k, v in totals.items()]\n# Сортировка: total по убыванию, category по возрастанию при равенстве\nresult.sort(key=lambda x: (-x['total'], x['category']))\n\nwith open('summary.json', 'w', encoding='utf-8') as out:\n    json.dump(result, out, ensure_ascii=False, indent=2)",
+      "file_path": "process_orders.py"
+     },
+     "id": "13037268-c16e-4f8a-80a1-9507d42096e1"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import csv\nimport json\n\ndata = []\nwith open('orders.csv', 'r', encoding='utf-8') as f:\n    reader = csv.DictReader(f)\n    for row in reader:\n        amount = int(row['amount'])\n        if amount >= 100:\n            data.append({\n                'category': row['category'],\n                'amount': amount\n            })\n\ntotals = {}\nfor item in data:\n    cat = item['category']\n    totals[cat] = totals.get(cat, 0) + item['amount']\n\nresult = [{'category': k, 'total': v} for k, v in totals.items()]\n# Сортировка: total по убыванию, category по возрастанию при равенстве\nresult.sort(key=lambda x: (-x['total'], x['category']))\n\nwith open('summary.json', 'w', encoding='utf-8') as out:\n    json.dump(result, out, ensure_ascii=False, indent=2)",
+     "file_path": "process_orders.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /process_orders.py",
+   "content_len": 31,
+   "name": "write_file",
+   "tool_call_id": "13037268-c16e-4f8a-80a1-9507d42096e1"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python process_orders.py"
+     },
+     "id": "9b32b1ca-f15c-4c97-8b64-be43cad53fb9"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python process_orders.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "9b32b1ca-f15c-4c97-8b64-be43cad53fb9"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "summary.json"
+     },
+     "id": "1df46e5b-dd18-4a35-9b28-3f2749b00b02"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "summary.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t[\n     2\t  {\n     3\t    \"category\": \"tech\",\n     4\t    \"total\": 2855\n     5\t  },\n     6\t  {\n     7\t    \"category\": \"books\",\n     8\t    \"total\": 1065\n     9\t  },\n    10\t  {\n    11\t    \"category\": \"food\",\n    12\t    \"total\": 615\n    13\t  }\n    14\t]",
+   "content_len": 253,
+   "name": "read_file",
+   "tool_call_id": "1df46e5b-dd18-4a35-9b28-3f2749b00b02"
+  },
+  {
+   "type": "ai",
+   "content": "Файл summary.json успешно создан. Итоговый массив содержит три объекта, отсортированные по убыванию суммы заказа:\n\n1.  **tech**: 2855\n2.  **books**: 1065\n3.  **food**: 615\n\nВ расчёт вошли только заказы с `amount >= 100`. Категории без подходящих заказов в результат не включены.",
+   "content_len": 278,
+   "finish_reason": "stop"
+  }
+ ]
+}

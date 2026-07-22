@@ -1,0 +1,210 @@
+{
+ "task_id": "task_94_remove_unused",
+ "name": "Remove `unused_helper` from utils.py",
+ "prompt": "В файле utils.py три функции: keep_one, unused_helper, keep_two. Удали определение функции unused_helper целиком (вместе с её телом). Функции keep_one и keep_two трогать не нужно — оставь их без изменений.",
+ "passed": true,
+ "message": "utils.py free of forbidden substrings; utils.py contains all expected substrings; utils.py: mod.keep_one() == 1; utils.py: mod.keep_two() == 2",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "edit_file",
+  "read_file",
+  "edit_file",
+  "edit_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле utils.py три функции: keep_one, unused_helper, keep_two. Удали определение функции unused_helper целиком (вместе с её телом). Функции keep_one и keep_two трогать не нужно — оставь их без изменений.",
+   "content_len": 205
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "utils.py"
+     },
+     "id": "ea9626d1-1690-4a1a-a1f3-e8c0eac1eef0"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "utils.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdef keep_one():\n     2\t    return 1\n     3\t\n     4\t\n     5\tdef unused_helper():\n     6\t    return 'dead code'\n     7\t\n     8\t\n     9\tdef keep_two():\n    10\t    return 2",
+   "content_len": 175,
+   "name": "read_file",
+   "tool_call_id": "ea9626d1-1690-4a1a-a1f3-e8c0eac1eef0"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "utils.py",
+      "new_string": "",
+      "old_string": "def unused_helper():\n    return 'dead code'"
+     },
+     "id": "f963001e-fc49-4a03-b1d2-6198aa73016b"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "utils.py",
+     "new_string": "",
+     "old_string": "def unused_helper():\n    return 'dead code'"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/utils.py'",
+   "content_len": 64,
+   "name": "edit_file",
+   "tool_call_id": "f963001e-fc49-4a03-b1d2-6198aa73016b"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "utils.py"
+     },
+     "id": "7bd0edef-727b-40e1-bada-86068e42d4d8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "utils.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdef keep_one():\n     2\t    return 1\n     3\t\n     4\t\n     5\t\n     6\t\n     7\t\n     8\tdef keep_two():\n     9\t    return 2",
+   "content_len": 125,
+   "name": "read_file",
+   "tool_call_id": "7bd0edef-727b-40e1-bada-86068e42d4d8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "utils.py",
+      "new_string": "def keep_one():\n    return 1",
+      "old_string": "def keep_one():\n    return 1\n\n\n"
+     },
+     "id": "31b1d25a-714e-4d93-8dac-d9a3447731df"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "utils.py",
+     "new_string": "def keep_one():\n    return 1",
+     "old_string": "def keep_one():\n    return 1\n\n\n"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/utils.py'",
+   "content_len": 64,
+   "name": "edit_file",
+   "tool_call_id": "31b1d25a-714e-4d93-8dac-d9a3447731df"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "utils.py",
+      "new_string": "def keep_two():\n    return 2",
+      "old_string": "def keep_two():\n    return 2\n\n\n"
+     },
+     "id": "8c088c8a-ceda-4cbf-ba33-939cc6b354c2"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "utils.py",
+     "new_string": "def keep_two():\n    return 2",
+     "old_string": "def keep_two():\n    return 2\n\n\n"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Error: String not found in file: 'def keep_two():\n    return 2\n\n\n'",
+   "content_len": 66,
+   "name": "edit_file",
+   "tool_call_id": "8c088c8a-ceda-4cbf-ba33-939cc6b354c2"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "utils.py"
+     },
+     "id": "53dd7dea-2535-483d-a812-eb015e483da9"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "utils.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdef keep_one():\n     2\t    return 1\n     3\t\n     4\t\n     5\tdef keep_two():\n     6\t    return 2",
+   "content_len": 101,
+   "name": "read_file",
+   "tool_call_id": "53dd7dea-2535-483d-a812-eb015e483da9"
+  },
+  {
+   "type": "ai",
+   "content": "Определение функции `unused_helper` полностью удалено из файла utils.py. Функции keep_one и keep_two оставлены без изменений.\n\nСодержимое файла:\n```python\ndef keep_one():\n    return 1\n\ndef keep_two():\n    return 2\n```",
+   "content_len": 217,
+   "finish_reason": "stop"
+  }
+ ]
+}

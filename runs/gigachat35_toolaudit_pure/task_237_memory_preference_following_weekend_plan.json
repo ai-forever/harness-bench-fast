@@ -1,0 +1,23 @@
+{
+ "task_id": "task_237_memory_preference_following_weekend_plan",
+ "name": "Memory: preference-following weekend plan with anti-preference constraints",
+ "prompt": "Сделай `weekend_plan.json` по моим предпочтениям из памяти.\nФормат: `city`, `activities` (ровно 3 пункта), `notes`.\nВажно: не предлагай то, что я не люблю.",
+ "passed": false,
+ "message": "weekend_plan.json missing",
+ "error": null,
+ "real_tool_call_names": [],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Сделай `weekend_plan.json` по моим предпочтениям из памяти.\nФормат: `city`, `activities` (ровно 3 пункта), `notes`.\nВажно: не предлагай то, что я не люблю.",
+   "content_len": 155
+  },
+  {
+   "type": "ai",
+   "content": "У меня нет доступа к вашей памяти или предыдущим диалогам, поэтому я не знаю ваших предпочтений. Чтобы составить план на выходные, который вам понравится, пожалуйста, напишите:\n\n- Какой город?\n- Какие три вида деятельности вы любите? *(Например: музеи, долгие прогулки по паркам, гастрономические туры).*\n- Важные примечания? *(Например: бюджет, с кем планируете провести время, чего точно нужно избегать).*\n\nКак только вы предоставите эту информацию, я создам файл `weekend_plan.json` в нужном формате.",
+   "content_len": 503,
+   "finish_reason": "stop"
+  }
+ ]
+}

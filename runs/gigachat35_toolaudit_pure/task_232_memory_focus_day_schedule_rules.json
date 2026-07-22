@@ -1,0 +1,55 @@
+{
+ "task_id": "task_232_memory_focus_day_schedule_rules",
+ "name": "Memory: add focus day and implement can_schedule_meeting()",
+ "prompt": "Добавь в память, что у меня фокус-день по пятницам (в этот день встреч не ставим). И создай `calendar_rules.py` с функцией `can_schedule_meeting(day_of_week: str, hour: int) -> bool`.\nПравила:\n- работаем только в часы 10:00-19:00 (19:00 уже не входит);\n- по пятницам встречи всегда запрещены;\n- `day_of_week` приходит в английском формате (`monday`, ..., `sunday`).",
+ "passed": false,
+ "message": "MEMORY.md doesn't contain '- Фокус-день: пятница'",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Добавь в память, что у меня фокус-день по пятницам (в этот день встреч не ставим). И создай `calendar_rules.py` с функцией `can_schedule_meeting(day_of_week: str, hour: int) -> bool`.\nПравила:\n- работаем только в часы 10:00-19:00 (19:00 уже не входит);\n- по пятницам встречи всегда запрещены;\n- `day_of_week` приходит в английском формате (`monday`, ..., `sunday`).",
+   "content_len": 365
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "def can_schedule_meeting(day_of_week: str, hour: int) -> bool:\n    \"\"\"\n    Determines if a meeting can be scheduled based on the day of the week and hour.\n\n    Rules:\n    - Meetings are only allowed between 10:00 (inclusive) and 19:00 (exclusive).\n    - No meetings are allowed on Fridays (focus day).\n    \n    Args:\n        day_of_week (str): The day of the week in English (e.g., 'monday', ..., 'sunday').\n        hour (int): The hour of the day in 24-hour format (0-23).\n\n    Returns:\n        bool: True if the meeting can be scheduled, False otherwise.\n    \"\"\"\n    # Rule 1: Focus day is Friday. No meetings.\n    if day_of_week.lower() == 'friday':\n        return False\n\n    # Rule 2: Working hours are from 10:00 inclusive to 19:00 exclusive.\n    if not (10 <= hour < 19):\n        return False\n\n    return True",
+      "file_path": "/calendar_rules.py"
+     },
+     "id": "cc1f7417-5d05-4143-ad6e-d13b75baa85a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "def can_schedule_meeting(day_of_week: str, hour: int) -> bool:\n    \"\"\"\n    Determines if a meeting can be scheduled based on the day of the week and hour.\n\n    Rules:\n    - Meetings are only allowed between 10:00 (inclusive) and 19:00 (exclusive).\n    - No meetings are allowed on Fridays (focus day).\n    \n    Args:\n        day_of_week (str): The day of the week in English (e.g., 'monday', ..., 'sunday').\n        hour (int): The hour of the day in 24-hour format (0-23).\n\n    Returns:\n        bool: True if the meeting can be scheduled, False otherwise.\n    \"\"\"\n    # Rule 1: Focus day is Friday. No meetings.\n    if day_of_week.lower() == 'friday':\n        return False\n\n    # Rule 2: Working hours are from 10:00 inclusive to 19:00 exclusive.\n    if not (10 <= hour < 19):\n        return False\n\n    return True",
+     "file_path": "/calendar_rules.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /calendar_rules.py",
+   "content_len": 31,
+   "name": "write_file",
+   "tool_call_id": "cc1f7417-5d05-4143-ad6e-d13b75baa85a"
+  },
+  {
+   "type": "ai",
+   "content": "Я создал файл `calendar_rules.py` с функцией, которая реализует ваши правила.\n\n### Содержимое файла `/calendar_rules.py`\n```python\ndef can_schedule_meeting(day_of_week: str, hour: int) -> bool:\n    \"\"\"\n    Determines if a meeting can be scheduled based on the day of the week and hour.\n\n    Rules:\n    - Meetings are only allowed between 10:00 (inclusive) and 19:00 (exclusive).\n    - No meetings are allowed on Fridays (focus day).\n    \n    Args:\n        day_of_week (str): The day of the week in English (e.g., 'monday', ..., 'sunday').\n        hour (int): The hour of the day in 24-hour format (0-23).\n\n    Returns:\n        bool: True if the meeting can be scheduled, False otherwise.\n    \"\"\"\n    # Rule 1: Focus day is Friday. No meetings.\n    if day_of_week.lower() == 'friday':\n        return False\n\n    # Rule 2: Working hours are from 10:00 inclusive to 19:00 exclusive.\n    if not (10 <= hour < 19):\n        return False\n\n    return True\n```\n\nЧто касается добавления информации в память, я не имею доступа к долгосрочной памяти пользователя за пределами текущего диалога. Однако эта информация зафиксирована в коде функции как правило №1: по пятницам встречи всегда запрещены.",
+   "content_len": 1185,
+   "finish_reason": "stop"
+  }
+ ]
+}

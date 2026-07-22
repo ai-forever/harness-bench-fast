@@ -1,0 +1,171 @@
+{
+ "task_id": "task_132_md5_hash",
+ "name": "Write MD5 hash of input.txt to hash.txt",
+ "prompt": "В файле input.txt лежит текст 'hello world\\n' (12 байт, включая завершающий перевод строки). Посчитай MD5-хеш содержимого этого файла (как байтов, без какой-либо предобработки) и запиши получившуюся шестнадцатеричную строку (32 символа в нижнем регистре) одной строкой в файл hash.txt. Используй модуль hashlib из стандартной библиотеки.",
+ "passed": true,
+ "message": "hash.txt matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "execute",
+  "ls",
+  "execute",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле input.txt лежит текст 'hello world\\n' (12 байт, включая завершающий перевод строки). Посчитай MD5-хеш содержимого этого файла (как байтов, без какой-либо предобработки) и запиши получившуюся шестнадцатеричную строку (32 символа в нижнем регистре) одной строкой в файл hash.txt. Используй модуль hashlib из стандартной библиотеки.",
+   "content_len": 337
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/input.txt"
+     },
+     "id": "da710acb-6efd-4ea4-ab04-9ad91fd0704b"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/input.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\thello world",
+   "content_len": 18,
+   "name": "read_file",
+   "tool_call_id": "da710acb-6efd-4ea4-ab04-9ad91fd0704b"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python3 -c \"import hashlib; print(hashlib.md5(open('/input.txt', 'rb').read()).hexdigest())\""
+     },
+     "id": "6bf85bbb-0149-4c9c-91f5-96162a09cb38"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python3 -c \"import hashlib; print(hashlib.md5(open('/input.txt', 'rb').read()).hexdigest())\""
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "[stderr] Traceback (most recent call last):\n[stderr]   File \"<string>\", line 1, in <module>\n[stderr] FileNotFoundError: [Errno 2] No such file or directory: '/input.txt'\n\nExit code: 1\n[Command failed with exit code 1]",
+   "content_len": 217,
+   "name": "execute",
+   "tool_call_id": "6bf85bbb-0149-4c9c-91f5-96162a09cb38"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/"
+     },
+     "id": "fec7883c-e8bf-4c90-a9ee-13a31d82692a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/input.txt']",
+   "content_len": 14,
+   "name": "ls",
+   "tool_call_id": "fec7883c-e8bf-4c90-a9ee-13a31d82692a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python3 -c \"import hashlib; print(hashlib.md5(open('input.txt', 'rb').read()).hexdigest())\""
+     },
+     "id": "5b69be35-9076-47ed-ad28-61edefaa6458"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python3 -c \"import hashlib; print(hashlib.md5(open('input.txt', 'rb').read()).hexdigest())\""
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "6f5902ac237024bdd0c176cb93063dc4\n\n[Command succeeded with exit code 0]",
+   "content_len": 70,
+   "name": "execute",
+   "tool_call_id": "5b69be35-9076-47ed-ad28-61edefaa6458"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "6f5902ac237024bdd0c176cb93063dc4",
+      "file_path": "/hash.txt"
+     },
+     "id": "06b59e9f-4a49-43ac-9b21-bc3768b6c3aa"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "6f5902ac237024bdd0c176cb93063dc4",
+     "file_path": "/hash.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /hash.txt",
+   "content_len": 22,
+   "name": "write_file",
+   "tool_call_id": "06b59e9f-4a49-43ac-9b21-bc3768b6c3aa"
+  },
+  {
+   "type": "ai",
+   "content": "MD5-хеш содержимого файла input.txt (байты 'hello world\\n') вычислен и записан в файл hash.txt.\n\nПолученная шестнадцатеричная строка: 6f5902ac237024bdd0c176cb93063dc4",
+   "content_len": 166,
+   "finish_reason": "stop"
+  }
+ ]
+}

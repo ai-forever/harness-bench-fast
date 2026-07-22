@@ -1,0 +1,204 @@
+{
+ "task_id": "task_260_swe_version_parser",
+ "name": "Fix normalize_version for prefixed and prerelease versions",
+ "prompt": "В мини-репозитории падают тесты для парсинга версий. Почини versions.py так, чтобы normalize_version принимала обычные версии, префикс v, суффиксы вроде -rc1, а также версии без patch-компонента. Запусти тесты и не меняй tests/test_versions.py.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "read_file",
+  "read_file",
+  "write_file",
+  "edit_file",
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В мини-репозитории падают тесты для парсинга версий. Почини versions.py так, чтобы normalize_version принимала обычные версии, префикс v, суффиксы вроде -rc1, а также версии без patch-компонента. Запусти тесты и не меняй tests/test_versions.py.",
+   "content_len": 244
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "."
+     },
+     "id": "b4fc5b2a-5d21-4031-8947-552f3d519077"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "."
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/tests/', '/versions.py']",
+   "content_len": 27,
+   "name": "ls",
+   "tool_call_id": "b4fc5b2a-5d21-4031-8947-552f3d519077"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "versions.py"
+     },
+     "id": "f7de02c3-a50d-44fd-bce3-c9e62bc84d52"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "versions.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdef normalize_version(raw: str) -> tuple[int, ...]:\n     2\t    parts = raw.strip().split(\".\")\n     3\t    return tuple(int(part) for part in parts)\n     4\t\n     5\t\n     6\tdef is_compatible(installed: str, required: str) -> bool:\n     7\t    return normalize_version(installed) >= normalize_version(required)",
+   "content_len": 312,
+   "name": "read_file",
+   "tool_call_id": "f7de02c3-a50d-44fd-bce3-c9e62bc84d52"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "tests/test_versions.py"
+     },
+     "id": "ff70921e-9904-48a0-9b4c-fc73bc000c28"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "tests/test_versions.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tfrom versions import is_compatible, normalize_version\n     2\t\n     3\t\n     4\tdef test_plain_versions_still_work():\n     5\t    assert normalize_version(\"1.2.3\") == (1, 2, 3)\n     6\t    assert is_compatible(\"1.10.0\", \"1.2.9\")\n     7\t\n     8\t\n     9\tdef test_prefix_and_suffix_are_ignored():\n    10\t    assert normalize_version(\"v2.4.0\") == (2, 4, 0)\n    11\t    assert normalize_version(\"3.1.0-rc1\") == (3, 1, 0)\n    12\t    assert is_compatible(\"v3.1.0-rc1\", \"3.0.9\")\n    13\t\n    14\t\n    15\tdef test_missing_patch_is_padded():\n    16\t    assert normalize_version(\"2.4\") == (2, 4, 0)\n    17\t    assert is_compatible(\"2.4\", \"2.4.0\")",
+   "content_len": 634,
+   "name": "read_file",
+   "tool_call_id": "ff70921e-9904-48a0-9b4c-fc73bc000c28"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import re\n\ndef normalize_version(raw: str) -> tuple[int, ...]:\n    # Remove leading 'v' and any suffix starting with '-'\n    cleaned = raw.strip().lstrip('v').split('-')[0]\n    parts = [int(p) for p in cleaned.split('.') if p.isdigit()]\n    # Pad to 3 components (major, minor, patch)\n    while len(parts) < 3:\n        parts.append(0)\n    return tuple(parts[:3])\n\n\ndef is_compatible(installed: str, required: str) -> bool:\n    return normalize_version(installed) >= normalize_version(required)",
+      "file_path": "versions.py"
+     },
+     "id": "82cf3320-6814-4b98-b412-521c12d5aa06"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import re\n\ndef normalize_version(raw: str) -> tuple[int, ...]:\n    # Remove leading 'v' and any suffix starting with '-'\n    cleaned = raw.strip().lstrip('v').split('-')[0]\n    parts = [int(p) for p in cleaned.split('.') if p.isdigit()]\n    # Pad to 3 components (major, minor, patch)\n    while len(parts) < 3:\n        parts.append(0)\n    return tuple(parts[:3])\n\n\ndef is_compatible(installed: str, required: str) -> bool:\n    return normalize_version(installed) >= normalize_version(required)",
+     "file_path": "versions.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Cannot write to /versions.py because it already exists. Read and then make an edit, or write to a new path.",
+   "content_len": 107,
+   "name": "write_file",
+   "tool_call_id": "82cf3320-6814-4b98-b412-521c12d5aa06"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "versions.py",
+      "new_string": "def normalize_version(raw: str) -> tuple[int, ...]:\n    # Remove leading 'v' and any suffix starting with '-'\n    cleaned = raw.strip().lstrip('v').split('-')[0]\n    parts = [int(p) for p in cleaned.split('.') if p.isdigit()]\n    # Pad to 3 components (major, minor, patch)\n    while len(parts) < 3:\n        parts.append(0)\n    return tuple(parts[:3])",
+      "old_string": "def normalize_version(raw: str) -> tuple[int, ...]:\n    parts = raw.strip().split(\".\")\n    return tuple(int(part) for part in parts)"
+     },
+     "id": "3aa178ec-b42a-453e-93bd-58ab6811f65f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "versions.py",
+     "new_string": "def normalize_version(raw: str) -> tuple[int, ...]:\n    # Remove leading 'v' and any suffix starting with '-'\n    cleaned = raw.strip().lstrip('v').split('-')[0]\n    parts = [int(p) for p in cleaned.split('.') if p.isdigit()]\n    # Pad to 3 components (major, minor, patch)\n    while len(parts) < 3:\n        parts.append(0)\n    return tuple(parts[:3])",
+     "old_string": "def normalize_version(raw: str) -> tuple[int, ...]:\n    parts = raw.strip().split(\".\")\n    return tuple(int(part) for part in parts)"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/versions.py'",
+   "content_len": 67,
+   "name": "edit_file",
+   "tool_call_id": "3aa178ec-b42a-453e-93bd-58ab6811f65f"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -m pytest tests/test_versions.py -q"
+     },
+     "id": "6b9afee0-8001-43aa-b7ac-777ef297cdc2"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -m pytest tests/test_versions.py -q"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "...                                                                      [100%]\n3 passed in 0.01s\n\n[Command succeeded with exit code 0]",
+   "content_len": 135,
+   "name": "execute",
+   "tool_call_id": "6b9afee0-8001-43aa-b7ac-777ef297cdc2"
+  },
+  {
+   "type": "ai",
+   "content": "Исправил функцию `normalize_version` в файле `versions.py`. Теперь она корректно обрабатывает версии с префиксом `v`, суффиксами вроде `-rc1` и без patch-компонента, приводя их к стандартному кортежу из трёх чисел.\n\nВсе тесты (`tests/test_versions.py`) успешно пройдены:\n```\n3 passed in 0.01s\n```",
+   "content_len": 296,
+   "finish_reason": "stop"
+  }
+ ]
+}

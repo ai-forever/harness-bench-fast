@@ -1,0 +1,82 @@
+{
+ "task_id": "task_160_create_zip",
+ "name": "Create bundle.zip containing files/one.txt, two.txt, three.txt",
+ "prompt": "В каталоге files три файла: one.txt, two.txt, three.txt. Упакуй все три в архив bundle.zip в корне рабочей директории. Допустимо как положить файлы под путём files/<имя>, так и просто в корень архива под именем <имя> — важно, чтобы файлы можно было прочитать из архива и содержимое каждого совпадало с исходным.",
+ "passed": true,
+ "message": "bundle.zip contains the three files with correct content",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каталоге files три файла: one.txt, two.txt, three.txt. Упакуй все три в архив bundle.zip в корне рабочей директории. Допустимо как положить файлы под путём files/<имя>, так и просто в корень архива под именем <имя> — важно, чтобы файлы можно было прочитать из архива и содержимое каждого совпадало с исходным.",
+   "content_len": 311
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "files"
+     },
+     "id": "6fd1c619-5afb-4ce2-a146-2efe549b76ae"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "files"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/files/one.txt', '/files/three.txt', '/files/two.txt']",
+   "content_len": 56,
+   "name": "ls",
+   "tool_call_id": "6fd1c619-5afb-4ce2-a146-2efe549b76ae"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "zip -r bundle.zip files"
+     },
+     "id": "c86718ad-3781-40e7-92e8-50fea3c72c43"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "zip -r bundle.zip files"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "  adding: files/ (stored 0%)\n  adding: files/two.txt (stored 0%)\n  adding: files/three.txt (stored 0%)\n  adding: files/one.txt (stored 0%)\n\n[Command succeeded with exit code 0]",
+   "content_len": 176,
+   "name": "execute",
+   "tool_call_id": "c86718ad-3781-40e7-92e8-50fea3c72c43"
+  },
+  {
+   "type": "ai",
+   "content": "Архив bundle.zip успешно создан в корне рабочей директории. В него упакованы файлы files/one.txt, files/two.txt и files/three.txt с сохранением структуры каталога.\n\nСодержимое архива:\n- files/one.txt\n- files/two.txt\n- files/three.txt",
+   "content_len": 233,
+   "finish_reason": "stop"
+  }
+ ]
+}

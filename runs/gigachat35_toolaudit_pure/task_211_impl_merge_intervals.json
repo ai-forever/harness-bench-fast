@@ -1,0 +1,55 @@
+{
+ "task_id": "task_211_impl_merge_intervals",
+ "name": "Implement merge_intervals with validation so pytest passes",
+ "prompt": "Создай intervals.py с функцией merge_intervals(intervals).\nВход: список пар [start, end]. Нужно:\n  - валидировать, что start <= end, иначе ValueError;\n  - объединять пересекающиеся и соприкасающиеся интервалы;\n  - вернуть список объединенных интервалов, отсортированный по start.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай intervals.py с функцией merge_intervals(intervals).\nВход: список пар [start, end]. Нужно:\n  - валидировать, что start <= end, иначе ValueError;\n  - объединять пересекающиеся и соприкасающиеся интервалы;\n  - вернуть список объединенных интервалов, отсортированный по start.",
+   "content_len": 279
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "def merge_intervals(intervals):\n    \"\"\"\n    Объединяет пересекающиеся и соприкасающиеся интервалы.\n\n    Параметры:\n        intervals (list[list[int]]): Список интервалов [start, end].\n\n    Возвращает:\n        list[list[int]]: Отсортированный список объединенных интервалов.\n\n    Исключения:\n        ValueError: Если для какого-либо интервала start > end.\n    \"\"\"\n    if not isinstance(intervals, list):\n        raise TypeError(\"Ожидается список интервалов\")\n\n    # Валидация входных данных\n    validated = []\n    for i, interval in enumerate(intervals):\n        if (\n            not isinstance(interval, (list, tuple))\n            or len(interval) != 2\n            or not all(isinstance(x, int) for x in interval)\n        ):\n            raise TypeError(f\"Интервал {i} должен быть списком или кортежем из двух целых чисел\")\n        \n        start, end = interval\n        if start > end:\n            raise ValueError(f\"Начало интервала не может быть больше его конца: {interval}\")\n        validated.append((start, end))\n\n    if not validated:\n        return []\n\n    # Сортировка по началу интервала\n    sorted_intervals = sorted(validated, key=lambda x: x[0])\n\n    merged = [sorted_intervals[0]]\n    for current_start, current_end in sorted_intervals[1:]:\n        last_start, last_end = merged[-1]\n\n        # Проверка на пересечение или соприкосновение\n        if current_start <= last_end:\n            # Объединяем интервалы\n            merged[-1] = (last_start, max(last_end, current_end))\n        else:\n            merged.append((current_start, current_end))\n\n    return [list(interval) for interval in merged]",
+      "file_path": "/intervals.py"
+     },
+     "id": "8ae2a3c8-9648-4c4b-b612-29eba4150a2b"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "def merge_intervals(intervals):\n    \"\"\"\n    Объединяет пересекающиеся и соприкасающиеся интервалы.\n\n    Параметры:\n        intervals (list[list[int]]): Список интервалов [start, end].\n\n    Возвращает:\n        list[list[int]]: Отсортированный список объединенных интервалов.\n\n    Исключения:\n        ValueError: Если для какого-либо интервала start > end.\n    \"\"\"\n    if not isinstance(intervals, list):\n        raise TypeError(\"Ожидается список интервалов\")\n\n    # Валидация входных данных\n    validated = []\n    for i, interval in enumerate(intervals):\n        if (\n            not isinstance(interval, (list, tuple))\n            or len(interval) != 2\n            or not all(isinstance(x, int) for x in interval)\n        ):\n            raise TypeError(f\"Интервал {i} должен быть списком или кортежем из двух целых чисел\")\n        \n        start, end = interval\n        if start > end:\n            raise ValueError(f\"Начало интервала не может быть больше его конца: {interval}\")\n        validated.append((start, end))\n\n    if not validated:\n        return []\n\n    # Сортировка по началу интервала\n    sorted_intervals = sorted(validated, key=lambda x: x[0])\n\n    merged = [sorted_intervals[0]]\n    for current_start, current_end in sorted_intervals[1:]:\n        last_start, last_end = merged[-1]\n\n        # Проверка на пересечение или соприкосновение\n        if current_start <= last_end:\n            # Объединяем интервалы\n            merged[-1] = (last_start, max(last_end, current_end))\n        else:\n            merged.append((current_start, current_end))\n\n    return [list(interval) for interval in merged]",
+     "file_path": "/intervals.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /intervals.py",
+   "content_len": 26,
+   "name": "write_file",
+   "tool_call_id": "8ae2a3c8-9648-4c4b-b612-29eba4150a2b"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `intervals.py` с функцией `merge_intervals(intervals)` успешно создан.\n\nФункция выполняет следующие действия:\n- **Валидация**: Проверяет, что каждый интервал является списком или кортежем из двух целых чисел и что начало (`start`) не больше конца (`end`). В противном случае выбрасывает `ValueError` или `TypeError`.\n- **Объединение**: Объединяет пересекающиеся (например, `[1, 5]` и `[3, 7]`) и соприкасающиеся (например, `[1, 5]` и `[5, 8]`) интервалы в один.\n- **Сортировка**: Возвращает итоговый список интервалов, отсортированный по их началу.\n\nПример использования:\n```python\nfrom intervals import merge_intervals\n\n# Пример 1: Пересекающиеся интервалы\nprint(merge_intervals([[1, 3], [2, 6], [8, 10], [15, 18]]))\n# Вывод: [[1, 6], [8, 10], [15, 18]]\n\n# Пример 2: Соприкасающиеся интервалы\nprint(merge_intervals([[1, 4], [4, 5]]))\n# Вывод: [[1, 5]]\n\n# Пример 3: Некорректный интервал\ntry:\n    print(merge_intervals([[5, 2]]))\nexcept ValueError as e:\n    print(e)\n# Вывод: Начало интервала не может быть больше его конца: [5, 2]\n```",
+   "content_len": 1040,
+   "finish_reason": "stop"
+  }
+ ]
+}

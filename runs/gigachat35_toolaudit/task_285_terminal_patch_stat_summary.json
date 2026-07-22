@@ -1,0 +1,113 @@
+{
+ "task_id": "task_285_terminal_patch_stat_summary",
+ "name": "Summarize git patch statistics",
+ "prompt": "В patch.diff лежит unified diff. Посчитай files_changed, insertions и deletions. Строки заголовков diff (+++ и ---) не считать как insertions/deletions. Создай patch_summary.tsv ровно с тремя строками: files_changed, insertions, deletions.",
+ "passed": false,
+ "message": "patch_summary.tsv lines differ\nExpected: ['files_changed\\t3', 'insertions\\t7', 'deletions\\t3']\nActual:   ['files_changed\\t3', 'insertions\\t5', 'deletions\\t3']",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В patch.diff лежит unified diff. Посчитай files_changed, insertions и deletions. Строки заголовков diff (+++ и ---) не считать как insertions/deletions. Создай patch_summary.tsv ровно с тремя строками: files_changed, insertions, deletions.",
+   "content_len": 239
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "patch.diff"
+     },
+     "id": "86215cbe-2747-4993-ae33-406ba7ab8194"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "patch.diff"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdiff --git a/a.py b/a.py\n     2\t--- a/a.py\n     3\t+++ b/a.py\n     4\t@@ -1,3 +1,5 @@\n     5\t line\n     6\t-old\n     7\t+new\n     8\t+extra\n     9\tdiff --git a/b.py b/b.py\n    10\t--- a/b.py\n    11\t+++ b/b.py\n    12\t@@ -1,2 +1,4 @@\n    13\t-x\n    14\t+y\n    15\t+z\n    16\t+q\n    17\tdiff --git a/c.py b/c.py\n    18\t--- a/c.py\n    19\t+++ b/c.py\n    20\t@@ -1,3 +1,4 @@\n    21\t-drop\n    22\t keep\n    23\t+add\n    24\t+more",
+   "content_len": 414,
+   "name": "read_file",
+   "tool_call_id": "86215cbe-2747-4993-ae33-406ba7ab8194"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "files_changed\t3\ninsertions\t5\ndeletions\t3",
+      "file_path": "patch_summary.tsv"
+     },
+     "id": "6909ad49-1bde-4026-ab39-329edf247bfd"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "files_changed\t3\ninsertions\t5\ndeletions\t3",
+     "file_path": "patch_summary.tsv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /patch_summary.tsv",
+   "content_len": 31,
+   "name": "write_file",
+   "tool_call_id": "6909ad49-1bde-4026-ab39-329edf247bfd"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "patch_summary.tsv"
+     },
+     "id": "9b4d1b3b-bcb6-42fd-9f6f-5e98dd160d39"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "patch_summary.tsv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tfiles_changed\t3\n     2\tinsertions\t5\n     3\tdeletions\t3",
+   "content_len": 61,
+   "name": "read_file",
+   "tool_call_id": "9b4d1b3b-bcb6-42fd-9f6f-5e98dd160d39"
+  },
+  {
+   "type": "ai",
+   "content": "Готово. В файле patch_summary.tsv:\n\nfiles_changed\t3\ninsertions\t5\ndeletions\t3",
+   "content_len": 76,
+   "finish_reason": "stop"
+  }
+ ]
+}

@@ -1,0 +1,113 @@
+{
+ "task_id": "task_199_sqlite_filtered_export",
+ "name": "Export click events with value>15 from sqlite to CSV",
+ "prompt": "В файле events.db таблица events(id, kind, value). Выбери из неё только события с kind == 'click' и value > 15 и сохрани их value в файл big_clicks.csv с заголовком 'value' — по одной строке на значение, отсортированные по возрастанию.",
+ "passed": true,
+ "message": "big_clicks.csv matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "execute",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле events.db таблица events(id, kind, value). Выбери из неё только события с kind == 'click' и value > 15 и сохрани их value в файл big_clicks.csv с заголовком 'value' — по одной строке на значение, отсортированные по возрастанию.",
+   "content_len": 235
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import sqlite3\nimport csv\n\n# Connect to the database file\nconn = sqlite3.connect('events.db')\ncursor = conn.cursor()\n\n# Execute the query to select values based on conditions\nquery = \"SELECT value FROM events WHERE kind = 'click' AND value > 15 ORDER BY value ASC\"\ncursor.execute(query)\nresults = cursor.fetchall()\n\n# Write the results to a CSV file with a header\nwith open('big_clicks.csv', 'w', newline='') as f:\n    writer = csv.writer(f)\n    writer.writerow(['value'])  # Header\n    for row in results:\n        writer.writerow([row[0]])\n\nconn.close()\n",
+      "file_path": "extract_clicks.py"
+     },
+     "id": "129a9278-63c8-4bd3-a7a9-770ef3cbb7f9"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import sqlite3\nimport csv\n\n# Connect to the database file\nconn = sqlite3.connect('events.db')\ncursor = conn.cursor()\n\n# Execute the query to select values based on conditions\nquery = \"SELECT value FROM events WHERE kind = 'click' AND value > 15 ORDER BY value ASC\"\ncursor.execute(query)\nresults = cursor.fetchall()\n\n# Write the results to a CSV file with a header\nwith open('big_clicks.csv', 'w', newline='') as f:\n    writer = csv.writer(f)\n    writer.writerow(['value'])  # Header\n    for row in results:\n        writer.writerow([row[0]])\n\nconn.close()\n",
+     "file_path": "extract_clicks.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /extract_clicks.py",
+   "content_len": 31,
+   "name": "write_file",
+   "tool_call_id": "129a9278-63c8-4bd3-a7a9-770ef3cbb7f9"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python extract_clicks.py"
+     },
+     "id": "13fab0a3-9f94-4dfa-971e-4c93bacc8d8f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python extract_clicks.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "13fab0a3-9f94-4dfa-971e-4c93bacc8d8f"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "big_clicks.csv"
+     },
+     "id": "04fa83fc-c4b1-4c68-9dec-795824b69df5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "big_clicks.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tvalue\n     2\t20\n     3\t30\n     4\t50",
+   "content_len": 42,
+   "name": "read_file",
+   "tool_call_id": "04fa83fc-c4b1-4c68-9dec-795824b69df5"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `big_clicks.csv` успешно создан. В него записаны значения из таблицы events, отфильтрованные по условиям (`kind == 'click'` и `value > 15`) и отсортированные по возрастанию.\n\nСодержимое файла:\n```\nvalue\n20\n30\n50\n```",
+   "content_len": 220,
+   "finish_reason": "stop"
+  }
+ ]
+}

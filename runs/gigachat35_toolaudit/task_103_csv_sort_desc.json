@@ -1,0 +1,84 @@
+{
+ "task_id": "task_103_csv_sort_desc",
+ "name": "Sort teams.csv by score descending",
+ "prompt": "В файле teams.csv 15 строк данных в формате team,score (плюс строка-заголовок). Отсортируй строки данных по столбцу score по убыванию и сохрани результат в sorted.csv (включая ту же строку-заголовок). Названия команд и значения не меняй.",
+ "passed": true,
+ "message": "sorted.csv matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле teams.csv 15 строк данных в формате team,score (плюс строка-заголовок). Отсортируй строки данных по столбцу score по убыванию и сохрани результат в sorted.csv (включая ту же строку-заголовок). Названия команд и значения не меняй.",
+   "content_len": 237
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "teams.csv"
+     },
+     "id": "046c7c41-a212-48a6-91de-a34c8f15ee0d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "teams.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tteam,score\n     2\talpha,42\n     3\tbravo,88\n     4\tcharlie,15\n     5\tdelta,73\n     6\techo,91\n     7\tfoxtrot,27\n     8\tgolf,64\n     9\thotel,50\n    10\tindia,36\n    11\tjuliet,80\n    12\tkilo,58\n    13\tlima,19\n    14\tmike,95\n    15\tnovember,71\n    16\toscar,33",
+   "content_len": 260,
+   "name": "read_file",
+   "tool_call_id": "046c7c41-a212-48a6-91de-a34c8f15ee0d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "team,score\nmike,95\necho,91\nbravo,88\njuliet,80\ndelta,73\nnovember,71\ngolf,64\nkilo,58\nhotel,50\nalpha,42\nindia,36\noscar,33\nfoxtrot,27\nlima,19\ncharlie,15",
+      "file_path": "sorted.csv"
+     },
+     "id": "32bb97a4-9f1d-4372-b423-2cebf9a75a34"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "team,score\nmike,95\necho,91\nbravo,88\njuliet,80\ndelta,73\nnovember,71\ngolf,64\nkilo,58\nhotel,50\nalpha,42\nindia,36\noscar,33\nfoxtrot,27\nlima,19\ncharlie,15",
+     "file_path": "sorted.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /sorted.csv",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "32bb97a4-9f1d-4372-b423-2cebf9a75a34"
+  },
+  {
+   "type": "ai",
+   "content": "Отсортированные данные сохранены в файл `sorted.csv`.",
+   "content_len": 53,
+   "finish_reason": "stop"
+  }
+ ]
+}

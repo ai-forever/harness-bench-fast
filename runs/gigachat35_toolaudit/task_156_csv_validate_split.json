@@ -1,0 +1,115 @@
+{
+ "task_id": "task_156_csv_validate_split",
+ "name": "Split records.csv into good.csv and bad.csv",
+ "prompt": "В файле records.csv 10 строк данных (id,status,value). Раздели их на два файла:\n  - good.csv — те, у которых status == 'ok' И value >= 0;\n  - bad.csv — все остальные (status != 'ok' или value < 0).\nВ обоих файлах должна быть исходная строка-заголовок 'id,status,value', а данные — в исходном порядке.",
+ "passed": false,
+ "message": "good.csv content differs\nExpected: 'id,status,value\\nu01,ok,100\\nu03,ok,50\\nu04,ok,0\\nu06,ok,80\\nu08,ok,999\\nu10,ok,45'\nActual:   'id,status,value\\nu01,ok,100\\nu03,ok,50\\nu04,ok,0\\nu06,ok,80\\nu09,BAD,10\\nu10,ok,45'",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле records.csv 10 строк данных (id,status,value). Раздели их на два файла:\n  - good.csv — те, у которых status == 'ok' И value >= 0;\n  - bad.csv — все остальные (status != 'ok' или value < 0).\nВ обоих файлах должна быть исходная строка-заголовок 'id,status,value', а данные — в исходном порядке.",
+   "content_len": 300
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "records.csv"
+     },
+     "id": "2577ecd5-4b88-4764-93d2-00fe0f59308e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "records.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tid,status,value\n     2\tu01,ok,100\n     3\tu02,BAD,-5\n     4\tu03,ok,50\n     5\tu04,ok,0\n     6\tu05,BAD,200\n     7\tu06,ok,80\n     8\tu07,ok,-1\n     9\tu08,ok,999\n    10\tu09,BAD,10\n    11\tu10,ok,45",
+   "content_len": 197,
+   "name": "read_file",
+   "tool_call_id": "2577ecd5-4b88-4764-93d2-00fe0f59308e"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "id,status,value\nu01,ok,100\nu03,ok,50\nu04,ok,0\nu06,ok,80\nu09,BAD,10\nu10,ok,45",
+      "file_path": "good.csv"
+     },
+     "id": "f9c77cbe-d321-4bea-add9-430e500303a8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "id,status,value\nu01,ok,100\nu03,ok,50\nu04,ok,0\nu06,ok,80\nu09,BAD,10\nu10,ok,45",
+     "file_path": "good.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /good.csv",
+   "content_len": 22,
+   "name": "write_file",
+   "tool_call_id": "f9c77cbe-d321-4bea-add9-430e500303a8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "id,status,value\nu02,BAD,-5\nu05,BAD,200\nu07,ok,-1",
+      "file_path": "bad.csv"
+     },
+     "id": "509d59a0-e6eb-43c9-baf5-6060d0572635"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "id,status,value\nu02,BAD,-5\nu05,BAD,200\nu07,ok,-1",
+     "file_path": "bad.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /bad.csv",
+   "content_len": 21,
+   "name": "write_file",
+   "tool_call_id": "509d59a0-e6eb-43c9-baf5-6060d0572635"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `good.csv` содержит 6 строк (включая заголовок): u01,ok,100; u03,ok,50; u04,ok,0; u06,ok,80; u09,BAD,10; u10,ok,45.\n\nФайл `bad.csv` содержит 4 строки (включая заголовок): u02,BAD,-5; u05,BAD,200; u07,ok,-1.",
+   "content_len": 211,
+   "finish_reason": "stop"
+  }
+ ]
+}

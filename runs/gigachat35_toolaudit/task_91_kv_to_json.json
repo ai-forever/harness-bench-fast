@@ -1,0 +1,113 @@
+{
+ "task_id": "task_91_kv_to_json",
+ "name": "Convert config.ini-style key=value file to JSON",
+ "prompt": "В файле config.kv лежат три строки в формате key=value:\n  host=localhost\n  port=8080\n  debug=true\n Сохрани их как объект JSON в файле config.json. Значения 8080 и true можно сохранить как строки или как соответствующие типы (число и булево) — оба варианта допустимы.",
+ "passed": true,
+ "message": "config.json has the three expected keys",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле config.kv лежат три строки в формате key=value:\n  host=localhost\n  port=8080\n  debug=true\n Сохрани их как объект JSON в файле config.json. Значения 8080 и true можно сохранить как строки или как соответствующие типы (число и булево) — оба варианта допустимы.",
+   "content_len": 266
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "config.kv"
+     },
+     "id": "1f9f3df0-32dd-4f49-982c-0e4b62d78e08"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "config.kv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\thost=localhost\n     2\tport=8080\n     3\tdebug=true",
+   "content_len": 56,
+   "name": "read_file",
+   "tool_call_id": "1f9f3df0-32dd-4f49-982c-0e4b62d78e08"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"host\": \"localhost\",\n  \"port\": 8080,\n  \"debug\": true\n}",
+      "file_path": "config.json"
+     },
+     "id": "532f8127-5991-4068-8856-a05273948ee8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"host\": \"localhost\",\n  \"port\": 8080,\n  \"debug\": true\n}",
+     "file_path": "config.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /config.json",
+   "content_len": 25,
+   "name": "write_file",
+   "tool_call_id": "532f8127-5991-4068-8856-a05273948ee8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "config.json"
+     },
+     "id": "dd5cd605-e8ed-4a2d-a4bd-d406ad502aaf"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "config.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\n     2\t  \"host\": \"localhost\",\n     3\t  \"port\": 8080,\n     4\t  \"debug\": true\n     5\t}",
+   "content_len": 93,
+   "name": "read_file",
+   "tool_call_id": "dd5cd605-e8ed-4a2d-a4bd-d406ad502aaf"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `config.json` успешно создан. Он содержит объект JSON с данными из файла `config.kv`.\n\nСодержимое файла `config.json`:\n```json\n{\n  \"host\": \"localhost\",\n  \"port\": 8080,\n  \"debug\": true\n}\n```\nЗначение для ключа `port` сохранено как число, а для ключа `debug` — как булево значение (`true`), что соответствует одному из допустимых вариантов в задании.",
+   "content_len": 353,
+   "finish_reason": "stop"
+  }
+ ]
+}

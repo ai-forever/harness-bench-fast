@@ -1,0 +1,117 @@
+{
+ "task_id": "task_137_grep_count_defs",
+ "name": "Count `def ` across pkg/*.py",
+ "prompt": "В каталоге pkg лежит 12 .py-файлов. Посчитай общее число вхождений подстроки 'def ' (defение функций; именно с пробелом после 'def') во всех этих файлах. Запиши число одной строкой в файл count.txt.",
+ "passed": true,
+ "message": "count.txt matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "grep",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каталоге pkg лежит 12 .py-файлов. Посчитай общее число вхождений подстроки 'def ' (defение функций; именно с пробелом после 'def') во всех этих файлах. Запиши число одной строкой в файл count.txt.",
+   "content_len": 198
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/pkg"
+     },
+     "id": "381f0c44-c2dd-4083-b195-d73755168528"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/pkg"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/pkg/mod_00.py', '/pkg/mod_01.py', '/pkg/mod_02.py', '/pkg/mod_03.py', '/pkg/mod_04.py', '/pkg/mod_05.py', '/pkg/mod_06.py', '/pkg/mod_07.py', '/pkg/mod_08.py', '/pkg/mod_09.py', '/pkg/mod_10.py', '/pkg/mod_11.py']",
+   "content_len": 216,
+   "name": "ls",
+   "tool_call_id": "381f0c44-c2dd-4083-b195-d73755168528"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "grep",
+     "args": {
+      "glob": "*.py",
+      "output_mode": "count",
+      "pattern": "def "
+     },
+     "id": "e7434840-3419-4250-97a3-652934e81df0"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "grep",
+    "arguments": {
+     "glob": "*.py",
+     "output_mode": "count",
+     "pattern": "def "
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "/pkg/mod_00.py: 1\n/pkg/mod_01.py: 2\n/pkg/mod_02.py: 3\n/pkg/mod_03.py: 4\n/pkg/mod_04.py: 1\n/pkg/mod_05.py: 2\n/pkg/mod_06.py: 3\n/pkg/mod_07.py: 4\n/pkg/mod_08.py: 1\n/pkg/mod_09.py: 2\n/pkg/mod_10.py: 3\n/pkg/mod_11.py: 4",
+   "content_len": 215,
+   "name": "grep",
+   "tool_call_id": "e7434840-3419-4250-97a3-652934e81df0"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "30",
+      "file_path": "/count.txt"
+     },
+     "id": "7ef411c5-8462-4e6c-96fc-f6126a7fc6ed"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "30",
+     "file_path": "/count.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /count.txt",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "7ef411c5-8462-4e6c-96fc-f6126a7fc6ed"
+  },
+  {
+   "type": "ai",
+   "content": "30",
+   "content_len": 2,
+   "finish_reason": "stop"
+  }
+ ]
+}

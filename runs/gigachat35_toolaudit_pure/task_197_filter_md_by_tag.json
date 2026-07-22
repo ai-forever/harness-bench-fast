@@ -1,0 +1,229 @@
+{
+ "task_id": "task_197_filter_md_by_tag",
+ "name": "List posts in posts/ tagged with `python`",
+ "prompt": "В каталоге posts пять .md-файлов. У каждого в начале — YAML-фронт матер между двумя строками '---' с полями title и tags (tags — это список строк). Сделай файл python_posts.txt со списком имён файлов (без префикса 'posts/' или с ним — оба варианта допустимы), у которых в tags есть значение 'python'. По одному имени на строку, порядок не важен.",
+ "passed": true,
+ "message": "python_posts.txt has the three python-tagged posts",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "read_file",
+  "read_file",
+  "read_file",
+  "read_file",
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каталоге posts пять .md-файлов. У каждого в начале — YAML-фронт матер между двумя строками '---' с полями title и tags (tags — это список строк). Сделай файл python_posts.txt со списком имён файлов (без префикса 'posts/' или с ним — оба варианта допустимы), у которых в tags есть значение 'python'. По одному имени на строку, порядок не важен.",
+   "content_len": 345
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "posts"
+     },
+     "id": "1d57c740-1fe3-42c5-b494-23c3873bf87b"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "posts"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/posts/a.md', '/posts/b.md', '/posts/c.md', '/posts/d.md', '/posts/e.md']",
+   "content_len": 75,
+   "name": "ls",
+   "tool_call_id": "1d57c740-1fe3-42c5-b494-23c3873bf87b"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/posts/a.md"
+     },
+     "id": "775ff1af-ae24-473b-b740-bb5ebc6b495e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/posts/a.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t---\n     2\ttitle: A\n     3\ttags: [python]\n     4\t---\n     5\tbody",
+   "content_len": 71,
+   "name": "read_file",
+   "tool_call_id": "775ff1af-ae24-473b-b740-bb5ebc6b495e"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/posts/b.md"
+     },
+     "id": "63043e21-6cfc-4196-9b6a-d3ed6064fa9a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/posts/b.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t---\n     2\ttitle: B\n     3\ttags: [js]\n     4\t---\n     5\tbody",
+   "content_len": 67,
+   "name": "read_file",
+   "tool_call_id": "63043e21-6cfc-4196-9b6a-d3ed6064fa9a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/posts/c.md"
+     },
+     "id": "94c9dfb1-b25c-4261-81ac-6d3a98c06d97"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/posts/c.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t---\n     2\ttitle: C\n     3\ttags: [python, web]\n     4\t---\n     5\tbody",
+   "content_len": 76,
+   "name": "read_file",
+   "tool_call_id": "94c9dfb1-b25c-4261-81ac-6d3a98c06d97"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/posts/d.md"
+     },
+     "id": "7055768f-bdfc-4113-8dae-3deaf84d0b06"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/posts/d.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t---\n     2\ttitle: D\n     3\ttags: [rust]\n     4\t---\n     5\tbody",
+   "content_len": 69,
+   "name": "read_file",
+   "tool_call_id": "7055768f-bdfc-4113-8dae-3deaf84d0b06"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/posts/e.md"
+     },
+     "id": "e24e3f72-d3f3-4820-a7b5-20f9b2756c9a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/posts/e.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t---\n     2\ttitle: E\n     3\ttags: [python, db]\n     4\t---\n     5\tbody",
+   "content_len": 75,
+   "name": "read_file",
+   "tool_call_id": "e24e3f72-d3f3-4820-a7b5-20f9b2756c9a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "posts/a.md\nposts/c.md\nposts/e.md",
+      "file_path": "/python_posts.txt"
+     },
+     "id": "c0c68845-6364-4a7c-b7c9-b2a1a275bba2"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "posts/a.md\nposts/c.md\nposts/e.md",
+     "file_path": "/python_posts.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /python_posts.txt",
+   "content_len": 30,
+   "name": "write_file",
+   "tool_call_id": "c0c68845-6364-4a7c-b7c9-b2a1a275bba2"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `/python_posts.txt` создан. В него записаны имена файлов из каталога `posts`, у которых в YAML-фронтматтере поле `tags` содержит значение `python`.\n\nСодержимое файла:\n```\nposts/a.md\nposts/c.md\nposts/e.md\n```",
+   "content_len": 212,
+   "finish_reason": "stop"
+  }
+ ]
+}

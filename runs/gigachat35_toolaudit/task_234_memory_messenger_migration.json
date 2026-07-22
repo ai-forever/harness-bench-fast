@@ -1,0 +1,219 @@
+{
+ "task_id": "task_234_memory_messenger_migration",
+ "name": "Memory: migrate Telegram to Mattermost across MEMORY.md and TOML",
+ "prompt": "Я перешёл с Telegram на Mattermost. Новый ник: `@oleg_mm`.\nTelegram больше не использую.\nОбнови это и в памяти, и в `contacts.toml`.",
+ "passed": true,
+ "message": "messenger successfully migrated to Mattermost",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "read_file",
+  "edit_file",
+  "edit_file",
+  "edit_file",
+  "edit_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Я перешёл с Telegram на Mattermost. Новый ник: `@oleg_mm`.\nTelegram больше не использую.\nОбнови это и в памяти, и в `contacts.toml`.",
+   "content_len": 132
+  },
+  {
+   "type": "human",
+   "content": "[MEMORY-TASK] This is a memory task.\n1) read_file MEMORY.md first\n2) complete the requested deliverable using MEMORY facts verbatim\n3) if the user mentioned ANY personal fact, edit_file MEMORY.md before finishing",
+   "content_len": 212
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "MEMORY.md"
+     },
+     "id": "bc9e6b64-d07c-4cee-934c-b2fb83296b56"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "MEMORY.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t- Имя: Олег\n     2\t- Email: oleg@example.com\n     3\t- Основной мессенджер: Telegram\n     4\t- Telegram: @oleg_ops",
+   "content_len": 119,
+   "name": "read_file",
+   "tool_call_id": "bc9e6b64-d07c-4cee-934c-b2fb83296b56"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "contacts.toml"
+     },
+     "id": "de275cfe-5a3a-4c20-a0d2-655a2a556949"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "contacts.toml"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t[contacts]\n     2\temail = \"oleg@example.com\"\n     3\ttelegram = \"@oleg_ops\"\n     4\tpreferred = \"telegram\"",
+   "content_len": 111,
+   "name": "read_file",
+   "tool_call_id": "de275cfe-5a3a-4c20-a0d2-655a2a556949"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "MEMORY.md",
+      "new_string": "- Основной мессенджер: Mattermost",
+      "old_string": "- Основной мессенджер: Telegram"
+     },
+     "id": "f34016da-dfd8-4336-80b3-128cc8a901b4"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "MEMORY.md",
+     "new_string": "- Основной мессенджер: Mattermost",
+     "old_string": "- Основной мессенджер: Telegram"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/MEMORY.md'",
+   "content_len": 65,
+   "name": "edit_file",
+   "tool_call_id": "f34016da-dfd8-4336-80b3-128cc8a901b4"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "MEMORY.md",
+      "new_string": "- Mattermost: @oleg_mm",
+      "old_string": "- Telegram: @oleg_ops"
+     },
+     "id": "23b86a7c-1829-4ce7-ac9a-86d415a948d8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "MEMORY.md",
+     "new_string": "- Mattermost: @oleg_mm",
+     "old_string": "- Telegram: @oleg_ops"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/MEMORY.md'",
+   "content_len": 65,
+   "name": "edit_file",
+   "tool_call_id": "23b86a7c-1829-4ce7-ac9a-86d415a948d8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "contacts.toml",
+      "new_string": "mattermost = \"@oleg_mm\"",
+      "old_string": "telegram = \"@oleg_ops\""
+     },
+     "id": "0b9a1d54-3a75-4480-981d-c4686332e62e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "contacts.toml",
+     "new_string": "mattermost = \"@oleg_mm\"",
+     "old_string": "telegram = \"@oleg_ops\""
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/contacts.toml'",
+   "content_len": 69,
+   "name": "edit_file",
+   "tool_call_id": "0b9a1d54-3a75-4480-981d-c4686332e62e"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "contacts.toml",
+      "new_string": "preferred = \"mattermost\"",
+      "old_string": "preferred = \"telegram\""
+     },
+     "id": "a1824b36-3dc2-4a61-8fb7-90da3f221db8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "contacts.toml",
+     "new_string": "preferred = \"mattermost\"",
+     "old_string": "preferred = \"telegram\""
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/contacts.toml'",
+   "content_len": 69,
+   "name": "edit_file",
+   "tool_call_id": "a1824b36-3dc2-4a61-8fb7-90da3f221db8"
+  },
+  {
+   "type": "ai",
+   "content": "Память и файл `contacts.toml` обновлены.\n\n**MEMORY.md**\n- Имя: Олег\n- Email: oleg@example.com\n- Основной мессенджер: Mattermost\n- Mattermost: @oleg_mm\n\n**contacts.toml**\n```toml\n[contacts]\nemail = \"oleg@example.com\"\nmattermost = \"@oleg_mm\"\npreferred = \"mattermost\"\n```",
+   "content_len": 268,
+   "finish_reason": "stop"
+  }
+ ]
+}

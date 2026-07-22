@@ -1,0 +1,113 @@
+{
+ "task_id": "task_105_csv_to_tsv",
+ "name": "Convert data.csv to TSV (tab-separated)",
+ "prompt": "Преобразуй файл data.csv (запятая как разделитель) в data.tsv (символ табуляции как разделитель). Заголовки и значения сохрани, порядок строк не меняй.",
+ "passed": true,
+ "message": "data.tsv matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Преобразуй файл data.csv (запятая как разделитель) в data.tsv (символ табуляции как разделитель). Заголовки и значения сохрани, порядок строк не меняй.",
+   "content_len": 151
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/"
+     },
+     "id": "b9128972-27ba-47b8-aba3-7f09edac94f5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/data.csv']",
+   "content_len": 13,
+   "name": "ls",
+   "tool_call_id": "b9128972-27ba-47b8-aba3-7f09edac94f5"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/data.csv"
+     },
+     "id": "5ae81bdf-60f6-45dc-95bf-288d9ac97003"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/data.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tname,age,city\n     2\tAlice,30,Moscow\n     3\tBob,25,Berlin\n     4\tCarol,40,Paris",
+   "content_len": 86,
+   "name": "read_file",
+   "tool_call_id": "5ae81bdf-60f6-45dc-95bf-288d9ac97003"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "name\tage\tcity\nAlice\t30\tMoscow\nBob\t25\tBerlin\nCarol\t40\tParis",
+      "file_path": "/data.tsv"
+     },
+     "id": "ec99e5f8-354d-4acd-86a3-d449b5196569"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "name\tage\tcity\nAlice\t30\tMoscow\nBob\t25\tBerlin\nCarol\t40\tParis",
+     "file_path": "/data.tsv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /data.tsv",
+   "content_len": 22,
+   "name": "write_file",
+   "tool_call_id": "ec99e5f8-354d-4acd-86a3-d449b5196569"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `data.csv` успешно преобразован в `data.tsv`. Разделитель изменён с запятой на табуляцию, заголовки и значения сохранены, порядок строк не нарушен.",
+   "content_len": 152,
+   "finish_reason": "stop"
+  }
+ ]
+}

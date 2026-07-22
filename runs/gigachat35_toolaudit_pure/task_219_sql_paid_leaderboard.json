@@ -1,0 +1,142 @@
+{
+ "task_id": "task_219_sql_paid_leaderboard",
+ "name": "Export deterministic paid leaderboard from sqlite",
+ "prompt": "По orders.db построй paid_leaderboard.csv:\n  - только status='paid',\n  - сумма amount по customer,\n  - заголовок customer,paid_total,\n  - сортировка paid_total desc, при равенстве customer asc.",
+ "passed": true,
+ "message": "paid_leaderboard.csv matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "execute",
+  "execute",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "По orders.db построй paid_leaderboard.csv:\n  - только status='paid',\n  - сумма amount по customer,\n  - заголовок customer,paid_total,\n  - сортировка paid_total desc, при равенстве customer asc.",
+   "content_len": 193
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/"
+     },
+     "id": "03281adb-e497-4959-a1fe-62c863bc4b31"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/orders.db']",
+   "content_len": 14,
+   "name": "ls",
+   "tool_call_id": "03281adb-e497-4959-a1fe-62c863bc4b31"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "sqlite3 orders.db \"SELECT customer, SUM(amount) AS paid_total FROM orders WHERE status='paid' GROUP BY customer ORDER BY paid_total DESC, customer ASC;\" > /paid_leaderboard.csv"
+     },
+     "id": "89c511b8-f3af-41ed-b049-9575717d8806"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "sqlite3 orders.db \"SELECT customer, SUM(amount) AS paid_total FROM orders WHERE status='paid' GROUP BY customer ORDER BY paid_total DESC, customer ASC;\" > /paid_leaderboard.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "[stderr] /bin/sh: /paid_leaderboard.csv: Read-only file system\n\nExit code: 1\n[Command failed with exit code 1]",
+   "content_len": 110,
+   "name": "execute",
+   "tool_call_id": "89c511b8-f3af-41ed-b049-9575717d8806"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "sqlite3 orders.db \"SELECT customer, SUM(amount) AS paid_total FROM orders WHERE status='paid' GROUP BY customer ORDER BY paid_total DESC, customer ASC;\""
+     },
+     "id": "f47b1108-ad1c-4ff6-85ae-b2f82cabbe64"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "sqlite3 orders.db \"SELECT customer, SUM(amount) AS paid_total FROM orders WHERE status='paid' GROUP BY customer ORDER BY paid_total DESC, customer ASC;\""
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "carol|200\ndave|200\nalice|150\nbob|130\n\n[Command succeeded with exit code 0]",
+   "content_len": 74,
+   "name": "execute",
+   "tool_call_id": "f47b1108-ad1c-4ff6-85ae-b2f82cabbe64"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "customer,paid_total\ncarol,200\ndave,200\nalice,150\nbob,130",
+      "file_path": "/paid_leaderboard.csv"
+     },
+     "id": "157d57f2-3c0f-48d3-8da9-6dc257a9fcf6"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "customer,paid_total\ncarol,200\ndave,200\nalice,150\nbob,130",
+     "file_path": "/paid_leaderboard.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /paid_leaderboard.csv",
+   "content_len": 34,
+   "name": "write_file",
+   "tool_call_id": "157d57f2-3c0f-48d3-8da9-6dc257a9fcf6"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `/paid_leaderboard.csv` успешно создан.\n\nСодержимое файла:\n```\ncustomer,paid_total\ncarol,200\ndave,200\nalice,150\nbob,130\n```",
+   "content_len": 128,
+   "finish_reason": "stop"
+  }
+ ]
+}

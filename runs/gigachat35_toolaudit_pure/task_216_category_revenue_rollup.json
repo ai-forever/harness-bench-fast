@@ -1,0 +1,142 @@
+{
+ "task_id": "task_216_category_revenue_rollup",
+ "name": "Join products/sales and roll up revenue by category",
+ "prompt": "Есть products.csv (sku,category) и sales.csv (sku,qty,price). Построй category_revenue.csv с колонками category,revenue:\n  - revenue = sum(qty*price) по sku категории,\n  - строки с пустым price игнорировать,\n  - sku, которых нет в products.csv, игнорировать,\n  - сортировка по revenue по убыванию.",
+ "passed": true,
+ "message": "category_revenue.csv contains all expected substrings",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "read_file",
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Есть products.csv (sku,category) и sales.csv (sku,qty,price). Построй category_revenue.csv с колонками category,revenue:\n  - revenue = sum(qty*price) по sku категории,\n  - строки с пустым price игнорировать,\n  - sku, которых нет в products.csv, игнорировать,\n  - сортировка по revenue по убыванию.",
+   "content_len": 297
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/"
+     },
+     "id": "eb5c801b-2984-459d-9648-db4b34ec5c6e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/products.csv', '/sales.csv']",
+   "content_len": 31,
+   "name": "ls",
+   "tool_call_id": "eb5c801b-2984-459d-9648-db4b34ec5c6e"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/products.csv"
+     },
+     "id": "8b9e52a8-4d57-4083-a4de-7b63f309c0c6"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/products.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tsku,category\n     2\tA,books\n     3\tB,books\n     4\tC,tech\n     5\tD,tech\n     6\tE,food",
+   "content_len": 91,
+   "name": "read_file",
+   "tool_call_id": "8b9e52a8-4d57-4083-a4de-7b63f309c0c6"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/sales.csv"
+     },
+     "id": "f05a052e-06c1-4dcc-9c39-717472718009"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/sales.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tsku,qty,price\n     2\tA,2,100\n     3\tA,1,100\n     4\tB,1,80\n     5\tC,3,50\n     6\tD,1,\n     7\tE,4,20\n     8\tX,10,1",
+   "content_len": 118,
+   "name": "read_file",
+   "tool_call_id": "f05a052e-06c1-4dcc-9c39-717472718009"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "category,revenue\nbooks,380\ntech,150\nfood,80",
+      "file_path": "/category_revenue.csv"
+     },
+     "id": "8879e2b6-fedc-47ef-b58e-385a8dbbb1cc"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "category,revenue\nbooks,380\ntech,150\nfood,80",
+     "file_path": "/category_revenue.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /category_revenue.csv",
+   "content_len": 34,
+   "name": "write_file",
+   "tool_call_id": "8879e2b6-fedc-47ef-b58e-385a8dbbb1cc"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `category_revenue.csv` успешно создан.\n\nРезультат:\n- **books**: 380 (SKU A: 3 * 100 = 300; SKU B: 1 * 80 = 80)\n- **tech**: 150 (SKU C: 3 * 50 = 150. Строка с SKU D проигнорирована из-за пустой цены).\n- **food**: 80 (SKU E: 4 * 20 = 80).\n\nСтрока для SKU X была проигнорирована, так как этого артикула нет в файле `products.csv`. Сортировка выполнена по убыванию выручки.",
+   "content_len": 374,
+   "finish_reason": "stop"
+  }
+ ]
+}

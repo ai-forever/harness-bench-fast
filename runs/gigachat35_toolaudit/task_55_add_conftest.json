@@ -1,0 +1,55 @@
+{
+ "task_id": "task_55_add_conftest",
+ "name": "Create tests/conftest.py with a fixture",
+ "prompt": "В каталоге tests создай файл conftest.py со следующим содержимым: импорт pytest, после него — функция sample_data, помеченная декоратором @pytest.fixture, возвращающая словарь {'name': 'Alice', 'age': 30}. Других определений добавлять не нужно.",
+ "passed": true,
+ "message": "tests/conftest.py exists; tests/conftest.py contains all expected substrings",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каталоге tests создай файл conftest.py со следующим содержимым: импорт pytest, после него — функция sample_data, помеченная декоратором @pytest.fixture, возвращающая словарь {'name': 'Alice', 'age': 30}. Других определений добавлять не нужно.",
+   "content_len": 244
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import pytest\n\n@pytest.fixture\ndef sample_data():\n    return {'name': 'Alice', 'age': 30}\n",
+      "file_path": "tests/conftest.py"
+     },
+     "id": "abc86f0a-dca1-4a5d-a36f-7db9202fa52b"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import pytest\n\n@pytest.fixture\ndef sample_data():\n    return {'name': 'Alice', 'age': 30}\n",
+     "file_path": "tests/conftest.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /tests/conftest.py",
+   "content_len": 31,
+   "name": "write_file",
+   "tool_call_id": "abc86f0a-dca1-4a5d-a36f-7db9202fa52b"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `tests/conftest.py` успешно создан с указанным содержимым.",
+   "content_len": 63,
+   "finish_reason": "stop"
+  }
+ ]
+}

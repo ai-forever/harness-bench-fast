@@ -1,0 +1,55 @@
+{
+ "task_id": "task_03_slugify",
+ "name": "Implement src/utils.py:slugify",
+ "prompt": "В каталоге src создай файл utils.py с функцией slugify(text: str) -> str. Поведение функции:\n- сначала привести строку к нижнему регистру;\n- любые подряд идущие пробельные символы заменить на одиночный дефис;\n- удалить все символы, кроме латинских букв a-z, цифр 0-9 и дефиса.\nПример: slugify('Hello, World!') должна возвращать 'hello-world'.",
+ "passed": true,
+ "message": "src/utils.py: mod.slugify('Hello, World!') == 'hello-world'; src/utils.py: mod.slugify('Foo Bar Baz') == 'foo-bar-baz'",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каталоге src создай файл utils.py с функцией slugify(text: str) -> str. Поведение функции:\n- сначала привести строку к нижнему регистру;\n- любые подряд идущие пробельные символы заменить на одиночный дефис;\n- удалить все символы, кроме латинских букв a-z, цифр 0-9 и дефиса.\nПример: slugify('Hello, World!') должна возвращать 'hello-world'.",
+   "content_len": 342
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import re\n\ndef slugify(text: str) -> str:\n    \"\"\"\n    Преобразует строку в 'slug' (URL-дружелюбный формат).\n\n    - Приводит к нижнему регистру.\n    - Заменяет пробелы на дефисы.\n    - Удаляет все символы, кроме a-z, 0-9 и дефиса.\n    \"\"\"\n    # Нижний регистр\n    text = text.lower()\n    # Пробельные символы в дефис\n    text = re.sub(r'\\s+', '-', text)\n    # Удаление недопустимых символов\n    text = re.sub(r'[^a-z0-9-]', '', text)\n    return text\n",
+      "file_path": "src/utils.py"
+     },
+     "id": "2c889e9b-4123-4d98-a946-eed6e0d5feda"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import re\n\ndef slugify(text: str) -> str:\n    \"\"\"\n    Преобразует строку в 'slug' (URL-дружелюбный формат).\n\n    - Приводит к нижнему регистру.\n    - Заменяет пробелы на дефисы.\n    - Удаляет все символы, кроме a-z, 0-9 и дефиса.\n    \"\"\"\n    # Нижний регистр\n    text = text.lower()\n    # Пробельные символы в дефис\n    text = re.sub(r'\\s+', '-', text)\n    # Удаление недопустимых символов\n    text = re.sub(r'[^a-z0-9-]', '', text)\n    return text\n",
+     "file_path": "src/utils.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /src/utils.py",
+   "content_len": 26,
+   "name": "write_file",
+   "tool_call_id": "2c889e9b-4123-4d98-a946-eed6e0d5feda"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `src/utils.py` с функцией `slugify(text: str) -> str` успешно создан. Функция выполняет все требуемые преобразования:\n\n-   Приводит строку к нижнему регистру.\n-   Заменяет подряд идущие пробельные символы на один дефис.\n-   Удаляет все символы, кроме латинских букв a-z, цифр 0-9 и дефиса.\n\nПример использования:\n```python\nfrom src.utils import slugify\n\nprint(slugify('Hello, World!')) # Выведет: 'hello-world'\n```",
+   "content_len": 419,
+   "finish_reason": "stop"
+  }
+ ]
+}

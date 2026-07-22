@@ -1,0 +1,89 @@
+{
+ "task_id": "task_252_memory_event_ordering_next_milestone",
+ "name": "Memory: event ordering → next_milestone() function",
+ "prompt": "На основе milestones проекта Orion из памяти создай `milestones.py` с функцией `next_milestone(today: str) -> str | None`.\nАргумент `today` — строка YYYY-MM-DD. Функция возвращает имя ближайшего будущего milestone (строго после `today`), или None, если все в прошлом.",
+ "passed": true,
+ "message": "next_milestone() correctly implements event-ordering logic",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "На основе milestones проекта Orion из памяти создай `milestones.py` с функцией `next_milestone(today: str) -> str | None`.\nАргумент `today` — строка YYYY-MM-DD. Функция возвращает имя ближайшего будущего milestone (строго после `today`), или None, если все в прошлом.",
+   "content_len": 267
+  },
+  {
+   "type": "human",
+   "content": "[MEMORY-TASK] This is a memory task.\n1) read_file MEMORY.md first\n2) complete the requested deliverable using MEMORY facts verbatim\n3) if the user mentioned ANY personal fact, edit_file MEMORY.md before finishing",
+   "content_len": 212
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "MEMORY.md"
+     },
+     "id": "75ea0357-acbd-4874-8661-89c5daf50163"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "MEMORY.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t- Проект: Orion\n     2\t- Milestones проекта Orion:\n     3\t  - alpha: 2026-03-01\n     4\t  - beta: 2026-06-15\n     5\t  - rc: 2026-08-01\n     6\t  - ga: 2026-10-01",
+   "content_len": 166,
+   "name": "read_file",
+   "tool_call_id": "75ea0357-acbd-4874-8661-89c5daf50163"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "from datetime import date\n\n_MILESTONES = {\n    \"alpha\": date(2026, 3, 1),\n    \"beta\": date(2026, 6, 15),\n    \"rc\": date(2026, 8, 1),\n    \"ga\": date(2026, 10, 1),\n}\n\ndef next_milestone(today: str) -> str | None:\n    \"\"\"Возвращает имя ближайшего будущего milestone строго после today (YYYY-MM-DD), или None.\"\"\"\n    try:\n        current = date.fromisoformat(today)\n    except ValueError:\n        return None\n\n    future = [(name, d) for name, d in _MILESTONES.items() if d > current]\n    if not future:\n        return None\n    # Сортируем по дате и возвращаем первое имя\n    future.sort(key=lambda x: x[1])\n    return future[0][0]",
+      "file_path": "milestones.py"
+     },
+     "id": "5b6989c9-e939-4dac-998d-ed7fa053c7e6"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "from datetime import date\n\n_MILESTONES = {\n    \"alpha\": date(2026, 3, 1),\n    \"beta\": date(2026, 6, 15),\n    \"rc\": date(2026, 8, 1),\n    \"ga\": date(2026, 10, 1),\n}\n\ndef next_milestone(today: str) -> str | None:\n    \"\"\"Возвращает имя ближайшего будущего milestone строго после today (YYYY-MM-DD), или None.\"\"\"\n    try:\n        current = date.fromisoformat(today)\n    except ValueError:\n        return None\n\n    future = [(name, d) for name, d in _MILESTONES.items() if d > current]\n    if not future:\n        return None\n    # Сортируем по дате и возвращаем первое имя\n    future.sort(key=lambda x: x[1])\n    return future[0][0]",
+     "file_path": "milestones.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /milestones.py",
+   "content_len": 27,
+   "name": "write_file",
+   "tool_call_id": "5b6989c9-e939-4dac-998d-ed7fa053c7e6"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `milestones.py` создан. В нём определён словарь `_MILESTONES` с датами из памяти и функция `next_milestone(today: str) -> str | None`, которая возвращает имя ближайшего будущего этапа (строго после указанной даты) или `None`, если все этапы в прошлом.\n\nСодержимое файла:\n```python\nfrom datetime import date\n\n_MILESTONES = {\n    \"alpha\": date(2026, 3, 1),\n    \"beta\": date(2026, 6, 15),\n    \"rc\": date(2026, 8, 1),\n    \"ga\": date(2026, 10, 1),\n}\n\ndef next_milestone(today: str) -> str | None:\n    \"\"\"Возвращает имя ближайшего будущего milestone строго после today (YYYY-MM-DD), или None.\"\"\"\n    try:\n        current = date.fromisoformat(today)\n    except ValueError:\n        return None\n\n    future = [(name, d) for name, d in _MILESTONES.items() if d > current]\n    if not future:\n        return None\n    # Сортируем по дате и возвращаем первое имя\n    future.sort(key=lambda x: x[1])\n    return future[0][0]\n```\nВ файле MEMORY.md новых личных фактов не обнаружено, поэтому изменений не требуется.",
+   "content_len": 1002,
+   "finish_reason": "stop"
+  }
+ ]
+}

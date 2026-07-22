@@ -1,0 +1,113 @@
+{
+ "task_id": "task_106_csv_group_count",
+ "name": "Count sales per category",
+ "prompt": "В файле sales.csv 20 строк данных (id,category). Сформируй файл counts.csv с заголовком 'category,count' и тремя строками: по одной на каждую уникальную категорию, со значением — числом её появлений в sales.csv. Категории расположи в алфавитном порядке по возрастанию.",
+ "passed": false,
+ "message": "counts.csv content differs\nExpected: 'category,count\\nbooks,5\\nfood,6\\ntech,9'\nActual:   'category,count\\nbooks,5\\nfood,5\\ntech,10'",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле sales.csv 20 строк данных (id,category). Сформируй файл counts.csv с заголовком 'category,count' и тремя строками: по одной на каждую уникальную категорию, со значением — числом её появлений в sales.csv. Категории расположи в алфавитном порядке по возрастанию.",
+   "content_len": 268
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "sales.csv"
+     },
+     "id": "fee47ba1-27de-4428-af4a-abad28a61d36"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "sales.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tid,category\n     2\t1,food\n     3\t2,tech\n     4\t3,tech\n     5\t4,books\n     6\t5,food\n     7\t6,tech\n     8\t7,books\n     9\t8,food\n    10\t9,tech\n    11\t10,food\n    12\t11,tech\n    13\t12,tech\n    14\t13,books\n    15\t14,food\n    16\t15,tech\n    17\t16,books\n    18\t17,food\n    19\t18,tech\n    20\t19,tech\n    21\t20,books",
+   "content_len": 314,
+   "name": "read_file",
+   "tool_call_id": "fee47ba1-27de-4428-af4a-abad28a61d36"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "category,count\nbooks,5\nfood,5\ntech,10",
+      "file_path": "counts.csv"
+     },
+     "id": "8326db73-9f73-4d99-80e4-1bcf4b47cc13"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "category,count\nbooks,5\nfood,5\ntech,10",
+     "file_path": "counts.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /counts.csv",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "8326db73-9f73-4d99-80e4-1bcf4b47cc13"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "counts.csv"
+     },
+     "id": "c6d016de-e4af-4ebe-8f6d-0a69fc9a482d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "counts.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tcategory,count\n     2\tbooks,5\n     3\tfood,5\n     4\ttech,10",
+   "content_len": 65,
+   "name": "read_file",
+   "tool_call_id": "c6d016de-e4af-4ebe-8f6d-0a69fc9a482d"
+  },
+  {
+   "type": "ai",
+   "content": "Файл counts.csv успешно создан. Он содержит заголовок и три строки с подсчётом категорий из sales.csv, отсортированных в алфавитном порядке.\n\nСодержимое файла:\ncategory,count\nbooks,5\nfood,5\ntech,10",
+   "content_len": 197,
+   "finish_reason": "stop"
+  }
+ ]
+}

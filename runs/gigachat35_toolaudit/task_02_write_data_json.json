@@ -1,0 +1,55 @@
+{
+ "task_id": "task_02_write_data_json",
+ "name": "Write data.json with given fields",
+ "prompt": "Создай файл data.json в текущей директории. В нём должен лежать валидный JSON-объект с двумя полями: name со строковым значением \"GigaChat\" и version с целочисленным значением 3.",
+ "passed": true,
+ "message": "data.json has expected JSON keys",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл data.json в текущей директории. В нём должен лежать валидный JSON-объект с двумя полями: name со строковым значением \"GigaChat\" и version с целочисленным значением 3.",
+   "content_len": 178
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"name\": \"GigaChat\",\n  \"version\": 3\n}",
+      "file_path": "data.json"
+     },
+     "id": "e8193306-373d-4cfa-8649-bbb05b450fcf"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"name\": \"GigaChat\",\n  \"version\": 3\n}",
+     "file_path": "data.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /data.json",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "e8193306-373d-4cfa-8649-bbb05b450fcf"
+  },
+  {
+   "type": "ai",
+   "content": "Файл data.json создан в текущей директории.",
+   "content_len": 43,
+   "finish_reason": "stop"
+  }
+ ]
+}

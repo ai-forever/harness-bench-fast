@@ -1,0 +1,23 @@
+{
+ "task_id": "task_233_memory_endpoints_json",
+ "name": "Memory: compose endpoints.json with derived URLs and ordering",
+ "prompt": "Собери `endpoints.json` из моих данных в памяти.\nФормат строго такой:\n- `domain`: строка;\n- `services`: массив объектов `{name, port, health_url}`;\n- `base_url_map`: объект `name -> http://<domain>:<port>`.\nДля каждого сервиса `health_url` должен быть `http://<domain>:<port>/health`.\nСервисы в массиве отсортируй по возрастанию порта.",
+ "passed": false,
+ "message": "endpoints.json missing",
+ "error": null,
+ "real_tool_call_names": [],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Собери `endpoints.json` из моих данных в памяти.\nФормат строго такой:\n- `domain`: строка;\n- `services`: массив объектов `{name, port, health_url}`;\n- `base_url_map`: объект `name -> http://<domain>:<port>`.\nДля каждого сервиса `health_url` должен быть `http://<domain>:<port>/health`.\nСервисы в массиве отсортируй по возрастанию порта.",
+   "content_len": 335
+  },
+  {
+   "type": "ai",
+   "content": "В вашей инструкции не хватает самих данных для сборки файла. Пожалуйста, предоставьте список сервисов с их именами и портами.\n\nНапример:\n- Сервис `auth` на порту `8080`\n- Сервис `data` на порту `5432`\n- Сервис `web` на порту `80`\n\nКак только вы пришлёте данные, я соберу из них файл `endpoints.json` в точном соответствии с вашими требованиями.",
+   "content_len": 344,
+   "finish_reason": "stop"
+  }
+ ]
+}

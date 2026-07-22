@@ -1,0 +1,142 @@
+{
+ "task_id": "task_256_terminal_event_summary",
+ "name": "Normalize shell-style event lines into JSON",
+ "prompt": "Прочитай raw_events.txt. Каждая строка начинается с уровня INFO/WARN/ERROR, дальше key=value поля job, attempt, duration_ms. Создай job_summary.json: JSON-массив объектов, отсортированный по job. Для каждого job укажи attempts (количество строк), max_duration_ms (максимум duration_ms) и errors (количество строк уровня ERROR).",
+ "passed": true,
+ "message": "job_summary.json matches expected aggregate",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "execute",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Прочитай raw_events.txt. Каждая строка начинается с уровня INFO/WARN/ERROR, дальше key=value поля job, attempt, duration_ms. Создай job_summary.json: JSON-массив объектов, отсортированный по job. Для каждого job укажи attempts (количество строк), max_duration_ms (максимум duration_ms) и errors (количество строк уровня ERROR).",
+   "content_len": 327
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "raw_events.txt"
+     },
+     "id": "5e4a5ccc-49f0-4459-b304-c19d67c8e3d3"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "raw_events.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tINFO job=ingest attempt=1 duration_ms=120\n     2\tWARN job=ingest attempt=2 duration_ms=240\n     3\tINFO job=export attempt=1 duration_ms=80\n     4\tERROR job=ingest attempt=3 duration_ms=510\n     5\tINFO job=export attempt=2 duration_ms=90\n     6\tERROR job=sync attempt=1 duration_ms=310\n     7\tINFO job=sync attempt=2 duration_ms=150",
+   "content_len": 338,
+   "name": "read_file",
+   "tool_call_id": "5e4a5ccc-49f0-4459-b304-c19d67c8e3d3"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import json\nfrom collections import defaultdict\n\ndef parse_line(line):\n    parts = line.strip().split()\n    level = parts[0]\n    fields = dict(p.split('=', 1) for p in parts[1:])\n    return {\n        'level': level,\n        'job': fields.get('job'),\n        'attempt': int(fields.get('attempt', 0)),\n        'duration_ms': int(fields.get('duration_ms', 0))\n    }\n\njobs = defaultdict(lambda: {'attempts': 0, 'max_duration_ms': 0, 'errors': 0})\n\nwith open('raw_events.txt', 'r') as f:\n    for line in f:\n        if not line.strip():\n            continue\n        entry = parse_line(line)\n        job = entry['job']\n        jobs[job]['attempts'] += 1\n        jobs[job]['max_duration_ms'] = max(jobs[job]['max_duration_ms'], entry['duration_ms'])\n        if entry['level'] == 'ERROR':\n            jobs[job]['errors'] += 1\n\nsummary = [{'job': k, **v} for k, v in jobs.items()]\nsummary.sort(key=lambda x: x['job'])\n\nwith open('job_summary.json', 'w') as out:\n    json.dump(summary, out, ensure_ascii=False, indent=2)",
+      "file_path": "job_summary.py"
+     },
+     "id": "713a00b7-639a-4211-889c-d69632fd6f82"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import json\nfrom collections import defaultdict\n\ndef parse_line(line):\n    parts = line.strip().split()\n    level = parts[0]\n    fields = dict(p.split('=', 1) for p in parts[1:])\n    return {\n        'level': level,\n        'job': fields.get('job'),\n        'attempt': int(fields.get('attempt', 0)),\n        'duration_ms': int(fields.get('duration_ms', 0))\n    }\n\njobs = defaultdict(lambda: {'attempts': 0, 'max_duration_ms': 0, 'errors': 0})\n\nwith open('raw_events.txt', 'r') as f:\n    for line in f:\n        if not line.strip():\n            continue\n        entry = parse_line(line)\n        job = entry['job']\n        jobs[job]['attempts'] += 1\n        jobs[job]['max_duration_ms'] = max(jobs[job]['max_duration_ms'], entry['duration_ms'])\n        if entry['level'] == 'ERROR':\n            jobs[job]['errors'] += 1\n\nsummary = [{'job': k, **v} for k, v in jobs.items()]\nsummary.sort(key=lambda x: x['job'])\n\nwith open('job_summary.json', 'w') as out:\n    json.dump(summary, out, ensure_ascii=False, indent=2)",
+     "file_path": "job_summary.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /job_summary.py",
+   "content_len": 28,
+   "name": "write_file",
+   "tool_call_id": "713a00b7-639a-4211-889c-d69632fd6f82"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python job_summary.py"
+     },
+     "id": "25cc6169-76f6-4c97-b49c-1c73b5101754"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python job_summary.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "25cc6169-76f6-4c97-b49c-1c73b5101754"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "job_summary.json"
+     },
+     "id": "461bbe8b-e980-404f-82ca-12cb77955966"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "job_summary.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t[\n     2\t  {\n     3\t    \"job\": \"export\",\n     4\t    \"attempts\": 2,\n     5\t    \"max_duration_ms\": 90,\n     6\t    \"errors\": 0\n     7\t  },\n     8\t  {\n     9\t    \"job\": \"ingest\",\n    10\t    \"attempts\": 3,\n    11\t    \"max_duration_ms\": 510,\n    12\t    \"errors\": 1\n    13\t  },\n    14\t  {\n    15\t    \"job\": \"sync\",\n    16\t    \"attempts\": 2,\n    17\t    \"max_duration_ms\": 310,\n    18\t    \"errors\": 1\n    19\t  }\n    20\t]",
+   "content_len": 418,
+   "name": "read_file",
+   "tool_call_id": "461bbe8b-e980-404f-82ca-12cb77955966"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `job_summary.json` успешно создан.\n\nСодержимое файла:\n```json\n[\n  {\n    \"job\": \"export\",\n    \"attempts\": 2,\n    \"max_duration_ms\": 90,\n    \"errors\": 0\n  },\n  {\n    \"job\": \"ingest\",\n    \"attempts\": 3,\n    \"max_duration_ms\": 510,\n    \"errors\": 1\n  },\n  {\n    \"job\": \"sync\",\n    \"attempts\": 2,\n    \"max_duration_ms\": 310,\n    \"errors\": 1\n  }\n]\n```\nДанные корректно агрегированы и отсортированы по названию задачи (`job`).",
+   "content_len": 423,
+   "finish_reason": "stop"
+  }
+ ]
+}

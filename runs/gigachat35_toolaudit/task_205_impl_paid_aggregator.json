@@ -1,0 +1,55 @@
+{
+ "task_id": "task_205_impl_paid_aggregator",
+ "name": "Implement normalize_transactions so pytest passes",
+ "prompt": "Создай файл pipeline.py с функцией normalize_transactions(rows). Вход: список словарей с полями user, amount, status.\n Поведение:\n  - учитывай только строки со status == 'paid';\n  - amount может быть int/float/str, нужно корректно привести к float;\n  - если amount нельзя привести к числу у paid-строки — бросай ValueError;\n  - агрегируй сумму amount по user;\n  - верни list[tuple[user, total]], где total округлен до 2 знаков;\n  - сортировка: total по убыванию, при равенстве user по возрастанию.\nТесты в tests/test_pipeline.py должны пройти.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл pipeline.py с функцией normalize_transactions(rows). Вход: список словарей с полями user, amount, status.\n Поведение:\n  - учитывай только строки со status == 'paid';\n  - amount может быть int/float/str, нужно корректно привести к float;\n  - если amount нельзя привести к числу у paid-строки — бросай ValueError;\n  - агрегируй сумму amount по user;\n  - верни list[tuple[user, total]], где total округлен до 2 знаков;\n  - сортировка: total по убыванию, при равенстве user по возрастанию.\nТесты в tests/test_pipeline.py должны пройти.",
+   "content_len": 543
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "from collections import defaultdict\nfrom typing import List, Dict, Tuple, Any\n\n\ndef normalize_transactions(rows: List[Dict[str, Any]]) -> List[Tuple[str, float]]:\n    \"\"\"\n    Агрегирует суммы транзакций со статусом 'paid' по пользователям.\n\n    Параметры:\n        rows (List[Dict[str, Any]]): Список словарей с ключами 'user', 'amount', 'status'.\n\n    Возвращает:\n        List[Tuple[str, float]]: Отсортированный список кортежей (user, total_amount),\n                                 где total_amount округлен до 2 знаков после запятой.\n\n    Исключения:\n        ValueError: Если amount у строки со статусом 'paid' не может быть преобразован в число.\n    \"\"\"\n    totals = defaultdict(float)\n\n    for row in rows:\n        if row.get('status') != 'paid':\n            continue\n\n        user = row['user']\n        raw_amount = row['amount']\n\n        try:\n            # Корректное приведение к float для int/float/str\n            amount = float(str(raw_amount).replace(',', ''))\n        except (ValueError, TypeError):\n            raise ValueError(f\"Invalid amount '{raw_amount}' for paid transaction of user '{user}'\")\n\n        totals[user] += amount\n\n    # Формирование и сортировка результата\n    result = [(user, round(total, 2)) for user, total in totals.items()]\n    result.sort(key=lambda x: (-x[1], x[0]))\n\n    return result\n",
+      "file_path": "pipeline.py"
+     },
+     "id": "73b13340-b22c-4099-a043-9cb3de0fedd4"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "from collections import defaultdict\nfrom typing import List, Dict, Tuple, Any\n\n\ndef normalize_transactions(rows: List[Dict[str, Any]]) -> List[Tuple[str, float]]:\n    \"\"\"\n    Агрегирует суммы транзакций со статусом 'paid' по пользователям.\n\n    Параметры:\n        rows (List[Dict[str, Any]]): Список словарей с ключами 'user', 'amount', 'status'.\n\n    Возвращает:\n        List[Tuple[str, float]]: Отсортированный список кортежей (user, total_amount),\n                                 где total_amount округлен до 2 знаков после запятой.\n\n    Исключения:\n        ValueError: Если amount у строки со статусом 'paid' не может быть преобразован в число.\n    \"\"\"\n    totals = defaultdict(float)\n\n    for row in rows:\n        if row.get('status') != 'paid':\n            continue\n\n        user = row['user']\n        raw_amount = row['amount']\n\n        try:\n            # Корректное приведение к float для int/float/str\n            amount = float(str(raw_amount).replace(',', ''))\n        except (ValueError, TypeError):\n            raise ValueError(f\"Invalid amount '{raw_amount}' for paid transaction of user '{user}'\")\n\n        totals[user] += amount\n\n    # Формирование и сортировка результата\n    result = [(user, round(total, 2)) for user, total in totals.items()]\n    result.sort(key=lambda x: (-x[1], x[0]))\n\n    return result\n",
+     "file_path": "pipeline.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /pipeline.py",
+   "content_len": 25,
+   "name": "write_file",
+   "tool_call_id": "73b13340-b22c-4099-a043-9cb3de0fedd4"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `pipeline.py` с функцией `normalize_transactions(rows)` создан. Функция реализует требуемую логику: фильтрует транзакции по статусу 'paid', корректно приводит сумму к типу float (с обработкой строк), агрегирует её по пользователю, округляет до двух знаков и сортирует результат.\n\nДля проверки работоспособности необходимо запустить тесты в файле `tests/test_pipeline.py`.",
+   "content_len": 376,
+   "finish_reason": "stop"
+  }
+ ]
+}

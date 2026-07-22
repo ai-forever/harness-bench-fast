@@ -1,0 +1,86 @@
+{
+ "task_id": "task_250_memory_abstention_dataclass",
+ "name": "Memory: abstention — dataclass with Optional fields for unknown data",
+ "prompt": "Создай `user_model.py` с dataclass/моделью User: поля name (str), age (int), city (str), email (Optional[str]), phone (Optional[str]).\nТакже создай `instance.json` — мой экземпляр с данными из памяти. Поля, которых нет в памяти, ставь null. Не придумывай email/phone.",
+ "passed": false,
+ "message": "name = ''",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай `user_model.py` с dataclass/моделью User: поля name (str), age (int), city (str), email (Optional[str]), phone (Optional[str]).\nТакже создай `instance.json` — мой экземпляр с данными из памяти. Поля, которых нет в памяти, ставь null. Не придумывай email/phone.",
+   "content_len": 267
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "from dataclasses import dataclass\nfrom typing import Optional\n\n@dataclass\nclass User:\n    name: str\n    age: int\n    city: str\n    email: Optional[str] = None\n    phone: Optional[str] = None",
+      "file_path": "/user_model.py"
+     },
+     "id": "4fa1b5bc-7511-4931-91cb-f6ee6f872cd4"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "from dataclasses import dataclass\nfrom typing import Optional\n\n@dataclass\nclass User:\n    name: str\n    age: int\n    city: str\n    email: Optional[str] = None\n    phone: Optional[str] = None",
+     "file_path": "/user_model.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /user_model.py",
+   "content_len": 27,
+   "name": "write_file",
+   "tool_call_id": "4fa1b5bc-7511-4931-91cb-f6ee6f872cd4"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"name\": \"\",\n  \"age\": 0,\n  \"city\": \"\",\n  \"email\": null,\n  \"phone\": null\n}",
+      "file_path": "/instance.json"
+     },
+     "id": "c5e8e73e-5d1b-41e1-a632-98c3585b45f1"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"name\": \"\",\n  \"age\": 0,\n  \"city\": \"\",\n  \"email\": null,\n  \"phone\": null\n}",
+     "file_path": "/instance.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /instance.json",
+   "content_len": 27,
+   "name": "write_file",
+   "tool_call_id": "c5e8e73e-5d1b-41e1-a632-98c3585b45f1"
+  },
+  {
+   "type": "ai",
+   "content": "Файлы созданы:\n\n- **user_model.py** — содержит dataclass `User` с полями: name (str), age (int), city (str), email (Optional[str]), phone (Optional[str]).\n- **instance.json** — шаблон экземпляра, где необязательные поля (`email`, `phone`) установлены в null, а остальные имеют значения-заглушки.",
+   "content_len": 295,
+   "finish_reason": "stop"
+  }
+ ]
+}

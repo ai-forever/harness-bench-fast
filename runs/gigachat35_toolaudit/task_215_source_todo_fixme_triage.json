@@ -1,0 +1,204 @@
+{
+ "task_id": "task_215_source_todo_fixme_triage",
+ "name": "Generate structured TODO/FIXME triage report",
+ "prompt": "Просканируй все .py файлы под src/ и найди строки с TODO и FIXME.\nСоздай:\n  - summary.json с ключами todo_count и fixme_count,\n  - triage.md в формате:\n      ## TODO\n      - <path>:<line> <text>\n      ...\n      ## FIXME\n      - <path>:<line> <text>\n    где <text> — содержимое комментария начиная с маркера TODO:/FIXME:\n    (то есть префикс сохраняется). Пример строки:\n      - src/a.py:2 TODO: refactor\nСекции и порядок строк внутри каждой секции — по path asc, затем line asc.\nМежду секциями ровно одна пустая строка.",
+ "passed": true,
+ "message": "summary.json and triage.md match expected TODO/FIXME inventory",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "read_file",
+  "read_file",
+  "read_file",
+  "write_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Просканируй все .py файлы под src/ и найди строки с TODO и FIXME.\nСоздай:\n  - summary.json с ключами todo_count и fixme_count,\n  - triage.md в формате:\n      ## TODO\n      - <path>:<line> <text>\n      ...\n      ## FIXME\n      - <path>:<line> <text>\n    где <text> — содержимое комментария начиная с маркера TODO:/FIXME:\n    (то есть префикс сохраняется). Пример строки:\n      - src/a.py:2 TODO: refactor\nСекции и порядок строк внутри каждой секции — по path asc, затем line asc.\nМежду секциями ровно одна пустая строка.",
+   "content_len": 519
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "path": "src",
+      "pattern": "**/*.py"
+     },
+     "id": "6611f0d9-3b32-4d1f-b31b-44c838f2ff00"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "path": "src",
+     "pattern": "**/*.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['src/a.py', '/src/b.py', '/src/nested/c.py']",
+   "content_len": 45,
+   "name": "glob",
+   "tool_call_id": "6611f0d9-3b32-4d1f-b31b-44c838f2ff00"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "src/a.py"
+     },
+     "id": "6e972704-948c-47e2-98f0-145135d8417a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "src/a.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdef f():\n     2\t    pass  # TODO: refactor",
+   "content_len": 49,
+   "name": "read_file",
+   "tool_call_id": "6e972704-948c-47e2-98f0-145135d8417a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "src/b.py"
+     },
+     "id": "65f78d47-6806-4d44-9af2-372cb4943d26"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "src/b.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t# FIXME: handle None\n     2\t\n     3\tdef g():\n     4\t    return 1",
+   "content_len": 71,
+   "name": "read_file",
+   "tool_call_id": "65f78d47-6806-4d44-9af2-372cb4943d26"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "src/nested/c.py"
+     },
+     "id": "58924468-5a00-4ac5-a166-877e77d05dc4"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "src/nested/c.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tx = 1  # TODO: remove magic number\n     2\t# FIXME: add typing",
+   "content_len": 68,
+   "name": "read_file",
+   "tool_call_id": "58924468-5a00-4ac5-a166-877e77d05dc4"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"todo_count\": 2,\n  \"fixme_count\": 2\n}",
+      "file_path": "summary.json"
+     },
+     "id": "c5c5425b-1394-470c-9b27-72ca9e852d17"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"todo_count\": 2,\n  \"fixme_count\": 2\n}",
+     "file_path": "summary.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /summary.json",
+   "content_len": 26,
+   "name": "write_file",
+   "tool_call_id": "c5c5425b-1394-470c-9b27-72ca9e852d17"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "## TODO\n- src/a.py:2 TODO: refactor\n- src/nested/c.py:1 TODO: remove magic number\n\n## FIXME\n- src/b.py:1 FIXME: handle None\n- src/nested/c.py:2 FIXME: add typing",
+      "file_path": "triage.md"
+     },
+     "id": "4ad537ec-b599-4de7-a4a1-68c5964b2e34"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "## TODO\n- src/a.py:2 TODO: refactor\n- src/nested/c.py:1 TODO: remove magic number\n\n## FIXME\n- src/b.py:1 FIXME: handle None\n- src/nested/c.py:2 FIXME: add typing",
+     "file_path": "triage.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /triage.md",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "4ad537ec-b599-4de7-a4a1-68c5964b2e34"
+  },
+  {
+   "type": "ai",
+   "content": "Сканирование завершено. Найдено 2 TODO и 2 FIXME.\n\n**summary.json**\n```json\n{\n  \"todo_count\": 2,\n  \"fixme_count\": 2\n}\n```\n\n**triage.md**\n## TODO\n- src/a.py:2 TODO: refactor\n- src/nested/c.py:1 TODO: remove magic number\n\n## FIXME\n- src/b.py:1 FIXME: handle None\n- src/nested/c.py:2 FIXME: add typing",
+   "content_len": 298,
+   "finish_reason": "stop"
+  }
+ ]
+}

@@ -1,0 +1,119 @@
+{
+ "task_id": "task_142_grep_asserts",
+ "name": "Count `assert ` occurrences in tests/*.py",
+ "prompt": "В каталоге tests лежат 10 .py-файлов. Посчитай общее число строк, в которых встречается подстрока 'assert ' (assert с пробелом после), во всех этих файлах. Запиши число одной строкой в файл assert_count.txt.",
+ "passed": true,
+ "message": "assert_count.txt matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "grep",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каталоге tests лежат 10 .py-файлов. Посчитай общее число строк, в которых встречается подстрока 'assert ' (assert с пробелом после), во всех этих файлах. Запиши число одной строкой в файл assert_count.txt.",
+   "content_len": 207
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "tests"
+     },
+     "id": "8a16e679-1fd1-4ac6-8f74-a858230de573"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "tests"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/tests/test_00.py', '/tests/test_01.py', '/tests/test_02.py', '/tests/test_03.py', '/tests/test_04.py', '/tests/test_05.py', '/tests/test_06.py', '/tests/test_07.py', '/tests/test_08.py', '/tests/test_09.py']",
+   "content_len": 210,
+   "name": "ls",
+   "tool_call_id": "8a16e679-1fd1-4ac6-8f74-a858230de573"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "grep",
+     "args": {
+      "glob": "*.py",
+      "output_mode": "count",
+      "path": "tests",
+      "pattern": "assert "
+     },
+     "id": "6b46d8cd-d900-4c1c-b257-2dbd14532aa6"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "grep",
+    "arguments": {
+     "glob": "*.py",
+     "output_mode": "count",
+     "path": "tests",
+     "pattern": "assert "
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "tests/test_00.py: 2\ntests/test_01.py: 3\ntests/test_02.py: 4\ntests/test_03.py: 2\ntests/test_04.py: 3\ntests/test_05.py: 4\ntests/test_06.py: 2\ntests/test_07.py: 3\ntests/test_08.py: 4\ntests/test_09.py: 2",
+   "content_len": 199,
+   "name": "grep",
+   "tool_call_id": "6b46d8cd-d900-4c1c-b257-2dbd14532aa6"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "29",
+      "file_path": "assert_count.txt"
+     },
+     "id": "97fed1f9-85ea-4445-adea-d9990c50152f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "29",
+     "file_path": "assert_count.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /assert_count.txt",
+   "content_len": 30,
+   "name": "write_file",
+   "tool_call_id": "97fed1f9-85ea-4445-adea-d9990c50152f"
+  },
+  {
+   "type": "ai",
+   "content": "Общее число строк с подстрокой 'assert ' в 10 .py-файлах каталога tests равно 29. Это значение записано в файл assert_count.txt.",
+   "content_len": 128,
+   "finish_reason": "stop"
+  }
+ ]
+}

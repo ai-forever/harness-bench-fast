@@ -1,0 +1,200 @@
+{
+ "task_id": "task_180_csv_percentiles",
+ "name": "Compute p25/p50/p75/p90/p95 of a CSV column",
+ "prompt": "В файле values.csv 100 строк данных (целые числа от 1 до 100 в произвольном порядке) в колонке value. Посчитай для них пять перцентилей: 25-й, 50-й, 75-й, 90-й, 95-й. Сохрани результат в percentiles.json как объект с ключами 'p25', 'p50', 'p75', 'p90', 'p95' и числовыми значениями (можно округлять до целых или с точностью до 0.5). Допустимо использовать numpy/statistics.",
+ "passed": true,
+ "message": "percentiles.json values within tolerance of expected",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "execute",
+  "execute",
+  "ls",
+  "execute",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле values.csv 100 строк данных (целые числа от 1 до 100 в произвольном порядке) в колонке value. Посчитай для них пять перцентилей: 25-й, 50-й, 75-й, 90-й, 95-й. Сохрани результат в percentiles.json как объект с ключами 'p25', 'p50', 'p75', 'p90', 'p95' и числовыми значениями (можно округлять до целых или с точностью до 0.5). Допустимо использовать numpy/statistics.",
+   "content_len": 373
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/values.csv"
+     },
+     "id": "723103f0-c248-400e-af62-8f247967d8e9"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/values.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tvalue\n     2\t100\n     3\t99\n     4\t98\n     5\t97\n     6\t96\n     7\t95\n     8\t94\n     9\t93\n    10\t92\n    11\t91\n    12\t90\n    13\t89\n    14\t88\n    15\t87\n    16\t86\n    17\t85\n    18\t84\n    19\t83\n    20\t82\n    21\t81\n    22\t80\n    23\t79\n    24\t78\n    25\t77\n    26\t76\n    27\t75\n    28\t74\n    29\t73\n    30\t72\n    31\t71\n    32\t70\n    33\t69\n    34\t68\n    35\t67\n    36\t66\n    37\t65\n    38\t64\n    39\t63\n    40\t62\n    41\t61\n    42\t60\n    43\t59\n    44\t58\n    45\t57\n    46\t56\n    47\t55\n    48\t54\n    49\t53\n    50\t52\n    51\t51\n    52\t50\n    53\t49\n    54\t48\n    55\t47\n    56\t46\n    57\t45\n    58\t44\n    59\t43\n    60\t42\n    61\t41\n    62\t40\n    63\t39\n    64\t38\n    65\t37\n    66\t36\n    67\t35\n    68\t34\n    69\t33\n    70\t32\n    71\t31\n    72\t30\n    73\t29\n    74\t28\n    75\t27\n    76\t26\n    77\t25\n    78\t24\n    79\t23\n    80\t22\n    81\t21\n    82\t20\n    83\t19\n    84\t18\n    85\t17\n    86\t16\n    87\t15\n    88\t14\n    89\t13\n    90\t12\n    91\t11\n    92\t10\n    93\t9\n    94\t8\n    95\t7\n    96\t6\n    97\t5\n    98\t4\n    99\t3\n   100\t2",
+   "content_len": 995,
+   "name": "read_file",
+   "tool_call_id": "723103f0-c248-400e-af62-8f247967d8e9"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python3 -c \"import numpy as np, json; data=np.loadtxt('/values.csv', delimiter=',', skiprows=1); percentiles=[25,50,75,90,95]; values=np.percentile(data, percentiles); result={'p25':round(values[0]), 'p50':round(values[1]), 'p75':round(values[2]), 'p90':round(values[3]), 'p95':round(values[4])}; print(json.dumps(result))\" > /percentiles.json"
+     },
+     "id": "b57e66f0-d142-4616-9366-30e166a4fcd8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python3 -c \"import numpy as np, json; data=np.loadtxt('/values.csv', delimiter=',', skiprows=1); percentiles=[25,50,75,90,95]; values=np.percentile(data, percentiles); result={'p25':round(values[0]), 'p50':round(values[1]), 'p75':round(values[2]), 'p90':round(values[3]), 'p95':round(values[4])}; print(json.dumps(result))\" > /percentiles.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "[stderr] /bin/sh: /percentiles.json: Read-only file system\n\nExit code: 1\n[Command failed with exit code 1]",
+   "content_len": 106,
+   "name": "execute",
+   "tool_call_id": "b57e66f0-d142-4616-9366-30e166a4fcd8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python3 -c \"import numpy as np, json; data=np.loadtxt('/values.csv', delimiter=',', skiprows=1); percentiles=[25,50,75,90,95]; values=np.percentile(data, percentiles); result={'p25':round(values[0]), 'p50':round(values[1]), 'p75':round(values[2]), 'p90':round(values[3]), 'p95':round(values[4])}; print(json.dumps(result))\""
+     },
+     "id": "f34760a0-b706-4a2c-8df9-926189199dc1"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python3 -c \"import numpy as np, json; data=np.loadtxt('/values.csv', delimiter=',', skiprows=1); percentiles=[25,50,75,90,95]; values=np.percentile(data, percentiles); result={'p25':round(values[0]), 'p50':round(values[1]), 'p75':round(values[2]), 'p90':round(values[3]), 'p95':round(values[4])}; print(json.dumps(result))\""
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "[stderr] Traceback (most recent call last):\n[stderr]   File \"<string>\", line 1, in <module>\n[stderr]   File \"/Users/krestnikov/giga/harness-bench-fast/.venv/lib/python3.12/site-packages/numpy/lib/_npyio_impl.py\", line 1384, in loadtxt\n[stderr]     arr = _read(fname, dtype=dtype, comment=comment, delimiter=delimiter,\n[stderr]           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n[stderr]   File \"/Users/krestnikov/giga/harness-bench-fast/.venv/lib/python3.12/site-packages/numpy/lib/_npyio_impl.py\", line 1011, in _read\n[stderr]     fh = np.lib._datasource.open(fname, 'rt', encoding=encoding)\n[stderr]          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n[stderr]   File \"/Users/krestnikov/giga/harness-bench-fast/.venv/lib/python3.12/site-packages/numpy/lib/_datasource.py\", line 192, in open\n[stderr]     return ds.open(path, mode, encoding=encoding, newline=newline)\n[stderr]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n[stderr]   File \"/Users/krestnikov/giga/harness-bench-fast/.venv/lib/python3.12/site-packages/numpy/lib/_datasource.py\", line 526, in open\n[stderr]     return _file_openers[ext](found, mode=mode,\n[stderr]            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n[stderr] FileNotFoundError: [Errno 2] No such file or directory: '/values.csv'\n\nExit code: 1\n[Command failed with exit code 1]",
+   "content_len": 1360,
+   "name": "execute",
+   "tool_call_id": "f34760a0-b706-4a2c-8df9-926189199dc1"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/"
+     },
+     "id": "4fe88a9f-d9f3-47fe-be5c-72f90cc2f9b7"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/values.csv']",
+   "content_len": 15,
+   "name": "ls",
+   "tool_call_id": "4fe88a9f-d9f3-47fe-be5c-72f90cc2f9b7"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python3 -c \"import numpy as np, json; data=np.loadtxt('values.csv', delimiter=',', skiprows=1); percentiles=[25,50,75,90,95]; values=np.percentile(data, percentiles); result={'p25':round(values[0]), 'p50':round(values[1]), 'p75':round(values[2]), 'p90':round(values[3]), 'p95':round(values[4])}; print(json.dumps(result))\""
+     },
+     "id": "b6e8cf83-638e-4e42-b26e-5c2c3a0e10c7"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python3 -c \"import numpy as np, json; data=np.loadtxt('values.csv', delimiter=',', skiprows=1); percentiles=[25,50,75,90,95]; values=np.percentile(data, percentiles); result={'p25':round(values[0]), 'p50':round(values[1]), 'p75':round(values[2]), 'p90':round(values[3]), 'p95':round(values[4])}; print(json.dumps(result))\""
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "{\"p25\": 26, \"p50\": 50, \"p75\": 75, \"p90\": 90, \"p95\": 95}\n\n[Command succeeded with exit code 0]",
+   "content_len": 93,
+   "name": "execute",
+   "tool_call_id": "b6e8cf83-638e-4e42-b26e-5c2c3a0e10c7"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\"p25\": 26, \"p50\": 50, \"p75\": 75, \"p90\": 90, \"p95\": 95}",
+      "file_path": "/percentiles.json"
+     },
+     "id": "6989709c-d506-4f2d-b420-6c33ce6c06e5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\"p25\": 26, \"p50\": 50, \"p75\": 75, \"p90\": 90, \"p95\": 95}",
+     "file_path": "/percentiles.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /percentiles.json",
+   "content_len": 30,
+   "name": "write_file",
+   "tool_call_id": "6989709c-d506-4f2d-b420-6c33ce6c06e5"
+  },
+  {
+   "type": "ai",
+   "content": "Результат вычислений сохранён в файл `/percentiles.json`.\n\nСодержимое файла:\n```json\n{\"p25\": 26, \"p50\": 50, \"p75\": 75, \"p90\": 90, \"p95\": 95}\n```\n\nДля набора чисел от 1 до 100 перцентили были рассчитаны с помощью `numpy.percentile` и округлены до целых значений.",
+   "content_len": 261,
+   "finish_reason": "stop"
+  }
+ ]
+}

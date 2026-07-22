@@ -1,0 +1,84 @@
+{
+ "task_id": "task_99_add_readme",
+ "name": "Create a short README.md",
+ "prompt": "Создай в корне рабочей директории файл README.md. В нём должно быть ровно две непустые строки в указанном порядке:\n  # demo\n  Описание проекта.",
+ "passed": true,
+ "message": "README.md lines match",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай в корне рабочей директории файл README.md. В нём должно быть ровно две непустые строки в указанном порядке:\n  # demo\n  Описание проекта.",
+   "content_len": 143
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "# demo\nОписание проекта.",
+      "file_path": "/README.md"
+     },
+     "id": "15ab2d33-5e81-44a0-a02e-becdaa17eb0d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "# demo\nОписание проекта.",
+     "file_path": "/README.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /README.md",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "15ab2d33-5e81-44a0-a02e-becdaa17eb0d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/README.md"
+     },
+     "id": "3cbac0d3-9c87-48f2-b295-da1ec833b7fb"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/README.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t# demo\n     2\tОписание проекта.",
+   "content_len": 38,
+   "name": "read_file",
+   "tool_call_id": "3cbac0d3-9c87-48f2-b295-da1ec833b7fb"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `/README.md` успешно создан и содержит ровно две непустые строки в указанном порядке:\n\n1. `# demo`\n2. `Описание проекта.`",
+   "content_len": 126,
+   "finish_reason": "stop"
+  }
+ ]
+}

@@ -1,0 +1,115 @@
+{
+ "task_id": "task_81_swap_lines",
+ "name": "Swap second and third lines of order.txt",
+ "prompt": "В файле order.txt четыре непустые строки: first, second, third, fourth. Поменяй местами вторую и третью строки — должно стать: first, third, second, fourth.",
+ "passed": true,
+ "message": "order.txt lines match",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "edit_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле order.txt четыре непустые строки: first, second, third, fourth. Поменяй местами вторую и третью строки — должно стать: first, third, second, fourth.",
+   "content_len": 156
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "order.txt"
+     },
+     "id": "59811c0f-d963-48a2-822c-68e62c36810a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "order.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tfirst\n     2\tsecond\n     3\tthird\n     4\tfourth",
+   "content_len": 53,
+   "name": "read_file",
+   "tool_call_id": "59811c0f-d963-48a2-822c-68e62c36810a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "order.txt",
+      "new_string": "first\nthird\nsecond\nfourth",
+      "old_string": "first\nsecond\nthird\nfourth"
+     },
+     "id": "7ca7a6f0-e43f-4f00-9845-dbff078351e5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "order.txt",
+     "new_string": "first\nthird\nsecond\nfourth",
+     "old_string": "first\nsecond\nthird\nfourth"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/order.txt'",
+   "content_len": 65,
+   "name": "edit_file",
+   "tool_call_id": "7ca7a6f0-e43f-4f00-9845-dbff078351e5"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "order.txt"
+     },
+     "id": "e32c33ef-4512-4e62-8c7a-472a8a0c215e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "order.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tfirst\n     2\tthird\n     3\tsecond\n     4\tfourth",
+   "content_len": 53,
+   "name": "read_file",
+   "tool_call_id": "e32c33ef-4512-4e62-8c7a-472a8a0c215e"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `order.txt` успешно изменён. Порядок строк теперь: first, third, second, fourth.",
+   "content_len": 85,
+   "finish_reason": "stop"
+  }
+ ]
+}

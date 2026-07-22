@@ -1,0 +1,200 @@
+{
+ "task_id": "task_200_impl_priority_queue",
+ "name": "Implement PriorityQueue class so pytest passes",
+ "prompt": "Создай файл pq.py с классом PriorityQueue. Методы:\n  - push(item, priority): добавить элемент с приоритетом (любое число; меньшее число — выше приоритет);\n  - pop(): извлечь и вернуть элемент с наивысшим приоритетом (то есть с наименьшим числовым значением приоритета); поднимать IndexError если пусто;\n  - __len__(): количество элементов в очереди.\n Если приоритеты равны, порядок извлечения может быть любым. Тесты в tests/test_pq.py должны пройти.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "ls",
+  "ls",
+  "read_file",
+  "execute",
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл pq.py с классом PriorityQueue. Методы:\n  - push(item, priority): добавить элемент с приоритетом (любое число; меньшее число — выше приоритет);\n  - pop(): извлечь и вернуть элемент с наивысшим приоритетом (то есть с наименьшим числовым значением приоритета); поднимать IndexError если пусто;\n  - __len__(): количество элементов в очереди.\n Если приоритеты равны, порядок извлечения может быть любым. Тесты в tests/test_pq.py должны пройти.",
+   "content_len": 450
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import heapq\n\nclass PriorityQueue:\n    def __init__(self):\n        self._data = []\n\n    def push(self, item, priority):\n        \"\"\"Добавить элемент с заданным приоритетом.\n        \n        Меньшее число означает более высокий приоритет.\n        \"\"\"\n        # Используем кортеж (priority, item), чтобы heapq могла сравнивать по первому элементу.\n        heapq.heappush(self._data, (priority, item))\n\n    def pop(self):\n        \"\"\"Извлечь и вернуть элемент с наивысшим приоритетом.\n        \n        Поднимает IndexError, если очередь пуста.\n        \"\"\"\n        if not self._data:\n            raise IndexError(\"pop from an empty priority queue\")\n        return heapq.heappop(self._data)[1]\n\n    def __len__(self):\n        \"\"\"Вернуть количество элементов в очереди.\"\"\"\n        return len(self._data)\n",
+      "file_path": "/pq.py"
+     },
+     "id": "9a72403a-8442-463c-a053-510e97afa951"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import heapq\n\nclass PriorityQueue:\n    def __init__(self):\n        self._data = []\n\n    def push(self, item, priority):\n        \"\"\"Добавить элемент с заданным приоритетом.\n        \n        Меньшее число означает более высокий приоритет.\n        \"\"\"\n        # Используем кортеж (priority, item), чтобы heapq могла сравнивать по первому элементу.\n        heapq.heappush(self._data, (priority, item))\n\n    def pop(self):\n        \"\"\"Извлечь и вернуть элемент с наивысшим приоритетом.\n        \n        Поднимает IndexError, если очередь пуста.\n        \"\"\"\n        if not self._data:\n            raise IndexError(\"pop from an empty priority queue\")\n        return heapq.heappop(self._data)[1]\n\n    def __len__(self):\n        \"\"\"Вернуть количество элементов в очереди.\"\"\"\n        return len(self._data)\n",
+     "file_path": "/pq.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /pq.py",
+   "content_len": 19,
+   "name": "write_file",
+   "tool_call_id": "9a72403a-8442-463c-a053-510e97afa951"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/"
+     },
+     "id": "f8b78fef-ef5c-4448-b4e5-52caf49bbf28"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/pq.py', '/tests/']",
+   "content_len": 21,
+   "name": "ls",
+   "tool_call_id": "f8b78fef-ef5c-4448-b4e5-52caf49bbf28"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/tests"
+     },
+     "id": "04f0e7d2-36d6-43c8-bf5a-7abe696252ed"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/tests"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/tests/test_pq.py']",
+   "content_len": 21,
+   "name": "ls",
+   "tool_call_id": "04f0e7d2-36d6-43c8-bf5a-7abe696252ed"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/tests/test_pq.py"
+     },
+     "id": "12d4b5a3-2757-4cf7-bfba-c602e8b08ff4"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/tests/test_pq.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\timport pytest\n     2\t\n     3\tfrom pq import PriorityQueue\n     4\t\n     5\t\n     6\tdef test_basic_order():\n     7\t    q = PriorityQueue()\n     8\t    q.push('b', 2)\n     9\t    q.push('a', 1)\n    10\t    q.push('c', 3)\n    11\t    assert q.pop() == 'a'\n    12\t    assert q.pop() == 'b'\n    13\t    assert q.pop() == 'c'\n    14\t\n    15\t\n    16\tdef test_len():\n    17\t    q = PriorityQueue()\n    18\t    assert len(q) == 0\n    19\t    q.push('x', 1)\n    20\t    q.push('y', 0)\n    21\t    assert len(q) == 2\n    22\t    q.pop()\n    23\t    assert len(q) == 1\n    24\t\n    25\t\n    26\tdef test_empty_raises():\n    27\t    q = PriorityQueue()\n    28\t    with pytest.raises(IndexError):\n    29\t        q.pop()",
+   "content_len": 695,
+   "name": "read_file",
+   "tool_call_id": "12d4b5a3-2757-4cf7-bfba-c602e8b08ff4"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -m pytest /tests/test_pq.py -v"
+     },
+     "id": "3f2db1cc-b81f-41e9-a1e9-25b67e65ca26"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -m pytest /tests/test_pq.py -v"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.12, pytest-9.0.3, pluggy-1.6.0 -- /Users/krestnikov/giga/harness-bench-fast/.venv/bin/python\ncachedir: .pytest_cache\nrootdir: /private/var/folders/81/xpcl3q6d0jqf831cy52ltwfm0000gn/T/hbta_task_200_impl_priority_queue_upwjucl8\nplugins: langsmith-0.8.16, anyio-4.13.0\ncollecting ... collected 0 items\n\n============================ no tests ran in 0.00s =============================\n\n[stderr] ERROR: file or directory not found: /tests/test_pq.py\n\nExit code: 4\n[Command failed with exit code 4]",
+   "content_len": 604,
+   "name": "execute",
+   "tool_call_id": "3f2db1cc-b81f-41e9-a1e9-25b67e65ca26"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -m pytest tests/test_pq.py -v"
+     },
+     "id": "8d62c660-8c2f-485d-8af5-d15c1f25129a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -m pytest tests/test_pq.py -v"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.12, pytest-9.0.3, pluggy-1.6.0 -- /Users/krestnikov/giga/harness-bench-fast/.venv/bin/python\ncachedir: .pytest_cache\nrootdir: /private/var/folders/81/xpcl3q6d0jqf831cy52ltwfm0000gn/T/hbta_task_200_impl_priority_queue_upwjucl8\nplugins: langsmith-0.8.16, anyio-4.13.0\ncollecting ... collected 3 items\n\ntests/test_pq.py::test_basic_order PASSED                                [ 33%]\ntests/test_pq.py::test_len PASSED                                        [ 66%]\ntests/test_pq.py::test_empty_raises PASSED                               [100%]\n\n============================== 3 passed in 0.01s ===============================\n\n[Command succeeded with exit code 0]",
+   "content_len": 771,
+   "name": "execute",
+   "tool_call_id": "8d62c660-8c2f-485d-8af5-d15c1f25129a"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `pq.py` с классом `PriorityQueue` успешно создан. Все тесты в файле `tests/test_pq.py` пройдены.\n\n### Итоговый код файла pq.py:\n```python\nimport heapq\n\nclass PriorityQueue:\n    def __init__(self):\n        self._data = []\n\n    def push(self, item, priority):\n        \"\"\"Добавить элемент с заданным приоритетом.\n        \n        Меньшее число означает более высокий приоритет.\n        \"\"\"\n        # Используем кортеж (priority, item), чтобы heapq могла сравнивать по первому элементу.\n        heapq.heappush(self._data, (priority, item))\n\n    def pop(self):\n        \"\"\"Извлечь и вернуть элемент с наивысшим приоритетом.\n        \n        Поднимает IndexError, если очередь пуста.\n        \"\"\"\n        if not self._data:\n            raise IndexError(\"pop from an empty priority queue\")\n        return heapq.heappop(self._data)[1]\n\n    def __len__(self):\n        \"\"\"Вернуть количество элементов в очереди.\"\"\"\n        return len(self._data)\n```\nРеализация использует встроенный модуль `heapq`, который обеспечивает эффективное выполнение операций вставки (`O(log n)`) и извлечения (`O(log n)`). Метод `push` добавляет элементы в виде кортежей `(приоритет, элемент)`. Поскольку сравнение кортежей в Python происходит поэлементно, куча автоматически упорядочивается сначала по приоритету, а затем по элементу (если приоритеты равны).\n\nМетод `pop` извлекает элемент с наименьшим значением приоритета, что соответствует требованию «меньшее число — выше приоритет». Если очередь пуста, он корректно вызывает `IndexError`.\n\nТесты подтверждают работоспособность:\n-   **test_basic_order**: Проверяет, что элементы извлекаются строго в порядке возрастания приоритета.\n-   **test_len**: Убеждается, что метод `__len__` возвращает точное количество элементов до и после операций добавления/извлечения.\n-   **test_empty_raises**: Гарантирует, что попытка извлечения из пустой очереди приводит к ошибке `IndexError`.",
+   "content_len": 1901,
+   "finish_reason": "stop"
+  }
+ ]
+}

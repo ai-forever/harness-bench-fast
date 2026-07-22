@@ -1,0 +1,13 @@
+{
+ "model": "GigaChat-3.5-430B-A28B (IFT)",
+ "harness": "deepagents + GigaChat profile (deepagents-gigachat)",
+ "detector": "tool-call-as-text (assistant turn, no real tool_calls, content matches a tool-call pattern); ```json/```python result displays excluded",
+ "total_tasks": 313,
+ "passed": 278,
+ "tasks_with_tool_as_text": 0,
+ "tool_as_text_total_turns": 0,
+ "pattern_counts": {},
+ "confidence_counts": {},
+ "cases": [],
+ "model_build": "GigaChat-3.5-430B-A28B:32.9.23.6"
+}

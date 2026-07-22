@@ -1,0 +1,84 @@
+{
+ "task_id": "task_147_log_filter_404",
+ "name": "Filter access.log to 404 lines",
+ "prompt": "В файле access.log семь строк в формате Apache combined log. Сохрани в файл not_found.log только те строки, у которых HTTP-статус равен 404, в исходном порядке. Содержимое каждой строки переноси байт-в-байт.",
+ "passed": true,
+ "message": "not_found.log has the three 404 lines",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле access.log семь строк в формате Apache combined log. Сохрани в файл not_found.log только те строки, у которых HTTP-статус равен 404, в исходном порядке. Содержимое каждой строки переноси байт-в-байт.",
+   "content_len": 207
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/access.log"
+     },
+     "id": "c345fcfd-9c9c-46ae-b52f-1af5aa5ce530"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/access.log"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t10.0.0.1 - - [13/May/2026:10:00:00 +0000] \"GET / HTTP/1.1\" 200 100\n     2\t10.0.0.2 - - [13/May/2026:10:00:01 +0000] \"GET /a HTTP/1.1\" 404 50\n     3\t10.0.0.1 - - [13/May/2026:10:00:02 +0000] \"GET /b HTTP/1.1\" 200 200\n     4\t10.0.0.3 - - [13/May/2026:10:00:03 +0000] \"POST /x HTTP/1.1\" 500 0\n     5\t10.0.0.2 - - [13/May/2026:10:00:04 +0000] \"GET /c HTTP/1.1\" 404 30\n     6\t10.0.0.1 - - [13/May/2026:10:00:05 +0000] \"GET /d HTTP/1.1\" 200 70\n     7\t10.0.0.4 - - [13/May/2026:10:00:06 +0000] \"GET /e HTTP/1.1\" 404 25",
+   "content_len": 518,
+   "name": "read_file",
+   "tool_call_id": "c345fcfd-9c9c-46ae-b52f-1af5aa5ce530"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "10.0.0.2 - - [13/May/2026:10:00:01 +0000] \"GET /a HTTP/1.1\" 404 50\n10.0.0.2 - - [13/May/2026:10:00:04 +0000] \"GET /c HTTP/1.1\" 404 30\n10.0.0.4 - - [13/May/2026:10:00:06 +0000] \"GET /e HTTP/1.1\" 404 25\n",
+      "file_path": "/not_found.log"
+     },
+     "id": "1489b85b-6f5e-4236-b4c2-a539c5a31127"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "10.0.0.2 - - [13/May/2026:10:00:01 +0000] \"GET /a HTTP/1.1\" 404 50\n10.0.0.2 - - [13/May/2026:10:00:04 +0000] \"GET /c HTTP/1.1\" 404 30\n10.0.0.4 - - [13/May/2026:10:00:06 +0000] \"GET /e HTTP/1.1\" 404 25\n",
+     "file_path": "/not_found.log"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /not_found.log",
+   "content_len": 27,
+   "name": "write_file",
+   "tool_call_id": "1489b85b-6f5e-4236-b4c2-a539c5a31127"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `/not_found.log` создан. В него записаны только строки из `access.log` с HTTP-статусом 404, в исходном порядке:\n\n1. `10.0.0.2 - - [13/May/2026:10:00:01 +0000] \"GET /a HTTP/1.1\" 404 50`\n2. `10.0.0.2 - - [13/May/2026:10:00:04 +0000] \"GET /c HTTP/1.1\" 404 30`\n3. `10.0.0.4 - - [13/May/2026:10:00:06 +0000] \"GET /e HTTP/1.1\" 404 25`",
+   "content_len": 333,
+   "finish_reason": "stop"
+  }
+ ]
+}

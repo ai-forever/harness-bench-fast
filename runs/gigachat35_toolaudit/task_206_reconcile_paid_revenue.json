@@ -1,0 +1,229 @@
+{
+ "task_id": "task_206_reconcile_paid_revenue",
+ "name": "Reconcile CSV+JSONL revenue into vip_revenue.csv",
+ "prompt": "Есть файлы customers.csv, orders.jsonl, fx_rates.json и blocked_countries.txt.\nПострой vip_revenue.csv с колонками user_id,tier,paid_usd,paid_orders:\n  - учитывать только заказы со status='paid';\n  - amount конвертировать в USD через fx_rates.json;\n  - пользователей из стран из blocked_countries.txt исключить;\n  - агрегировать сумму paid_usd и количество paid_orders по user_id;\n  - включать только пользователей с paid_usd >= 200;\n  - paid_usd форматировать как строку с ровно двумя знаками после\n    точки (например '320.00', а не '320.0'); сортировать по paid_usd\n    desc, при равенстве по user_id asc.",
+ "passed": true,
+ "message": "vip_revenue.csv matches expected rows",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "read_file",
+  "read_file",
+  "read_file",
+  "write_file",
+  "execute",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Есть файлы customers.csv, orders.jsonl, fx_rates.json и blocked_countries.txt.\nПострой vip_revenue.csv с колонками user_id,tier,paid_usd,paid_orders:\n  - учитывать только заказы со status='paid';\n  - amount конвертировать в USD через fx_rates.json;\n  - пользователей из стран из blocked_countries.txt исключить;\n  - агрегировать сумму paid_usd и количество paid_orders по user_id;\n  - включать только пользователей с paid_usd >= 200;\n  - paid_usd форматировать как строку с ровно двумя знаками после\n    точки (например '320.00', а не '320.0'); сортировать по paid_usd\n    desc, при равенстве по user_id asc.",
+   "content_len": 608
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "customers.csv"
+     },
+     "id": "9a26beb3-29dd-4d4a-adab-6ed3ecfd411e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "customers.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tuser_id,email,country,tier\n     2\t1,alice@example.com,US,gold\n     3\t2,bob@example.com,DE,silver\n     4\t3,carol@example.com,RU,gold\n     5\t4,dave@example.com,US,bronze\n     6\t5,erin@example.com,CN,gold\n     7\t6,fraud@example.com,NK,bronze",
+   "content_len": 245,
+   "name": "read_file",
+   "tool_call_id": "9a26beb3-29dd-4d4a-adab-6ed3ecfd411e"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "orders.jsonl"
+     },
+     "id": "ee56f030-401a-4195-8ca3-e339c3bd354d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "orders.jsonl"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\"user_id\": 1, \"amount\": 120, \"currency\": \"USD\", \"status\": \"paid\"}\n     2\t{\"user_id\": 1, \"amount\": 100, \"currency\": \"EUR\", \"status\": \"paid\"}\n     3\t{\"user_id\": 1, \"amount\": 50, \"currency\": \"USD\", \"status\": \"refund\"}\n     4\t{\"user_id\": 2, \"amount\": 200, \"currency\": \"USD\", \"status\": \"paid\"}\n     5\t{\"user_id\": 2, \"amount\": 100, \"currency\": \"EUR\", \"status\": \"paid\"}\n     6\t{\"user_id\": 3, \"amount\": 30000, \"currency\": \"RUB\", \"status\": \"paid\"}\n     7\t{\"user_id\": 4, \"amount\": 150, \"currency\": \"USD\", \"status\": \"paid\"}\n     8\t{\"user_id\": 4, \"amount\": 160, \"currency\": \"USD\", \"status\": \"paid\"}\n     9\t{\"user_id\": 5, \"amount\": 400, \"currency\": \"USD\", \"status\": \"failed\"}\n    10\t{\"user_id\": 6, \"amount\": 1000, \"currency\": \"USD\", \"status\": \"paid\"}",
+   "content_len": 745,
+   "name": "read_file",
+   "tool_call_id": "ee56f030-401a-4195-8ca3-e339c3bd354d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "fx_rates.json"
+     },
+     "id": "f9db16cb-d539-4681-967a-5e69fe8910b5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "fx_rates.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\"USD\": 1.0, \"EUR\": 1.2, \"RUB\": 0.01}",
+   "content_len": 44,
+   "name": "read_file",
+   "tool_call_id": "f9db16cb-d539-4681-967a-5e69fe8910b5"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "blocked_countries.txt"
+     },
+     "id": "caeb18ad-8d9e-41dc-84e5-5f41aa97d62d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "blocked_countries.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tNK",
+   "content_len": 9,
+   "name": "read_file",
+   "tool_call_id": "caeb18ad-8d9e-41dc-84e5-5f41aa97d62d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import csv\nimport json\nfrom decimal import Decimal, ROUND_HALF_UP\n\n# Load data\nwith open('customers.csv', 'r', encoding='utf-8') as f:\n    customers = list(csv.DictReader(f))\ncustomer_lookup = {int(c['user_id']): c for c in customers}\ncountry_by_user = {int(c['user_id']): c['country'] for c in customers}\n\nwith open('fx_rates.json', 'r', encoding='utf-8') as f:\n    fx_rates = json.load(f)\n\nwith open('blocked_countries.txt', 'r', encoding='utf-8') as f:\n    blocked_countries = set(line.strip() for line in f if line.strip())\n\npaid_orders_by_user = {}\nfor line in open('orders.jsonl', 'r', encoding='utf-8'):\n    order = json.loads(line)\n    if order.get('status') != 'paid':\n        continue\n    user_id = int(order['user_id'])\n    # Exclude blocked countries\n    country = country_by_user.get(user_id)\n    if not country or country in blocked_countries:\n        continue\n    amount = Decimal(str(order['amount']))\n    currency = order['currency']\n    rate = Decimal(str(fx_rates.get(currency)))\n    if rate is None:\n        continue  # skip unknown currencies\n    paid_usd = (amount * rate).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)\n    entry = paid_orders_by_user.setdefault(user_id, {'tier': customer_lookup[user_id]['tier'], 'sum_usd': Decimal('0.00'), 'count': 0})\n    entry['sum_usd'] += paid_usd\n    entry['count'] += 1\n\n# Filter and prepare rows\nrows = []\nfor user_id, data in paid_orders_by_user.items():\n    total = data['sum_usd'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)\n    if total >= Decimal('200'):\n        rows.append({\n            'user_id': str(user_id),\n            'tier': data['tier'],\n            'paid_usd': format(total.normalize(), 'f') if '.' in format(total.normalize(), 'f') else f\"{total.normalize():.2f}\",\n            'paid_orders': str(data['count'])\n        })\n\n# Sort: paid_usd desc, user_id asc\ndef sort_key(r):\n    return (-float(r['paid_usd']), r['user_id'])\nrows.sort(key=sort_key)\n\n# Write output\nwith open('vip_revenue.csv', 'w', newline='', encoding='utf-8') as f:\n    writer = csv.DictWriter(f, fieldnames=['user_id','tier','paid_usd','paid_orders'])\n    writer.writeheader()\n    for row in rows:\n        # Ensure two decimals exactly\n        usd_val = Decimal(row['paid_usd']).quantize(Decimal('0.01'))\n        row['paid_usd'] = f\"{usd_val:.2f}\"\n        writer.writerow(row)",
+      "file_path": "build_vip_revenue.py"
+     },
+     "id": "c7c98c4d-0092-4452-92ae-a1c17a287d03"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import csv\nimport json\nfrom decimal import Decimal, ROUND_HALF_UP\n\n# Load data\nwith open('customers.csv', 'r', encoding='utf-8') as f:\n    customers = list(csv.DictReader(f))\ncustomer_lookup = {int(c['user_id']): c for c in customers}\ncountry_by_user = {int(c['user_id']): c['country'] for c in customers}\n\nwith open('fx_rates.json', 'r', encoding='utf-8') as f:\n    fx_rates = json.load(f)\n\nwith open('blocked_countries.txt', 'r', encoding='utf-8') as f:\n    blocked_countries = set(line.strip() for line in f if line.strip())\n\npaid_orders_by_user = {}\nfor line in open('orders.jsonl', 'r', encoding='utf-8'):\n    order = json.loads(line)\n    if order.get('status') != 'paid':\n        continue\n    user_id = int(order['user_id'])\n    # Exclude blocked countries\n    country = country_by_user.get(user_id)\n    if not country or country in blocked_countries:\n        continue\n    amount = Decimal(str(order['amount']))\n    currency = order['currency']\n    rate = Decimal(str(fx_rates.get(currency)))\n    if rate is None:\n        continue  # skip unknown currencies\n    paid_usd = (amount * rate).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)\n    entry = paid_orders_by_user.setdefault(user_id, {'tier': customer_lookup[user_id]['tier'], 'sum_usd': Decimal('0.00'), 'count': 0})\n    entry['sum_usd'] += paid_usd\n    entry['count'] += 1\n\n# Filter and prepare rows\nrows = []\nfor user_id, data in paid_orders_by_user.items():\n    total = data['sum_usd'].quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)\n    if total >= Decimal('200'):\n        rows.append({\n            'user_id': str(user_id),\n            'tier': data['tier'],\n            'paid_usd': format(total.normalize(), 'f') if '.' in format(total.normalize(), 'f') else f\"{total.normalize():.2f}\",\n            'paid_orders': str(data['count'])\n        })\n\n# Sort: paid_usd desc, user_id asc\ndef sort_key(r):\n    return (-float(r['paid_usd']), r['user_id'])\nrows.sort(key=sort_key)\n\n# Write output\nwith open('vip_revenue.csv', 'w', newline='', encoding='utf-8') as f:\n    writer = csv.DictWriter(f, fieldnames=['user_id','tier','paid_usd','paid_orders'])\n    writer.writeheader()\n    for row in rows:\n        # Ensure two decimals exactly\n        usd_val = Decimal(row['paid_usd']).quantize(Decimal('0.01'))\n        row['paid_usd'] = f\"{usd_val:.2f}\"\n        writer.writerow(row)",
+     "file_path": "build_vip_revenue.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /build_vip_revenue.py",
+   "content_len": 34,
+   "name": "write_file",
+   "tool_call_id": "c7c98c4d-0092-4452-92ae-a1c17a287d03"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python build_vip_revenue.py"
+     },
+     "id": "7ce1fe49-8ff7-42fc-90c9-bbd44cdba0c7"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python build_vip_revenue.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "7ce1fe49-8ff7-42fc-90c9-bbd44cdba0c7"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "vip_revenue.csv"
+     },
+     "id": "2beb6ece-17cc-43f7-8192-36f269d04553"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "vip_revenue.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tuser_id,tier,paid_usd,paid_orders\n     2\t2,silver,320.00,2\n     3\t4,bronze,310.00,2\n     4\t3,gold,300.00,1\n     5\t1,gold,240.00,2",
+   "content_len": 136,
+   "name": "read_file",
+   "tool_call_id": "2beb6ece-17cc-43f7-8192-36f269d04553"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `vip_revenue.csv` успешно создан. Содержимое:\n\nuser_id,tier,paid_usd,paid_orders\n2,silver,320.00,2\n4,bronze,310.00,2\n3,gold,300.00,1\n1,gold,240.00,2",
+   "content_len": 153,
+   "finish_reason": "stop"
+  }
+ ]
+}

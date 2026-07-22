@@ -1,0 +1,84 @@
+{
+ "task_id": "task_151_pipeline_csv_to_json",
+ "name": "Filter + groupby + sort orders.csv to summary.json",
+ "prompt": "В файле orders.csv 20 строк данных (user,category,amount). Сделай summary.json — JSON-массив объектов с полями category и total. Включай только заказы, у которых amount >= 100; суммируй amount по каждой категории; сортируй итоговый массив по полю total по убыванию (при равенстве — по имени категории по возрастанию). В итоговом массиве должны быть только категории, по которым есть хотя бы одна подходящая строка.",
+ "passed": false,
+ "message": "summary.json JSON mismatch\n--- got ---\n[{'category': 'tech', 'total': 2715}, {'category': 'books', 'total': 1065}, {'category': 'food', 'total': 615}]\n--- exp ---\n[{'category': 'tech', 'total': 2855}, {'category': 'books', 'total': 1065}, {'category': 'food', 'total': 615}]",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле orders.csv 20 строк данных (user,category,amount). Сделай summary.json — JSON-массив объектов с полями category и total. Включай только заказы, у которых amount >= 100; суммируй amount по каждой категории; сортируй итоговый массив по полю total по убыванию (при равенстве — по имени категории по возрастанию). В итоговом массиве должны быть только категории, по которым есть хотя бы одна подходящая строка.",
+   "content_len": 414
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/orders.csv"
+     },
+     "id": "14059279-344a-4268-9a2d-1772b83a1a5f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/orders.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tuser,category,amount\n     2\talice,books,120\n     3\tbob,tech,95\n     4\tcarol,books,250\n     5\tdave,food,80\n     6\teve,tech,1100\n     7\tfrank,books,40\n     8\tgrace,food,110\n     9\thenry,tech,105\n    10\tivy,books,300\n    11\tjack,food,200\n    12\tkate,tech,99\n    13\tliam,books,175\n    14\tmia,food,130\n    15\tnoah,tech,1500\n    16\tolive,books,95\n    17\tpaul,food,175\n    18\tquinn,tech,80\n    19\triley,books,220\n    20\tsam,food,60\n    21\ttara,tech,150",
+   "content_len": 452,
+   "name": "read_file",
+   "tool_call_id": "14059279-344a-4268-9a2d-1772b83a1a5f"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "[\n  {\n    \"category\": \"tech\",\n    \"total\": 2715\n  },\n  {\n    \"category\": \"books\",\n    \"total\": 1065\n  },\n  {\n    \"category\": \"food\",\n    \"total\": 615\n  }\n]",
+      "file_path": "/summary.json"
+     },
+     "id": "87b35486-aa73-4628-a1c4-cf091b4f52a5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "[\n  {\n    \"category\": \"tech\",\n    \"total\": 2715\n  },\n  {\n    \"category\": \"books\",\n    \"total\": 1065\n  },\n  {\n    \"category\": \"food\",\n    \"total\": 615\n  }\n]",
+     "file_path": "/summary.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /summary.json",
+   "content_len": 26,
+   "name": "write_file",
+   "tool_call_id": "87b35486-aa73-4628-a1c4-cf091b4f52a5"
+  },
+  {
+   "type": "ai",
+   "content": "Файл summary.json создан. В нём содержится JSON-массив с категориями и суммами заказов (amount ≥ 100), отсортированный по убыванию total.\n\nСодержимое файла /summary.json:\n```json\n[\n  {\n    \"category\": \"tech\",\n    \"total\": 2715\n  },\n  {\n    \"category\": \"books\",\n    \"total\": 1065\n  },\n  {\n    \"category\": \"food\",\n    \"total\": 615\n  }\n]\n```\nРасчёт: tech — 1100+105+1500+150=2715, books — 120+250+300+175+220=1065, food — 110+200+130+175=615; категории без подходящих строк не включены.",
+   "content_len": 483,
+   "finish_reason": "stop"
+  }
+ ]
+}

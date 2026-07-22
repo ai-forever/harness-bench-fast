@@ -1,0 +1,125 @@
+{
+  "task_set_version": "0.9.0",
+  "total": 5,
+  "passed": 5,
+  "pass_rate": 1.0,
+  "tasks": [
+    {
+      "task_id": "task_01_create_hello",
+      "number": 1,
+      "passed": true,
+      "message": "hello.py ran and produced expected output",
+      "elapsed_seconds": 3.284673999994993,
+      "error": null,
+      "tags": [
+        "create",
+        "python",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 3,
+      "agent_tool_calls": 1,
+      "agent_shell_commands": 0,
+      "agent_events": 4,
+      "agent_llm_calls": 2,
+      "agent_input_tokens": 28944,
+      "agent_output_tokens": 135,
+      "agent_total_tokens": 29079
+    },
+    {
+      "task_id": "task_06_toggle_debug",
+      "number": 6,
+      "passed": true,
+      "message": "config.py contains all expected substrings; config.py free of forbidden substrings",
+      "elapsed_seconds": 4.133673625001393,
+      "error": null,
+      "tags": [
+        "edit",
+        "python",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 5,
+      "agent_tool_calls": 2,
+      "agent_shell_commands": 0,
+      "agent_events": 6,
+      "agent_llm_calls": 3,
+      "agent_input_tokens": 29679,
+      "agent_output_tokens": 222,
+      "agent_total_tokens": 29901
+    },
+    {
+      "task_id": "task_28_csv_to_json",
+      "number": 28,
+      "passed": true,
+      "message": "users.json contains the expected records",
+      "elapsed_seconds": 4.604764834002708,
+      "error": null,
+      "tags": [
+        "read",
+        "compute",
+        "json",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 5,
+      "agent_tool_calls": 2,
+      "agent_shell_commands": 0,
+      "agent_events": 6,
+      "agent_llm_calls": 3,
+      "agent_input_tokens": 5415,
+      "agent_output_tokens": 306,
+      "agent_total_tokens": 5721
+    },
+    {
+      "task_id": "task_37_make_pytest_test",
+      "number": 37,
+      "passed": true,
+      "message": "tests/test_math.py exists; tests/test_math.py contains all expected substrings",
+      "elapsed_seconds": 3.648647958005313,
+      "error": null,
+      "tags": [
+        "create",
+        "python",
+        "tests",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 3,
+      "agent_tool_calls": 1,
+      "agent_shell_commands": 0,
+      "agent_events": 4,
+      "agent_llm_calls": 2,
+      "agent_input_tokens": 4935,
+      "agent_output_tokens": 252,
+      "agent_total_tokens": 5187
+    },
+    {
+      "task_id": "task_49_csv_to_markdown",
+      "number": 49,
+      "passed": true,
+      "message": "table.md looks like a valid markdown table",
+      "elapsed_seconds": 4.894980917000794,
+      "error": null,
+      "tags": [
+        "read",
+        "compute",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 5,
+      "agent_tool_calls": 2,
+      "agent_shell_commands": 0,
+      "agent_events": 6,
+      "agent_llm_calls": 3,
+      "agent_input_tokens": 5607,
+      "agent_output_tokens": 318,
+      "agent_total_tokens": 5925
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+ "task_id": "task_240_memory_summarize_profile",
+ "name": "Memory: summarize verbose profile into concise summary.txt",
+ "prompt": "Напиши `summary.txt` — краткое резюме обо мне на основе памяти. Максимум 3-5 строк текста. Упомяни имя, компанию и основной стек.",
+ "passed": true,
+ "message": "summary.txt is concise and includes key facts",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Напиши `summary.txt` — краткое резюме обо мне на основе памяти. Максимум 3-5 строк текста. Упомяни имя, компанию и основной стек.",
+   "content_len": 129
+  },
+  {
+   "type": "human",
+   "content": "[MEMORY-TASK] This is a memory task.\n1) read_file MEMORY.md first\n2) complete the requested deliverable using MEMORY facts verbatim\n3) if the user mentioned ANY personal fact, edit_file MEMORY.md before finishing",
+   "content_len": 212
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "MEMORY.md"
+     },
+     "id": "f3775f2f-d04d-4664-97bd-af75ee113a37"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "MEMORY.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t- Имя: Софья Белова\n     2\t- Город: Екатеринбург\n     3\t- Компания: RocketData\n     4\t- Должность: Senior Backend Developer\n     5\t- Стаж: 8 лет\n     6\t- Основной язык: Go\n     7\t- Вторичный язык: Python\n     8\t- БД: PostgreSQL, ClickHouse\n     9\t- Хобби: скалолазание, фотография\n    10\t- ОС: Linux (Fedora)\n    11\t- Редактор: Neovim\n    12\t- Любимый фреймворк: Echo (Go)",
+   "content_len": 379,
+   "name": "read_file",
+   "tool_call_id": "f3775f2f-d04d-4664-97bd-af75ee113a37"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "Софья Белова, Senior Backend Developer в RocketData с 8-летним стажем. Основной стек: Go (фреймворк Echo), Python и базы данных PostgreSQL/ClickHouse. Работает в Linux (Fedora) с редактором Neovim.",
+      "file_path": "summary.txt"
+     },
+     "id": "4ccd87af-78af-4f13-8dcd-f98241d7a205"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "Софья Белова, Senior Backend Developer в RocketData с 8-летним стажем. Основной стек: Go (фреймворк Echo), Python и базы данных PostgreSQL/ClickHouse. Работает в Linux (Fedora) с редактором Neovim.",
+     "file_path": "summary.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /summary.txt",
+   "content_len": 25,
+   "name": "write_file",
+   "tool_call_id": "4ccd87af-78af-4f13-8dcd-f98241d7a205"
+  },
+  {
+   "type": "ai",
+   "content": "Краткое резюме о вас создано в файле `summary.txt`.",
+   "content_len": 51,
+   "finish_reason": "stop"
+  }
+ ]
+}

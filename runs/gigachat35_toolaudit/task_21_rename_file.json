@@ -1,0 +1,53 @@
+{
+ "task_id": "task_21_rename_file",
+ "name": "Rename oldname.txt to newname.txt",
+ "prompt": "Переименуй файл oldname.txt в newname.txt, сохранив его содержимое байт-в-байт. После переименования файла oldname.txt существовать не должно.",
+ "passed": true,
+ "message": "oldname.txt absent; newname.txt contains all expected substrings",
+ "error": null,
+ "real_tool_call_names": [
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Переименуй файл oldname.txt в newname.txt, сохранив его содержимое байт-в-байт. После переименования файла oldname.txt существовать не должно.",
+   "content_len": 142
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "mv oldname.txt newname.txt"
+     },
+     "id": "5a3f6c69-7123-4e2d-9591-8a4b28ebc15c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "mv oldname.txt newname.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "5a3f6c69-7123-4e2d-9591-8a4b28ebc15c"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `oldname.txt` успешно переименован в `newname.txt`.",
+   "content_len": 56,
+   "finish_reason": "stop"
+  }
+ ]
+}

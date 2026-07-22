@@ -1,0 +1,55 @@
+{
+ "task_id": "task_133_impl_factorial",
+ "name": "Implement factorial(n)",
+ "prompt": "Создай файл factorial.py с функцией factorial(n: int) -> int, которая возвращает n! (произведение чисел от 1 до n; factorial(0) == 1, factorial(5) == 120, factorial(10) == 3628800).",
+ "passed": true,
+ "message": "factorial.py: mod.factorial(0) == 1; factorial.py: mod.factorial(5) == 120; factorial.py: mod.factorial(10) == 3628800",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл factorial.py с функцией factorial(n: int) -> int, которая возвращает n! (произведение чисел от 1 до n; factorial(0) == 1, factorial(5) == 120, factorial(10) == 3628800).",
+   "content_len": 181
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "def factorial(n: int) -> int:\n    \"\"\"\n    Вычисляет факториал числа n.\n\n    Args:\n        n (int): Неотрицательное целое число.\n\n    Returns:\n        int: Факториал числа n. По определению, 0! = 1.\n\n    Raises:\n        ValueError: Если n является отрицательным числом.\n    \"\"\"\n    if n < 0:\n        raise ValueError(\"Факториал не определен для отрицательных чисел\")\n    result = 1\n    for i in range(2, n + 1):\n        result *= i\n    return result",
+      "file_path": "factorial.py"
+     },
+     "id": "87feb3fe-de12-480f-ad66-0a97f5421816"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "def factorial(n: int) -> int:\n    \"\"\"\n    Вычисляет факториал числа n.\n\n    Args:\n        n (int): Неотрицательное целое число.\n\n    Returns:\n        int: Факториал числа n. По определению, 0! = 1.\n\n    Raises:\n        ValueError: Если n является отрицательным числом.\n    \"\"\"\n    if n < 0:\n        raise ValueError(\"Факториал не определен для отрицательных чисел\")\n    result = 1\n    for i in range(2, n + 1):\n        result *= i\n    return result",
+     "file_path": "factorial.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /factorial.py",
+   "content_len": 26,
+   "name": "write_file",
+   "tool_call_id": "87feb3fe-de12-480f-ad66-0a97f5421816"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `factorial.py` с функцией `factorial(n: int) -> int` успешно создан. Функция вычисляет факториал неотрицательного целого числа, где по определению 0! = 1.",
+   "content_len": 159,
+   "finish_reason": "stop"
+  }
+ ]
+}

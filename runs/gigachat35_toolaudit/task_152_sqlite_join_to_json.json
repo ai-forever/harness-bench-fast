@@ -1,0 +1,113 @@
+{
+ "task_id": "task_152_sqlite_join_to_json",
+ "name": "JOIN users+orders in sqlite, export per-user totals to JSON",
+ "prompt": "В файле shop.db лежат таблицы users(id,name) и orders(id,user_id,amount). Для каждого пользователя посчитай сумму всех его заказов и сохрани результат в users_totals.json как JSON-массив объектов с полями name и total (целое число). Включай всех 4 пользователей (даже если у кого-то один заказ). Порядок объектов в массиве не важен.",
+ "passed": true,
+ "message": "users_totals.json matches expected JSON",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "execute",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле shop.db лежат таблицы users(id,name) и orders(id,user_id,amount). Для каждого пользователя посчитай сумму всех его заказов и сохрани результат в users_totals.json как JSON-массив объектов с полями name и total (целое число). Включай всех 4 пользователей (даже если у кого-то один заказ). Порядок объектов в массиве не важен.",
+   "content_len": 332
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import sqlite3\nimport json\n\n# Connect to the database\nconn = sqlite3.connect('shop.db')\ncursor = conn.cursor()\n\n# Execute a LEFT JOIN query to get all users and their total order amounts.\n# COALESCE is used to replace NULL with 0 for users who have no orders.\nquery = '''\nSELECT u.name, COALESCE(SUM(o.amount), 0) as total\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nGROUP BY u.id;\n'''\n\ncursor.execute(query)\nresults = cursor.fetchall()\n\n# Format the results into the required JSON structure\noutput_data = [{\"name\": row[0], \"total\": int(row[1])} for row in results]\n\n# Write the output to a JSON file\nwith open('users_totals.json', 'w', encoding='utf-8') as f:\n    json.dump(output_data, f, ensure_ascii=False, indent=2)\n\nconn.close()",
+      "file_path": "calculate_totals.py"
+     },
+     "id": "e14d09ff-7acc-4dc5-8855-3a874820be26"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import sqlite3\nimport json\n\n# Connect to the database\nconn = sqlite3.connect('shop.db')\ncursor = conn.cursor()\n\n# Execute a LEFT JOIN query to get all users and their total order amounts.\n# COALESCE is used to replace NULL with 0 for users who have no orders.\nquery = '''\nSELECT u.name, COALESCE(SUM(o.amount), 0) as total\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nGROUP BY u.id;\n'''\n\ncursor.execute(query)\nresults = cursor.fetchall()\n\n# Format the results into the required JSON structure\noutput_data = [{\"name\": row[0], \"total\": int(row[1])} for row in results]\n\n# Write the output to a JSON file\nwith open('users_totals.json', 'w', encoding='utf-8') as f:\n    json.dump(output_data, f, ensure_ascii=False, indent=2)\n\nconn.close()",
+     "file_path": "calculate_totals.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /calculate_totals.py",
+   "content_len": 33,
+   "name": "write_file",
+   "tool_call_id": "e14d09ff-7acc-4dc5-8855-3a874820be26"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python calculate_totals.py"
+     },
+     "id": "c9c5a0c8-f562-4490-868a-c7640e2a0f0f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python calculate_totals.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "c9c5a0c8-f562-4490-868a-c7640e2a0f0f"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "users_totals.json"
+     },
+     "id": "a1af2a3c-b5cb-458c-a1e0-7f355c588677"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "users_totals.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t[\n     2\t  {\n     3\t    \"name\": \"Alice\",\n     4\t    \"total\": 240\n     5\t  },\n     6\t  {\n     7\t    \"name\": \"Bob\",\n     8\t    \"total\": 200\n     9\t  },\n    10\t  {\n    11\t    \"name\": \"Carol\",\n    12\t    \"total\": 380\n    13\t  },\n    14\t  {\n    15\t    \"name\": \"Dave\",\n    16\t    \"total\": 70\n    17\t  }\n    18\t]",
+   "content_len": 312,
+   "name": "read_file",
+   "tool_call_id": "a1af2a3c-b5cb-458c-a1e0-7f355c588677"
+  },
+  {
+   "type": "ai",
+   "content": "Результат был сохранен в файл `users_totals.json`.\n\nСодержимое файла:\n```json\n[\n  {\n    \"name\": \"Alice\",\n    \"total\": 240\n  },\n  {\n    \"name\": \"Bob\",\n    \"total\": 200\n  },\n  {\n    \"name\": \"Carol\",\n    \"total\": 380\n  },\n  {\n    \"name\": \"Dave\",\n    \"total\": 70\n  }\n]\n```\nДля каждого из четырех пользователей посчитана общая сумма его заказов.",
+   "content_len": 340,
+   "finish_reason": "stop"
+  }
+ ]
+}

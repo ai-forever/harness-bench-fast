@@ -1,0 +1,84 @@
+{
+ "task_id": "task_122_yaml_to_json",
+ "name": "Convert config.yaml to config.json",
+ "prompt": "Преобразуй файл config.yaml в config.json (валидный JSON). Структура данных должна сохраниться: после json.loads(config.json) должен получиться тот же объект, что и yaml.safe_load(config.yaml). Формат отступов в JSON не важен.",
+ "passed": true,
+ "message": "config.json equals the YAML structure",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Преобразуй файл config.yaml в config.json (валидный JSON). Структура данных должна сохраниться: после json.loads(config.json) должен получиться тот же объект, что и yaml.safe_load(config.yaml). Формат отступов в JSON не важен.",
+   "content_len": 226
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/config.yaml"
+     },
+     "id": "1b16f699-eef1-4e35-a8c3-04250717baa7"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/config.yaml"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tname: gigachat\n     2\tversion: 3\n     3\tdebug: false\n     4\tfeatures:\n     5\t  - tools\n     6\t  - think",
+   "content_len": 110,
+   "name": "read_file",
+   "tool_call_id": "1b16f699-eef1-4e35-a8c3-04250717baa7"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\"name\": \"gigachat\", \"version\": 3, \"debug\": false, \"features\": [\"tools\", \"think\"]}",
+      "file_path": "/config.json"
+     },
+     "id": "f5d9b83a-c280-472e-8c1e-2e6ad87e40f9"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\"name\": \"gigachat\", \"version\": 3, \"debug\": false, \"features\": [\"tools\", \"think\"]}",
+     "file_path": "/config.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /config.json",
+   "content_len": 25,
+   "name": "write_file",
+   "tool_call_id": "f5d9b83a-c280-472e-8c1e-2e6ad87e40f9"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `/config.yaml` успешно преобразован в валидный JSON и сохранён как `/config.json`.\n\nСодержимое нового файла:\n```json\n{\"name\": \"gigachat\", \"version\": 3, \"debug\": false, \"features\": [\"tools\", \"think\"]}\n```\n\nСтруктура данных полностью сохранена. При выполнении `json.loads()` для этого файла будет получен тот же объект Python (`dict`), что и при использовании `yaml.safe_load()` для исходного YAML-файла.\n\n*   **YAML:** `{ 'name': 'gigachat', 'version': 3, 'debug': False, 'features': ['tools', 'think'] }`\n*   **JSON (после загрузки):** `{ 'name': 'gigachat', 'version': 3, 'debug': False, 'features': ['tools', 'think'] }`",
+   "content_len": 627,
+   "finish_reason": "stop"
+  }
+ ]
+}

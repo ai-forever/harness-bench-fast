@@ -1,0 +1,171 @@
+{
+ "task_id": "task_194_impl_context_manager",
+ "name": "Implement Timer context manager so pytest passes",
+ "prompt": "Создай файл timer.py с классом Timer, который работает как контекстный менеджер: при входе в блок with запоминает текущее время, при выходе — записывает прошедшее время (число секунд, любого типа — float или int) в атрибут elapsed. Тесты в tests/test_timer.py должны пройти.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "ls",
+  "read_file",
+  "execute",
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл timer.py с классом Timer, который работает как контекстный менеджер: при входе в блок with запоминает текущее время, при выходе — записывает прошедшее время (число секунд, любого типа — float или int) в атрибут elapsed. Тесты в tests/test_timer.py должны пройти.",
+   "content_len": 274
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import time\n\n\nclass Timer:\n    \"\"\"\n    Контекстный менеджер для измерения времени выполнения блока кода.\n\n    Пример использования:\n        with Timer() as t:\n            # код, время которого нужно измерить\n            pass\n        print(t.elapsed)  # Выведет прошедшее время в секундах\n    \"\"\"\n    def __enter__(self):\n        self.start_time = time.perf_counter()\n        return self\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        end_time = time.perf_counter()\n        self.elapsed = end_time - self.start_time\n",
+      "file_path": "/timer.py"
+     },
+     "id": "45224b66-4a59-4c12-9383-9bffd9353a32"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import time\n\n\nclass Timer:\n    \"\"\"\n    Контекстный менеджер для измерения времени выполнения блока кода.\n\n    Пример использования:\n        with Timer() as t:\n            # код, время которого нужно измерить\n            pass\n        print(t.elapsed)  # Выведет прошедшее время в секундах\n    \"\"\"\n    def __enter__(self):\n        self.start_time = time.perf_counter()\n        return self\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        end_time = time.perf_counter()\n        self.elapsed = end_time - self.start_time\n",
+     "file_path": "/timer.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /timer.py",
+   "content_len": 22,
+   "name": "write_file",
+   "tool_call_id": "45224b66-4a59-4c12-9383-9bffd9353a32"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/tests"
+     },
+     "id": "2254502a-33f0-42ef-9f96-21d537e98d12"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/tests"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/tests/test_timer.py']",
+   "content_len": 24,
+   "name": "ls",
+   "tool_call_id": "2254502a-33f0-42ef-9f96-21d537e98d12"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/tests/test_timer.py"
+     },
+     "id": "086dc1fa-4c95-4e03-9934-bad0c34f068b"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/tests/test_timer.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\timport time\n     2\t\n     3\tfrom timer import Timer\n     4\t\n     5\t\n     6\tdef test_records_elapsed():\n     7\t    with Timer() as t:\n     8\t        time.sleep(0.01)\n     9\t    assert t.elapsed >= 0\n    10\t    assert t.elapsed < 1\n    11\t\n    12\t\n    13\tdef test_can_be_reused():\n    14\t    t = Timer()\n    15\t    with t:\n    16\t        pass\n    17\t    first = t.elapsed\n    18\t    with t:\n    19\t        time.sleep(0.01)\n    20\t    assert t.elapsed >= first",
+   "content_len": 463,
+   "name": "read_file",
+   "tool_call_id": "086dc1fa-4c95-4e03-9934-bad0c34f068b"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -m pytest /tests/test_timer.py -v"
+     },
+     "id": "43a6c21a-6aaf-4c73-ac06-c3516d29f1fe"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -m pytest /tests/test_timer.py -v"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.12, pytest-9.0.3, pluggy-1.6.0 -- /Users/krestnikov/giga/harness-bench-fast/.venv/bin/python\ncachedir: .pytest_cache\nrootdir: /private/var/folders/81/xpcl3q6d0jqf831cy52ltwfm0000gn/T/hbta_task_194_impl_context_manager_vp1ywdgl\nplugins: langsmith-0.8.16, anyio-4.13.0\ncollecting ... collected 0 items\n\n============================ no tests ran in 0.00s =============================\n\n[stderr] ERROR: file or directory not found: /tests/test_timer.py\n\nExit code: 4\n[Command failed with exit code 4]",
+   "content_len": 608,
+   "name": "execute",
+   "tool_call_id": "43a6c21a-6aaf-4c73-ac06-c3516d29f1fe"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -m pytest tests/test_timer.py -v"
+     },
+     "id": "f7ce321d-c498-4f46-b861-99da7f382ffa"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -m pytest tests/test_timer.py -v"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.12, pytest-9.0.3, pluggy-1.6.0 -- /Users/krestnikov/giga/harness-bench-fast/.venv/bin/python\ncachedir: .pytest_cache\nrootdir: /private/var/folders/81/xpcl3q6d0jqf831cy52ltwfm0000gn/T/hbta_task_194_impl_context_manager_vp1ywdgl\nplugins: langsmith-0.8.16, anyio-4.13.0\ncollecting ... collected 2 items\n\ntests/test_timer.py::test_records_elapsed PASSED                         [ 50%]\ntests/test_timer.py::test_can_be_reused PASSED                           [100%]\n\n============================== 2 passed in 0.03s ===============================\n\n[Command succeeded with exit code 0]",
+   "content_len": 692,
+   "name": "execute",
+   "tool_call_id": "f7ce321d-c498-4f46-b861-99da7f382ffa"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `timer.py` с классом `Timer` успешно создан. Класс реализован как контекстный менеджер, который при входе в блок `with` запоминает время через `time.perf_counter()`, а при выходе вычисляет разницу и сохраняет её в атрибуте `elapsed`.\n\nВсе тесты из файла `tests/test_timer.py` пройдены:\n- **test_records_elapsed**: Проверяет, что измеренное время неотрицательное и меньше 1 секунды.\n- **test_can_be_reused**: Проверяет, что один и тот же экземпляр таймера можно использовать повторно для разных измерений.\n\nОба теста завершились успешно, подтверждая корректность работы класса.",
+   "content_len": 581,
+   "finish_reason": "stop"
+  }
+ ]
+}

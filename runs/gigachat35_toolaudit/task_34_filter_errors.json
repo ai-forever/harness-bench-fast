@@ -1,0 +1,113 @@
+{
+ "task_id": "task_34_filter_errors",
+ "name": "Extract ERROR lines from app.log",
+ "prompt": "Из файла app.log выбери только строки, которые начинаются с 'ERROR:', и запиши их (в исходном порядке) в файл errors.log. Остальные строки в errors.log включать не нужно.",
+ "passed": true,
+ "message": "errors.log lines match",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Из файла app.log выбери только строки, которые начинаются с 'ERROR:', и запиши их (в исходном порядке) в файл errors.log. Остальные строки в errors.log включать не нужно.",
+   "content_len": 170
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "app.log"
+     },
+     "id": "d62992d0-43a1-4578-b100-3f740b50a9ad"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "app.log"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tINFO: server started\n     2\tINFO: client connected\n     3\tERROR: db timeout after 30s\n     4\tWARN: retry attempt 1\n     5\tERROR: db unreachable\n     6\tINFO: shutdown",
+   "content_len": 172,
+   "name": "read_file",
+   "tool_call_id": "d62992d0-43a1-4578-b100-3f740b50a9ad"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "ERROR: db timeout after 30s\nERROR: db unreachable",
+      "file_path": "errors.log"
+     },
+     "id": "00a1ef71-bf08-4c5e-8e55-12a4dc99fe03"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "ERROR: db timeout after 30s\nERROR: db unreachable",
+     "file_path": "errors.log"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /errors.log",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "00a1ef71-bf08-4c5e-8e55-12a4dc99fe03"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "errors.log"
+     },
+     "id": "ce60c466-0149-409b-ade1-daf8b5ab09e9"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "errors.log"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tERROR: db timeout after 30s\n     2\tERROR: db unreachable",
+   "content_len": 63,
+   "name": "read_file",
+   "tool_call_id": "ce60c466-0149-409b-ade1-daf8b5ab09e9"
+  },
+  {
+   "type": "ai",
+   "content": "В файл `errors.log` были записаны только строки, начинающиеся с 'ERROR:', из исходного файла `app.log`.\n\nСодержимое созданного файла errors.log:\n```\nERROR: db timeout after 30s\nERROR: db unreachable\n```",
+   "content_len": 202,
+   "finish_reason": "stop"
+  }
+ ]
+}

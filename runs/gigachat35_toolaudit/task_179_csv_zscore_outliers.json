@@ -1,0 +1,113 @@
+{
+ "task_id": "task_179_csv_zscore_outliers",
+ "name": "Filter z-score outliers (|z|>2) into outliers.csv",
+ "prompt": "В файле values.csv 15 строк данных (одна колонка value). Сохрани в файл outliers.csv (с тем же заголовком 'value') только те значения, у которых модуль z-score больше 2 — то есть |v - mean| / std > 2, где mean и std считаются по всем 15 значениям. std считай как корень из дисперсии популяции (делитель N, а не N-1).",
+ "passed": true,
+ "message": "outliers.csv has the expected outliers [100]",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле values.csv 15 строк данных (одна колонка value). Сохрани в файл outliers.csv (с тем же заголовком 'value') только те значения, у которых модуль z-score больше 2 — то есть |v - mean| / std > 2, где mean и std считаются по всем 15 значениям. std считай как корень из дисперсии популяции (делитель N, а не N-1).",
+   "content_len": 316
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "values.csv"
+     },
+     "id": "4eed2f3a-e9c2-4e89-8d3e-a715531c5116"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "values.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tvalue\n     2\t10\n     3\t12\n     4\t11\n     5\t9\n     6\t10\n     7\t100\n     8\t8\n     9\t11\n    10\t12\n    11\t9\n    12\t10\n    13\t11\n    14\t13\n    15\t8\n    16\t10",
+   "content_len": 159,
+   "name": "read_file",
+   "tool_call_id": "4eed2f3a-e9c2-4e89-8d3e-a715531c5116"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "value\n100",
+      "file_path": "outliers.csv"
+     },
+     "id": "8fe671db-9a51-4cc5-a2d8-298dfa2bccb8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "value\n100",
+     "file_path": "outliers.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /outliers.csv",
+   "content_len": 26,
+   "name": "write_file",
+   "tool_call_id": "8fe671db-9a51-4cc5-a2d8-298dfa2bccb8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "outliers.csv"
+     },
+     "id": "16a3807d-8c31-40c8-8f10-50ed0ea533bd"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "outliers.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tvalue\n     2\t100",
+   "content_len": 23,
+   "name": "read_file",
+   "tool_call_id": "16a3807d-8c31-40c8-8f10-50ed0ea533bd"
+  },
+  {
+   "type": "ai",
+   "content": "В файл outliers.csv сохранено значение 100, так как его z-score по модулю превышает 2.\n\nРасчёт:\n*   **Данные (N=15):** [10, 12, 11, 9, 10, 100, 8, 11, 12, 9, 10, 11, 13, 8, 10]\n*   **Среднее (*mean*):** 244 / 15 ≈ 16.27\n*   **Дисперсия популяции (*std²*):** Σ(x - *mean*)² / N = 6937.73 / 15 ≈ 462.52\n*   **Стандартное отклонение (*std*):** √462.52 ≈ 21.51\n\nДля значения `v = 100`:\n|z-score| = |100 - 16.27| / 21.51 ≈ 3.89 > 2",
+   "content_len": 426,
+   "finish_reason": "stop"
+  }
+ ]
+}

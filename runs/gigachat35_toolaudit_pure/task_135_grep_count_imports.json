@@ -1,0 +1,121 @@
+{
+ "task_id": "task_135_grep_count_imports",
+ "name": "Count `import` lines across src/*.py",
+ "prompt": "В каталоге src лежит 20 .py-файлов. Посчитай общее число строк, начинающихся со слова 'import' (то есть строк вида 'import <что-то>') во всех этих файлах. Запиши число одной строкой в файл count.txt.",
+ "passed": false,
+ "message": "count.txt content differs\nExpected: '39'\nActual:   '0'",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "grep",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каталоге src лежит 20 .py-файлов. Посчитай общее число строк, начинающихся со слова 'import' (то есть строк вида 'import <что-то>') во всех этих файлах. Запиши число одной строкой в файл count.txt.",
+   "content_len": 199
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "path": "src",
+      "pattern": "*.py"
+     },
+     "id": "8ba61d35-4903-4e47-b161-7d5f3394c954"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "path": "src",
+     "pattern": "*.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/src/file_00.py', '/src/file_01.py', '/src/file_02.py', '/src/file_03.py', '/src/file_04.py', '/src/file_05.py', '/src/file_06.py', '/src/file_07.py', '/src/file_08.py', '/src/file_09.py', '/src/file_10.py', '/src/file_11.py', '/src/file_12.py', '/src/file_13.py', '/src/file_14.py', '/src/file_15.py', '/src/file_16.py', '/src/file_17.py', '/src/file_18.py', '/src/file_19.py']",
+   "content_len": 380,
+   "name": "glob",
+   "tool_call_id": "8ba61d35-4903-4e47-b161-7d5f3394c954"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "grep",
+     "args": {
+      "glob": "*.py",
+      "output_mode": "count",
+      "path": "src",
+      "pattern": "^import"
+     },
+     "id": "7255a46c-f700-4cf1-95e3-1f83e0e039e2"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "grep",
+    "arguments": {
+     "glob": "*.py",
+     "output_mode": "count",
+     "path": "src",
+     "pattern": "^import"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "No matches found",
+   "content_len": 16,
+   "name": "grep",
+   "tool_call_id": "7255a46c-f700-4cf1-95e3-1f83e0e039e2"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "0",
+      "file_path": "count.txt"
+     },
+     "id": "633dcc42-9dff-4742-bb75-df9b1f8b82f4"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "0",
+     "file_path": "count.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /count.txt",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "633dcc42-9dff-4742-bb75-df9b1f8b82f4"
+  },
+  {
+   "type": "ai",
+   "content": "0",
+   "content_len": 1,
+   "finish_reason": "stop"
+  }
+ ]
+}

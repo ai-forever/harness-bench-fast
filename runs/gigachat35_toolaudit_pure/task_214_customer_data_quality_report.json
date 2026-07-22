@@ -1,0 +1,113 @@
+{
+ "task_id": "task_214_customer_data_quality_report",
+ "name": "Build data quality report for customers.csv",
+ "prompt": "Проанализируй customers.csv и собери dq_report.json со структурой:\n  - row_count: общее число data-строк (без заголовка),\n  - duplicate_ids: список id, которые встречаются >1 раза,\n  - invalid_emails: список id, у которых email не содержит символ '@',\n  - invalid_ages: список id, у которых age не целое неотрицательное число,\n  - missing_country_ids: список id, у которых пустое country.\nВсе списки — строки id, отсортированные по возрастанию.",
+ "passed": false,
+ "message": "dq_report mismatch: {'row_count': 5, 'duplicate_ids': ['2'], 'invalid_emails': ['2'], 'invalid_ages': ['3', '4'], 'missing_country_ids': ['5']} != {'row_count': 6, 'duplicate_ids': ['2'], 'invalid_emails': ['2'], 'invalid_ages': ['3', '4'], 'missing_country_ids': ['5']}",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Проанализируй customers.csv и собери dq_report.json со структурой:\n  - row_count: общее число data-строк (без заголовка),\n  - duplicate_ids: список id, которые встречаются >1 раза,\n  - invalid_emails: список id, у которых email не содержит символ '@',\n  - invalid_ages: список id, у которых age не целое неотрицательное число,\n  - missing_country_ids: список id, у которых пустое country.\nВсе списки — строки id, отсортированные по возрастанию.",
+   "content_len": 444
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/"
+     },
+     "id": "d283379d-8d72-44f5-9a63-07b8461e5c4d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/customers.csv']",
+   "content_len": 18,
+   "name": "ls",
+   "tool_call_id": "d283379d-8d72-44f5-9a63-07b8461e5c4d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/customers.csv"
+     },
+     "id": "429128fa-b727-4021-8bdc-d9827e4d6727"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/customers.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tid,email,age,country\n     2\t1,alice@example.com,30,US\n     3\t2,bob_at_example.com,25,DE\n     4\t2,bob_at_example.com,25,DE\n     5\t3,carol@example.com,-1,RU\n     6\t4,dave@example.com,not_a_number,US\n     7\t5,erin@example.com,40,",
+   "content_len": 233,
+   "name": "read_file",
+   "tool_call_id": "429128fa-b727-4021-8bdc-d9827e4d6727"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"row_count\": 5,\n  \"duplicate_ids\": [\"2\"],\n  \"invalid_emails\": [\"2\"],\n  \"invalid_ages\": [\"3\", \"4\"],\n  \"missing_country_ids\": [\"5\"]\n}",
+      "file_path": "/dq_report.json"
+     },
+     "id": "792e532d-5ce6-4499-adbd-d08eeba6c247"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"row_count\": 5,\n  \"duplicate_ids\": [\"2\"],\n  \"invalid_emails\": [\"2\"],\n  \"invalid_ages\": [\"3\", \"4\"],\n  \"missing_country_ids\": [\"5\"]\n}",
+     "file_path": "/dq_report.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /dq_report.json",
+   "content_len": 28,
+   "name": "write_file",
+   "tool_call_id": "792e532d-5ce6-4499-adbd-d08eeba6c247"
+  },
+  {
+   "type": "ai",
+   "content": "Файл dq_report.json создан. Содержимое:\n\n{\n  \"row_count\": 5,\n  \"duplicate_ids\": [\"2\"],\n  \"invalid_emails\": [\"2\"],\n  \"invalid_ages\": [\"3\", \"4\"],\n  \"missing_country_ids\": [\"5\"]\n}",
+   "content_len": 176,
+   "finish_reason": "stop"
+  }
+ ]
+}

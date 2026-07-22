@@ -1,0 +1,171 @@
+{
+ "task_id": "task_245_memory_temporal_deadline_urgency",
+ "name": "Memory: temporal reasoning — days until deadline → urgency level",
+ "prompt": "Сегодня 26 мая 2026. Собери `urgency.json` из памяти.\nПоля: `project`, `deadline`, `today` (строка YYYY-MM-DD), `days_left` (int), `urgency` (строка: low/medium/high по правилам из памяти).",
+ "passed": true,
+ "message": "deadline urgency computed correctly",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "read_file",
+  "ls",
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Сегодня 26 мая 2026. Собери `urgency.json` из памяти.\nПоля: `project`, `deadline`, `today` (строка YYYY-MM-DD), `days_left` (int), `urgency` (строка: low/medium/high по правилам из памяти).",
+   "content_len": 189
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/urgency.json"
+     },
+     "id": "4f068454-7045-4e8f-bf66-8a3763bdf434"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/urgency.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Error: File '/urgency.json' not found",
+   "content_len": 37,
+   "name": "read_file",
+   "tool_call_id": "4f068454-7045-4e8f-bf66-8a3763bdf434"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/memory.json"
+     },
+     "id": "cc54e29d-b81d-43c2-a251-9323beebb19f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/memory.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Error: File '/memory.json' not found",
+   "content_len": 36,
+   "name": "read_file",
+   "tool_call_id": "cc54e29d-b81d-43c2-a251-9323beebb19f"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/"
+     },
+     "id": "ae891f17-0493-43f5-81ec-777d4706a844"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/AGENTS.md', '/MEMORY.md']",
+   "content_len": 28,
+   "name": "ls",
+   "tool_call_id": "ae891f17-0493-43f5-81ec-777d4706a844"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/MEMORY.md"
+     },
+     "id": "bcf97d12-21e2-447d-9fa4-99e6d03d21f7"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/MEMORY.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t- Проект: Phoenix\n     2\t- Дедлайн проекта Phoenix: 2026-06-10\n     3\t- Уровни срочности: > 30 дней = low, 15-30 = medium, < 15 = high",
+   "content_len": 141,
+   "name": "read_file",
+   "tool_call_id": "bcf97d12-21e2-447d-9fa4-99e6d03d21f7"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"project\": \"Phoenix\",\n  \"deadline\": \"2026-06-10\",\n  \"today\": \"2026-05-26\",\n  \"days_left\": 15,\n  \"urgency\": \"medium\"\n}",
+      "file_path": "/urgency.json"
+     },
+     "id": "6f398eb3-057c-40c9-ab9e-d4aab83bac0e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"project\": \"Phoenix\",\n  \"deadline\": \"2026-06-10\",\n  \"today\": \"2026-05-26\",\n  \"days_left\": 15,\n  \"urgency\": \"medium\"\n}",
+     "file_path": "/urgency.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /urgency.json",
+   "content_len": 26,
+   "name": "write_file",
+   "tool_call_id": "6f398eb3-057c-40c9-ab9e-d4aab83bac0e"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `/urgency.json` успешно создан.\n\n**Содержимое `urgency.json`:**\n```json\n{\n  \"project\": \"Phoenix\",\n  \"deadline\": \"2026-06-10\",\n  \"today\": \"2026-05-26\",\n  \"days_left\": 15,\n  \"urgency\": \"medium\"\n}\n```\n\nРасчёт:\n*   **Дата:** Сегодняшняя дата — 2026-05-26, дедлайн проекта *«Phoenix»* — 2026-06-10.\n*   **Дней до дедлайна:** Между 26 мая и 10 июня ровно 15 дней.\n*   **Уровень срочности:** Согласно правилу из памяти (`> 30 дней = low`, `15–30 = medium`, `< 15 = high`), значение в 15 дней попадает в категорию `medium`.",
+   "content_len": 520,
+   "finish_reason": "stop"
+  }
+ ]
+}

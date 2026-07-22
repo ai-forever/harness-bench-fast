@@ -1,0 +1,146 @@
+{
+ "task_id": "task_17_add_future_imports",
+ "name": "Add `from __future__ import annotations`",
+ "prompt": "Добавь в самое начало файла module.py строку 'from __future__ import annotations', а сразу под ней — одну пустую строку. Существующее содержимое файла (x = 1 и print(x)) сохрани без изменений.",
+ "passed": true,
+ "message": "module.py matches /\\Afrom __future__ import annotations\\b/; module.py contains all expected substrings",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "edit_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Добавь в самое начало файла module.py строку 'from __future__ import annotations', а сразу под ней — одну пустую строку. Существующее содержимое файла (x = 1 и print(x)) сохрани без изменений.",
+   "content_len": 192
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "module.py"
+     },
+     "id": "d9b8da53-2b50-4283-81a2-db4e3ef57024"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "module.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tx = 1\n     2\tprint(x)",
+   "content_len": 28,
+   "name": "read_file",
+   "tool_call_id": "d9b8da53-2b50-4283-81a2-db4e3ef57024"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "from __future__ import annotations\n\nx = 1\nprint(x)",
+      "file_path": "module.py"
+     },
+     "id": "289d239e-da12-4d76-87aa-94a17c517b89"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "from __future__ import annotations\n\nx = 1\nprint(x)",
+     "file_path": "module.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Cannot write to /module.py because it already exists. Read and then make an edit, or write to a new path.",
+   "content_len": 105,
+   "name": "write_file",
+   "tool_call_id": "289d239e-da12-4d76-87aa-94a17c517b89"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "module.py",
+      "new_string": "from __future__ import annotations\n\nx = 1\nprint(x)",
+      "old_string": "x = 1\nprint(x)"
+     },
+     "id": "7231c918-0ce6-4d02-9520-b6314af5061d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "module.py",
+     "new_string": "from __future__ import annotations\n\nx = 1\nprint(x)",
+     "old_string": "x = 1\nprint(x)"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/module.py'",
+   "content_len": 65,
+   "name": "edit_file",
+   "tool_call_id": "7231c918-0ce6-4d02-9520-b6314af5061d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "module.py"
+     },
+     "id": "90449b5b-f354-4c26-b2de-8d5813cfdb00"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "module.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tfrom __future__ import annotations\n     2\t\n     3\tx = 1\n     4\tprint(x)",
+   "content_len": 78,
+   "name": "read_file",
+   "tool_call_id": "90449b5b-f354-4c26-b2de-8d5813cfdb00"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `module.py` успешно изменён. В самое начало добавлена строка `from __future__ import annotations`, за ней следует пустая строка, а исходное содержимое (`x = 1` и `print(x)`) сохранено без изменений.\n\nСодержимое файла:\n```\nfrom __future__ import annotations\n\nx = 1\nprint(x)\n```",
+   "content_len": 281,
+   "finish_reason": "stop"
+  }
+ ]
+}

@@ -1,0 +1,84 @@
+{
+ "task_id": "task_25_sort_lines",
+ "name": "Sort lines from unsorted.txt to sorted.txt",
+ "prompt": "Прочитай файл unsorted.txt, отсортируй его строки по возрастанию (лексикографически) и запиши результат в файл sorted.txt — одна строка на каждое значение, без пустых строк между ними.",
+ "passed": true,
+ "message": "sorted.txt lines match",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Прочитай файл unsorted.txt, отсортируй его строки по возрастанию (лексикографически) и запиши результат в файл sorted.txt — одна строка на каждое значение, без пустых строк между ними.",
+   "content_len": 184
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/unsorted.txt"
+     },
+     "id": "888a9ed4-3693-47e2-862d-c735dd49102a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/unsorted.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tbanana\n     2\tapple\n     3\tcherry\n     4\tdate",
+   "content_len": 52,
+   "name": "read_file",
+   "tool_call_id": "888a9ed4-3693-47e2-862d-c735dd49102a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "apple\nbanana\ncherry\ndate",
+      "file_path": "/sorted.txt"
+     },
+     "id": "4e69c264-8eef-4193-a571-6c89b1eac523"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "apple\nbanana\ncherry\ndate",
+     "file_path": "/sorted.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /sorted.txt",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "4e69c264-8eef-4193-a571-6c89b1eac523"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `unsorted.txt` был прочитан, его строки отсортированы по возрастанию (лексикографически) и результат записан в файл `sorted.txt`.\n\nСодержимое файла `/sorted.txt`:\n```\napple\nbanana\ncherry\ndate```",
+   "content_len": 199,
+   "finish_reason": "stop"
+  }
+ ]
+}

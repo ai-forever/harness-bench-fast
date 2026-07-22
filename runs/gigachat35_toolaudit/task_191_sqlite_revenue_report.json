@@ -1,0 +1,113 @@
+{
+ "task_id": "task_191_sqlite_revenue_report",
+ "name": "Compute revenue per product from shop.db, sort desc, save CSV",
+ "prompt": "В файле shop.db лежат таблицы:\n  - products(id, name, price)\n  - orders(id, product_id, qty)\nПосчитай для каждого продукта суммарную выручку — sum(qty * price) по всем заказам. Сохрани результат в revenue.csv с заголовком 'name,revenue', строки — по убыванию revenue. При равенстве выручки сортируй по name по возрастанию (в данных такого не случится, но на всякий случай).",
+ "passed": true,
+ "message": "revenue.csv matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "execute",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле shop.db лежат таблицы:\n  - products(id, name, price)\n  - orders(id, product_id, qty)\nПосчитай для каждого продукта суммарную выручку — sum(qty * price) по всем заказам. Сохрани результат в revenue.csv с заголовком 'name,revenue', строки — по убыванию revenue. При равенстве выручки сортируй по name по возрастанию (в данных такого не случится, но на всякий случай).",
+   "content_len": 373
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import sqlite3\nimport csv\n\n# Connect to the database\nconn = sqlite3.connect('shop.db')\ncursor = conn.cursor()\n\n# Execute the SQL query to calculate revenue per product\nquery = '''\nSELECT p.name, SUM(o.qty * p.price) as revenue\nFROM products p\nJOIN orders o ON p.id = o.product_id\nGROUP BY p.id, p.name\nORDER BY revenue DESC, p.name ASC;\n'''\n\ncursor.execute(query)\nresults = cursor.fetchall()\n\n# Write results to a CSV file\nwith open('revenue.csv', 'w', newline='') as f:\n    writer = csv.writer(f)\n    # Write header\n    writer.writerow(['name', 'revenue'])\n    # Write data rows\n    for row in results:\n        writer.writerow(row)\n\nconn.close()",
+      "file_path": "calculate_revenue.py"
+     },
+     "id": "84091b14-524c-4afd-9482-08a6b2a025bf"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import sqlite3\nimport csv\n\n# Connect to the database\nconn = sqlite3.connect('shop.db')\ncursor = conn.cursor()\n\n# Execute the SQL query to calculate revenue per product\nquery = '''\nSELECT p.name, SUM(o.qty * p.price) as revenue\nFROM products p\nJOIN orders o ON p.id = o.product_id\nGROUP BY p.id, p.name\nORDER BY revenue DESC, p.name ASC;\n'''\n\ncursor.execute(query)\nresults = cursor.fetchall()\n\n# Write results to a CSV file\nwith open('revenue.csv', 'w', newline='') as f:\n    writer = csv.writer(f)\n    # Write header\n    writer.writerow(['name', 'revenue'])\n    # Write data rows\n    for row in results:\n        writer.writerow(row)\n\nconn.close()",
+     "file_path": "calculate_revenue.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /calculate_revenue.py",
+   "content_len": 34,
+   "name": "write_file",
+   "tool_call_id": "84091b14-524c-4afd-9482-08a6b2a025bf"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python calculate_revenue.py"
+     },
+     "id": "9db7a0e0-979c-479c-a7f2-b20aad226971"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python calculate_revenue.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "9db7a0e0-979c-479c-a7f2-b20aad226971"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "revenue.csv"
+     },
+     "id": "b13b6095-120f-4f7d-872e-5ce22ce65546"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "revenue.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tname,revenue\n     2\tA,500\n     3\tB,450\n     4\tD,300\n     5\tC,200",
+   "content_len": 71,
+   "name": "read_file",
+   "tool_call_id": "b13b6095-120f-4f7d-872e-5ce22ce65546"
+  },
+  {
+   "type": "ai",
+   "content": "Результат сохранён в файл `revenue.csv`.\n\nСодержимое файла:\n```\nname,revenue\nA,500\nB,450\nD,300\nC,200\n```",
+   "content_len": 104,
+   "finish_reason": "stop"
+  }
+ ]
+}

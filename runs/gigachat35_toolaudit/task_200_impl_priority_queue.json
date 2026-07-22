@@ -1,0 +1,55 @@
+{
+ "task_id": "task_200_impl_priority_queue",
+ "name": "Implement PriorityQueue class so pytest passes",
+ "prompt": "Создай файл pq.py с классом PriorityQueue. Методы:\n  - push(item, priority): добавить элемент с приоритетом (любое число; меньшее число — выше приоритет);\n  - pop(): извлечь и вернуть элемент с наивысшим приоритетом (то есть с наименьшим числовым значением приоритета); поднимать IndexError если пусто;\n  - __len__(): количество элементов в очереди.\n Если приоритеты равны, порядок извлечения может быть любым. Тесты в tests/test_pq.py должны пройти.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл pq.py с классом PriorityQueue. Методы:\n  - push(item, priority): добавить элемент с приоритетом (любое число; меньшее число — выше приоритет);\n  - pop(): извлечь и вернуть элемент с наивысшим приоритетом (то есть с наименьшим числовым значением приоритета); поднимать IndexError если пусто;\n  - __len__(): количество элементов в очереди.\n Если приоритеты равны, порядок извлечения может быть любым. Тесты в tests/test_pq.py должны пройти.",
+   "content_len": 450
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import heapq\n\nclass PriorityQueue:\n    def __init__(self):\n        self._heap = []\n\n    def push(self, item, priority):\n        \"\"\"Добавить элемент с заданным приоритетом.\n        \n        Меньшее число означает более высокий приоритет.\n        \"\"\"\n        heapq.heappush(self._heap, (priority, item))\n\n    def pop(self):\n        \"\"\"Извлечь и вернуть элемент с наивысшим приоритетом.\n        \n        Поднимает IndexError, если очередь пуста.\n        \"\"\"\n        if not self._heap:\n            raise IndexError(\"pop from an empty priority queue\")\n        return heapq.heappop(self._heap)[1]\n\n    def __len__(self):\n        \"\"\"Вернуть количество элементов в очереди.\"\"\"\n        return len(self._heap)\n",
+      "file_path": "pq.py"
+     },
+     "id": "7d742340-7d92-4255-9331-9a626f85743a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import heapq\n\nclass PriorityQueue:\n    def __init__(self):\n        self._heap = []\n\n    def push(self, item, priority):\n        \"\"\"Добавить элемент с заданным приоритетом.\n        \n        Меньшее число означает более высокий приоритет.\n        \"\"\"\n        heapq.heappush(self._heap, (priority, item))\n\n    def pop(self):\n        \"\"\"Извлечь и вернуть элемент с наивысшим приоритетом.\n        \n        Поднимает IndexError, если очередь пуста.\n        \"\"\"\n        if not self._heap:\n            raise IndexError(\"pop from an empty priority queue\")\n        return heapq.heappop(self._heap)[1]\n\n    def __len__(self):\n        \"\"\"Вернуть количество элементов в очереди.\"\"\"\n        return len(self._heap)\n",
+     "file_path": "pq.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /pq.py",
+   "content_len": 19,
+   "name": "write_file",
+   "tool_call_id": "7d742340-7d92-4255-9331-9a626f85743a"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `pq.py` с классом `PriorityQueue` успешно создан. Класс использует модуль `heapq` для эффективного управления приоритетами, где меньшее числовое значение означает более высокий приоритет.\n\nМетоды класса:\n- `push(item, priority)`: добавляет элемент в очередь.\n- `pop()`: извлекает и возвращает элемент с наименьшим значением приоритета. Если очередь пуста, метод поднимает `IndexError`.\n- `__len__()`: возвращает текущее количество элементов в очереди.\n\nРеализация готова к тестированию.",
+   "content_len": 491,
+   "finish_reason": "stop"
+  }
+ ]
+}

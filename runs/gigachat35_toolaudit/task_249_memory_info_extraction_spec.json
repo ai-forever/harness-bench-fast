@@ -1,0 +1,118 @@
+{
+ "task_id": "task_249_memory_info_extraction_spec",
+ "name": "Memory: extract project spec facts into normalized JSON",
+ "prompt": "Извлеки спецификацию моего проекта из памяти в `project_spec.json`.\nПоля: `name`, `type`, `language`, `framework`, `database`, `auth`, `min_node_version` (int).",
+ "passed": true,
+ "message": "project spec extracted correctly from memory",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Извлеки спецификацию моего проекта из памяти в `project_spec.json`.\nПоля: `name`, `type`, `language`, `framework`, `database`, `auth`, `min_node_version` (int).",
+   "content_len": 160
+  },
+  {
+   "type": "human",
+   "content": "[MEMORY-TASK] This is a memory task.\n1) read_file MEMORY.md first\n2) complete the requested deliverable using MEMORY facts verbatim\n3) if the user mentioned ANY personal fact, edit_file MEMORY.md before finishing",
+   "content_len": 212
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "MEMORY.md"
+     },
+     "id": "6363c64f-0cbd-4fe1-99e9-bf4b67d71463"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "MEMORY.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t- Проект: Helix\n     2\t- Тип: REST API\n     3\t- Язык: TypeScript\n     4\t- Фреймворк: Fastify\n     5\t- БД: MongoDB\n     6\t- Аутентификация: JWT\n     7\t- Минимальная версия Node: 20",
+   "content_len": 186,
+   "name": "read_file",
+   "tool_call_id": "6363c64f-0cbd-4fe1-99e9-bf4b67d71463"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"name\": \"Helix\",\n  \"type\": \"REST API\",\n  \"language\": \"TypeScript\",\n  \"framework\": \"Fastify\",\n  \"database\": \"MongoDB\",\n  \"auth\": \"JWT\",\n  \"min_node_version\": 20\n}",
+      "file_path": "project_spec.json"
+     },
+     "id": "356acefd-fbe7-485b-b3b7-499634a8d519"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"name\": \"Helix\",\n  \"type\": \"REST API\",\n  \"language\": \"TypeScript\",\n  \"framework\": \"Fastify\",\n  \"database\": \"MongoDB\",\n  \"auth\": \"JWT\",\n  \"min_node_version\": 20\n}",
+     "file_path": "project_spec.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /project_spec.json",
+   "content_len": 31,
+   "name": "write_file",
+   "tool_call_id": "356acefd-fbe7-485b-b3b7-499634a8d519"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "project_spec.json"
+     },
+     "id": "100d091d-1b3c-482d-ada6-52d3f6111992"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "project_spec.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\n     2\t  \"name\": \"Helix\",\n     3\t  \"type\": \"REST API\",\n     4\t  \"language\": \"TypeScript\",\n     5\t  \"framework\": \"Fastify\",\n     6\t  \"database\": \"MongoDB\",\n     7\t  \"auth\": \"JWT\",\n     8\t  \"min_node_version\": 20\n     9\t}",
+   "content_len": 228,
+   "name": "read_file",
+   "tool_call_id": "100d091d-1b3c-482d-ada6-52d3f6111992"
+  },
+  {
+   "type": "ai",
+   "content": "Спецификация проекта извлечена из памяти и сохранена в файл `project_spec.json`.\n\nСодержимое файла:\n```json\n{\n  \"name\": \"Helix\",\n  \"type\": \"REST API\",\n  \"language\": \"TypeScript\",\n  \"framework\": \"Fastify\",\n  \"database\": \"MongoDB\",\n  \"auth\": \"JWT\",\n  \"min_node_version\": 20\n}\n```",
+   "content_len": 277,
+   "finish_reason": "stop"
+  }
+ ]
+}

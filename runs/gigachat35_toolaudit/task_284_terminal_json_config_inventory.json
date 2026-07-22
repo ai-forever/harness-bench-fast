@@ -1,0 +1,200 @@
+{
+ "task_id": "task_284_terminal_json_config_inventory",
+ "name": "Inventory enabled service ports from JSON configs",
+ "prompt": "В services/*/config.json лежат конфиги сервисов с полями service, port, enabled. Создай enabled_ports.tsv: только enabled=true, формат '<service>\\t<port>', сортировка по service.",
+ "passed": true,
+ "message": "enabled_ports.tsv lines match",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "read_file",
+  "read_file",
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В services/*/config.json лежат конфиги сервисов с полями service, port, enabled. Создай enabled_ports.tsv: только enabled=true, формат '<service>\\t<port>', сортировка по service.",
+   "content_len": 178
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "pattern": "services/*/config.json"
+     },
+     "id": "e849db90-586e-439e-a86c-0f9ac781917f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "pattern": "services/*/config.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['services/api/config.json', '/services/web/config.json', '/services/worker/config.json']",
+   "content_len": 89,
+   "name": "glob",
+   "tool_call_id": "e849db90-586e-439e-a86c-0f9ac781917f"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "services/api/config.json"
+     },
+     "id": "8dd4fcd3-efef-4ddc-a73b-eaad0d587aaf"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "services/api/config.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\n     2\t  \"service\": \"api\",\n     3\t  \"port\": 8080,\n     4\t  \"enabled\": true\n     5\t}",
+   "content_len": 92,
+   "name": "read_file",
+   "tool_call_id": "8dd4fcd3-efef-4ddc-a73b-eaad0d587aaf"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "services/web/config.json"
+     },
+     "id": "cf36a87b-3728-46c6-a6c5-29ccda986999"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "services/web/config.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\n     2\t  \"service\": \"web\",\n     3\t  \"port\": 3000,\n     4\t  \"enabled\": true\n     5\t}",
+   "content_len": 92,
+   "name": "read_file",
+   "tool_call_id": "cf36a87b-3728-46c6-a6c5-29ccda986999"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "services/worker/config.json"
+     },
+     "id": "562c27b7-0bdf-4cc8-8b5f-0dc1875f974a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "services/worker/config.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\n     2\t  \"service\": \"worker\",\n     3\t  \"port\": 9090,\n     4\t  \"enabled\": false\n     5\t}",
+   "content_len": 96,
+   "name": "read_file",
+   "tool_call_id": "562c27b7-0bdf-4cc8-8b5f-0dc1875f974a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "api\t8080\nweb\t3000",
+      "file_path": "enabled_ports.tsv"
+     },
+     "id": "7e1bb228-15fb-4e1c-925f-e2198c0f0175"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "api\t8080\nweb\t3000",
+     "file_path": "enabled_ports.tsv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /enabled_ports.tsv",
+   "content_len": 31,
+   "name": "write_file",
+   "tool_call_id": "7e1bb228-15fb-4e1c-925f-e2198c0f0175"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "enabled_ports.tsv"
+     },
+     "id": "409b7ba6-8c53-4bcd-a50a-ce097ff1fd27"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "enabled_ports.tsv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tapi\t8080\n     2\tweb\t3000",
+   "content_len": 31,
+   "name": "read_file",
+   "tool_call_id": "409b7ba6-8c53-4bcd-a50a-ce097ff1fd27"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `enabled_ports.tsv` создан. В него включены только сервисы с `\"enabled\": true`, отсортированные по имени сервиса:\n\napi\t8080\nweb\t3000",
+   "content_len": 137,
+   "finish_reason": "stop"
+  }
+ ]
+}

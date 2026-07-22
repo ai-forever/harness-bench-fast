@@ -1,0 +1,33 @@
+{
+  "task_set_version": "0.13.0",
+  "total": 1,
+  "passed": 1,
+  "pass_rate": 1.0,
+  "tasks": [
+    {
+      "task_id": "task_215_source_todo_fixme_triage",
+      "number": 215,
+      "passed": true,
+      "message": "summary.json and triage.md match expected TODO/FIXME inventory",
+      "elapsed_seconds": 126.30003183399094,
+      "error": null,
+      "tags": [
+        "search",
+        "multifile",
+        "reporting",
+        "execute",
+        "hard"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    }
+  ]
+}

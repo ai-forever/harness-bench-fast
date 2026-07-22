@@ -1,0 +1,171 @@
+{
+ "task_id": "task_240_memory_summarize_profile",
+ "name": "Memory: summarize verbose profile into concise summary.txt",
+ "prompt": "Напиши `summary.txt` — краткое резюме обо мне на основе памяти. Максимум 3-5 строк текста. Упомяни имя, компанию и основной стек.",
+ "passed": true,
+ "message": "summary.txt is concise and includes key facts",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "ls",
+  "ls",
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Напиши `summary.txt` — краткое резюме обо мне на основе памяти. Максимум 3-5 строк текста. Упомяни имя, компанию и основной стек.",
+   "content_len": 129
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/memories/memory.json"
+     },
+     "id": "cc87ad24-0a37-49de-82ec-ec4046c303e6"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/memories/memory.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Error: File '/memories/memory.json' not found",
+   "content_len": 45,
+   "name": "read_file",
+   "tool_call_id": "cc87ad24-0a37-49de-82ec-ec4046c303e6"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/memories"
+     },
+     "id": "f0e5c75a-6b42-451e-a6ea-d81ce9145dd8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/memories"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Error: Path '/memories': path_not_found",
+   "content_len": 39,
+   "name": "ls",
+   "tool_call_id": "f0e5c75a-6b42-451e-a6ea-d81ce9145dd8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/"
+     },
+     "id": "b3f5ed6f-d94b-4366-829b-e5ee58032563"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/AGENTS.md', '/MEMORY.md']",
+   "content_len": 28,
+   "name": "ls",
+   "tool_call_id": "b3f5ed6f-d94b-4366-829b-e5ee58032563"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/MEMORY.md"
+     },
+     "id": "11e4beb8-bc54-49bb-806b-4b4eb9c7a792"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/MEMORY.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t- Имя: Софья Белова\n     2\t- Город: Екатеринбург\n     3\t- Компания: RocketData\n     4\t- Должность: Senior Backend Developer\n     5\t- Стаж: 8 лет\n     6\t- Основной язык: Go\n     7\t- Вторичный язык: Python\n     8\t- БД: PostgreSQL, ClickHouse\n     9\t- Хобби: скалолазание, фотография\n    10\t- ОС: Linux (Fedora)\n    11\t- Редактор: Neovim\n    12\t- Любимый фреймворк: Echo (Go)",
+   "content_len": 379,
+   "name": "read_file",
+   "tool_call_id": "11e4beb8-bc54-49bb-806b-4b4eb9c7a792"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "Софья Белова, Senior Backend Developer в RocketData с 8-летним стажем. Основной язык — Go, активно использует Python и фреймворк Echo. В работе опирается на PostgreSQL и ClickHouse.",
+      "file_path": "/summary.txt"
+     },
+     "id": "3e5e4fed-a717-4ba8-b5c1-cf3504a9d609"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "Софья Белова, Senior Backend Developer в RocketData с 8-летним стажем. Основной язык — Go, активно использует Python и фреймворк Echo. В работе опирается на PostgreSQL и ClickHouse.",
+     "file_path": "/summary.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /summary.txt",
+   "content_len": 25,
+   "name": "write_file",
+   "tool_call_id": "3e5e4fed-a717-4ba8-b5c1-cf3504a9d609"
+  },
+  {
+   "type": "ai",
+   "content": "Резюме сохранено в файл `/summary.txt`.\n\n**Содержание файла:**\nСофья Белова, Senior Backend Developer в RocketData с 8-летним стажем. Основной язык — Go, активно использует Python и фреймворк Echo. В работе опирается на PostgreSQL и ClickHouse.",
+   "content_len": 244,
+   "finish_reason": "stop"
+  }
+ ]
+}

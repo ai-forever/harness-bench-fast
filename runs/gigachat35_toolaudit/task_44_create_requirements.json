@@ -1,0 +1,55 @@
+{
+ "task_id": "task_44_create_requirements",
+ "name": "Create requirements.txt with three deps",
+ "prompt": "Создай файл requirements.txt со следующими тремя строками (каждая на отдельной строке, в указанном порядке):\n1) requests==2.31.0\n2) pydantic>=2.0\n3) httpx",
+ "passed": true,
+ "message": "requirements.txt lines match",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл requirements.txt со следующими тремя строками (каждая на отдельной строке, в указанном порядке):\n1) requests==2.31.0\n2) pydantic>=2.0\n3) httpx",
+   "content_len": 154
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "requests==2.31.0\npydantic>=2.0\nhttpx",
+      "file_path": "requirements.txt"
+     },
+     "id": "efae92f1-2300-43d9-8899-9d7bda396a26"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "requests==2.31.0\npydantic>=2.0\nhttpx",
+     "file_path": "requirements.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /requirements.txt",
+   "content_len": 30,
+   "name": "write_file",
+   "tool_call_id": "efae92f1-2300-43d9-8899-9d7bda396a26"
+  },
+  {
+   "type": "ai",
+   "content": "Файл requirements.txt создан с указанным содержимым.",
+   "content_len": 52,
+   "finish_reason": "stop"
+  }
+ ]
+}

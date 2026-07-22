@@ -1,0 +1,128 @@
+{
+  "task_set_version": "0.10.0",
+  "total": 5,
+  "passed": 0,
+  "pass_rate": 0.0,
+  "tasks": [
+    {
+      "task_id": "task_326_skill_a3_quokka_library_quirk",
+      "number": 326,
+      "passed": false,
+      "message": "solution.py missing | CLI exit=1: 'Reading additional input from stdin...'",
+      "elapsed_seconds": 20.430246249999982,
+      "error": null,
+      "tags": [
+        "skill",
+        "library-api",
+        "code",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_shell_commands": 0,
+      "agent_events": 4,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_327_skill_r3_act4_compliance_notice",
+      "number": 327,
+      "passed": false,
+      "message": "notice.md missing | CLI exit=1: 'Reading additional input from stdin...'",
+      "elapsed_seconds": 24.652251458000137,
+      "error": null,
+      "tags": [
+        "skill",
+        "template",
+        "compliance",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_shell_commands": 0,
+      "agent_events": 4,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_328_skill_d2_meridian_reconcile_xlsx",
+      "number": 328,
+      "passed": false,
+      "message": "reconciliation.csv missing | gave up after 5 transient retries ('request failed')",
+      "elapsed_seconds": 63.02779670899963,
+      "error": null,
+      "tags": [
+        "skill",
+        "spreadsheet",
+        "data-cleaning",
+        "hard"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_shell_commands": 0,
+      "agent_events": 4,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_329_skill_d1_arcflux_exposure",
+      "number": 329,
+      "passed": false,
+      "message": "solution.py missing | CLI exit=1: 'Reading additional input from stdin...'",
+      "elapsed_seconds": 10.65654537499995,
+      "error": null,
+      "tags": [
+        "skill",
+        "mathematical-method",
+        "calculation",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_shell_commands": 0,
+      "agent_events": 4,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_330_skill_d1b_arcflux_multifile",
+      "number": 330,
+      "passed": false,
+      "message": "solution.py missing | CLI exit=1: 'Reading additional input from stdin...'",
+      "elapsed_seconds": 8.752399042000434,
+      "error": null,
+      "tags": [
+        "skill",
+        "mathematical-method",
+        "calculation",
+        "hard"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 0,
+      "agent_tool_calls": 0,
+      "agent_shell_commands": 0,
+      "agent_events": 4,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    }
+  ]
+}

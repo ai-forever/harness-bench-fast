@@ -1,0 +1,84 @@
+{
+ "task_id": "task_113_xlsx_update_cell",
+ "name": "Set cell C3 in inventory.xlsx to 999",
+ "prompt": "В файле inventory.xlsx (лист Inventory) есть таблица с колонками sku, qty, price. Замени значение ячейки C3 на число 999 (остальные ячейки оставь без изменений) и сохрани файл по тому же пути. Используй openpyxl — он установлен.",
+ "passed": true,
+ "message": "inventory.xlsx[Inventory!C3] == 999",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле inventory.xlsx (лист Inventory) есть таблица с колонками sku, qty, price. Замени значение ячейки C3 на число 999 (остальные ячейки оставь без изменений) и сохрани файл по тому же пути. Используй openpyxl — он установлен.",
+   "content_len": 228
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import openpyxl\n\n# Путь к файлу\nfile_path = 'inventory.xlsx'\n\n# Загружаем книгу и выбираем лист\nwb = openpyxl.load_workbook(file_path)\nws = wb['Inventory']\n\n# Меняем значение ячейки C3 на 999\nws['C3'] = 999\n\n# Сохраняем изменения в тот же файл\nwb.save(file_path)",
+      "file_path": "update_inventory.py"
+     },
+     "id": "9903bfda-16ad-45a8-8546-f28978b3b1a1"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import openpyxl\n\n# Путь к файлу\nfile_path = 'inventory.xlsx'\n\n# Загружаем книгу и выбираем лист\nwb = openpyxl.load_workbook(file_path)\nws = wb['Inventory']\n\n# Меняем значение ячейки C3 на 999\nws['C3'] = 999\n\n# Сохраняем изменения в тот же файл\nwb.save(file_path)",
+     "file_path": "update_inventory.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /update_inventory.py",
+   "content_len": 33,
+   "name": "write_file",
+   "tool_call_id": "9903bfda-16ad-45a8-8546-f28978b3b1a1"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python update_inventory.py"
+     },
+     "id": "7a5ddbc4-0412-4b97-a77f-4f67f809482c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python update_inventory.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "7a5ddbc4-0412-4b97-a77f-4f67f809482c"
+  },
+  {
+   "type": "ai",
+   "content": "Файл inventory.xlsx успешно обновлён: значение ячейки C3 на листе Inventory изменено на 999.",
+   "content_len": 92,
+   "finish_reason": "stop"
+  }
+ ]
+}

@@ -1,0 +1,89 @@
+{
+ "task_id": "task_233_memory_endpoints_json",
+ "name": "Memory: compose endpoints.json with derived URLs and ordering",
+ "prompt": "Собери `endpoints.json` из моих данных в памяти.\nФормат строго такой:\n- `domain`: строка;\n- `services`: массив объектов `{name, port, health_url}`;\n- `base_url_map`: объект `name -> http://<domain>:<port>`.\nДля каждого сервиса `health_url` должен быть `http://<domain>:<port>/health`.\nСервисы в массиве отсортируй по возрастанию порта.",
+ "passed": true,
+ "message": "endpoints.json correctly normalized from MEMORY.md facts",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Собери `endpoints.json` из моих данных в памяти.\nФормат строго такой:\n- `domain`: строка;\n- `services`: массив объектов `{name, port, health_url}`;\n- `base_url_map`: объект `name -> http://<domain>:<port>`.\nДля каждого сервиса `health_url` должен быть `http://<domain>:<port>/health`.\nСервисы в массиве отсортируй по возрастанию порта.",
+   "content_len": 335
+  },
+  {
+   "type": "human",
+   "content": "[MEMORY-TASK] This is a memory task.\n1) read_file MEMORY.md first\n2) complete the requested deliverable using MEMORY facts verbatim\n3) if the user mentioned ANY personal fact, edit_file MEMORY.md before finishing",
+   "content_len": 212
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "MEMORY.md"
+     },
+     "id": "02fb027b-2238-4de6-a4f2-d066a76fab80"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "MEMORY.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t- Домен разработки: dev.internal\n     2\t- Сервисы: auth=7001, billing=7002, metrics=9090",
+   "content_len": 95,
+   "name": "read_file",
+   "tool_call_id": "02fb027b-2238-4de6-a4f2-d066a76fab80"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"domain\": \"dev.internal\",\n  \"services\": [\n    {\n      \"name\": \"auth\",\n      \"port\": 7001,\n      \"health_url\": \"http://dev.internal:7001/health\"\n    },\n    {\n      \"name\": \"billing\",\n      \"port\": 7002,\n      \"health_url\": \"http://dev.internal:7002/health\"\n    },\n    {\n      \"name\": \"metrics\",\n      \"port\": 9090,\n      \"health_url\": \"http://dev.internal:9090/health\"\n    }\n  ],\n  \"base_url_map\": {\n    \"auth\": \"http://dev.internal:7001\",\n    \"billing\": \"http://dev.internal:7002\",\n    \"metrics\": \"http://dev.internal:9090\"\n  }\n}",
+      "file_path": "endpoints.json"
+     },
+     "id": "3a3d0b91-c197-4499-87a5-df391e3e0d5f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"domain\": \"dev.internal\",\n  \"services\": [\n    {\n      \"name\": \"auth\",\n      \"port\": 7001,\n      \"health_url\": \"http://dev.internal:7001/health\"\n    },\n    {\n      \"name\": \"billing\",\n      \"port\": 7002,\n      \"health_url\": \"http://dev.internal:7002/health\"\n    },\n    {\n      \"name\": \"metrics\",\n      \"port\": 9090,\n      \"health_url\": \"http://dev.internal:9090/health\"\n    }\n  ],\n  \"base_url_map\": {\n    \"auth\": \"http://dev.internal:7001\",\n    \"billing\": \"http://dev.internal:7002\",\n    \"metrics\": \"http://dev.internal:9090\"\n  }\n}",
+     "file_path": "endpoints.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /endpoints.json",
+   "content_len": 28,
+   "name": "write_file",
+   "tool_call_id": "3a3d0b91-c197-4499-87a5-df391e3e0d5f"
+  },
+  {
+   "type": "ai",
+   "content": "Файл endpoints.json создан на основе данных из MEMORY.md.\n\n- **domain**: dev.internal\n- **services** (отсортированы по порту):\n  - auth:7001 -> /health\n  - billing:7002 -> /health\n  - metrics:9090 -> /health\n- **base_url_map** содержит URL вида `http://dev.internal:<port>` для каждого сервиса.",
+   "content_len": 294,
+   "finish_reason": "stop"
+  }
+ ]
+}

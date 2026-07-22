@@ -1,0 +1,137 @@
+{
+ "task_set_version": "0.9.0",
+ "harness": "deepagents, no profile (pure)",
+ "model": "GigaChat-3.5-430B-A28B (IFT)",
+ "total": 4,
+ "passed": 4,
+ "pass_rate": 1.0,
+ "tool_as_text_total_turns": 0,
+ "tool_as_text_task_count": 0,
+ "tool_as_text_pattern_counts": {},
+ "tool_as_text_confidence_counts": {},
+ "tasks": [
+  {
+   "task_id": "task_01_create_hello",
+   "number": 1,
+   "name": "Create hello.py that prints Hello, world!",
+   "passed": true,
+   "message": "hello.py ran and produced expected output",
+   "error": null,
+   "elapsed_seconds": 133.7,
+   "tags": [
+    "create",
+    "python",
+    "easy"
+   ],
+   "agent_steps": 33,
+   "agent_tool_calls": 16,
+   "agent_llm_calls": 17,
+   "agent_input_tokens": 86709,
+   "agent_output_tokens": 2475,
+   "agent_total_tokens": 89184,
+   "real_tool_call_names": [
+    "write_file",
+    "execute",
+    "ls",
+    "execute",
+    "read_file",
+    "execute",
+    "execute",
+    "ls",
+    "ls",
+    "ls",
+    "ls",
+    "ls",
+    "execute",
+    "execute",
+    "write_file",
+    "execute"
+   ],
+   "tool_as_text_count": 0,
+   "tool_as_text": [],
+   "transcript_file": "runs/gigachat35_toolaudit_pure_smoke/task_01_create_hello.json"
+  },
+  {
+   "task_id": "task_06_toggle_debug",
+   "number": 6,
+   "name": "Toggle DEBUG in config.py",
+   "passed": true,
+   "message": "config.py contains all expected substrings; config.py free of forbidden substrings",
+   "error": null,
+   "elapsed_seconds": 4.3,
+   "tags": [
+    "edit",
+    "python",
+    "easy"
+   ],
+   "agent_steps": 7,
+   "agent_tool_calls": 3,
+   "agent_llm_calls": 4,
+   "agent_input_tokens": 55707,
+   "agent_output_tokens": 588,
+   "agent_total_tokens": 56295,
+   "real_tool_call_names": [
+    "read_file",
+    "edit_file",
+    "read_file"
+   ],
+   "tool_as_text_count": 0,
+   "tool_as_text": [],
+   "transcript_file": "runs/gigachat35_toolaudit_pure_smoke/task_06_toggle_debug.json"
+  },
+  {
+   "task_id": "task_11_count_py",
+   "number": 11,
+   "name": "Count .py files into count.txt",
+   "passed": true,
+   "message": "count.txt matches expected content",
+   "error": null,
+   "elapsed_seconds": 3.4,
+   "tags": [
+    "read",
+    "search",
+    "medium"
+   ],
+   "agent_steps": 5,
+   "agent_tool_calls": 2,
+   "agent_llm_calls": 3,
+   "agent_input_tokens": 54477,
+   "agent_output_tokens": 300,
+   "agent_total_tokens": 54777,
+   "real_tool_call_names": [
+    "glob",
+    "write_file"
+   ],
+   "tool_as_text_count": 0,
+   "tool_as_text": [],
+   "transcript_file": "runs/gigachat35_toolaudit_pure_smoke/task_11_count_py.json"
+  },
+  {
+   "task_id": "task_14_sum_numbers",
+   "number": 14,
+   "name": "Sum numbers from numbers.txt",
+   "passed": true,
+   "message": "sum.txt matches expected content",
+   "error": null,
+   "elapsed_seconds": 3.6,
+   "tags": [
+    "read",
+    "compute",
+    "medium"
+   ],
+   "agent_steps": 5,
+   "agent_tool_calls": 2,
+   "agent_llm_calls": 3,
+   "agent_input_tokens": 54390,
+   "agent_output_tokens": 420,
+   "agent_total_tokens": 54810,
+   "real_tool_call_names": [
+    "read_file",
+    "write_file"
+   ],
+   "tool_as_text_count": 0,
+   "tool_as_text": [],
+   "transcript_file": "runs/gigachat35_toolaudit_pure_smoke/task_14_sum_numbers.json"
+  }
+ ]
+}

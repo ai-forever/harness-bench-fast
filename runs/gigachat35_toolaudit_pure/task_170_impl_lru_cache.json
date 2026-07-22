@@ -1,0 +1,171 @@
+{
+ "task_id": "task_170_impl_lru_cache",
+ "name": "Implement LRUCache class so pytest passes",
+ "prompt": "Создай файл lru.py с классом LRUCache(capacity). Класс должен поддерживать методы get(key) (возвращает значение или None если ключа нет) и put(key, value) (записывает пару). При превышении capacity вытесняется наименее недавно использованный элемент (Least Recently Used). И get, и put обновляют признак 'недавно использованного'. Тесты в tests/test_lru.py должны пройти.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "ls",
+  "read_file",
+  "execute",
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл lru.py с классом LRUCache(capacity). Класс должен поддерживать методы get(key) (возвращает значение или None если ключа нет) и put(key, value) (записывает пару). При превышении capacity вытесняется наименее недавно использованный элемент (Least Recently Used). И get, и put обновляют признак 'недавно использованного'. Тесты в tests/test_lru.py должны пройти.",
+   "content_len": 371
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "from collections import OrderedDict\n\nclass LRUCache:\n    \"\"\"\n    Класс для реализации кэша с вытеснением наименее недавно использованных элементов (LRU).\n\n    Атрибуты:\n        capacity (int): Максимальная вместимость кэша.\n        cache (OrderedDict): Словарь, хранящий пары ключ-значение. Порядок элементов отражает их использование,\n                             от наименее к наиболее недавно использованному.\n    \"\"\"\n\n    def __init__(self, capacity: int):\n        \"\"\"\n        Инициализирует кэш с заданной вместимостью.\n\n        Args:\n            capacity (int): Максимальное количество элементов, которое может хранить кэш.\n        \"\"\"\n        if not isinstance(capacity, int) or capacity <= 0:\n            raise ValueError(\"Capacity must be a positive integer.\")\n        self.capacity = capacity\n        self.cache = OrderedDict()\n\n    def get(self, key):\n        \"\"\"\n        Получает значение по ключу из кэша и помечает элемент как \"недавно использованный\".\n\n        Если ключ отсутствует в кэше, возвращается None.\n\n        Args:\n            key: Ключ для поиска в кэше.\n\n        Returns:\n            Значение, соответствующее ключу, или None, если ключ не найден.\n        \"\"\"\n        if key not in self.cache:\n            return None\n        \n        # Перемещаем ключ в конец словаря, чтобы обозначить его как недавно использованный\n        self.cache.move_to_end(key)\n        return self.cache[key]\n\n    def put(self, key, value):\n        \"\"\"\n        Добавляет или обновляет пару ключ-значение в кэше.\n\n        Если ключ уже существует, его значение обновляется, и он помечается как \"недавно использованный\".\n        Если добавление нового ключа приводит к превышению вместимости, удаляется наименее\n        недавно использованный элемент.\n\n        Args:\n            key: Ключ для добавления или обновления.\n            value: Значение, соответствующее ключу.\n        \"\"\"\n        if key in self.cache:\n            # Обновляем значение и перемещаем ключ в конец\n            self.cache.move_to_end(key)\n        self.cache[key] = value\n\n        # Проверяем, не превысил ли размер кэша его вместимость\n        if len(self.cache) > self.capacity:\n            # popitem(last=False) удаляет первый (наименее недавно использованный) элемент\n            self.cache.popitem(last=False)\n",
+      "file_path": "/lru.py"
+     },
+     "id": "af889d07-cfab-431d-9360-ca7a306f8761"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "from collections import OrderedDict\n\nclass LRUCache:\n    \"\"\"\n    Класс для реализации кэша с вытеснением наименее недавно использованных элементов (LRU).\n\n    Атрибуты:\n        capacity (int): Максимальная вместимость кэша.\n        cache (OrderedDict): Словарь, хранящий пары ключ-значение. Порядок элементов отражает их использование,\n                             от наименее к наиболее недавно использованному.\n    \"\"\"\n\n    def __init__(self, capacity: int):\n        \"\"\"\n        Инициализирует кэш с заданной вместимостью.\n\n        Args:\n            capacity (int): Максимальное количество элементов, которое может хранить кэш.\n        \"\"\"\n        if not isinstance(capacity, int) or capacity <= 0:\n            raise ValueError(\"Capacity must be a positive integer.\")\n        self.capacity = capacity\n        self.cache = OrderedDict()\n\n    def get(self, key):\n        \"\"\"\n        Получает значение по ключу из кэша и помечает элемент как \"недавно использованный\".\n\n        Если ключ отсутствует в кэше, возвращается None.\n\n        Args:\n            key: Ключ для поиска в кэше.\n\n        Returns:\n            Значение, соответствующее ключу, или None, если ключ не найден.\n        \"\"\"\n        if key not in self.cache:\n            return None\n        \n        # Перемещаем ключ в конец словаря, чтобы обозначить его как недавно использованный\n        self.cache.move_to_end(key)\n        return self.cache[key]\n\n    def put(self, key, value):\n        \"\"\"\n        Добавляет или обновляет пару ключ-значение в кэше.\n\n        Если ключ уже существует, его значение обновляется, и он помечается как \"недавно использованный\".\n        Если добавление нового ключа приводит к превышению вместимости, удаляется наименее\n        недавно использованный элемент.\n\n        Args:\n            key: Ключ для добавления или обновления.\n            value: Значение, соответствующее ключу.\n        \"\"\"\n        if key in self.cache:\n            # Обновляем значение и перемещаем ключ в конец\n            self.cache.move_to_end(key)\n        self.cache[key] = value\n\n        # Проверяем, не превысил ли размер кэша его вместимость\n        if len(self.cache) > self.capacity:\n            # popitem(last=False) удаляет первый (наименее недавно использованный) элемент\n            self.cache.popitem(last=False)\n",
+     "file_path": "/lru.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /lru.py",
+   "content_len": 20,
+   "name": "write_file",
+   "tool_call_id": "af889d07-cfab-431d-9360-ca7a306f8761"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/tests"
+     },
+     "id": "c6e051d2-d0d0-46b5-b935-64260987ae0d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/tests"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/tests/test_lru.py']",
+   "content_len": 22,
+   "name": "ls",
+   "tool_call_id": "c6e051d2-d0d0-46b5-b935-64260987ae0d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/tests/test_lru.py"
+     },
+     "id": "cca1934a-d297-4159-8921-355551763a85"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/tests/test_lru.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tfrom lru import LRUCache\n     2\t\n     3\t\n     4\tdef test_basic_get_put():\n     5\t    c = LRUCache(2)\n     6\t    c.put('a', 1)\n     7\t    c.put('b', 2)\n     8\t    assert c.get('a') == 1\n     9\t    assert c.get('b') == 2\n    10\t\n    11\t\n    12\tdef test_miss_returns_none():\n    13\t    c = LRUCache(2)\n    14\t    assert c.get('x') is None\n    15\t\n    16\t\n    17\tdef test_eviction():\n    18\t    c = LRUCache(2)\n    19\t    c.put('a', 1)\n    20\t    c.put('b', 2)\n    21\t    c.put('c', 3)\n    22\t    assert c.get('a') is None\n    23\t    assert c.get('b') == 2\n    24\t    assert c.get('c') == 3\n    25\t\n    26\t\n    27\tdef test_recency_updates_on_get():\n    28\t    c = LRUCache(2)\n    29\t    c.put('a', 1)\n    30\t    c.put('b', 2)\n    31\t    c.get('a')\n    32\t    c.put('c', 3)\n    33\t    assert c.get('b') is None\n    34\t    assert c.get('a') == 1",
+   "content_len": 846,
+   "name": "read_file",
+   "tool_call_id": "cca1934a-d297-4159-8921-355551763a85"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -m pytest /tests/test_lru.py -v"
+     },
+     "id": "9b18acda-7cca-4d32-a3f6-18bdd03ce2ca"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -m pytest /tests/test_lru.py -v"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.12, pytest-9.0.3, pluggy-1.6.0 -- /Users/krestnikov/giga/harness-bench-fast/.venv/bin/python\ncachedir: .pytest_cache\nrootdir: /private/var/folders/81/xpcl3q6d0jqf831cy52ltwfm0000gn/T/hbta_task_170_impl_lru_cache_0wy1y46r\nplugins: langsmith-0.8.16, anyio-4.13.0\ncollecting ... collected 0 items\n\n============================ no tests ran in 0.00s =============================\n\n[stderr] ERROR: file or directory not found: /tests/test_lru.py\n\nExit code: 4\n[Command failed with exit code 4]",
+   "content_len": 600,
+   "name": "execute",
+   "tool_call_id": "9b18acda-7cca-4d32-a3f6-18bdd03ce2ca"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -m pytest tests/test_lru.py -v"
+     },
+     "id": "aedc3dff-8d9e-421e-a611-cd1e694c1d2a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -m pytest tests/test_lru.py -v"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.12, pytest-9.0.3, pluggy-1.6.0 -- /Users/krestnikov/giga/harness-bench-fast/.venv/bin/python\ncachedir: .pytest_cache\nrootdir: /private/var/folders/81/xpcl3q6d0jqf831cy52ltwfm0000gn/T/hbta_task_170_impl_lru_cache_0wy1y46r\nplugins: langsmith-0.8.16, anyio-4.13.0\ncollecting ... collected 4 items\n\ntests/test_lru.py::test_basic_get_put PASSED                             [ 25%]\ntests/test_lru.py::test_miss_returns_none PASSED                         [ 50%]\ntests/test_lru.py::test_eviction PASSED                                  [ 75%]\ntests/test_lru.py::test_recency_updates_on_get PASSED                    [100%]\n\n============================== 4 passed in 0.01s ===============================\n\n[Command succeeded with exit code 0]",
+   "content_len": 846,
+   "name": "execute",
+   "tool_call_id": "aedc3dff-8d9e-421e-a611-cd1e694c1d2a"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `lru.py` с классом `LRUCache` успешно создан. Все тесты в файле `tests/test_lru.py` пройдены.\n\nРеализация использует встроенный `collections.OrderedDict`, который идеально подходит для этой задачи, так как он сохраняет порядок вставки элементов и предоставляет метод `move_to_end(key)`. Этот метод эффективно обновляет признак \"недавно использованного\" элемента при вызовах `get` и `put`.\n\nЛогика вытеснения работает следующим образом:\n1. При вызове `put` новый элемент добавляется в конец словаря (как самый недавно используемый).\n2. Если ключ уже существует, его значение обновляется, и он также перемещается в конец.\n3. После добавления/обновления проверяется размер кэша. Если он превышает заданную вместимость (`capacity`), первый элемент из словаря удаляется методом `popitem(last=False)`. Поскольку это *OrderedDict*, первым элементом всегда является наименее недавно использованный.\n4. Метод `get` возвращает `None`, если ключ не найден. В противном случае он перемещает найденный ключ в конец словаря и возвращает его значение.\n\nТаким образом, все требования выполнены: кэш имеет фиксированную вместимость, поддерживает методы `get` и `put`, корректно обновляет приоритет использования и вытесняет нужные элементы. Тесты подтверждают корректность работы всех сценариев: базовое добавление/чтение, возврат `None` для отсутствующих ключей, правильное вытеснение LRU-элемента и обновление приоритета при чтении.",
+   "content_len": 1422,
+   "finish_reason": "stop"
+  }
+ ]
+}

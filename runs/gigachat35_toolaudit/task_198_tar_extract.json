@@ -1,0 +1,82 @@
+{
+ "task_id": "task_198_tar_extract",
+ "name": "Extract bundle.tar.gz into extracted/",
+ "prompt": "В корне рабочей директории есть архив bundle.tar.gz (tar+gzip). Распакуй его так, чтобы файлы first.txt, second.txt, third.txt оказались в каталоге extracted/. Содержимое файлов сохрани как есть.",
+ "passed": true,
+ "message": "bundle.tar.gz extracted to extracted/ with all three files",
+ "error": null,
+ "real_tool_call_names": [
+  "execute",
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В корне рабочей директории есть архив bundle.tar.gz (tar+gzip). Распакуй его так, чтобы файлы first.txt, second.txt, third.txt оказались в каталоге extracted/. Содержимое файлов сохрани как есть.",
+   "content_len": 195
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "mkdir -p extracted"
+     },
+     "id": "8b14da84-64b1-4793-b1cf-771cd5bf1964"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "mkdir -p extracted"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "8b14da84-64b1-4793-b1cf-771cd5bf1964"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "tar -xzf bundle.tar.gz -C extracted first.txt second.txt third.txt"
+     },
+     "id": "bd09d43b-eb1e-419f-b9d9-8a14fb04977a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "tar -xzf bundle.tar.gz -C extracted first.txt second.txt third.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "bd09d43b-eb1e-419f-b9d9-8a14fb04977a"
+  },
+  {
+   "type": "ai",
+   "content": "Файлы first.txt, second.txt и third.txt из архива bundle.tar.gz успешно извлечены в каталог extracted/.",
+   "content_len": 103,
+   "finish_reason": "stop"
+  }
+ ]
+}

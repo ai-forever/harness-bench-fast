@@ -1,0 +1,326 @@
+{
+ "model": "GigaChat-3.5-430B-A28B (IFT)",
+ "total_tasks": 313,
+ "failed_tasks": 35,
+ "failed_with_zero_mutating_tool_calls": 0,
+ "failed_hit_loop_cap": 4,
+ "note": "failed_with_zero_mutating_tool_calls counts failures where the model never called write_file/edit_file/execute — i.e. it narrated instead of acting. hit_loop_cap = no terminal assistant answer (recursion limit).",
+ "rows": [
+  {
+   "task_id": "task_106_csv_group_count",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "counts.csv content differs"
+  },
+  {
+   "task_id": "task_110_csv_count_above",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "count.txt content differs"
+  },
+  {
+   "task_id": "task_139_grep_log_errors",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "errors_count.txt content differs"
+  },
+  {
+   "task_id": "task_140_grep_emails",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "emails.txt [] differs from expected ['alice@example.com', 'bob@team.org', 'carol@team.org'"
+  },
+  {
+   "task_id": "task_146_log_count_5xx",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "err_count.txt content differs"
+  },
+  {
+   "task_id": "task_155_log_count_per_endpoint",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "endpoints.csv counts {'/api/users': 12, '/api/items': 12, '/api/health': 4, '/login': 16} "
+  },
+  {
+   "task_id": "task_177_csv_histogram",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "histogram.json JSON mismatch"
+  },
+  {
+   "task_id": "task_178_csv_pivot_count",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "pivot.csv content differs"
+  },
+  {
+   "task_id": "task_189_log_hourly_counts",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "hourly.csv {'08': 5, '09': 13, '10': 20, '11': 7, '12': 3} differs from {'08': 5, '09': 12"
+  },
+  {
+   "task_id": "task_210_tar_manifest_with_hashes",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "manifest.csv header ['./bundle.tar.gz', '178', '540563463bfed090ef09c0b7c533af36e292d905a1"
+  },
+  {
+   "task_id": "task_214_customer_data_quality_report",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "dq_report mismatch: {'row_count': 5, 'duplicate_ids': ['2'], 'invalid_emails': ['2'], 'inv"
+  },
+  {
+   "task_id": "task_259_tau2_telecom_plan_switch",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "telecom_action.json mismatch: {'action': 'switch_plan', 'account_id': 'acct-91', 'new_plan"
+  },
+  {
+   "task_id": "task_262_swe_csv_top_customers",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "pytest exit=1; tail: \"  \\nE         Right contains 2 more items, first extra item: 'Ann'\\n"
+  },
+  {
+   "task_id": "task_265_terminal_makefile_plan",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "build_order.txt lines differ"
+  },
+  {
+   "task_id": "task_285_terminal_patch_stat_summary",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 1,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "patch_summary.tsv lines differ"
+  },
+  {
+   "task_id": "task_292_tau2_pharmacy_refill",
+   "real_tool_calls": 4,
+   "mutating_tool_calls": 1,
+   "ai_turns": 5,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "pharmacy_action.json.action = 'refill', expected 'refuse_refill'"
+  },
+  {
+   "task_id": "task_32_count_words",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "words.txt content differs"
+  },
+  {
+   "task_id": "task_89_create_pre_commit",
+   "real_tool_calls": 1,
+   "mutating_tool_calls": 1,
+   "ai_turns": 2,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": ".pre-commit-config.yaml lines differ"
+  },
+  {
+   "task_id": "task_92_count_chars",
+   "real_tool_calls": 2,
+   "mutating_tool_calls": 1,
+   "ai_turns": 3,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "count.txt content differs"
+  },
+  {
+   "task_id": "task_156_csv_validate_split",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 2,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "good.csv content differs"
+  },
+  {
+   "task_id": "task_196_xlsx_to_csv_and_json",
+   "real_tool_calls": 4,
+   "mutating_tool_calls": 2,
+   "ai_turns": 5,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "data.json invalid: Extra data: line 2 column 1 (char 32)"
+  },
+  {
+   "task_id": "task_230_memory_forget_telegram",
+   "real_tool_calls": 6,
+   "mutating_tool_calls": 2,
+   "ai_turns": 7,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "contacts.json invalid JSON: Expecting property name enclosed in double quotes: line 6 colu"
+  },
+  {
+   "task_id": "task_263_terminal_du_top_dirs",
+   "real_tool_calls": 5,
+   "mutating_tool_calls": 2,
+   "ai_turns": 6,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "reports/top_dirs.tsv lines differ"
+  },
+  {
+   "task_id": "task_41_count_todos",
+   "real_tool_calls": 3,
+   "mutating_tool_calls": 2,
+   "ai_turns": 4,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "count.txt content differs"
+  },
+  {
+   "task_id": "task_51_count_total_lines",
+   "real_tool_calls": 4,
+   "mutating_tool_calls": 2,
+   "ai_turns": 5,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "total.txt content differs"
+  },
+  {
+   "task_id": "task_219_sql_paid_leaderboard",
+   "real_tool_calls": 5,
+   "mutating_tool_calls": 3,
+   "ai_turns": 6,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "paid_leaderboard.csv content differs"
+  },
+  {
+   "task_id": "task_31_rename_in_multi",
+   "real_tool_calls": 7,
+   "mutating_tool_calls": 3,
+   "ai_turns": 8,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "b.py still contains forbidden: ['helper']"
+  },
+  {
+   "task_id": "task_223_memory_city_timezone_script",
+   "real_tool_calls": 5,
+   "mutating_tool_calls": 4,
+   "ai_turns": 6,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "now.py crashed: Traceback (most recent call last):"
+  },
+  {
+   "task_id": "task_236_memory_contradiction_resolution_region",
+   "real_tool_calls": 8,
+   "mutating_tool_calls": 4,
+   "ai_turns": 9,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "MEMORY.md doesn't contain updated region eu-central-1"
+  },
+  {
+   "task_id": "task_242_memory_knowledge_update_job_change",
+   "real_tool_calls": 7,
+   "mutating_tool_calls": 4,
+   "ai_turns": 8,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "package.json author still mentions oldcorp"
+  },
+  {
+   "task_id": "task_42_snake_case",
+   "real_tool_calls": 6,
+   "mutating_tool_calls": 4,
+   "ai_turns": 7,
+   "reached_final_answer": true,
+   "hit_loop_cap": false,
+   "first_line": "two.py still contains forbidden: ['userName']"
+  },
+  {
+   "task_id": "task_309_rename_refactor_scale",
+   "real_tool_calls": 16,
+   "mutating_tool_calls": 7,
+   "ai_turns": 16,
+   "reached_final_answer": false,
+   "hit_loop_cap": true,
+   "first_line": "c6.py still contains forbidden: ['<<<<<<<', '=======', '>>>>>>>', 'parse', 'c6!']"
+  },
+  {
+   "task_id": "task_312_policy_driven_merge",
+   "real_tool_calls": 16,
+   "mutating_tool_calls": 7,
+   "ai_turns": 16,
+   "reached_final_answer": false,
+   "hit_loop_cap": true,
+   "first_line": "m07.py still contains forbidden: ['<<<<<<<', '=======', '>>>>>>>', 'VALUE = 17']"
+  },
+  {
+   "task_id": "task_307_resolve_many_files",
+   "real_tool_calls": 16,
+   "mutating_tool_calls": 8,
+   "ai_turns": 16,
+   "reached_final_answer": false,
+   "hit_loop_cap": true,
+   "first_line": "mod07.py still contains forbidden: ['<<<<<<<', '=======', '>>>>>>>', 'WEIGHT = 2']"
+  },
+  {
+   "task_id": "task_311_apply_patch_stack_multifile",
+   "real_tool_calls": 16,
+   "mutating_tool_calls": 9,
+   "ai_turns": 16,
+   "reached_final_answer": false,
+   "hit_loop_cap": true,
+   "first_line": "d.py: mod.d() returned 2000, expected 3000"
+  }
+ ],
+ "model_build": "GigaChat-3.5-430B-A28B:32.9.23.6"
+}

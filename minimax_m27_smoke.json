@@ -1,0 +1,105 @@
+{
+  "task_set_version": "0.13.0",
+  "total": 4,
+  "passed": 3,
+  "pass_rate": 0.75,
+  "tasks": [
+    {
+      "task_id": "task_05_greet",
+      "number": 5,
+      "passed": false,
+      "message": "greeting.py missing",
+      "elapsed_seconds": 11.659860041000002,
+      "error": null,
+      "tags": [
+        "create",
+        "python",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 3,
+      "agent_tool_calls": 1,
+      "agent_shell_commands": 0,
+      "agent_events": 4,
+      "agent_llm_calls": 2,
+      "agent_input_tokens": 38022,
+      "agent_output_tokens": 426,
+      "agent_total_tokens": 38448
+    },
+    {
+      "task_id": "task_222_memory_name_pyproject",
+      "number": 222,
+      "passed": true,
+      "message": "name saved to MEMORY.md and used in pyproject.toml",
+      "elapsed_seconds": 21.958621749999992,
+      "error": null,
+      "tags": [
+        "memory",
+        "save",
+        "toml",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 7,
+      "agent_tool_calls": 3,
+      "agent_shell_commands": 0,
+      "agent_events": 8,
+      "agent_llm_calls": 4,
+      "agent_input_tokens": 94797,
+      "agent_output_tokens": 1128,
+      "agent_total_tokens": 95925
+    },
+    {
+      "task_id": "task_314_skill_r1_brand_landing",
+      "number": 314,
+      "passed": true,
+      "message": "index.html matches /#0b3d2e/; index.html matches /#e0552b/; index.html matches /#f4f1ea/; index.html contains all expected substrings; index.html matches /<h1[ >]/",
+      "elapsed_seconds": 25.639509083000007,
+      "error": null,
+      "tags": [
+        "skill",
+        "brand",
+        "office",
+        "html",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 5,
+      "agent_tool_calls": 2,
+      "agent_shell_commands": 0,
+      "agent_events": 6,
+      "agent_llm_calls": 3,
+      "agent_input_tokens": 65064,
+      "agent_output_tokens": 2820,
+      "agent_total_tokens": 67884
+    },
+    {
+      "task_id": "task_339_adv_false_python_version",
+      "number": 339,
+      "passed": true,
+      "message": "pytest tests/ passed",
+      "elapsed_seconds": 32.27457558399999,
+      "error": null,
+      "tags": [
+        "adversarial",
+        "python",
+        "pytest",
+        "distractor",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 14,
+      "agent_tool_calls": 7,
+      "agent_shell_commands": 3,
+      "agent_events": 15,
+      "agent_llm_calls": 7,
+      "agent_input_tokens": 144318,
+      "agent_output_tokens": 2124,
+      "agent_total_tokens": 146442
+    }
+  ]
+}

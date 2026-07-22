@@ -1,0 +1,94 @@
+{
+ "task_id": "task_50_fix_typo",
+ "name": "Fix \"recieve\" -> \"receive\" across docs",
+ "prompt": "В файлах docs/intro.md и docs/usage.md встречается слово 'recieve' с опечаткой. Замени все его вхождения на правильное 'receive'. Остального текста не трогай.",
+ "passed": true,
+ "message": "docs/intro.md free of forbidden substrings; docs/usage.md free of forbidden substrings; docs/intro.md contains all expected substrings; docs/usage.md contains all expected substrings",
+ "error": null,
+ "real_tool_call_names": [
+  "edit_file",
+  "edit_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файлах docs/intro.md и docs/usage.md встречается слово 'recieve' с опечаткой. Замени все его вхождения на правильное 'receive'. Остального текста не трогай.",
+   "content_len": 158
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "docs/intro.md",
+      "new_string": "receive",
+      "old_string": "recieve",
+      "replace_all": true
+     },
+     "id": "13ac138a-1c1f-4fb3-9ef4-afb929b6e7b1"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "docs/intro.md",
+     "new_string": "receive",
+     "old_string": "recieve",
+     "replace_all": true
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 2 instance(s) of the string in '/docs/intro.md'",
+   "content_len": 69,
+   "name": "edit_file",
+   "tool_call_id": "13ac138a-1c1f-4fb3-9ef4-afb929b6e7b1"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "docs/usage.md",
+      "new_string": "receive",
+      "old_string": "recieve",
+      "replace_all": true
+     },
+     "id": "40b4d050-d3ba-491c-b53a-55bac02609bb"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "docs/usage.md",
+     "new_string": "receive",
+     "old_string": "recieve",
+     "replace_all": true
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/docs/usage.md'",
+   "content_len": 69,
+   "name": "edit_file",
+   "tool_call_id": "40b4d050-d3ba-491c-b53a-55bac02609bb"
+  },
+  {
+   "type": "ai",
+   "content": "Замена выполнена. В файле docs/intro.md исправлено 2 вхождения, а в docs/usage.md — 1 вхождение слова 'recieve' на 'receive'.",
+   "content_len": 125,
+   "finish_reason": "stop"
+  }
+ ]
+}

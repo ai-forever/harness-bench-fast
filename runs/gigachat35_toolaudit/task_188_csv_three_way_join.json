@@ -1,0 +1,171 @@
+{
+ "task_id": "task_188_csv_three_way_join",
+ "name": "Three-way join: orders + users + products",
+ "prompt": "Три CSV-файла лежат в корне рабочей директории:\n  - users.csv: user_id,name\n  - orders.csv: order_id,user_id,product_id\n  - products.csv: product_id,price\nСделай файл joined.csv с заголовком 'order_id,name,product_id,price' — для каждой строки orders.csv (в исходном порядке) добавь имя пользователя из users.csv и цену продукта из products.csv.",
+ "passed": true,
+ "message": "joined.csv matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "read_file",
+  "read_file",
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Три CSV-файла лежат в корне рабочей директории:\n  - users.csv: user_id,name\n  - orders.csv: order_id,user_id,product_id\n  - products.csv: product_id,price\nСделай файл joined.csv с заголовком 'order_id,name,product_id,price' — для каждой строки orders.csv (в исходном порядке) добавь имя пользователя из users.csv и цену продукта из products.csv.",
+   "content_len": 345
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "."
+     },
+     "id": "d90f0a6e-212a-451f-83b8-4d2dd6838d1d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "."
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/orders.csv', '/products.csv', '/users.csv']",
+   "content_len": 46,
+   "name": "ls",
+   "tool_call_id": "d90f0a6e-212a-451f-83b8-4d2dd6838d1d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/users.csv"
+     },
+     "id": "3498dd60-a8c7-4d38-91ee-1c57fb14008e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/users.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tuser_id,name\n     2\t1,Alice\n     3\t2,Bob\n     4\t3,Carol",
+   "content_len": 62,
+   "name": "read_file",
+   "tool_call_id": "3498dd60-a8c7-4d38-91ee-1c57fb14008e"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/orders.csv"
+     },
+     "id": "6408fed0-0b23-4ac6-a577-4524664a98aa"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/orders.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\torder_id,user_id,product_id\n     2\t10,1,p1\n     3\t11,1,p2\n     4\t12,2,p1\n     5\t13,3,p3",
+   "content_len": 94,
+   "name": "read_file",
+   "tool_call_id": "6408fed0-0b23-4ac6-a577-4524664a98aa"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/products.csv"
+     },
+     "id": "8c17ad88-4c48-4aa4-9ee6-01d564af91b0"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/products.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tproduct_id,price\n     2\tp1,100\n     3\tp2,50\n     4\tp3,200",
+   "content_len": 64,
+   "name": "read_file",
+   "tool_call_id": "8c17ad88-4c48-4aa4-9ee6-01d564af91b0"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "order_id,name,product_id,price\n10,Alice,p1,100\n11,Alice,p2,50\n12,Bob,p1,100\n13,Carol,p3,200",
+      "file_path": "/joined.csv"
+     },
+     "id": "4a676e28-0964-4ab5-8666-b17b2c84403c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "order_id,name,product_id,price\n10,Alice,p1,100\n11,Alice,p2,50\n12,Bob,p1,100\n13,Carol,p3,200",
+     "file_path": "/joined.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /joined.csv",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "4a676e28-0964-4ab5-8666-b17b2c84403c"
+  },
+  {
+   "type": "ai",
+   "content": "Файл joined.csv создан. Его содержимое:\n\norder_id,name,product_id,price\n10,Alice,p1,100\n11,Alice,p2,50\n12,Bob,p1,100\n13,Carol,p3,200",
+   "content_len": 132,
+   "finish_reason": "stop"
+  }
+ ]
+}

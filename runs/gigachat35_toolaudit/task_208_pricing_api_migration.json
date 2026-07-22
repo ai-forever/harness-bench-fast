@@ -1,0 +1,561 @@
+{
+ "task_id": "task_208_pricing_api_migration",
+ "name": "Migrate legacy pricing API to core.pricing with tests",
+ "prompt": "Нужно сделать миграцию API:\n  1) создать core/pricing.py с функцией compute_total(lines, tax=0.0),\n  2) перевести app/service.py и cli.py с pricing.legacy.calc_total на новую API,\n  3) чтобы pytest из tests/ проходил.\nПоведение расчета не менять.",
+ "passed": true,
+ "message": "core/pricing.py exists; app/service.py free of forbidden substrings; cli.py free of forbidden substrings; app/service.py contains all expected substrings; cli.py contains all expected substrings; pytest tests/ passed",
+ "error": "Traceback (most recent call last):\n  File \"/Users/krestnikov/giga/harness-bench-fast/run_gigachat35_toolaudit.py\", line 224, in _stream_capture\n    for chunk in agent.stream(payload, stream_mode=\"values\", config=config):\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/krestnikov/giga/harness-bench-fast/.venv/lib/python3.12/site-packages/langgraph/pregel/main.py\", line 3026, in stream\n    raise GraphRecursionError(msg)\nlanggraph.errors.GraphRecursionError: Recursion limit of 80 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.\nFor troubleshooting, visit: https://docs.langchain.com/oss/python/langgraph/errors/GRAPH_RECURSION_LIMIT\n",
+ "real_tool_call_names": [
+  "write_todos",
+  "ls",
+  "ls",
+  "read_file",
+  "read_file",
+  "read_file",
+  "write_file",
+  "edit_file",
+  "edit_file",
+  "edit_file",
+  "edit_file",
+  "edit_file",
+  "execute",
+  "write_file",
+  "execute",
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Нужно сделать миграцию API:\n  1) создать core/pricing.py с функцией compute_total(lines, tax=0.0),\n  2) перевести app/service.py и cli.py с pricing.legacy.calc_total на новую API,\n  3) чтобы pytest из tests/ проходил.\nПоведение расчета не менять.",
+   "content_len": 246
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_todos",
+     "args": {
+      "todos": [
+       {
+        "content": "Создать файл core/pricing.py с функцией compute_total(lines, tax=0.0)",
+        "status": "pending"
+       },
+       {
+        "content": "Прочитать текущую реализацию pricing.legacy.calc_total для воспроизведения поведения",
+        "status": "pending"
+       },
+       {
+        "content": "Обновить app/service.py: заменить импорт и вызовы на новую API",
+        "status": "pending"
+       },
+       {
+        "content": "Обновить cli.py: заменить импорт и вызовы на новую API",
+        "status": "pending"
+       },
+       {
+        "content": "Запустить pytest из tests/, при необходимости скорректировать код под тесты",
+        "status": "pending"
+       }
+      ]
+     },
+     "id": "445d12ca-c868-4f3e-a6b4-9db2e4333da2"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_todos",
+    "arguments": {
+     "todos": [
+      {
+       "content": "Создать файл core/pricing.py с функцией compute_total(lines, tax=0.0)",
+       "status": "pending"
+      },
+      {
+       "content": "Прочитать текущую реализацию pricing.legacy.calc_total для воспроизведения поведения",
+       "status": "pending"
+      },
+      {
+       "content": "Обновить app/service.py: заменить импорт и вызовы на новую API",
+       "status": "pending"
+      },
+      {
+       "content": "Обновить cli.py: заменить импорт и вызовы на новую API",
+       "status": "pending"
+      },
+      {
+       "content": "Запустить pytest из tests/, при необходимости скорректировать код под тесты",
+       "status": "pending"
+      }
+     ]
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated todo list to [{'content': 'Создать файл core/pricing.py с функцией compute_total(lines, tax=0.0)', 'status': 'pending'}, {'content': 'Прочитать текущую реализацию pricing.legacy.calc_total для воспроизведения поведения', 'status': 'pending'}, {'content': 'Обновить app/service.py: заменить импорт и вызовы на новую API', 'status': 'pending'}, {'content': 'Обновить cli.py: заменить импорт и вызовы на новую API', 'status': 'pending'}, {'content': 'Запустить pytest из tests/, при необходимости скорректировать код под тесты', 'status': 'pending'}]",
+   "content_len": 555,
+   "name": "write_todos",
+   "tool_call_id": "445d12ca-c868-4f3e-a6b4-9db2e4333da2"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "."
+     },
+     "id": "b10859fc-ad32-45d0-81a7-b7d160f29cdb"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "."
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/app/', '/cli.py', '/pricing/', '/tests/']",
+   "content_len": 44,
+   "name": "ls",
+   "tool_call_id": "b10859fc-ad32-45d0-81a7-b7d160f29cdb"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "app"
+     },
+     "id": "bb7d8437-c72f-41f8-913d-8a5e50626bbd"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "app"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/app/service.py']",
+   "content_len": 19,
+   "name": "ls",
+   "tool_call_id": "bb7d8437-c72f-41f8-913d-8a5e50626bbd"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "pricing/legacy.py"
+     },
+     "id": "73554bac-e59a-4383-832d-f4c0b151346a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "pricing/legacy.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdef calc_total(subtotal, tax_rate):\n     2\t    return round(subtotal * (1 + tax_rate), 2)",
+   "content_len": 96,
+   "name": "read_file",
+   "tool_call_id": "73554bac-e59a-4383-832d-f4c0b151346a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "app/service.py"
+     },
+     "id": "6501b30d-3ddf-4300-acc3-f8c088d7b206"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "app/service.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tfrom pricing.legacy import calc_total\n     2\t\n     3\t\n     4\tdef quote(lines):\n     5\t    subtotal = sum(item['qty'] * item['price'] for item in lines)\n     6\t    return calc_total(subtotal, 0.2)",
+   "content_len": 202,
+   "name": "read_file",
+   "tool_call_id": "6501b30d-3ddf-4300-acc3-f8c088d7b206"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "cli.py"
+     },
+     "id": "5b941712-c8e6-4337-8297-845665729bec"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "cli.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tfrom pricing.legacy import calc_total\n     2\t\n     3\t\n     4\tdef render_quote(lines):\n     5\t    subtotal = sum(item['qty'] * item['price'] for item in lines)\n     6\t    return f'Total={calc_total(subtotal, 0.2)}'",
+   "content_len": 220,
+   "name": "read_file",
+   "tool_call_id": "5b941712-c8e6-4337-8297-845665729bec"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "def compute_total(lines, tax=0.0):\n    \"\"\"\n    Вычисляет итоговую сумму по строкам с налогом.\n\n    lines — итерируемый объект словарей с ключами 'qty' и 'price'.\n    tax — ставка налога (например, 0.2 для 20%).\n    Возвращает округлённый до двух знаков результат.\n    \"\"\"\n    subtotal = sum(item['qty'] * item['price'] for item in lines)\n    return round(subtotal * (1 + tax), 2)",
+      "file_path": "core/pricing.py"
+     },
+     "id": "a292b516-abf6-49f0-a72d-f27a1cd28459"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "def compute_total(lines, tax=0.0):\n    \"\"\"\n    Вычисляет итоговую сумму по строкам с налогом.\n\n    lines — итерируемый объект словарей с ключами 'qty' и 'price'.\n    tax — ставка налога (например, 0.2 для 20%).\n    Возвращает округлённый до двух знаков результат.\n    \"\"\"\n    subtotal = sum(item['qty'] * item['price'] for item in lines)\n    return round(subtotal * (1 + tax), 2)",
+     "file_path": "core/pricing.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /core/pricing.py",
+   "content_len": 29,
+   "name": "write_file",
+   "tool_call_id": "a292b516-abf6-49f0-a72d-f27a1cd28459"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "app/service.py",
+      "new_string": "from core.pricing import compute_total\n\ndef quote(lines):\n    return compute_total(lines, tax=0.2)",
+      "old_string": "from pricing.legacy import calc_total\n\ndef quote(lines):\n    subtotal = sum(item['qty'] * item['price'] for item in lines)\n    return calc_total(subtotal, 0.2)"
+     },
+     "id": "05810639-60e1-42b0-88fe-56da15f96a51"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "app/service.py",
+     "new_string": "from core.pricing import compute_total\n\ndef quote(lines):\n    return compute_total(lines, tax=0.2)",
+     "old_string": "from pricing.legacy import calc_total\n\ndef quote(lines):\n    subtotal = sum(item['qty'] * item['price'] for item in lines)\n    return calc_total(subtotal, 0.2)"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Error: String not found in file: 'from pricing.legacy import calc_total\n\ndef quote(lines):\n    subtotal = sum(item['qty'] * item['price'] for item in lines)\n    return calc_total(subtotal, 0.2)'",
+   "content_len": 194,
+   "name": "edit_file",
+   "tool_call_id": "05810639-60e1-42b0-88fe-56da15f96a51"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "app/service.py",
+      "new_string": "from core.pricing import compute_total",
+      "old_string": "from pricing.legacy import calc_total"
+     },
+     "id": "7f84ca9e-6ca4-4d38-a19a-7edfb29a3d2b"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "app/service.py",
+     "new_string": "from core.pricing import compute_total",
+     "old_string": "from pricing.legacy import calc_total"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/app/service.py'",
+   "content_len": 70,
+   "name": "edit_file",
+   "tool_call_id": "7f84ca9e-6ca4-4d38-a19a-7edfb29a3d2b"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "app/service.py",
+      "new_string": "def quote(lines):\n    return compute_total(lines, tax=0.2)",
+      "old_string": "def quote(lines):\n    subtotal = sum(item['qty'] * item['price'] for item in lines)\n    return calc_total(subtotal, 0.2)"
+     },
+     "id": "4b40368b-d93b-4816-b3e5-01fea4e9813a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "app/service.py",
+     "new_string": "def quote(lines):\n    return compute_total(lines, tax=0.2)",
+     "old_string": "def quote(lines):\n    subtotal = sum(item['qty'] * item['price'] for item in lines)\n    return calc_total(subtotal, 0.2)"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/app/service.py'",
+   "content_len": 70,
+   "name": "edit_file",
+   "tool_call_id": "4b40368b-d93b-4816-b3e5-01fea4e9813a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "cli.py",
+      "new_string": "from core.pricing import compute_total",
+      "old_string": "from pricing.legacy import calc_total"
+     },
+     "id": "b9531f3b-fae2-43fb-9c37-dd892dd5796b"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "cli.py",
+     "new_string": "from core.pricing import compute_total",
+     "old_string": "from pricing.legacy import calc_total"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/cli.py'",
+   "content_len": 62,
+   "name": "edit_file",
+   "tool_call_id": "b9531f3b-fae2-43fb-9c37-dd892dd5796b"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "cli.py",
+      "new_string": "def render_quote(lines):\n    return f'Total={compute_total(lines, tax=0.2)}'",
+      "old_string": "def render_quote(lines):\n    subtotal = sum(item['qty'] * item['price'] for item in lines)\n    return f'Total={calc_total(subtotal, 0.2)}'"
+     },
+     "id": "e12edf44-4370-4970-8938-eb5b3486d510"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "cli.py",
+     "new_string": "def render_quote(lines):\n    return f'Total={compute_total(lines, tax=0.2)}'",
+     "old_string": "def render_quote(lines):\n    subtotal = sum(item['qty'] * item['price'] for item in lines)\n    return f'Total={calc_total(subtotal, 0.2)}'"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/cli.py'",
+   "content_len": 62,
+   "name": "edit_file",
+   "tool_call_id": "e12edf44-4370-4970-8938-eb5b3486d510"
+  },
+  {
+   "type": "human",
+   "content": "[BUDGET-NUDGE] You have made 12 tool calls. STOP exploring and finish the task NOW.\n- Simple count task? write_file run.py + execute python run.py → done.\n- Required output file not written yet? write_file it immediately.\n- Do NOT make more read/grep calls. Write your best answer and finish.",
+   "content_len": 292
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "pytest -q"
+     },
+     "id": "12d06cee-48b3-446c-9531-70b303bb0670"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "pytest -q"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "\n==================================== ERRORS ====================================\n_______________ ERROR collecting tests/test_pricing_refactor.py ________________\nImportError while importing test module '/private/var/folders/81/xpcl3q6d0jqf831cy52ltwfm0000gn/T/hbta_task_208_pricing_api_migration_pjpba7al/tests/test_pricing_refactor.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/Users/krestnikov/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_pricing_refactor.py:1: in <module>\n    from app.service import quote\nE   ModuleNotFoundError: No module named 'app'\n=========================== short test summary info ============================\nERROR tests/test_pricing_refactor.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 error in 0.06s\n\nExit code: 2\n[Command failed with exit code 2]",
+   "content_len": 1070,
+   "name": "execute",
+   "tool_call_id": "12d06cee-48b3-446c-9531-70b303bb0670"
+  },
+  {
+   "type": "human",
+   "content": "[BUDGET-NUDGE] You have made 13 tool calls. STOP exploring and finish the task NOW.\n- Simple count task? write_file run.py + execute python run.py → done.\n- Required output file not written yet? write_file it immediately.\n- Do NOT make more read/grep calls. Write your best answer and finish.",
+   "content_len": 292
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "",
+      "file_path": "app/__init__.py"
+     },
+     "id": "05d80e8c-f266-46b7-abb2-67b8ccc45e3d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "",
+     "file_path": "app/__init__.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /app/__init__.py",
+   "content_len": 29,
+   "name": "write_file",
+   "tool_call_id": "05d80e8c-f266-46b7-abb2-67b8ccc45e3d"
+  },
+  {
+   "type": "human",
+   "content": "[BUDGET-NUDGE] You have made 14 tool calls. STOP exploring and finish the task NOW.\n- Simple count task? write_file run.py + execute python run.py → done.\n- Required output file not written yet? write_file it immediately.\n- Do NOT make more read/grep calls. Write your best answer and finish.",
+   "content_len": 292
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "pytest -q"
+     },
+     "id": "c01fae0f-c312-462e-9dfb-a20a4449c751"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "pytest -q"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "\n==================================== ERRORS ====================================\n_______________ ERROR collecting tests/test_pricing_refactor.py ________________\nImportError while importing test module '/private/var/folders/81/xpcl3q6d0jqf831cy52ltwfm0000gn/T/hbta_task_208_pricing_api_migration_pjpba7al/tests/test_pricing_refactor.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/Users/krestnikov/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_pricing_refactor.py:1: in <module>\n    from app.service import quote\nE   ModuleNotFoundError: No module named 'app'\n=========================== short test summary info ============================\nERROR tests/test_pricing_refactor.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 error in 0.06s\n\nExit code: 2\n[Command failed with exit code 2]",
+   "content_len": 1070,
+   "name": "execute",
+   "tool_call_id": "c01fae0f-c312-462e-9dfb-a20a4449c751"
+  },
+  {
+   "type": "human",
+   "content": "[BUDGET-NUDGE] You have made 15 tool calls. STOP exploring and finish the task NOW.\n- Simple count task? write_file run.py + execute python run.py → done.\n- Required output file not written yet? write_file it immediately.\n- Do NOT make more read/grep calls. Write your best answer and finish.",
+   "content_len": 292
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "PYTHONPATH=. pytest -q"
+     },
+     "id": "89fdc49e-81e3-4ff9-9ef8-a65cc009a4f1"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "PYTHONPATH=. pytest -q"
+    }
+   },
+   "finish_reason": "function_call"
+  }
+ ]
+}

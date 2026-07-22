@@ -1,0 +1,175 @@
+{
+ "task_id": "task_93_split_rows",
+ "name": "Split users.csv data rows into rows/row_N.csv",
+ "prompt": "В файле users.csv первая строка — заголовок 'name,age', дальше идут три строки данных. Для каждой строки данных создай отдельный файл в каталоге rows: первая строка данных — в rows/row_1.csv, вторая — в rows/row_2.csv, третья — в rows/row_3.csv. Содержимое каждого файла — это одна строка соответствующих данных (без заголовка), например 'Alice,30'.",
+ "passed": true,
+ "message": "each data row of users.csv saved to rows/row_N.csv",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "execute",
+  "write_file",
+  "write_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле users.csv первая строка — заголовок 'name,age', дальше идут три строки данных. Для каждой строки данных создай отдельный файл в каталоге rows: первая строка данных — в rows/row_1.csv, вторая — в rows/row_2.csv, третья — в rows/row_3.csv. Содержимое каждого файла — это одна строка соответствующих данных (без заголовка), например 'Alice,30'.",
+   "content_len": 349
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "users.csv"
+     },
+     "id": "4cfbe54f-e02b-4aab-b4b7-d4a417034bfa"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "users.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tname,age\n     2\tAlice,30\n     3\tBob,25\n     4\tCarol,40",
+   "content_len": 61,
+   "name": "read_file",
+   "tool_call_id": "4cfbe54f-e02b-4aab-b4b7-d4a417034bfa"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "mkdir -p rows"
+     },
+     "id": "8fdbcd45-ef5a-4f9d-b258-42f6a7b84d30"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "mkdir -p rows"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "8fdbcd45-ef5a-4f9d-b258-42f6a7b84d30"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "Alice,30",
+      "file_path": "rows/row_1.csv"
+     },
+     "id": "b32ddc30-ecd4-47a3-a1eb-138a4f09ece4"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "Alice,30",
+     "file_path": "rows/row_1.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /rows/row_1.csv",
+   "content_len": 28,
+   "name": "write_file",
+   "tool_call_id": "b32ddc30-ecd4-47a3-a1eb-138a4f09ece4"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "Bob,25",
+      "file_path": "rows/row_2.csv"
+     },
+     "id": "d8c3990e-6f41-4be9-a7e6-dda80f282128"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "Bob,25",
+     "file_path": "rows/row_2.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /rows/row_2.csv",
+   "content_len": 28,
+   "name": "write_file",
+   "tool_call_id": "d8c3990e-6f41-4be9-a7e6-dda80f282128"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "Carol,40",
+      "file_path": "rows/row_3.csv"
+     },
+     "id": "8a5f7599-d8fd-4a81-ba4c-f484e4f186b6"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "Carol,40",
+     "file_path": "rows/row_3.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /rows/row_3.csv",
+   "content_len": 28,
+   "name": "write_file",
+   "tool_call_id": "8a5f7599-d8fd-4a81-ba4c-f484e4f186b6"
+  },
+  {
+   "type": "ai",
+   "content": "Файлы созданы:\n- rows/row_1.csv: Alice,30\n- rows/row_2.csv: Bob,25\n- rows/row_3.csv: Carol,40",
+   "content_len": 93,
+   "finish_reason": "stop"
+  }
+ ]
+}

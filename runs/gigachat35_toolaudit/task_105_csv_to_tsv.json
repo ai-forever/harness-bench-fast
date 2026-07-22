@@ -1,0 +1,84 @@
+{
+ "task_id": "task_105_csv_to_tsv",
+ "name": "Convert data.csv to TSV (tab-separated)",
+ "prompt": "Преобразуй файл data.csv (запятая как разделитель) в data.tsv (символ табуляции как разделитель). Заголовки и значения сохрани, порядок строк не меняй.",
+ "passed": true,
+ "message": "data.tsv matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Преобразуй файл data.csv (запятая как разделитель) в data.tsv (символ табуляции как разделитель). Заголовки и значения сохрани, порядок строк не меняй.",
+   "content_len": 151
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "data.csv"
+     },
+     "id": "c9f78b41-a6b2-416f-8772-4efc9ff39271"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "data.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tname,age,city\n     2\tAlice,30,Moscow\n     3\tBob,25,Berlin\n     4\tCarol,40,Paris",
+   "content_len": 86,
+   "name": "read_file",
+   "tool_call_id": "c9f78b41-a6b2-416f-8772-4efc9ff39271"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "name\tage\tcity\nAlice\t30\tMoscow\nBob\t25\tBerlin\nCarol\t40\tParis",
+      "file_path": "data.tsv"
+     },
+     "id": "b7dab314-3c4a-4bdc-bb7b-87da8eff94ab"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "name\tage\tcity\nAlice\t30\tMoscow\nBob\t25\tBerlin\nCarol\t40\tParis",
+     "file_path": "data.tsv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /data.tsv",
+   "content_len": 22,
+   "name": "write_file",
+   "tool_call_id": "b7dab314-3c4a-4bdc-bb7b-87da8eff94ab"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `data.csv` успешно преобразован в `data.tsv`. Заголовки, значения и порядок строк сохранены.",
+   "content_len": 97,
+   "finish_reason": "stop"
+  }
+ ]
+}

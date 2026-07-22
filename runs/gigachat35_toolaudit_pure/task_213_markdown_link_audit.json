@@ -1,0 +1,204 @@
+{
+ "task_id": "task_213_markdown_link_audit",
+ "name": "Audit markdown links into domains.json and broken_links.txt",
+ "prompt": "Просканируй все .md файлы в каталоге docs и найди URL (http/https).\nСформируй два артефакта:\n  1) domains.json — объект domain->count (сколько раз домен встретился).\n     domain = netloc из urllib.parse.urlparse, то есть host вместе с\n     портом если он указан: для 'http://localhost:3000/dev' domain ==\n     'localhost:3000', а не 'localhost';\n  2) broken_links.txt — по одной ссылке в строке для URL, которые\n     считаются проблемными: scheme == http ИЛИ домен содержит localhost.\nДля broken_links.txt порядок строк не важен.",
+ "passed": true,
+ "message": "domains.json and broken_links.txt match expected link audit",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "read_file",
+  "read_file",
+  "read_file",
+  "write_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Просканируй все .md файлы в каталоге docs и найди URL (http/https).\nСформируй два артефакта:\n  1) domains.json — объект domain->count (сколько раз домен встретился).\n     domain = netloc из urllib.parse.urlparse, то есть host вместе с\n     портом если он указан: для 'http://localhost:3000/dev' domain ==\n     'localhost:3000', а не 'localhost';\n  2) broken_links.txt — по одной ссылке в строке для URL, которые\n     считаются проблемными: scheme == http ИЛИ домен содержит localhost.\nДля broken_links.txt порядок строк не важен.",
+   "content_len": 529
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "path": "/docs",
+      "pattern": "**/*.md"
+     },
+     "id": "44659c48-6a33-4846-9f0d-9d53bb66e1f9"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "path": "/docs",
+     "pattern": "**/*.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/docs/a.md', '/docs/b.md', '/docs/c.md']",
+   "content_len": 42,
+   "name": "glob",
+   "tool_call_id": "44659c48-6a33-4846-9f0d-9d53bb66e1f9"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/docs/a.md"
+     },
+     "id": "b6169914-5b5a-4c8e-ba93-3d4afdebced6"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/docs/a.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tSee https://example.com/a and http://legacy.local/page.",
+   "content_len": 62,
+   "name": "read_file",
+   "tool_call_id": "b6169914-5b5a-4c8e-ba93-3d4afdebced6"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/docs/b.md"
+     },
+     "id": "8ec7f618-c867-4b2e-84af-c1406cd63ec5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/docs/b.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tRef: https://example.com/b and https://docs.site/help.",
+   "content_len": 61,
+   "name": "read_file",
+   "tool_call_id": "8ec7f618-c867-4b2e-84af-c1406cd63ec5"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/docs/c.md"
+     },
+     "id": "25fe44f6-f7ca-4227-927b-9ca8771bc3fa"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/docs/c.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tInternal http://localhost:3000/dev and https://example.com/c",
+   "content_len": 67,
+   "name": "read_file",
+   "tool_call_id": "25fe44f6-f7ca-4227-927b-9ca8771bc3fa"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"example.com\": 3,\n  \"legacy.local\": 1,\n  \"docs.site\": 1,\n  \"localhost:3000\": 1\n}",
+      "file_path": "/domains.json"
+     },
+     "id": "253995fd-6241-4c46-9e12-27f799b8c01a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"example.com\": 3,\n  \"legacy.local\": 1,\n  \"docs.site\": 1,\n  \"localhost:3000\": 1\n}",
+     "file_path": "/domains.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /domains.json",
+   "content_len": 26,
+   "name": "write_file",
+   "tool_call_id": "253995fd-6241-4c46-9e12-27f799b8c01a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "http://legacy.local/page\nhttp://localhost:3000/dev",
+      "file_path": "/broken_links.txt"
+     },
+     "id": "e167ae85-d05e-4ea2-aaa8-36620be111ab"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "http://legacy.local/page\nhttp://localhost:3000/dev",
+     "file_path": "/broken_links.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /broken_links.txt",
+   "content_len": 30,
+   "name": "write_file",
+   "tool_call_id": "e167ae85-d05e-4ea2-aaa8-36620be111ab"
+  },
+  {
+   "type": "ai",
+   "content": "Готово. Артефакты:\n\n- /domains.json — подсчёт доменов (netloc с портом, если указан):\n{\n  \"example.com\": 3,\n  \"legacy.local\": 1,\n  \"docs.site\": 1,\n  \"localhost:3000\": 1\n}\n\n- /broken_links.txt — ссылки со схемой http или содержащие localhost:\nhttp://legacy.local/page\nhttp://localhost:3000/dev",
+   "content_len": 292,
+   "finish_reason": "stop"
+  }
+ ]
+}

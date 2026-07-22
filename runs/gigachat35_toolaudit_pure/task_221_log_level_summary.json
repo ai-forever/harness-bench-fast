@@ -1,0 +1,84 @@
+{
+ "task_id": "task_221_log_level_summary",
+ "name": "Summarize INFO/WARN/ERROR counts from app.log",
+ "prompt": "В app.log каждая строка начинается с timestamp и далее уровнем INFO/WARN/ERROR. Построй level_summary.json как объект с ключами INFO,WARN,ERROR и соответствующим количеством строк каждого уровня.",
+ "passed": true,
+ "message": "level_summary.json matches expected JSON",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В app.log каждая строка начинается с timestamp и далее уровнем INFO/WARN/ERROR. Построй level_summary.json как объект с ключами INFO,WARN,ERROR и соответствующим количеством строк каждого уровня.",
+   "content_len": 195
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "app.log"
+     },
+     "id": "bd95aa6e-cc13-4f1b-a8b8-0e73c444123d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "app.log"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t2026-05-01T10:00:00Z INFO auth user=1\n     2\t2026-05-01T10:00:01Z ERROR db timeout\n     3\t2026-05-01T10:00:02Z WARN api retry\n     4\t2026-05-01T10:00:03Z ERROR api 500\n     5\t2026-05-01T10:00:04Z INFO auth user=2\n     6\t2026-05-01T10:00:05Z WARN db slow",
+   "content_len": 260,
+   "name": "read_file",
+   "tool_call_id": "bd95aa6e-cc13-4f1b-a8b8-0e73c444123d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\"INFO\": 2, \"WARN\": 2, \"ERROR\": 2}",
+      "file_path": "level_summary.json"
+     },
+     "id": "7e5c0f7e-2a41-49cf-aa72-0e25453a30ac"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\"INFO\": 2, \"WARN\": 2, \"ERROR\": 2}",
+     "file_path": "level_summary.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /level_summary.json",
+   "content_len": 32,
+   "name": "write_file",
+   "tool_call_id": "7e5c0f7e-2a41-49cf-aa72-0e25453a30ac"
+  },
+  {
+   "type": "ai",
+   "content": "Файл level_summary.json создан. В нём содержится сводка по уровням логирования:\n\n```json\n{\n  \"INFO\": 2,\n  \"WARN\": 2,\n  \"ERROR\": 2\n}\n```\n\nПодсчёт выполнен на основе содержимого файла app.log, где было найдено ровно две строки для каждого из уровней: INFO, WARN и ERROR.",
+   "content_len": 268,
+   "finish_reason": "stop"
+  }
+ ]
+}

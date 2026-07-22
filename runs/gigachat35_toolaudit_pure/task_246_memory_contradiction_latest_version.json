@@ -1,0 +1,113 @@
+{
+ "task_id": "task_246_memory_contradiction_latest_version",
+ "name": "Memory: resolve version contradiction — pick latest entry",
+ "prompt": "В памяти есть две версии проекта Nexus с разными датами. Собери `version.json` с полями: `project`, `current_version` (самая свежая), `previous_version`, `license`.",
+ "passed": true,
+ "message": "latest version correctly identified from contradicting entries",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В памяти есть две версии проекта Nexus с разными датами. Собери `version.json` с полями: `project`, `current_version` (самая свежая), `previous_version`, `license`.",
+   "content_len": 164
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/"
+     },
+     "id": "ac768037-0c17-4f88-bdda-1dcdbec63709"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/AGENTS.md', '/CHANGELOG.md', '/MEMORY.md']",
+   "content_len": 45,
+   "name": "ls",
+   "tool_call_id": "ac768037-0c17-4f88-bdda-1dcdbec63709"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/MEMORY.md"
+     },
+     "id": "03fa2864-f366-4194-8842-ac23fd468cc2"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/MEMORY.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t- Проект: Nexus\n     2\t- Версия Nexus (январь 2026): 2.1.0\n     3\t- Версия Nexus (май 2026): 3.0.0-rc1\n     4\t- Лицензия: Apache-2.0",
+   "content_len": 139,
+   "name": "read_file",
+   "tool_call_id": "03fa2864-f366-4194-8842-ac23fd468cc2"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\n  \"project\": \"Nexus\",\n  \"current_version\": \"3.0.0-rc1\",\n  \"previous_version\": \"2.1.0\",\n  \"license\": \"Apache-2.0\"\n}",
+      "file_path": "/version.json"
+     },
+     "id": "10b60f59-d28c-4013-a863-f807f933662a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\n  \"project\": \"Nexus\",\n  \"current_version\": \"3.0.0-rc1\",\n  \"previous_version\": \"2.1.0\",\n  \"license\": \"Apache-2.0\"\n}",
+     "file_path": "/version.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /version.json",
+   "content_len": 26,
+   "name": "write_file",
+   "tool_call_id": "10b60f59-d28c-4013-a863-f807f933662a"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `/version.json` успешно создан.\n\n**Содержимое файла:**\n```json\n{\n  \"project\": \"Nexus\",\n  \"current_version\": \"3.0.0-rc1\",\n  \"previous_version\": \"2.1.0\",\n  \"license\": \"Apache-2.0\"\n}\n```\n\nВерсия `3.0.0-rc1` (май 2026) определена как самая свежая и установлена в поле `current_version`.",
+   "content_len": 287,
+   "finish_reason": "stop"
+  }
+ ]
+}

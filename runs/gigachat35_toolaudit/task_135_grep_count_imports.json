@@ -1,0 +1,115 @@
+{
+ "task_id": "task_135_grep_count_imports",
+ "name": "Count `import` lines across src/*.py",
+ "prompt": "В каталоге src лежит 20 .py-файлов. Посчитай общее число строк, начинающихся со слова 'import' (то есть строк вида 'import <что-то>') во всех этих файлах. Запиши число одной строкой в файл count.txt.",
+ "passed": true,
+ "message": "count.txt matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "execute",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каталоге src лежит 20 .py-файлов. Посчитай общее число строк, начинающихся со слова 'import' (то есть строк вида 'import <что-то>') во всех этих файлах. Запиши число одной строкой в файл count.txt.",
+   "content_len": 199
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "path": "src",
+      "pattern": "*.py"
+     },
+     "id": "dc3e5967-67b5-4578-8306-72ff1aee5732"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "path": "src",
+     "pattern": "*.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['src/file_00.py', '/src/file_01.py', '/src/file_02.py', '/src/file_03.py', '/src/file_04.py', '/src/file_05.py', '/src/file_06.py', '/src/file_07.py', '/src/file_08.py', '/src/file_09.py', '/src/file_10.py', '/src/file_11.py', '/src/file_12.py', '/src/file_13.py', '/src/file_14.py', '/src/file_15.py', '/src/file_16.py', '/src/file_17.py', '/src/file_18.py', '/src/file_19.py']",
+   "content_len": 379,
+   "name": "glob",
+   "tool_call_id": "dc3e5967-67b5-4578-8306-72ff1aee5732"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "grep -h '^import ' src/*.py | wc -l"
+     },
+     "id": "b45e4194-76a6-4186-8edf-9bce5b66fdd0"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "grep -h '^import ' src/*.py | wc -l"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "      39\n\n[Command succeeded with exit code 0]",
+   "content_len": 46,
+   "name": "execute",
+   "tool_call_id": "b45e4194-76a6-4186-8edf-9bce5b66fdd0"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "39",
+      "file_path": "count.txt"
+     },
+     "id": "e1b540f5-1430-4806-92f1-448dcebeb224"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "39",
+     "file_path": "count.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /count.txt",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "e1b540f5-1430-4806-92f1-448dcebeb224"
+  },
+  {
+   "type": "ai",
+   "content": "39",
+   "content_len": 2,
+   "finish_reason": "stop"
+  }
+ ]
+}

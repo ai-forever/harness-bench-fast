@@ -1,0 +1,173 @@
+{
+ "task_id": "task_269_terminal_markdown_index",
+ "name": "Build an index from markdown H1 headings",
+ "prompt": "Найди все .md-файлы внутри docs. Для каждого возьми первый заголовок первого уровня (# Title) и создай docs_index.tsv в корне. Формат '<path>\\t<title>', пути сортируй лексикографически.",
+ "passed": false,
+ "message": "docs_index.tsv lines differ\nExpected: ['docs/api/auth.md\\tAuth API', 'docs/api/orders.md\\tOrders API', 'docs/guide/install.md\\tInstall Guide']\nActual:   ['/docs/api/auth.md\\tAuth API', '/docs/api/orders.md\\tOrders API', '/docs/guide/install.md\\tInstall Guide']",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "read_file",
+  "read_file",
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Найди все .md-файлы внутри docs. Для каждого возьми первый заголовок первого уровня (# Title) и создай docs_index.tsv в корне. Формат '<path>\\t<title>', пути сортируй лексикографически.",
+   "content_len": 185
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "path": "docs",
+      "pattern": "**/*.md"
+     },
+     "id": "5bebf39c-df70-441a-b6d9-61dd50c31a8c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "path": "docs",
+     "pattern": "**/*.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/docs/api/auth.md', '/docs/api/orders.md', '/docs/guide/install.md']",
+   "content_len": 70,
+   "name": "glob",
+   "tool_call_id": "5bebf39c-df70-441a-b6d9-61dd50c31a8c"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/docs/api/auth.md"
+     },
+     "id": "3c40ff64-d2dd-4641-a2f5-f01af39f5a2e"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/docs/api/auth.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t# Auth API\n     2\t\n     3\tDetails",
+   "content_len": 40,
+   "name": "read_file",
+   "tool_call_id": "3c40ff64-d2dd-4641-a2f5-f01af39f5a2e"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/docs/api/orders.md"
+     },
+     "id": "b112040b-1b42-49fe-b2fb-d65b015ead87"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/docs/api/orders.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t# Orders API\n     2\t\n     3\tDetails",
+   "content_len": 42,
+   "name": "read_file",
+   "tool_call_id": "b112040b-1b42-49fe-b2fb-d65b015ead87"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/docs/guide/install.md"
+     },
+     "id": "76e25d66-279f-488f-925e-e55b4973ccc6"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/docs/guide/install.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t# Install Guide\n     2\t\n     3\tDetails",
+   "content_len": 45,
+   "name": "read_file",
+   "tool_call_id": "76e25d66-279f-488f-925e-e55b4973ccc6"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "/docs/api/auth.md\tAuth API\n/docs/api/orders.md\tOrders API\n/docs/guide/install.md\tInstall Guide",
+      "file_path": "/docs_index.tsv"
+     },
+     "id": "06ef488f-de06-45af-a467-786b1d8f008f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "/docs/api/auth.md\tAuth API\n/docs/api/orders.md\tOrders API\n/docs/guide/install.md\tInstall Guide",
+     "file_path": "/docs_index.tsv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /docs_index.tsv",
+   "content_len": 28,
+   "name": "write_file",
+   "tool_call_id": "06ef488f-de06-45af-a467-786b1d8f008f"
+  },
+  {
+   "type": "ai",
+   "content": "Файл docs_index.tsv создан в корне. В нём перечислены все .md-файлы из директории docs с их первыми заголовками первого уровня, пути отсортированы лексикографически:\n\n/docs/api/auth.md\tAuth API\n/docs/api/orders.md\tOrders API\n/docs/guide/install.md\tInstall Guide",
+   "content_len": 261,
+   "finish_reason": "stop"
+  }
+ ]
+}

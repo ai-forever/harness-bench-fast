@@ -1,0 +1,117 @@
+{
+ "task_id": "task_71_count_assert",
+ "name": "Count `assert` occurrences across tests/*.py",
+ "prompt": "Посчитай, сколько раз встречается слово 'assert' (как отдельное слово или как часть строки, без учёта регистра не нужно — точное совпадение подстроки) во всех .py-файлах внутри каталога tests. Запиши число одной строкой в файл assert_count.txt.",
+ "passed": true,
+ "message": "assert_count.txt matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "grep",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Посчитай, сколько раз встречается слово 'assert' (как отдельное слово или как часть строки, без учёта регистра не нужно — точное совпадение подстроки) во всех .py-файлах внутри каталога tests. Запиши число одной строкой в файл assert_count.txt.",
+   "content_len": 244
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "pattern": "tests/**/*.py"
+     },
+     "id": "3386babf-3c3d-4da5-8773-d9789f31c5cd"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "pattern": "tests/**/*.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/tests/test_a.py', '/tests/test_b.py']",
+   "content_len": 40,
+   "name": "glob",
+   "tool_call_id": "3386babf-3c3d-4da5-8773-d9789f31c5cd"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "grep",
+     "args": {
+      "glob": "**/*.py",
+      "output_mode": "count",
+      "pattern": "assert"
+     },
+     "id": "9800a5f0-ff89-4696-9588-e17182e3e6b7"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "grep",
+    "arguments": {
+     "glob": "**/*.py",
+     "output_mode": "count",
+     "pattern": "assert"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "/tests/test_a.py: 2\n/tests/test_b.py: 1",
+   "content_len": 39,
+   "name": "grep",
+   "tool_call_id": "9800a5f0-ff89-4696-9588-e17182e3e6b7"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "3",
+      "file_path": "/assert_count.txt"
+     },
+     "id": "e38de743-a442-4321-840d-a6ddcacb829c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "3",
+     "file_path": "/assert_count.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /assert_count.txt",
+   "content_len": 30,
+   "name": "write_file",
+   "tool_call_id": "e38de743-a442-4321-840d-a6ddcacb829c"
+  },
+  {
+   "type": "ai",
+   "content": "3",
+   "content_len": 1,
+   "finish_reason": "stop"
+  }
+ ]
+}

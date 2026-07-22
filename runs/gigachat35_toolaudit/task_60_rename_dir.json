@@ -1,0 +1,111 @@
+{
+ "task_id": "task_60_rename_dir",
+ "name": "Move src/old/* to src/new/",
+ "prompt": "Переименуй каталог src/old в src/new — все файлы alpha.py и beta.py из него должны оказаться в src/new с прежним содержимым; пустого или непустого каталога src/old после этого быть не должно.",
+ "passed": true,
+ "message": "src/old/ renamed to src/new/ with content preserved",
+ "error": null,
+ "real_tool_call_names": [
+  "execute",
+  "ls",
+  "ls"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Переименуй каталог src/old в src/new — все файлы alpha.py и beta.py из него должны оказаться в src/new с прежним содержимым; пустого или непустого каталога src/old после этого быть не должно.",
+   "content_len": 191
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "mv src/old src/new"
+     },
+     "id": "a4fad80c-176d-4a5f-9457-7a54ba8938e9"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "mv src/old src/new"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "a4fad80c-176d-4a5f-9457-7a54ba8938e9"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "src/new"
+     },
+     "id": "10420714-8af1-4319-b658-7f91e4de66c7"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "src/new"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/src/new/alpha.py', '/src/new/beta.py']",
+   "content_len": 41,
+   "name": "ls",
+   "tool_call_id": "10420714-8af1-4319-b658-7f91e4de66c7"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "src"
+     },
+     "id": "54c50052-dc91-47b7-b360-168e6200c0d7"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "src"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/src/new/']",
+   "content_len": 13,
+   "name": "ls",
+   "tool_call_id": "54c50052-dc91-47b7-b360-168e6200c0d7"
+  },
+  {
+   "type": "ai",
+   "content": "Переименование выполнено: каталог `src/old` перемещён в `src/new`, файлы `alpha.py` и `beta.py` сохранены с прежним содержимым. Каталога `src/old` больше не существует.",
+   "content_len": 168,
+   "finish_reason": "stop"
+  }
+ ]
+}

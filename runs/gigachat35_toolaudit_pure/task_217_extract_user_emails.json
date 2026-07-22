@@ -1,0 +1,84 @@
+{
+ "task_id": "task_217_extract_user_emails",
+ "name": "Extract first email contact per user from nested JSON",
+ "prompt": "В input.json есть users[].contacts[]. Построй emails.json как массив объектов {id,email} для пользователей, у которых есть контакт type='email'. Бери первое такое значение. Пользователей без email не включать.",
+ "passed": true,
+ "message": "emails.json matches expected JSON",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В input.json есть users[].contacts[]. Построй emails.json как массив объектов {id,email} для пользователей, у которых есть контакт type='email'. Бери первое такое значение. Пользователей без email не включать.",
+   "content_len": 209
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/input.json"
+     },
+     "id": "60624851-3bf0-42b6-a724-493cd4f2b8a5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/input.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\"users\": [{\"id\": 1, \"contacts\": [{\"type\": \"email\", \"value\": \"a@example.com\"}, {\"type\": \"phone\", \"value\": \"+111\"}]}, {\"id\": 2, \"contacts\": [{\"type\": \"email\", \"value\": \"b@example.com\"}]}, {\"id\": 3, \"contacts\": []}]}",
+   "content_len": 221,
+   "name": "read_file",
+   "tool_call_id": "60624851-3bf0-42b6-a724-493cd4f2b8a5"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "[{\"id\": 1, \"email\": \"a@example.com\"}, {\"id\": 2, \"email\": \"b@example.com\"}]",
+      "file_path": "/emails.json"
+     },
+     "id": "d3aeb2b4-a6ad-47bb-b1d6-640099998cf3"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "[{\"id\": 1, \"email\": \"a@example.com\"}, {\"id\": 2, \"email\": \"b@example.com\"}]",
+     "file_path": "/emails.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /emails.json",
+   "content_len": 25,
+   "name": "write_file",
+   "tool_call_id": "d3aeb2b4-a6ad-47bb-b1d6-640099998cf3"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `/emails.json` создан. В него записан массив объектов `{id, email}` для пользователей с контактами типа `email`, взято первое вхождение; пользователи без email не включены.\n\nСодержимое файла:\n```json\n[{\"id\": 1, \"email\": \"a@example.com\"}, {\"id\": 2, \"email\": \"b@example.com\"}]\n```",
+   "content_len": 283,
+   "finish_reason": "stop"
+  }
+ ]
+}

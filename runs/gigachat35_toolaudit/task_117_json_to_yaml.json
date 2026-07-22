@@ -1,0 +1,113 @@
+{
+ "task_id": "task_117_json_to_yaml",
+ "name": "Convert data.json to data.yaml",
+ "prompt": "Преобразуй содержимое файла data.json (валидный JSON-объект) в формат YAML и сохрани результат в файл data.yaml. Структура данных должна остаться той же — при загрузке data.yaml через yaml.safe_load должен получиться тот же объект, что и при json.loads(data.json).",
+ "passed": true,
+ "message": "data.yaml decodes to the expected mapping",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Преобразуй содержимое файла data.json (валидный JSON-объект) в формат YAML и сохрани результат в файл data.yaml. Структура данных должна остаться той же — при загрузке data.yaml через yaml.safe_load должен получиться тот же объект, что и при json.loads(data.json).",
+   "content_len": 264
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "data.json"
+     },
+     "id": "943262aa-b968-4a59-84f1-bc047aa5bd9a"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "data.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\n     2\t  \"name\": \"demo\",\n     3\t  \"version\": 3,\n     4\t  \"debug\": false\n     5\t}",
+   "content_len": 89,
+   "name": "read_file",
+   "tool_call_id": "943262aa-b968-4a59-84f1-bc047aa5bd9a"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "name: demo\nversion: 3\ndebug: false",
+      "file_path": "data.yaml"
+     },
+     "id": "ec64878c-f258-40d1-b0fb-2be0670e6f9c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "name: demo\nversion: 3\ndebug: false",
+     "file_path": "data.yaml"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /data.yaml",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "ec64878c-f258-40d1-b0fb-2be0670e6f9c"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "data.yaml"
+     },
+     "id": "7561542a-94b6-4bc6-bf1c-ef79abf994c8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "data.yaml"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tname: demo\n     2\tversion: 3\n     3\tdebug: false",
+   "content_len": 55,
+   "name": "read_file",
+   "tool_call_id": "7561542a-94b6-4bc6-bf1c-ef79abf994c8"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `data.json` успешно преобразован в формат YAML и сохранён как `data.yaml`. Структура данных полностью сохранена.",
+   "content_len": 117,
+   "finish_reason": "stop"
+  }
+ ]
+}

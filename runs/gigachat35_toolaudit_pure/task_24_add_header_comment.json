@@ -1,0 +1,179 @@
+{
+ "task_id": "task_24_add_header_comment",
+ "name": "Prepend copyright header to src/*.py",
+ "prompt": "В каждый .py файл в каталоге src добавь первой строкой комментарий '# (c) 2026 Acme Inc.' и сразу после него — одну пустую строку. Существующее содержимое файлов сохрани без изменений.",
+ "passed": true,
+ "message": "src/a.py matches /\\A# \\(c\\) 2026 Acme Inc\\./; src/b.py matches /\\A# \\(c\\) 2026 Acme Inc\\./; src/a.py contains all expected substrings; src/b.py contains all expected substrings",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "read_file",
+  "read_file",
+  "edit_file",
+  "edit_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каждый .py файл в каталоге src добавь первой строкой комментарий '# (c) 2026 Acme Inc.' и сразу после него — одну пустую строку. Существующее содержимое файлов сохрани без изменений.",
+   "content_len": 184
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "path": "src",
+      "pattern": "**/*.py"
+     },
+     "id": "78a9fba8-c4f6-42d7-869b-38de0d52d1b5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "path": "src",
+     "pattern": "**/*.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/src/a.py', '/src/b.py']",
+   "content_len": 26,
+   "name": "glob",
+   "tool_call_id": "78a9fba8-c4f6-42d7-869b-38de0d52d1b5"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/src/a.py"
+     },
+     "id": "6742dcae-cae0-4adf-8dec-3dbe4d2b25f3"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/src/a.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\timport os\n     2\tprint(1)",
+   "content_len": 32,
+   "name": "read_file",
+   "tool_call_id": "6742dcae-cae0-4adf-8dec-3dbe4d2b25f3"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/src/b.py"
+     },
+     "id": "0abc667b-8914-4592-8245-11fdb8716585"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/src/b.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tx = 2",
+   "content_len": 12,
+   "name": "read_file",
+   "tool_call_id": "0abc667b-8914-4592-8245-11fdb8716585"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "/src/a.py",
+      "new_string": "# (c) 2026 Acme Inc.\n\nimport os",
+      "old_string": "import os"
+     },
+     "id": "f36e7e1d-3f0f-4793-b3c1-a05c6c2560d8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "/src/a.py",
+     "new_string": "# (c) 2026 Acme Inc.\n\nimport os",
+     "old_string": "import os"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/src/a.py'",
+   "content_len": 64,
+   "name": "edit_file",
+   "tool_call_id": "f36e7e1d-3f0f-4793-b3c1-a05c6c2560d8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "/src/b.py",
+      "new_string": "# (c) 2026 Acme Inc.\n\nx = 2",
+      "old_string": "x = 2"
+     },
+     "id": "27c1727e-20fc-4cc4-96a6-18272bcc786c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "/src/b.py",
+     "new_string": "# (c) 2026 Acme Inc.\n\nx = 2",
+     "old_string": "x = 2"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/src/b.py'",
+   "content_len": 64,
+   "name": "edit_file",
+   "tool_call_id": "27c1727e-20fc-4cc4-96a6-18272bcc786c"
+  },
+  {
+   "type": "ai",
+   "content": "В каждый .py файл в каталоге `src` добавлена первая строка с комментарием '# (c) 2026 Acme Inc.' и одна пустая строка после неё. Существующее содержимое файлов сохранено без изменений.\n\n- **/src/a.py**:\n```\n# (c) 2026 Acme Inc.\n\nimport os\nprint(1)\n```\n\n- **/src/b.py**:\n```\n# (c) 2026 Acme Inc.\n\nx = 2\n```",
+   "content_len": 305,
+   "finish_reason": "stop"
+  }
+ ]
+}

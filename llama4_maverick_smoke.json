@@ -1,0 +1,105 @@
+{
+  "task_set_version": "0.13.0",
+  "total": 4,
+  "passed": 1,
+  "pass_rate": 0.25,
+  "tasks": [
+    {
+      "task_id": "task_05_greet",
+      "number": 5,
+      "passed": true,
+      "message": "greeting.py: mod.greet('Аня') == 'Привет, Аня!'",
+      "elapsed_seconds": 11.594409084000006,
+      "error": null,
+      "tags": [
+        "create",
+        "python",
+        "easy"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 3,
+      "agent_tool_calls": 1,
+      "agent_shell_commands": 0,
+      "agent_events": 4,
+      "agent_llm_calls": 2,
+      "agent_input_tokens": 36897,
+      "agent_output_tokens": 471,
+      "agent_total_tokens": 37368
+    },
+    {
+      "task_id": "task_222_memory_name_pyproject",
+      "number": 222,
+      "passed": false,
+      "message": "MEMORY.md doesn't have a '- Имя: Анна Петрова' entry in list format",
+      "elapsed_seconds": 12.402659374999985,
+      "error": null,
+      "tags": [
+        "memory",
+        "save",
+        "toml",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 1,
+      "agent_tool_calls": 0,
+      "agent_shell_commands": 0,
+      "agent_events": 2,
+      "agent_llm_calls": 1,
+      "agent_input_tokens": 16560,
+      "agent_output_tokens": 1179,
+      "agent_total_tokens": 17739
+    },
+    {
+      "task_id": "task_314_skill_r1_brand_landing",
+      "number": 314,
+      "passed": false,
+      "message": "index.html does not match /#0b3d2e/",
+      "elapsed_seconds": 21.813739666999993,
+      "error": null,
+      "tags": [
+        "skill",
+        "brand",
+        "office",
+        "html",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 11,
+      "agent_tool_calls": 5,
+      "agent_shell_commands": 0,
+      "agent_events": 12,
+      "agent_llm_calls": 6,
+      "agent_input_tokens": 106611,
+      "agent_output_tokens": 2325,
+      "agent_total_tokens": 108936
+    },
+    {
+      "task_id": "task_339_adv_false_python_version",
+      "number": 339,
+      "passed": false,
+      "message": "pytest exit=1; tail: '  def test_server_error():\\n>       assert classify(500) == \"error\"\\nE       AssertionError: assert \\'unknown\\' == \\'error\\'\\nE         \\nE         - error\\nE         + unknown\\n\\ntests/test_classify.py:10: AssertionError\\n=========================== short test summary info ============================\\nFAILED tests/test_classify.py::test_server_error - AssertionError: assert \\'un...\\n1 failed, 2 passed in 0.02s'",
+      "elapsed_seconds": 14.221053667000007,
+      "error": null,
+      "tags": [
+        "adversarial",
+        "python",
+        "pytest",
+        "distractor",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 6,
+      "agent_tool_calls": 3,
+      "agent_shell_commands": 0,
+      "agent_events": 7,
+      "agent_llm_calls": 3,
+      "agent_input_tokens": 50319,
+      "agent_output_tokens": 1029,
+      "agent_total_tokens": 51348
+    }
+  ]
+}

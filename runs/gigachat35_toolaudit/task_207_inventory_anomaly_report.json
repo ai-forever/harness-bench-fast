@@ -1,0 +1,171 @@
+{
+ "task_id": "task_207_inventory_anomaly_report",
+ "name": "Apply CSV deltas to sqlite stock and report anomalies",
+ "prompt": "В inventory.db есть таблица stock(sku,qty). В adjustments.csv лежат sku,delta.\nНужно применить дельты и сформировать anomalies.json:\n  - negative_stock: список объектов {sku, final_qty} для SKU, у которых    итоговый qty < 0;\n  - unknown_sku: список SKU из adjustments.csv, которых нет в stock.\nИтоговый JSON должен содержать оба ключа.",
+ "passed": true,
+ "message": "anomalies.json contains expected negative and unknown SKU sections",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "execute",
+  "write_file",
+  "execute",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В inventory.db есть таблица stock(sku,qty). В adjustments.csv лежат sku,delta.\nНужно применить дельты и сформировать anomalies.json:\n  - negative_stock: список объектов {sku, final_qty} для SKU, у которых    итоговый qty < 0;\n  - unknown_sku: список SKU из adjustments.csv, которых нет в stock.\nИтоговый JSON должен содержать оба ключа.",
+   "content_len": 336
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "adjustments.csv"
+     },
+     "id": "e922166b-728e-4905-b70c-5725134409ab"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "adjustments.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tsku,delta\n     2\tA,-4\n     3\tB,-10\n     4\tC,3\n     5\tX,8\n     6\tD,-1",
+   "content_len": 75,
+   "name": "read_file",
+   "tool_call_id": "e922166b-728e-4905-b70c-5725134409ab"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -c \"import sqlite3; conn=sqlite3.connect('inventory.db'); cur=conn.cursor(); cur.execute('SELECT sku, qty FROM stock'); rows=cur.fetchall(); print({r[0]: r[1] for r in rows})\""
+     },
+     "id": "67a40c45-c450-4c41-bf84-d7dfeeca91f5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -c \"import sqlite3; conn=sqlite3.connect('inventory.db'); cur=conn.cursor(); cur.execute('SELECT sku, qty FROM stock'); rows=cur.fetchall(); print({r[0]: r[1] for r in rows})\""
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "{'A': 10, 'B': 5, 'C': 0, 'D': 3}\n\n[Command succeeded with exit code 0]",
+   "content_len": 71,
+   "name": "execute",
+   "tool_call_id": "67a40c45-c450-4c41-bf84-d7dfeeca91f5"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import csv\nimport json\nimport sqlite3\n\n# Load stock from DB\nconn = sqlite3.connect('inventory.db')\ncur = conn.cursor()\ncur.execute('SELECT sku, qty FROM stock')\nstock = {row[0]: row[1] for row in cur.fetchall()}\noriginal_stock = stock.copy()\n\nunknown_sku = []\nadjustments = []\nwith open('adjustments.csv', newline='') as f:\n    reader = csv.DictReader(f)\n    for row in reader:\n        sku = row['sku']\n        delta = int(row['delta'])\n        adjustments.append((sku, delta))\n        if sku not in stock:\n            unknown_sku.append(sku)\n            continue\n        stock[sku] += delta\n\nnegative_stock = [{'sku': s, 'final_qty': q} for s, q in stock.items() if q < 0]\n\nresult = {\n    'negative_stock': negative_stock,\n    'unknown_sku': sorted(set(unknown_sku)),\n}\n\nwith open('anomalies.json', 'w') as out:\n    json.dump(result, out, ensure_ascii=False, indent=2)",
+      "file_path": "apply_adjustments.py"
+     },
+     "id": "719c68e5-90f1-427b-80f6-d20247a6b17c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import csv\nimport json\nimport sqlite3\n\n# Load stock from DB\nconn = sqlite3.connect('inventory.db')\ncur = conn.cursor()\ncur.execute('SELECT sku, qty FROM stock')\nstock = {row[0]: row[1] for row in cur.fetchall()}\noriginal_stock = stock.copy()\n\nunknown_sku = []\nadjustments = []\nwith open('adjustments.csv', newline='') as f:\n    reader = csv.DictReader(f)\n    for row in reader:\n        sku = row['sku']\n        delta = int(row['delta'])\n        adjustments.append((sku, delta))\n        if sku not in stock:\n            unknown_sku.append(sku)\n            continue\n        stock[sku] += delta\n\nnegative_stock = [{'sku': s, 'final_qty': q} for s, q in stock.items() if q < 0]\n\nresult = {\n    'negative_stock': negative_stock,\n    'unknown_sku': sorted(set(unknown_sku)),\n}\n\nwith open('anomalies.json', 'w') as out:\n    json.dump(result, out, ensure_ascii=False, indent=2)",
+     "file_path": "apply_adjustments.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /apply_adjustments.py",
+   "content_len": 34,
+   "name": "write_file",
+   "tool_call_id": "719c68e5-90f1-427b-80f6-d20247a6b17c"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python apply_adjustments.py"
+     },
+     "id": "75d9c26d-85a3-462e-8cc0-0b877145502c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python apply_adjustments.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "75d9c26d-85a3-462e-8cc0-0b877145502c"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "anomalies.json"
+     },
+     "id": "4c17f7b0-14a7-43ec-b820-5d5dd0d90912"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "anomalies.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t{\n     2\t  \"negative_stock\": [\n     3\t    {\n     4\t      \"sku\": \"B\",\n     5\t      \"final_qty\": -5\n     6\t    }\n     7\t  ],\n     8\t  \"unknown_sku\": [\n     9\t    \"X\"\n    10\t  ]\n    11\t}",
+   "content_len": 190,
+   "name": "read_file",
+   "tool_call_id": "4c17f7b0-14a7-43ec-b820-5d5dd0d90912"
+  },
+  {
+   "type": "ai",
+   "content": "anomalies.json:\n{\n  \"negative_stock\": [\n    {\n      \"sku\": \"B\",\n      \"final_qty\": -5\n    }\n  ],\n  \"unknown_sku\": [\n    \"X\"\n  ]\n}",
+   "content_len": 129,
+   "finish_reason": "stop"
+  }
+ ]
+}

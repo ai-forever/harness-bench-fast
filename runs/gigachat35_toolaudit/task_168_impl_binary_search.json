@@ -1,0 +1,84 @@
+{
+ "task_id": "task_168_impl_binary_search",
+ "name": "Implement binary_search(arr, target) so pytest passes",
+ "prompt": "Создай файл bsearch.py с функцией binary_search(arr: list[int], target: int) -> int, которая возвращает индекс target в отсортированном массиве arr, либо -1 если target отсутствует. В каталоге tests лежит test_bsearch.py — тесты должны пройти.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл bsearch.py с функцией binary_search(arr: list[int], target: int) -> int, которая возвращает индекс target в отсортированном массиве arr, либо -1 если target отсутствует. В каталоге tests лежит test_bsearch.py — тесты должны пройти.",
+   "content_len": 243
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "def binary_search(arr: list[int], target: int) -> int:\n    \"\"\"\n    Выполняет бинарный поиск элемента в отсортированном массиве.\n\n    :param arr: Отсортированный список целых чисел для поиска.\n    :param target: Целое число, которое нужно найти.\n    :return: Индекс искомого элемента, если он найден. В противном случае -1.\n    \"\"\"\n    left = 0\n    right = len(arr) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return -1",
+      "file_path": "bsearch.py"
+     },
+     "id": "c40e6f50-eab1-4ecc-ae16-c4e5e5147ce5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "def binary_search(arr: list[int], target: int) -> int:\n    \"\"\"\n    Выполняет бинарный поиск элемента в отсортированном массиве.\n\n    :param arr: Отсортированный список целых чисел для поиска.\n    :param target: Целое число, которое нужно найти.\n    :return: Индекс искомого элемента, если он найден. В противном случае -1.\n    \"\"\"\n    left = 0\n    right = len(arr) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return -1",
+     "file_path": "bsearch.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /bsearch.py",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "c40e6f50-eab1-4ecc-ae16-c4e5e5147ce5"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -m pytest tests/test_bsearch.py -v"
+     },
+     "id": "ea315c0f-7bc5-406b-890b-6e233ba7b914"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -m pytest tests/test_bsearch.py -v"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.12, pytest-9.0.3, pluggy-1.6.0 -- /Users/krestnikov/giga/harness-bench-fast/.venv/bin/python\ncachedir: .pytest_cache\nrootdir: /private/var/folders/81/xpcl3q6d0jqf831cy52ltwfm0000gn/T/hbta_task_168_impl_binary_search_nja45g0s\nplugins: langsmith-0.9.4, anyio-4.14.1\ncollecting ... collected 5 items\n\ntests/test_bsearch.py::test_found_middle PASSED                          [ 20%]\ntests/test_bsearch.py::test_found_first PASSED                           [ 40%]\ntests/test_bsearch.py::test_found_last PASSED                            [ 60%]\ntests/test_bsearch.py::test_not_found PASSED                             [ 80%]\ntests/test_bsearch.py::test_empty PASSED                                 [100%]\n\n============================== 5 passed in 0.01s ===============================\n\n[Command succeeded with exit code 0]",
+   "content_len": 929,
+   "name": "execute",
+   "tool_call_id": "ea315c0f-7bc5-406b-890b-6e233ba7b914"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `bsearch.py` с функцией `binary_search` успешно создан. Все тесты в файле `tests/test_bsearch.py` пройдены.\n\nСодержимое файла `bsearch.py`:\n```python\ndef binary_search(arr: list[int], target: int) -> int:\n    \"\"\"\n    Выполняет бинарный поиск элемента в отсортированном массиве.\n\n    :param arr: Отсортированный список целых чисел для поиска.\n    :param target: Целое число, которое нужно найти.\n    :return: Индекс искомого элемента, если он найден. В противном случае -1.\n    \"\"\"\n    left = 0\n    right = len(arr) - 1\n\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n\n    return -1\n```",
+   "content_len": 757,
+   "finish_reason": "stop"
+  }
+ ]
+}

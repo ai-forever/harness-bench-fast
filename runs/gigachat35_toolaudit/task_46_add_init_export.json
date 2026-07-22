@@ -1,0 +1,55 @@
+{
+ "task_id": "task_46_add_init_export",
+ "name": "Create src/__init__.py with __all__ = ['foo', 'bar']",
+ "prompt": "В каталоге src создай файл __init__.py. В нём должно быть ровно одно присваивание: переменной __all__ списка ['foo', 'bar'] (именно такой список из двух строк, в указанном порядке). Иных строк добавлять не нужно.",
+ "passed": true,
+ "message": "src/__init__.py exists; src/__init__.py matches /__all__\\s*=\\s*\\[\\s*['\\\"]foo['\\\"]\\s*,\\s*['\\\"]bar['\\\"]\\s*\\]/",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каталоге src создай файл __init__.py. В нём должно быть ровно одно присваивание: переменной __all__ списка ['foo', 'bar'] (именно такой список из двух строк, в указанном порядке). Иных строк добавлять не нужно.",
+   "content_len": 212
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "__all__ = ['foo', 'bar']",
+      "file_path": "src/__init__.py"
+     },
+     "id": "507ce621-e61f-4809-91e2-fc870e9e0bd3"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "__all__ = ['foo', 'bar']",
+     "file_path": "src/__init__.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /src/__init__.py",
+   "content_len": 29,
+   "name": "write_file",
+   "tool_call_id": "507ce621-e61f-4809-91e2-fc870e9e0bd3"
+  },
+  {
+   "type": "ai",
+   "content": "Файл src/__init__.py создан. Его единственное содержимое: `__all__ = ['foo', 'bar']`.",
+   "content_len": 85,
+   "finish_reason": "stop"
+  }
+ ]
+}

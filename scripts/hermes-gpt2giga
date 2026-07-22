@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+  echo "usage: hermes-gpt2giga MODEL PROMPT" >&2
+  exit 2
+fi
+
+model="$1"
+shift
+prompt="$1"
+
+export HOME="$PWD"
+HERMES_HOME="$(mktemp -d "${TMPDIR:-/tmp}/hermes_state_XXXXXX")"
+export HERMES_HOME
+mkdir -p "$HERMES_HOME"
+cat > "$HERMES_HOME/config.yaml" <<YAML
+model:
+  provider: custom
+  default: "$model"
+  base_url: "http://127.0.0.1:8090/v1"
+  api_key: "dummy"
+  api_mode: chat_completions
+YAML
+
+hermes --provider custom --model "$model" --yolo -z "$prompt"
+rc=$?
+rm -rf "$HERMES_HOME"
+exit "$rc"

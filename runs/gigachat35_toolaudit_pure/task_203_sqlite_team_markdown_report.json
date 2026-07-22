@@ -1,0 +1,113 @@
+{
+ "task_id": "task_203_sqlite_team_markdown_report",
+ "name": "Build markdown KPI report from support.db tickets",
+ "prompt": "В support.db есть таблица tickets(id, team, status, hours). Построй отчет team_report.md в виде markdown-таблицы с колонками team | open | closed | closed_hours, где:\n  - open = количество тикетов status='open',\n  - closed = количество тикетов status='closed',\n  - closed_hours = сумма hours только по status='closed'.\nСтроки отсортируй по team по возрастанию. После таблицы добавь пустую строку и строку вида TOTAL_OPEN=<число>.",
+ "passed": true,
+ "message": "team_report.md matches expected report",
+ "error": null,
+ "real_tool_call_names": [
+  "execute",
+  "execute",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В support.db есть таблица tickets(id, team, status, hours). Построй отчет team_report.md в виде markdown-таблицы с колонками team | open | closed | closed_hours, где:\n  - open = количество тикетов status='open',\n  - closed = количество тикетов status='closed',\n  - closed_hours = сумма hours только по status='closed'.\nСтроки отсортируй по team по возрастанию. После таблицы добавь пустую строку и строку вида TOTAL_OPEN=<число>.",
+   "content_len": 429
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "sqlite3 support.db << 'SQL'\n.headers on\n.mode markdown\nSELECT team,\n       SUM(CASE WHEN status='open' THEN 1 ELSE 0 END) AS open,\n       SUM(CASE WHEN status='closed' THEN 1 ELSE 0 END) AS closed,\n       SUM(CASE WHEN status='closed' THEN hours ELSE 0 END) AS closed_hours\nFROM tickets\nGROUP BY team\nORDER BY team;\nSQL"
+     },
+     "id": "e4ed6580-a209-4256-afda-d018039ae577"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "sqlite3 support.db << 'SQL'\n.headers on\n.mode markdown\nSELECT team,\n       SUM(CASE WHEN status='open' THEN 1 ELSE 0 END) AS open,\n       SUM(CASE WHEN status='closed' THEN 1 ELSE 0 END) AS closed,\n       SUM(CASE WHEN status='closed' THEN hours ELSE 0 END) AS closed_hours\nFROM tickets\nGROUP BY team\nORDER BY team;\nSQL"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "| team  | open | closed | closed_hours |\n|-------|------|--------|--------------|\n| alpha | 1    | 2      | 8            |\n| beta  | 2    | 1      | 2            |\n| gamma | 0    | 2      | 8            |\n\n[Command succeeded with exit code 0]",
+   "content_len": 242,
+   "name": "execute",
+   "tool_call_id": "e4ed6580-a209-4256-afda-d018039ae577"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "sqlite3 support.db << 'SQL'\nSELECT SUM(CASE WHEN status='open' THEN 1 ELSE 0 END) AS total_open\nFROM tickets;\nSQL"
+     },
+     "id": "8b6ea5be-f236-406c-b89a-ea7a4c0f1251"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "sqlite3 support.db << 'SQL'\nSELECT SUM(CASE WHEN status='open' THEN 1 ELSE 0 END) AS total_open\nFROM tickets;\nSQL"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "3\n\n[Command succeeded with exit code 0]",
+   "content_len": 39,
+   "name": "execute",
+   "tool_call_id": "8b6ea5be-f236-406c-b89a-ea7a4c0f1251"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "| team  | open | closed | closed_hours |\n|-------|------|--------|--------------|\n| alpha | 1    | 2      | 8            |\n| beta  | 2    | 1      | 2            |\n| gamma | 0    | 2      | 8            |\n\nTOTAL_OPEN=3",
+      "file_path": "/team_report.md"
+     },
+     "id": "78ceda94-5cc1-44dd-be2b-dcb0da1c7749"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "| team  | open | closed | closed_hours |\n|-------|------|--------|--------------|\n| alpha | 1    | 2      | 8            |\n| beta  | 2    | 1      | 2            |\n| gamma | 0    | 2      | 8            |\n\nTOTAL_OPEN=3",
+     "file_path": "/team_report.md"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /team_report.md",
+   "content_len": 28,
+   "name": "write_file",
+   "tool_call_id": "78ceda94-5cc1-44dd-be2b-dcb0da1c7749"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `/team_report.md` успешно создан. Его содержимое:\n\n```\n| team  | open | closed | closed_hours |\n|-------|------|--------|--------------|\n| alpha | 1    | 2      | 8            |\n| beta  | 2    | 1      | 2            |\n| gamma | 0    | 2      | 8            |\n\nTOTAL_OPEN=3\n```",
+   "content_len": 282,
+   "finish_reason": "stop"
+  }
+ ]
+}

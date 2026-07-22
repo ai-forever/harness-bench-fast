@@ -1,0 +1,119 @@
+{
+ "task_id": "task_139_grep_log_errors",
+ "name": "Count ERROR lines across logs/*.log",
+ "prompt": "В каталоге logs 6 файлов вида app*.log. Посчитай общее количество строк, начинающихся со слова 'ERROR' (то есть точно с этих пяти символов), во всех этих файлах. Запиши число одной строкой в файл errors_count.txt.",
+ "passed": false,
+ "message": "errors_count.txt content differs\nExpected: '5'\nActual:   '0'",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "grep",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каталоге logs 6 файлов вида app*.log. Посчитай общее количество строк, начинающихся со слова 'ERROR' (то есть точно с этих пяти символов), во всех этих файлах. Запиши число одной строкой в файл errors_count.txt.",
+   "content_len": 213
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/logs"
+     },
+     "id": "0bbe447c-8cdc-4a4b-b545-e5e2c7e588d6"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/logs"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/logs/app1.log', '/logs/app2.log', '/logs/app3.log', '/logs/app4.log', '/logs/app5.log', '/logs/app6.log']",
+   "content_len": 108,
+   "name": "ls",
+   "tool_call_id": "0bbe447c-8cdc-4a4b-b545-e5e2c7e588d6"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "grep",
+     "args": {
+      "glob": "app*.log",
+      "output_mode": "count",
+      "path": "/logs",
+      "pattern": "^ERROR"
+     },
+     "id": "b37c2fcc-1383-4fb8-93d1-954e3c80d7e8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "grep",
+    "arguments": {
+     "glob": "app*.log",
+     "output_mode": "count",
+     "path": "/logs",
+     "pattern": "^ERROR"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "No matches found",
+   "content_len": 16,
+   "name": "grep",
+   "tool_call_id": "b37c2fcc-1383-4fb8-93d1-954e3c80d7e8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "0",
+      "file_path": "/errors_count.txt"
+     },
+     "id": "656ff2f2-b14f-48c1-8453-e05c73715b26"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "0",
+     "file_path": "/errors_count.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /errors_count.txt",
+   "content_len": 30,
+   "name": "write_file",
+   "tool_call_id": "656ff2f2-b14f-48c1-8453-e05c73715b26"
+  },
+  {
+   "type": "ai",
+   "content": "0",
+   "content_len": 1,
+   "finish_reason": "stop"
+  }
+ ]
+}

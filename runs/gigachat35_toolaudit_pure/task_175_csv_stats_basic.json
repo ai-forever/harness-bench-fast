@@ -1,0 +1,316 @@
+{
+ "task_id": "task_175_csv_stats_basic",
+ "name": "Compute mean/median/min/max of a CSV column",
+ "prompt": "В файле numbers.csv 20 строк данных (одна колонка value, плюс заголовок). Посчитай по этой колонке четыре значения: mean (среднее арифметическое), median (медиана как (a+b)/2 для чётного количества элементов), min, max. Сохрани результат в stats.json как объект с ключами 'mean', 'median', 'min', 'max'. mean можно округлить до 2 знаков после запятой; median не округлять (может быть дробным, например 22.5); min и max — целые числа.",
+ "passed": true,
+ "message": "stats.json has mean, median, min, max within tolerance",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_todos",
+  "execute",
+  "execute",
+  "write_file",
+  "write_todos"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле numbers.csv 20 строк данных (одна колонка value, плюс заголовок). Посчитай по этой колонке четыре значения: mean (среднее арифметическое), median (медиана как (a+b)/2 для чётного количества элементов), min, max. Сохрани результат в stats.json как объект с ключами 'mean', 'median', 'min', 'max'. mean можно округлить до 2 знаков после запятой; median не округлять (может быть дробным, например 22.5); min и max — целые числа.",
+   "content_len": 433
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/numbers.csv"
+     },
+     "id": "40a15b73-0334-4dc5-8502-19799a8bf130"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/numbers.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tvalue\n     2\t12\n     3\t18\n     4\t25\n     5\t31\n     6\t8\n     7\t22\n     8\t27\n     9\t19\n    10\t33\n    11\t16\n    12\t21\n    13\t24\n    14\t30\n    15\t14\n    16\t26\n    17\t29\n    18\t11\n    19\t20\n    20\t28\n    21\t23",
+   "content_len": 211,
+   "name": "read_file",
+   "tool_call_id": "40a15b73-0334-4dc5-8502-19799a8bf130"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_todos",
+     "args": {
+      "todos": [
+       {
+        "content": "Извлечь числовые значения из файла numbers.csv",
+        "status": "in_progress"
+       },
+       {
+        "content": "Отсортировать список чисел для вычисления медианы и поиска min/max",
+        "status": "pending"
+       },
+       {
+        "content": "Вычислить среднее арифметическое (mean) с округлением до 2 знаков",
+        "status": "pending"
+       },
+       {
+        "content": "Вычислить медиану (median) как среднее двух средних элементов",
+        "status": "pending"
+       },
+       {
+        "content": "Найти минимальное (min) и максимальное (max) значения",
+        "status": "pending"
+       },
+       {
+        "content": "Сформировать объект со статистикой в требуемом формате",
+        "status": "pending"
+       },
+       {
+        "content": "Записать результат в файл stats.json",
+        "status": "pending"
+       }
+      ]
+     },
+     "id": "9a64b4d0-21fd-4b8c-aed7-d61a425eaa6d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_todos",
+    "arguments": {
+     "todos": [
+      {
+       "content": "Извлечь числовые значения из файла numbers.csv",
+       "status": "in_progress"
+      },
+      {
+       "content": "Отсортировать список чисел для вычисления медианы и поиска min/max",
+       "status": "pending"
+      },
+      {
+       "content": "Вычислить среднее арифметическое (mean) с округлением до 2 знаков",
+       "status": "pending"
+      },
+      {
+       "content": "Вычислить медиану (median) как среднее двух средних элементов",
+       "status": "pending"
+      },
+      {
+       "content": "Найти минимальное (min) и максимальное (max) значения",
+       "status": "pending"
+      },
+      {
+       "content": "Сформировать объект со статистикой в требуемом формате",
+       "status": "pending"
+      },
+      {
+       "content": "Записать результат в файл stats.json",
+       "status": "pending"
+      }
+     ]
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated todo list to [{'content': 'Извлечь числовые значения из файла numbers.csv', 'status': 'in_progress'}, {'content': 'Отсортировать список чисел для вычисления медианы и поиска min/max', 'status': 'pending'}, {'content': 'Вычислить среднее арифметическое (mean) с округлением до 2 знаков', 'status': 'pending'}, {'content': 'Вычислить медиану (median) как среднее двух средних элементов', 'status': 'pending'}, {'content': 'Найти минимальное (min) и максимальное (max) значения', 'status': 'pending'}, {'content': 'Сформировать объект со статистикой в требуемом формате', 'status': 'pending'}, {'content': 'Записать результат в файл stats.json', 'status': 'pending'}]",
+   "content_len": 672,
+   "name": "write_todos",
+   "tool_call_id": "9a64b4d0-21fd-4b8c-aed7-d61a425eaa6d"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python3 -c \"import csv, json; with open('numbers.csv') as f: reader = csv.DictReader(f); values = [int(row['value']) for row in reader]; sorted_vals = sorted(values); mean_val = round(sum(values)/len(values), 2); median_val = (sorted_vals[9] + sorted_vals[10]) / 2; min_val = sorted_vals[0]; max_val = sorted_vals[-1]; stats = {'mean': mean_val, 'median': median_val, 'min': min_val, 'max': max_val}; print(json.dumps(stats))\""
+     },
+     "id": "34054d8b-428f-4c3d-9c04-8daff2571125"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python3 -c \"import csv, json; with open('numbers.csv') as f: reader = csv.DictReader(f); values = [int(row['value']) for row in reader]; sorted_vals = sorted(values); mean_val = round(sum(values)/len(values), 2); median_val = (sorted_vals[9] + sorted_vals[10]) / 2; min_val = sorted_vals[0]; max_val = sorted_vals[-1]; stats = {'mean': mean_val, 'median': median_val, 'min': min_val, 'max': max_val}; print(json.dumps(stats))\""
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "[stderr] File \"<string>\", line 1\n[stderr]     import csv, json; with open('numbers.csv') as f: reader = csv.DictReader(f); values = [int(row['value']) for row in reader]; sorted_vals = sorted(values); mean_val = round(sum(values)/len(values), 2); median_val = (sorted_vals[9] + sorted_vals[10]) / 2; min_val = sorted_vals[0]; max_val = sorted_vals[-1]; stats = {'mean': mean_val, 'median': median_val, 'min': min_val, 'max': max_val}; print(json.dumps(stats))\n[stderr]                       ^^^^\n[stderr] SyntaxError: invalid syntax\n\nExit code: 1\n[Command failed with exit code 1]",
+   "content_len": 580,
+   "name": "execute",
+   "tool_call_id": "34054d8b-428f-4c3d-9c04-8daff2571125"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python3 - << 'EOF'\nimport csv, json\nwith open('numbers.csv') as f:\n    reader = csv.DictReader(f)\n    values = [int(row['value']) for row in reader]\nsorted_vals = sorted(values)\nmean_val = round(sum(values)/len(values), 2)\nmedian_val = (sorted_vals[9] + sorted_vals[10]) / 2\nmin_val = sorted_vals[0]\nmax_val = sorted_vals[-1]\nstats = {'mean': mean_val, 'median': median_val, 'min': min_val, 'max': max_val}\nprint(json.dumps(stats))\nEOF"
+     },
+     "id": "ef08085d-a585-4862-844d-e0f20640bb14"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python3 - << 'EOF'\nimport csv, json\nwith open('numbers.csv') as f:\n    reader = csv.DictReader(f)\n    values = [int(row['value']) for row in reader]\nsorted_vals = sorted(values)\nmean_val = round(sum(values)/len(values), 2)\nmedian_val = (sorted_vals[9] + sorted_vals[10]) / 2\nmin_val = sorted_vals[0]\nmax_val = sorted_vals[-1]\nstats = {'mean': mean_val, 'median': median_val, 'min': min_val, 'max': max_val}\nprint(json.dumps(stats))\nEOF"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "{\"mean\": 21.85, \"median\": 22.5, \"min\": 8, \"max\": 33}\n\n[Command succeeded with exit code 0]",
+   "content_len": 90,
+   "name": "execute",
+   "tool_call_id": "ef08085d-a585-4862-844d-e0f20640bb14"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "{\"mean\": 21.85, \"median\": 22.5, \"min\": 8, \"max\": 33}",
+      "file_path": "/stats.json"
+     },
+     "id": "0f647267-5ec8-4a01-b148-32ce9f82b010"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "{\"mean\": 21.85, \"median\": 22.5, \"min\": 8, \"max\": 33}",
+     "file_path": "/stats.json"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /stats.json",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "0f647267-5ec8-4a01-b148-32ce9f82b010"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_todos",
+     "args": {
+      "todos": [
+       {
+        "content": "Извлечь числовые значения из файла numbers.csv",
+        "status": "completed"
+       },
+       {
+        "content": "Отсортировать список чисел для вычисления медианы и поиска min/max",
+        "status": "completed"
+       },
+       {
+        "content": "Вычислить среднее арифметическое (mean) с округлением до 2 знаков",
+        "status": "completed"
+       },
+       {
+        "content": "Вычислить медиану (median) как среднее двух средних элементов",
+        "status": "completed"
+       },
+       {
+        "content": "Найти минимальное (min) и максимальное (max) значения",
+        "status": "completed"
+       },
+       {
+        "content": "Сформировать объект со статистикой в требуемом формате",
+        "status": "completed"
+       },
+       {
+        "content": "Записать результат в файл stats.json",
+        "status": "completed"
+       }
+      ]
+     },
+     "id": "29d447aa-b3b2-4fde-8694-a09bc39e98a8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_todos",
+    "arguments": {
+     "todos": [
+      {
+       "content": "Извлечь числовые значения из файла numbers.csv",
+       "status": "completed"
+      },
+      {
+       "content": "Отсортировать список чисел для вычисления медианы и поиска min/max",
+       "status": "completed"
+      },
+      {
+       "content": "Вычислить среднее арифметическое (mean) с округлением до 2 знаков",
+       "status": "completed"
+      },
+      {
+       "content": "Вычислить медиану (median) как среднее двух средних элементов",
+       "status": "completed"
+      },
+      {
+       "content": "Найти минимальное (min) и максимальное (max) значения",
+       "status": "completed"
+      },
+      {
+       "content": "Сформировать объект со статистикой в требуемом формате",
+       "status": "completed"
+      },
+      {
+       "content": "Записать результат в файл stats.json",
+       "status": "completed"
+      }
+     ]
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated todo list to [{'content': 'Извлечь числовые значения из файла numbers.csv', 'status': 'completed'}, {'content': 'Отсортировать список чисел для вычисления медианы и поиска min/max', 'status': 'completed'}, {'content': 'Вычислить среднее арифметическое (mean) с округлением до 2 знаков', 'status': 'completed'}, {'content': 'Вычислить медиану (median) как среднее двух средних элементов', 'status': 'completed'}, {'content': 'Найти минимальное (min) и максимальное (max) значения', 'status': 'completed'}, {'content': 'Сформировать объект со статистикой в требуемом формате', 'status': 'completed'}, {'content': 'Записать результат в файл stats.json', 'status': 'completed'}]",
+   "content_len": 682,
+   "name": "write_todos",
+   "tool_call_id": "29d447aa-b3b2-4fde-8694-a09bc39e98a8"
+  },
+  {
+   "type": "ai",
+   "content": "Результат вычислений сохранён в файл `/stats.json`.\n\nСодержимое файла:\n```json\n{\"mean\": 21.85, \"median\": 22.5, \"min\": 8, \"max\": 33}\n```\n\n**Значения по колонке `value`:**\n- **Mean (среднее):** 21.85\n- **Median (медиана):** 22.5\n- **Min (минимум):** 8\n- **Max (максимум):** 33",
+   "content_len": 274,
+   "finish_reason": "stop"
+  }
+ ]
+}

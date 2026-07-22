@@ -1,0 +1,4 @@
+#!/bin/bash
+# opencode headless via gpt2giga(3.5) on :8091 — absolute paths only.
+export OPENCODE_CONFIG_CONTENT='{"provider":{"giga":{"npm":"@ai-sdk/openai-compatible","name":"giga","options":{"baseURL":"http://127.0.0.1:8091/v1","apiKey":"dummy"},"models":{"GigaChat-3.5-432B-A28B":{"name":"GigaChat 3.5"}}}}}'
+exec /Users/krestnikov/.bun/bin/opencode run --model giga/GigaChat-3.5-432B-A28B "$@"

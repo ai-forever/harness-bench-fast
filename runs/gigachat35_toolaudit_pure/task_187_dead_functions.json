@@ -1,0 +1,142 @@
+{
+ "task_id": "task_187_dead_functions",
+ "name": "Find functions defined in utils.py but never called from main.py",
+ "prompt": "В каталоге code два файла:\n  - utils.py — определяет четыре функции (used_once, used_twice, never_called, also_dead);\n  - main.py — импортирует и вызывает что-то из них.\nСделай файл dead.txt со списком имён функций, которые ОПРЕДЕЛЕНЫ в utils.py, но НИ РАЗУ не вызываются из main.py (то есть в main.py не встречается подстрока '<имя>('). Записывай по одному имени на строку, порядок не важен.",
+ "passed": true,
+ "message": "dead.txt lists the two unused functions",
+ "error": null,
+ "real_tool_call_names": [
+  "ls",
+  "read_file",
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В каталоге code два файла:\n  - utils.py — определяет четыре функции (used_once, used_twice, never_called, also_dead);\n  - main.py — импортирует и вызывает что-то из них.\nСделай файл dead.txt со списком имён функций, которые ОПРЕДЕЛЕНЫ в utils.py, но НИ РАЗУ не вызываются из main.py (то есть в main.py не встречается подстрока '<имя>('). Записывай по одному имени на строку, порядок не важен.",
+   "content_len": 392
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "ls",
+     "args": {
+      "path": "/code"
+     },
+     "id": "2268a390-e484-428a-ba44-b032dada00d3"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "ls",
+    "arguments": {
+     "path": "/code"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/code/main.py', '/code/utils.py']",
+   "content_len": 35,
+   "name": "ls",
+   "tool_call_id": "2268a390-e484-428a-ba44-b032dada00d3"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/code/utils.py"
+     },
+     "id": "ecb2c39e-e4fd-40ed-afb6-799694ca2763"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/code/utils.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdef used_once():\n     2\t    return 1\n     3\t\n     4\t\n     5\tdef used_twice():\n     6\t    return 2\n     7\t\n     8\t\n     9\tdef never_called():\n    10\t    return 3\n    11\t\n    12\t\n    13\tdef also_dead():\n    14\t    return 4",
+   "content_len": 227,
+   "name": "read_file",
+   "tool_call_id": "ecb2c39e-e4fd-40ed-afb6-799694ca2763"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/code/main.py"
+     },
+     "id": "d4c64959-1fd0-4349-921b-32a1803acc29"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/code/main.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tfrom utils import used_once, used_twice\n     2\t\n     3\t\n     4\tprint(used_once())\n     5\tprint(used_twice())\n     6\tprint(used_twice())",
+   "content_len": 142,
+   "name": "read_file",
+   "tool_call_id": "d4c64959-1fd0-4349-921b-32a1803acc29"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "never_called\nalso_dead",
+      "file_path": "/code/dead.txt"
+     },
+     "id": "ec2656e1-f16f-44a2-b6af-4622b113ae57"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "never_called\nalso_dead",
+     "file_path": "/code/dead.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /code/dead.txt",
+   "content_len": 27,
+   "name": "write_file",
+   "tool_call_id": "ec2656e1-f16f-44a2-b6af-4622b113ae57"
+  },
+  {
+   "type": "ai",
+   "content": "Файл dead.txt создан. В него записаны имена функций, которые определены в utils.py, но не вызываются из main.py: never_called и also_dead (по одному имени на строку).",
+   "content_len": 166,
+   "finish_reason": "stop"
+  }
+ ]
+}

@@ -1,0 +1,113 @@
+{
+ "task_id": "task_174_impl_two_sum",
+ "name": "Implement two_sum(nums, target) so pytest passes",
+ "prompt": "Создай файл twosum.py с функцией two_sum(nums: list[int], target: int) -> tuple[int, int] | None. Если в списке есть два индекса i, j (i < j), при которых nums[i] + nums[j] == target — вернуть кортеж (i, j). Если такой пары нет — вернуть None. Тесты в tests/test_twosum.py должны пройти.",
+ "passed": true,
+ "message": "pytest tests/ passed",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file",
+  "read_file",
+  "execute"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл twosum.py с функцией two_sum(nums: list[int], target: int) -> tuple[int, int] | None. Если в списке есть два индекса i, j (i < j), при которых nums[i] + nums[j] == target — вернуть кортеж (i, j). Если такой пары нет — вернуть None. Тесты в tests/test_twosum.py должны пройти.",
+   "content_len": 287
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "def two_sum(nums: list[int], target: int) -> tuple[int, int] | None:\n    \"\"\"\n    Находит два индекса в списке `nums`, сумма элементов по которым равна `target`.\n\n    Использует хеш-таблицу (словарь) для хранения уже просмотренных чисел и их индексов.\n    Это позволяет достичь временной сложности O(n), где n — длина списка.\n\n    Args:\n        nums: Список целых чисел.\n        target: Целевая сумма.\n\n    Returns:\n        Кортеж из двух индексов (i, j), если такая пара существует, иначе None.\n    \"\"\"\n    seen = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        if complement in seen:\n            return (seen[complement], i)\n        seen[num] = i\n    return None",
+      "file_path": "twosum.py"
+     },
+     "id": "60900cd8-2acb-4dbf-a204-8137750c06ea"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "def two_sum(nums: list[int], target: int) -> tuple[int, int] | None:\n    \"\"\"\n    Находит два индекса в списке `nums`, сумма элементов по которым равна `target`.\n\n    Использует хеш-таблицу (словарь) для хранения уже просмотренных чисел и их индексов.\n    Это позволяет достичь временной сложности O(n), где n — длина списка.\n\n    Args:\n        nums: Список целых чисел.\n        target: Целевая сумма.\n\n    Returns:\n        Кортеж из двух индексов (i, j), если такая пара существует, иначе None.\n    \"\"\"\n    seen = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        if complement in seen:\n            return (seen[complement], i)\n        seen[num] = i\n    return None",
+     "file_path": "twosum.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /twosum.py",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "60900cd8-2acb-4dbf-a204-8137750c06ea"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "tests/test_twosum.py"
+     },
+     "id": "ad239a35-23cf-434c-bd1a-cb237fafb6b5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "tests/test_twosum.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tfrom twosum import two_sum\n     2\t\n     3\t\n     4\tdef test_simple():\n     5\t    assert two_sum([2, 7, 11, 15], 9) == (0, 1)\n     6\t\n     7\t\n     8\tdef test_later():\n     9\t    assert two_sum([3, 2, 4], 6) == (1, 2)\n    10\t\n    11\t\n    12\tdef test_no_pair():\n    13\t    assert two_sum([1, 2, 3], 100) is None\n    14\t\n    15\t\n    16\tdef test_empty():\n    17\t    assert two_sum([], 0) is None",
+   "content_len": 396,
+   "name": "read_file",
+   "tool_call_id": "ad239a35-23cf-434c-bd1a-cb237fafb6b5"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -m pytest tests/test_twosum.py -v"
+     },
+     "id": "418bfbf6-5333-4c43-83b8-ec5f8b3f2f73"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -m pytest tests/test_twosum.py -v"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "============================= test session starts ==============================\nplatform darwin -- Python 3.12.12, pytest-9.0.3, pluggy-1.6.0 -- /Users/krestnikov/giga/harness-bench-fast/.venv/bin/python\ncachedir: .pytest_cache\nrootdir: /private/var/folders/81/xpcl3q6d0jqf831cy52ltwfm0000gn/T/hbta_task_174_impl_two_sum_c_9zzyh3\nplugins: langsmith-0.9.4, anyio-4.14.1\ncollecting ... collected 4 items\n\ntests/test_twosum.py::test_simple PASSED                                 [ 25%]\ntests/test_twosum.py::test_later PASSED                                  [ 50%]\ntests/test_twosum.py::test_no_pair PASSED                                [ 75%]\ntests/test_twosum.py::test_empty PASSED                                  [100%]\n\n============================== 4 passed in 0.01s ===============================\n\n[Command succeeded with exit code 0]",
+   "content_len": 843,
+   "name": "execute",
+   "tool_call_id": "418bfbf6-5333-4c43-83b8-ec5f8b3f2f73"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `twosum.py` с функцией `two_sum` создан. Все тесты из файла `tests/test_twosum.py` успешно пройдены.\n\n### Содержимое файла twosum.py:\n```python\ndef two_sum(nums: list[int], target: int) -> tuple[int, int] | None:\n    \"\"\"\n    Находит два индекса в списке `nums`, сумма элементов по которым равна `target`.\n\n    Использует хеш-таблицу (словарь) для хранения уже просмотренных чисел и их индексов.\n    Это позволяет достичь временной сложности O(n), где n — длина списка.\n\n    Args:\n        nums: Список целых чисел.\n        target: Целевая сумма.\n\n    Returns:\n        Кортеж из двух индексов (i, j), если такая пара существует, иначе None.\n    \"\"\"\n    seen = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        if complement in seen:\n            return (seen[complement], i)\n        seen[num] = i\n    return None\n```\nФункция корректно обрабатывает все тестовые случаи, включая поиск пары, отсутствие пары и пустой список.",
+   "content_len": 953,
+   "finish_reason": "stop"
+  }
+ ]
+}

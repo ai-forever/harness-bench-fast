@@ -1,0 +1,82 @@
+{
+ "task_id": "task_124_sqlite_sum",
+ "name": "Sum the orders.amount column from shop.db",
+ "prompt": "В корне рабочей директории лежит SQLite-база shop.db с таблицей orders (колонки id, amount). Посчитай сумму всех значений в столбце amount и запиши число одной строкой в файл total.txt. Используй стандартную библиотеку sqlite3.",
+ "passed": true,
+ "message": "total.txt matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "execute",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В корне рабочей директории лежит SQLite-база shop.db с таблицей orders (колонки id, amount). Посчитай сумму всех значений в столбце amount и запиши число одной строкой в файл total.txt. Используй стандартную библиотеку sqlite3.",
+   "content_len": 227
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python -c \"import sqlite3; conn=sqlite3.connect('shop.db'); cur=conn.cursor(); cur.execute('SELECT SUM(amount) FROM orders'); result=cur.fetchone()[0] or 0; open('total.txt','w').write(str(result)); conn.close()\""
+     },
+     "id": "03f2555a-983b-43ca-ac0c-23c5709a1449"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python -c \"import sqlite3; conn=sqlite3.connect('shop.db'); cur=conn.cursor(); cur.execute('SELECT SUM(amount) FROM orders'); result=cur.fetchone()[0] or 0; open('total.txt','w').write(str(result)); conn.close()\""
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "03f2555a-983b-43ca-ac0c-23c5709a1449"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "total.txt"
+     },
+     "id": "3e3f3296-fdd0-49c5-bed4-eb927920203b"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "total.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t4445",
+   "content_len": 11,
+   "name": "read_file",
+   "tool_call_id": "3e3f3296-fdd0-49c5-bed4-eb927920203b"
+  },
+  {
+   "type": "ai",
+   "content": "Сумма всех значений в столбце amount записана в файл total.txt.\n\nСодержимое файла: 4445",
+   "content_len": 87,
+   "finish_reason": "stop"
+  }
+ ]
+}

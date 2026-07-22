@@ -1,0 +1,84 @@
+{
+ "task_id": "task_101_csv_mean_score",
+ "name": "Compute mean of the score column",
+ "prompt": "В файле scores.csv 30 строк данных (после строки-заголовка name,score). Посчитай среднее арифметическое по столбцу score и запиши его одной строкой в файл mean.txt, округлив до двух знаков после запятой (точка как десятичный разделитель, например '64.50').",
+ "passed": true,
+ "message": "mean.txt matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле scores.csv 30 строк данных (после строки-заголовка name,score). Посчитай среднее арифметическое по столбцу score и запиши его одной строкой в файл mean.txt, округлив до двух знаков после запятой (точка как десятичный разделитель, например '64.50').",
+   "content_len": 256
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/scores.csv"
+     },
+     "id": "55dcab3b-e22a-41c9-8f97-2d4bac75b91c"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/scores.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tname,score\n     2\tplayer_01,50\n     3\tplayer_02,51\n     4\tplayer_03,52\n     5\tplayer_04,53\n     6\tplayer_05,54\n     7\tplayer_06,55\n     8\tplayer_07,56\n     9\tplayer_08,57\n    10\tplayer_09,58\n    11\tplayer_10,59\n    12\tplayer_11,60\n    13\tplayer_12,61\n    14\tplayer_13,62\n    15\tplayer_14,63\n    16\tplayer_15,64\n    17\tplayer_16,65\n    18\tplayer_17,66\n    19\tplayer_18,67\n    20\tplayer_19,68\n    21\tplayer_20,69\n    22\tplayer_21,70\n    23\tplayer_22,71\n    24\tplayer_23,72\n    25\tplayer_24,73\n    26\tplayer_25,74\n    27\tplayer_26,75\n    28\tplayer_27,76\n    29\tplayer_28,77\n    30\tplayer_29,78\n    31\tplayer_30,79",
+   "content_len": 617,
+   "name": "read_file",
+   "tool_call_id": "55dcab3b-e22a-41c9-8f97-2d4bac75b91c"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "64.50",
+      "file_path": "/mean.txt"
+     },
+     "id": "3874834d-3982-4f0a-b8c5-e954209a7b56"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "64.50",
+     "file_path": "/mean.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /mean.txt",
+   "content_len": 22,
+   "name": "write_file",
+   "tool_call_id": "3874834d-3982-4f0a-b8c5-e954209a7b56"
+  },
+  {
+   "type": "ai",
+   "content": "Среднее арифметическое по столбцу score, округлённое до двух знаков после запятой (64.50), записано в файл mean.txt",
+   "content_len": 115,
+   "finish_reason": "stop"
+  }
+ ]
+}

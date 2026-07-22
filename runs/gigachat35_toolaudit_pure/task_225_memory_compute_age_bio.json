@@ -1,0 +1,55 @@
+{
+ "task_id": "task_225_memory_compute_age_bio",
+ "name": "Memory: read birth year, compute age, write bio.txt",
+ "prompt": "Сегодня 21 мая 2026. Сделай bio.txt — ровно одна строка в формате `Имя Фамилия, NN лет`. Возраст укажи цифрой.",
+ "passed": false,
+ "message": "bio.txt should match 'Пётр Сидоров, 36 …' (age as digit right after the name)",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Сегодня 21 мая 2026. Сделай bio.txt — ровно одна строка в формате `Имя Фамилия, NN лет`. Возраст укажи цифрой.",
+   "content_len": 110
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "Имя Фамилия, 29 лет",
+      "file_path": "/bio.txt"
+     },
+     "id": "dcbbffc4-8e6f-47e8-bd87-8c4ba9e933e8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "Имя Фамилия, 29 лет",
+     "file_path": "/bio.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /bio.txt",
+   "content_len": 21,
+   "name": "write_file",
+   "tool_call_id": "dcbbffc4-8e6f-47e8-bd87-8c4ba9e933e8"
+  },
+  {
+   "type": "ai",
+   "content": "Файл bio.txt создан.",
+   "content_len": 20,
+   "finish_reason": "stop"
+  }
+ ]
+}

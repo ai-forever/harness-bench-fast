@@ -1,0 +1,55 @@
+{
+ "task_id": "task_125_impl_fib",
+ "name": "Implement fib(n) (iterative)",
+ "prompt": "Создай файл fib.py с функцией fib(n: int) -> int, которая возвращает n-е число Фибоначчи (fib(0) == 0, fib(1) == 1, fib(2) == 1, fib(10) == 55, fib(20) == 6765). Реализуй итеративно за O(n) или любым корректным способом — главное, чтобы возвращаемые значения совпадали с примерами выше.",
+ "passed": true,
+ "message": "fib.py: mod.fib(0) == 0; fib.py: mod.fib(1) == 1; fib.py: mod.fib(10) == 55; fib.py: mod.fib(20) == 6765",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл fib.py с функцией fib(n: int) -> int, которая возвращает n-е число Фибоначчи (fib(0) == 0, fib(1) == 1, fib(2) == 1, fib(10) == 55, fib(20) == 6765). Реализуй итеративно за O(n) или любым корректным способом — главное, чтобы возвращаемые значения совпадали с примерами выше.",
+   "content_len": 286
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "def fib(n: int) -> int:\n    \"\"\"\n    Возвращает n-е число Фибоначчи.\n\n    Args:\n        n (int): Индекс числа в последовательности. Должен быть неотрицательным.\n\n    Returns:\n        int: n-е число Фибоначчи.\n\n    Примеры:\n        >>> fib(0)\n        0\n        >>> fib(1)\n        1\n        >>> fib(2)\n        1\n        >>> fib(10)\n        55\n        >>> fib(20)\n        6765\n    \"\"\"\n    if n < 0:\n        raise ValueError(\"n must be a non-negative integer\")\n\n    if n == 0:\n        return 0\n    if n == 1:\n        return 1\n\n    prev, curr = 0, 1\n    for _ in range(2, n + 1):\n        prev, curr = curr, prev + curr\n    return curr",
+      "file_path": "fib.py"
+     },
+     "id": "88840fdb-262c-48b1-81b5-e15d63d24eb4"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "def fib(n: int) -> int:\n    \"\"\"\n    Возвращает n-е число Фибоначчи.\n\n    Args:\n        n (int): Индекс числа в последовательности. Должен быть неотрицательным.\n\n    Returns:\n        int: n-е число Фибоначчи.\n\n    Примеры:\n        >>> fib(0)\n        0\n        >>> fib(1)\n        1\n        >>> fib(2)\n        1\n        >>> fib(10)\n        55\n        >>> fib(20)\n        6765\n    \"\"\"\n    if n < 0:\n        raise ValueError(\"n must be a non-negative integer\")\n\n    if n == 0:\n        return 0\n    if n == 1:\n        return 1\n\n    prev, curr = 0, 1\n    for _ in range(2, n + 1):\n        prev, curr = curr, prev + curr\n    return curr",
+     "file_path": "fib.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /fib.py",
+   "content_len": 20,
+   "name": "write_file",
+   "tool_call_id": "88840fdb-262c-48b1-81b5-e15d63d24eb4"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `fib.py` успешно создан. Он содержит итеративную функцию `fib(n: int) -> int`, которая вычисляет n-е число Фибоначчи.\n\nДля проверки корректности реализации можно выполнить несколько тестовых вызовов:\n- `fib(0)` вернёт `0`\n- `fib(1)` вернёт `1`\n- `fib(2)` вернёт `1`\n- `fib(10)` вернёт `55`\n- `fib(20)` вернёт `6765`\n\nФункция также включает проверку на неотрицательность входного значения и выбрасывает исключение `ValueError`, если передано отрицательное число, что делает её поведение предсказуемым для некорректных данных.",
+   "content_len": 529,
+   "finish_reason": "stop"
+  }
+ ]
+}

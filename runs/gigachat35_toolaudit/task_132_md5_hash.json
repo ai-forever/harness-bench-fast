@@ -1,0 +1,142 @@
+{
+ "task_id": "task_132_md5_hash",
+ "name": "Write MD5 hash of input.txt to hash.txt",
+ "prompt": "В файле input.txt лежит текст 'hello world\\n' (12 байт, включая завершающий перевод строки). Посчитай MD5-хеш содержимого этого файла (как байтов, без какой-либо предобработки) и запиши получившуюся шестнадцатеричную строку (32 символа в нижнем регистре) одной строкой в файл hash.txt. Используй модуль hashlib из стандартной библиотеки.",
+ "passed": true,
+ "message": "hash.txt matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "execute",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле input.txt лежит текст 'hello world\\n' (12 байт, включая завершающий перевод строки). Посчитай MD5-хеш содержимого этого файла (как байтов, без какой-либо предобработки) и запиши получившуюся шестнадцатеричную строку (32 символа в нижнем регистре) одной строкой в файл hash.txt. Используй модуль hashlib из стандартной библиотеки.",
+   "content_len": 337
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "input.txt"
+     },
+     "id": "24c5bf45-1ec3-40ef-831b-1f2fa3563961"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "input.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\thello world",
+   "content_len": 18,
+   "name": "read_file",
+   "tool_call_id": "24c5bf45-1ec3-40ef-831b-1f2fa3563961"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "import hashlib\n\nwith open('input.txt', 'rb') as f:\n    data = f.read()\n\nmd5_hash = hashlib.md5(data).hexdigest()\n\nwith open('hash.txt', 'w') as f:\n    f.write(md5_hash)",
+      "file_path": "compute_hash.py"
+     },
+     "id": "b9a091f6-dca7-4341-ac59-f14b6ec49205"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "import hashlib\n\nwith open('input.txt', 'rb') as f:\n    data = f.read()\n\nmd5_hash = hashlib.md5(data).hexdigest()\n\nwith open('hash.txt', 'w') as f:\n    f.write(md5_hash)",
+     "file_path": "compute_hash.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /compute_hash.py",
+   "content_len": 29,
+   "name": "write_file",
+   "tool_call_id": "b9a091f6-dca7-4341-ac59-f14b6ec49205"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "execute",
+     "args": {
+      "command": "python compute_hash.py"
+     },
+     "id": "1e846f64-3a3a-4221-bf04-1f98b6491ebd"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "execute",
+    "arguments": {
+     "command": "python compute_hash.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "<no output>\n[Command succeeded with exit code 0]",
+   "content_len": 48,
+   "name": "execute",
+   "tool_call_id": "1e846f64-3a3a-4221-bf04-1f98b6491ebd"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "hash.txt"
+     },
+     "id": "fc2a46d4-fd85-4a09-95ee-b4602e91fb0f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "hash.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t6f5902ac237024bdd0c176cb93063dc4",
+   "content_len": 39,
+   "name": "read_file",
+   "tool_call_id": "fc2a46d4-fd85-4a09-95ee-b4602e91fb0f"
+  },
+  {
+   "type": "ai",
+   "content": "MD5-хеш содержимого файла input.txt: 6f5902ac237024bdd0c176cb93063dc4. Результат записан в файл hash.txt",
+   "content_len": 104,
+   "finish_reason": "stop"
+  }
+ ]
+}

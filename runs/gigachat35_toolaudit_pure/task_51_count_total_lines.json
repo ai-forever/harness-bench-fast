@@ -1,0 +1,200 @@
+{
+ "task_id": "task_51_count_total_lines",
+ "name": "Sum lines across all .py files",
+ "prompt": "Посчитай суммарное количество строк во всех .py-файлах в рабочей директории (включая подкаталоги). Считай каждую строку файла, включая пустые. Запиши получившееся число одной строкой в файл total.txt.",
+ "passed": false,
+ "message": "total.txt content differs\nExpected: '10'\nActual:   '8'",
+ "error": null,
+ "real_tool_call_names": [
+  "glob",
+  "read_file",
+  "read_file",
+  "read_file",
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Посчитай суммарное количество строк во всех .py-файлах в рабочей директории (включая подкаталоги). Считай каждую строку файла, включая пустые. Запиши получившееся число одной строкой в файл total.txt.",
+   "content_len": 200
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "glob",
+     "args": {
+      "pattern": "**/*.py"
+     },
+     "id": "654d8135-ac93-4771-947b-b5d66f5c2f4f"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "glob",
+    "arguments": {
+     "pattern": "**/*.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "['/a.py', '/b.py', '/pkg/c.py', '/pkg/sub/d.py']",
+   "content_len": 48,
+   "name": "glob",
+   "tool_call_id": "654d8135-ac93-4771-947b-b5d66f5c2f4f"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/a.py"
+     },
+     "id": "702a71cb-aa8f-4c3f-b43e-1c5b221ef583"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/a.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tx = 1\n     2\tprint(x)",
+   "content_len": 28,
+   "name": "read_file",
+   "tool_call_id": "702a71cb-aa8f-4c3f-b43e-1c5b221ef583"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/b.py"
+     },
+     "id": "e432657a-491c-4973-bf9f-110fcafbb7f8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/b.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\ty = 2\n     2\t\n     3\tprint(y)",
+   "content_len": 36,
+   "name": "read_file",
+   "tool_call_id": "e432657a-491c-4973-bf9f-110fcafbb7f8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/pkg/c.py"
+     },
+     "id": "df90c760-09c2-482a-b706-af4670b5bdb4"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/pkg/c.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tz = 3",
+   "content_len": 12,
+   "name": "read_file",
+   "tool_call_id": "df90c760-09c2-482a-b706-af4670b5bdb4"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/pkg/sub/d.py"
+     },
+     "id": "68059cee-4d20-4b5e-9b5b-bd809f89bcb8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/pkg/sub/d.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tw = 4\n     2\tprint(w)\n     3\t\n     4\t# trailing",
+   "content_len": 54,
+   "name": "read_file",
+   "tool_call_id": "68059cee-4d20-4b5e-9b5b-bd809f89bcb8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "8",
+      "file_path": "/total.txt"
+     },
+     "id": "33dd5bee-160a-484c-93b5-0612f1caf231"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "8",
+     "file_path": "/total.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /total.txt",
+   "content_len": 23,
+   "name": "write_file",
+   "tool_call_id": "33dd5bee-160a-484c-93b5-0612f1caf231"
+  },
+  {
+   "type": "ai",
+   "content": "Суммарное количество строк во всех .py-файлах: 8. Результат записан в файл total.txt",
+   "content_len": 84,
+   "finish_reason": "stop"
+  }
+ ]
+}

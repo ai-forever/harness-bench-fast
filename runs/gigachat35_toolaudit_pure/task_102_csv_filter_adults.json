@@ -1,0 +1,84 @@
+{
+ "task_id": "task_102_csv_filter_adults",
+ "name": "Keep only adults (age>=18) from users.csv",
+ "prompt": "В файле users.csv 40 строк данных в формате name,age (плюс строка-заголовок). Сформируй файл adults.csv: в нём должна быть та же строка-заголовок, а затем только строки, у которых age >= 18 — в исходном порядке. Не меняй формат CSV.",
+ "passed": true,
+ "message": "adults.csv matches expected content",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле users.csv 40 строк данных в формате name,age (плюс строка-заголовок). Сформируй файл adults.csv: в нём должна быть та же строка-заголовок, а затем только строки, у которых age >= 18 — в исходном порядке. Не меняй формат CSV.",
+   "content_len": 232
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "/users.csv"
+     },
+     "id": "dec77f24-1b09-4960-968b-aba8382eebac"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "/users.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tname,age\n     2\tuser_01,15\n     3\tuser_02,22\n     4\tuser_03,17\n     5\tuser_04,25\n     6\tuser_05,16\n     7\tuser_06,19\n     8\tuser_07,31\n     9\tuser_08,14\n    10\tuser_09,18\n    11\tuser_10,27\n    12\tuser_11,33\n    13\tuser_12,16\n    14\tuser_13,21\n    15\tuser_14,17\n    16\tuser_15,28\n    17\tuser_16,19\n    18\tuser_17,15\n    19\tuser_18,30\n    20\tuser_19,17\n    21\tuser_20,22\n    22\tuser_21,18\n    23\tuser_22,16\n    24\tuser_23,24\n    25\tuser_24,17\n    26\tuser_25,20\n    27\tuser_26,19\n    28\tuser_27,16\n    29\tuser_28,23\n    30\tuser_29,18\n    31\tuser_30,17\n    32\tuser_31,25\n    33\tuser_32,15\n    34\tuser_33,19\n    35\tuser_34,17\n    36\tuser_35,22\n    37\tuser_36,18\n    38\tuser_37,16\n    39\tuser_38,21\n    40\tuser_39,17\n    41\tuser_40,19",
+   "content_len": 735,
+   "name": "read_file",
+   "tool_call_id": "dec77f24-1b09-4960-968b-aba8382eebac"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "name,age\nuser_02,22\nuser_04,25\nuser_06,19\nuser_07,31\nuser_09,18\nuser_10,27\nuser_11,33\nuser_13,21\nuser_15,28\nuser_16,19\nuser_18,30\nuser_20,22\nuser_21,18\nuser_23,24\nuser_25,20\nuser_26,19\nuser_28,23\nuser_29,18\nuser_31,25\nuser_33,19\nuser_35,22\nuser_36,18\nuser_38,21\nuser_40,19",
+      "file_path": "/adults.csv"
+     },
+     "id": "35a7e9f5-8567-4996-9d86-3eec61641a6d"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "name,age\nuser_02,22\nuser_04,25\nuser_06,19\nuser_07,31\nuser_09,18\nuser_10,27\nuser_11,33\nuser_13,21\nuser_15,28\nuser_16,19\nuser_18,30\nuser_20,22\nuser_21,18\nuser_23,24\nuser_25,20\nuser_26,19\nuser_28,23\nuser_29,18\nuser_31,25\nuser_33,19\nuser_35,22\nuser_36,18\nuser_38,21\nuser_40,19",
+     "file_path": "/adults.csv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /adults.csv",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "35a7e9f5-8567-4996-9d86-3eec61641a6d"
+  },
+  {
+   "type": "ai",
+   "content": "Файл adults.csv создан. В нём сохранена строка-заголовок из users.csv, а затем 24 строки с пользователями в возрасте от 18 лет и старше — в том же порядке, что и в исходном файле.",
+   "content_len": 179,
+   "finish_reason": "stop"
+  }
+ ]
+}

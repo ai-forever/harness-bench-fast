@@ -1,0 +1,175 @@
+{
+ "task_id": "task_263_terminal_du_top_dirs",
+ "name": "Extract top directories from du-style output",
+ "prompt": "В файле du.txt лежит вывод, похожий на `du -h`, но все размеры уже в KiB и записаны как '<N>K <path>'. Создай reports/top_dirs.tsv: три самые большие директории, формат '<path без ./>\\t<size_kib>', сортировка по размеру по убыванию. Заголовок не нужен.",
+ "passed": false,
+ "message": "reports/top_dirs.tsv lines differ\nExpected: ['data/raw\\t120', 'data/processed\\t64', 'src/web\\t44']\nActual:   ['data/raw\\t120K', 'data/processed\\t64K', 'src/web\\t44K']",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "read_file",
+  "edit_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле du.txt лежит вывод, похожий на `du -h`, но все размеры уже в KiB и записаны как '<N>K <path>'. Создай reports/top_dirs.tsv: три самые большие директории, формат '<path без ./>\\t<size_kib>', сортировка по размеру по убыванию. Заголовок не нужен.",
+   "content_len": 252
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "du.txt"
+     },
+     "id": "26058210-48d9-4647-99ba-fcb7d1bd6128"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "du.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\t16K ./src/api\n     2\t44K ./src/web\n     3\t8K ./docs\n     4\t120K ./data/raw\n     5\t64K ./data/processed\n     6\t12K ./tests",
+   "content_len": 128,
+   "name": "read_file",
+   "tool_call_id": "26058210-48d9-4647-99ba-fcb7d1bd6128"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "data/raw\t120K\nsrc/web\t44K\ndata/processed\t64K",
+      "file_path": "reports/top_dirs.tsv"
+     },
+     "id": "0cbed1a3-2442-4be1-9419-8693fee43375"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "data/raw\t120K\nsrc/web\t44K\ndata/processed\t64K",
+     "file_path": "reports/top_dirs.tsv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /reports/top_dirs.tsv",
+   "content_len": 34,
+   "name": "write_file",
+   "tool_call_id": "0cbed1a3-2442-4be1-9419-8693fee43375"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "reports/top_dirs.tsv"
+     },
+     "id": "5ff40c19-ec46-46a0-9811-236ac15141f8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "reports/top_dirs.tsv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdata/raw\t120K\n     2\tsrc/web\t44K\n     3\tdata/processed\t64K",
+   "content_len": 65,
+   "name": "read_file",
+   "tool_call_id": "5ff40c19-ec46-46a0-9811-236ac15141f8"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "edit_file",
+     "args": {
+      "file_path": "reports/top_dirs.tsv",
+      "new_string": "data/raw\t120K\ndata/processed\t64K\nsrc/web\t44K",
+      "old_string": "data/raw\t120K\nsrc/web\t44K\ndata/processed\t64K"
+     },
+     "id": "6d93807c-6558-4601-bd8d-0e064a753684"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "edit_file",
+    "arguments": {
+     "file_path": "reports/top_dirs.tsv",
+     "new_string": "data/raw\t120K\ndata/processed\t64K\nsrc/web\t44K",
+     "old_string": "data/raw\t120K\nsrc/web\t44K\ndata/processed\t64K"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Successfully replaced 1 instance(s) of the string in '/reports/top_dirs.tsv'",
+   "content_len": 76,
+   "name": "edit_file",
+   "tool_call_id": "6d93807c-6558-4601-bd8d-0e064a753684"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "reports/top_dirs.tsv"
+     },
+     "id": "4b40f0dc-03c0-4594-aa96-c31d8aa744b5"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "reports/top_dirs.tsv"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tdata/raw\t120K\n     2\tdata/processed\t64K\n     3\tsrc/web\t44K",
+   "content_len": 65,
+   "name": "read_file",
+   "tool_call_id": "4b40f0dc-03c0-4594-aa96-c31d8aa744b5"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `reports/top_dirs.tsv` создан. В нём содержатся три самые большие директории, отсортированные по убыванию размера:\n\n- data/raw\t120K\n- data/processed\t64K\n- src/web\t44K",
+   "content_len": 171,
+   "finish_reason": "stop"
+  }
+ ]
+}

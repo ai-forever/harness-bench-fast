@@ -1,0 +1,113 @@
+{
+ "task_id": "task_96_group_by_letter",
+ "name": "Group words by first letter",
+ "prompt": "В файле words.txt лежат слова, по одному на строку: apple, avocado, banana, blueberry, cherry. Сгруппируй слова по первой букве и сохрани результат в файл groups.txt — по одной строке на букву, в формате '<буква>: word1,word2' (слова через запятую без пробелов, в исходном порядке появления). Порядок групп может быть любым.",
+ "passed": true,
+ "message": "groups.txt groups words by first letter as expected",
+ "error": null,
+ "real_tool_call_names": [
+  "read_file",
+  "write_file",
+  "read_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "В файле words.txt лежат слова, по одному на строку: apple, avocado, banana, blueberry, cherry. Сгруппируй слова по первой букве и сохрани результат в файл groups.txt — по одной строке на букву, в формате '<буква>: word1,word2' (слова через запятую без пробелов, в исходном порядке появления). Порядок групп может быть любым.",
+   "content_len": 324
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "words.txt"
+     },
+     "id": "56764d35-a4c1-45c9-958c-822d29d5ce44"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "words.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\tapple\n     2\tavocado\n     3\tbanana\n     4\tblueberry\n     5\tcherry",
+   "content_len": 72,
+   "name": "read_file",
+   "tool_call_id": "56764d35-a4c1-45c9-958c-822d29d5ce44"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "a: apple,avocado\nb: banana,blueberry\nc: cherry",
+      "file_path": "groups.txt"
+     },
+     "id": "15fe5ad3-26ed-4bcb-9e69-3a727ce0d473"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "a: apple,avocado\nb: banana,blueberry\nc: cherry",
+     "file_path": "groups.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /groups.txt",
+   "content_len": 24,
+   "name": "write_file",
+   "tool_call_id": "15fe5ad3-26ed-4bcb-9e69-3a727ce0d473"
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "read_file",
+     "args": {
+      "file_path": "groups.txt"
+     },
+     "id": "3860dedf-bfb3-43ec-9fd5-cda311c09d09"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "read_file",
+    "arguments": {
+     "file_path": "groups.txt"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "     1\ta: apple,avocado\n     2\tb: banana,blueberry\n     3\tc: cherry",
+   "content_len": 67,
+   "name": "read_file",
+   "tool_call_id": "3860dedf-bfb3-43ec-9fd5-cda311c09d09"
+  },
+  {
+   "type": "ai",
+   "content": "Слова из файла `words.txt` сгруппированы по первой букве и сохранены в файл `groups.txt`. Результат:\n\na: apple,avocado\nb: banana,blueberry\nc: cherry",
+   "content_len": 148,
+   "finish_reason": "stop"
+  }
+ ]
+}

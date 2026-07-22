@@ -1,0 +1,55 @@
+{
+ "task_id": "task_76_create_dataclass",
+ "name": "Create a Point dataclass",
+ "prompt": "Создай файл point.py с импортом 'from dataclasses import dataclass' и определением dataclass-класса Point с двумя аннотированными полями: x: float и y: float. Никаких дополнительных методов или импортов не добавляй.",
+ "passed": true,
+ "message": "point.py contains all expected substrings; point.py: mod.Point(1.0, 2.0).x == 1.0; point.py: mod.Point(1.0, 2.0).y == 2.0",
+ "error": null,
+ "real_tool_call_names": [
+  "write_file"
+ ],
+ "tool_as_text": [],
+ "messages": [
+  {
+   "type": "human",
+   "content": "Создай файл point.py с импортом 'from dataclasses import dataclass' и определением dataclass-класса Point с двумя аннотированными полями: x: float и y: float. Никаких дополнительных методов или импортов не добавляй.",
+   "content_len": 215
+  },
+  {
+   "type": "ai",
+   "content": "",
+   "content_len": 0,
+   "tool_calls": [
+    {
+     "name": "write_file",
+     "args": {
+      "content": "from dataclasses import dataclass\n\n@dataclass\nclass Point:\n    x: float\n    y: float\n",
+      "file_path": "point.py"
+     },
+     "id": "b21c28b8-1081-494a-a583-59e2f1bbf9d8"
+    }
+   ],
+   "additional_kwargs_function_call": {
+    "name": "write_file",
+    "arguments": {
+     "content": "from dataclasses import dataclass\n\n@dataclass\nclass Point:\n    x: float\n    y: float\n",
+     "file_path": "point.py"
+    }
+   },
+   "finish_reason": "function_call"
+  },
+  {
+   "type": "tool",
+   "content": "Updated file /point.py",
+   "content_len": 22,
+   "name": "write_file",
+   "tool_call_id": "b21c28b8-1081-494a-a583-59e2f1bbf9d8"
+  },
+  {
+   "type": "ai",
+   "content": "Файл `point.py` успешно создан. Его содержимое:\n\n```python\nfrom dataclasses import dataclass\n\n@dataclass\nclass Point:\n    x: float\n    y: float\n```\n\nВ файле присутствуют только запрошенный импорт и определение класса с двумя полями типа `float`.",
+   "content_len": 245,
+   "finish_reason": "stop"
+  }
+ ]
+}
