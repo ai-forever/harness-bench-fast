@@ -1,0 +1,82 @@
+{
+  "task_set_version": "0.13.0",
+  "command": "python -m harness_bench run-cli --cli-command 'kimi-cli --quiet --yolo -m k3 -p' --task task_75_squash_blank --task task_135_grep_count_imports --task task_187_dead_functions --json-output kimi_cli_k3_openrouter_failretry.json --allow-task-failures",
+  "total": 3,
+  "passed": 3,
+  "pass_rate": 1.0,
+  "steps": 0,
+  "tokens": 0,
+  "tasks": [
+    {
+      "task_id": "task_75_squash_blank",
+      "number": 75,
+      "passed": true,
+      "message": "squashed.txt has at most one blank line between content lines",
+      "elapsed_seconds": 69.84913929200047,
+      "error": null,
+      "tags": [
+        "edit",
+        "text",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_135_grep_count_imports",
+      "number": 135,
+      "passed": true,
+      "message": "count.txt matches expected content",
+      "elapsed_seconds": 44.93496750000122,
+      "error": null,
+      "tags": [
+        "grep",
+        "search",
+        "execute",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    },
+    {
+      "task_id": "task_187_dead_functions",
+      "number": 187,
+      "passed": true,
+      "message": "dead.txt lists the two unused functions",
+      "elapsed_seconds": 38.23463516699849,
+      "error": null,
+      "tags": [
+        "grep",
+        "search",
+        "execute",
+        "hard"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": null,
+      "agent_tool_calls": null,
+      "agent_shell_commands": null,
+      "agent_events": null,
+      "agent_llm_calls": null,
+      "agent_input_tokens": null,
+      "agent_output_tokens": null,
+      "agent_total_tokens": null
+    }
+  ]
+}

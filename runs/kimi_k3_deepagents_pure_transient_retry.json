@@ -1,0 +1,84 @@
+{
+  "task_set_version": "0.13.0",
+  "command": "python -m harness_bench run-openrouter --model moonshotai/kimi-k3 --task task_71_count_assert --task task_83_const_uppercase --task task_204_requests_to_http_client_migration --json-output kimi_k3_deepagents_pure_transient_retry.json --allow-task-failures",
+  "total": 3,
+  "passed": 3,
+  "pass_rate": 1.0,
+  "steps": 30,
+  "tokens": 265218,
+  "tasks": [
+    {
+      "task_id": "task_71_count_assert",
+      "number": 71,
+      "passed": true,
+      "message": "assert_count.txt matches expected content",
+      "elapsed_seconds": 30.303261875000317,
+      "error": null,
+      "tags": [
+        "read",
+        "search",
+        "compute",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 10,
+      "agent_tool_calls": 5,
+      "agent_shell_commands": 3,
+      "agent_events": 11,
+      "agent_llm_calls": 5,
+      "agent_input_tokens": 98532,
+      "agent_output_tokens": 1584,
+      "agent_total_tokens": 100116
+    },
+    {
+      "task_id": "task_83_const_uppercase",
+      "number": 83,
+      "passed": true,
+      "message": "constants.py free of forbidden substrings; constants.py lines match",
+      "elapsed_seconds": 16.206621582998196,
+      "error": null,
+      "tags": [
+        "edit",
+        "python",
+        "refactor",
+        "medium"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 5,
+      "agent_tool_calls": 2,
+      "agent_shell_commands": 0,
+      "agent_events": 6,
+      "agent_llm_calls": 3,
+      "agent_input_tokens": 57312,
+      "agent_output_tokens": 681,
+      "agent_total_tokens": 57993
+    },
+    {
+      "task_id": "task_204_requests_to_http_client_migration",
+      "number": 204,
+      "passed": true,
+      "message": "requests API migrated in 3 files and report is correct",
+      "elapsed_seconds": 44.397949417001655,
+      "error": null,
+      "tags": [
+        "refactor",
+        "python",
+        "multifile",
+        "execute",
+        "hard"
+      ],
+      "attempt": 1,
+      "attempts": 1,
+      "agent_steps": 15,
+      "agent_tool_calls": 10,
+      "agent_shell_commands": 0,
+      "agent_events": 16,
+      "agent_llm_calls": 5,
+      "agent_input_tokens": 104403,
+      "agent_output_tokens": 2706,
+      "agent_total_tokens": 107109
+    }
+  ]
+}
