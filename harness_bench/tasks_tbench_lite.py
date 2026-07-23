@@ -233,7 +233,7 @@ TASK_354 = Task(
         "= floor(base_price*(10000-discount_bps)/10000), без скидки discount_bps=0. Включай только "
         "active=true и available>0; value_cents=price_cents*available. Сортируй по нормализованному "
         "SKU и выводи SKU в верхнем регистре. Также создай inventory_audit.json: snapshot, число "
-        "active_products, sellable_products, сумму value_cents всех строк и excluded с двумя "
+        "active_products, sellable_products, total_value_cents (сумма value_cents всех строк) и excluded с двумя "
         "лексикографически отсортированными массивами SKU в верхнем регистре: inactive и "
         "not_available (active, но available<=0)."
     ),
