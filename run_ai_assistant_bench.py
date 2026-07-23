@@ -38,7 +38,6 @@ def _drive(task_id: str, workspace: str) -> None:
     """Subprocess: drive the ai-assistant full Runtime on one task in cwd=workspace."""
     sys.path.insert(0, ENGINE)
     import logging
-
     logging.basicConfig(level=logging.ERROR)
     for noisy in ("runtime", "coordinator", "skill_worker", "agent_worker",
                   "llm_client", "function_registry"):
@@ -139,7 +138,7 @@ def _run_task(task, timeout: int) -> dict:
 def _write_json(path, results, tsv, harness_label="ai-assistant (full Runtime + coordinator) via gpt2giga"):
     rows = sorted(results, key=lambda x: x["task_id"])
     passed = sum(1 for x in results if x["passed"])
-    with open(path, "w", encoding="utf-8") as output:
+    with open(path, "w", encoding="utf-8") as fh:
         json.dump(
             {
                 "task_set_version": tsv,
@@ -150,7 +149,7 @@ def _write_json(path, results, tsv, harness_label="ai-assistant (full Runtime + 
                 "pass_rate": passed / max(len(results), 1),
                 "tasks": rows,
             },
-            output,
+            fh,
             ensure_ascii=False,
             indent=1,
         )
@@ -191,7 +190,7 @@ def main() -> None:
     results: list[dict] = []
     with ThreadPoolExecutor(max_workers=args.concurrency) as ex:
         futs = {ex.submit(_run_task, t, args.timeout): t for t in tasks}
-        for done, fu in enumerate(as_completed(futs), 1):
+        for done, fu in enumerate(as_completed(futs), start=1):
             r = fu.result()
             results.append(r)
             st = "PASS" if r["passed"] else "FAIL"

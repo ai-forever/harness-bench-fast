@@ -350,7 +350,7 @@ def build_agent(
         model=model_name,
         base_url=os.getenv("OPENROUTER_BASE_URL", DEFAULT_BASE_URL),
         api_key=_openrouter_api_key(),
-        timeout=600,
+        timeout=float(os.getenv("HARNESS_BENCH_REQUEST_TIMEOUT", "600")),
         **model_kwargs,
     )
     # Always close the virtual_mode shell/file-tool path split (see

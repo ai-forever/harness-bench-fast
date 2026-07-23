@@ -17,9 +17,9 @@ Run:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import sys
-from contextlib import suppress
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 
@@ -118,7 +118,7 @@ class Handler(BaseHTTPRequestHandler):
         headers = _forward_headers(self.headers)
         headers["Content-Type"] = "application/json"
         want_stream = False
-        with suppress(ValueError, TypeError):
+        with contextlib.suppress(ValueError, TypeError):
             want_stream = bool(json.loads(raw).get("stream"))
 
         assert _client is not None
