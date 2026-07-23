@@ -417,11 +417,11 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "deepagents", specifier = ">=0.6.11" },
-    { name = "deepagents-gigachat", marker = "extra == 'gigachat-profile'", specifier = ">=0.0.3" },
-    { name = "langchain-gigachat", marker = "extra == 'gigachat'", specifier = ">=0.5.0" },
-    { name = "langchain-gigachat", marker = "extra == 'gigachat-profile'", specifier = ">=0.5.0" },
-    { name = "langchain-openai", marker = "extra == 'openrouter'", specifier = ">=1.2.1" },
+    { name = "deepagents", specifier = "==0.6.12" },
+    { name = "deepagents-gigachat", marker = "extra == 'gigachat-profile'", specifier = "==0.0.3" },
+    { name = "langchain-gigachat", marker = "extra == 'gigachat'", specifier = "==0.5.1" },
+    { name = "langchain-gigachat", marker = "extra == 'gigachat-profile'", specifier = "==0.5.1" },
+    { name = "langchain-openai", marker = "extra == 'openrouter'", specifier = "==1.2.2" },
     { name = "openpyxl", specifier = ">=3.1" },
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
@@ -432,9 +432,9 @@ provides-extras = ["gigachat", "gigachat-profile", "openrouter"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "deepagents-gigachat", specifier = ">=0.0.3" },
-    { name = "langchain-gigachat", specifier = ">=0.5.0" },
-    { name = "langchain-openai", specifier = ">=1.2.1" },
+    { name = "deepagents-gigachat", specifier = "==0.0.3" },
+    { name = "langchain-gigachat", specifier = "==0.5.1" },
+    { name = "langchain-openai", specifier = "==1.2.2" },
     { name = "ruff", specifier = ">=0.15.12" },
 ]
 

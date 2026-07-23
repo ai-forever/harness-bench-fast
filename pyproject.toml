@@ -18,7 +18,9 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "deepagents>=0.6.11",
+    # Benchmark reproducibility: agent-harness libraries are pinned exactly (==).
+    # Bumping any of them is a deliberate, result-affecting change.
+    "deepagents==0.6.12",
     # Several benchmark tasks are verified by running `python -m pytest`.
     "pytest>=9.0.2",
     "python-dotenv>=1.2.2",
@@ -35,18 +37,18 @@ dependencies = [
 # through `runner.py`. The optional harness profile ships separately and is
 # auto-detected when installed.
 gigachat = [
-    "langchain-gigachat>=0.5.0",
+    "langchain-gigachat==0.5.1",
 ]
 # Public profile extra. For exact v9/v10 result reproduction, install the
 # matching local deepagents-gigachat wheel/source described in README.md.
 gigachat-profile = [
-    "langchain-gigachat>=0.5.0",
-    "deepagents-gigachat>=0.0.3",
+    "langchain-gigachat==0.5.1",
+    "deepagents-gigachat==0.0.3",
 ]
 # `uv pip install harness-bench-fast[openrouter]` for `runner_openrouter.py`
 # against any OpenAI-compatible OpenRouter model.
 openrouter = [
-    "langchain-openai>=1.2.1",
+    "langchain-openai==1.2.2",
 ]
 
 [project.urls]
@@ -83,9 +85,9 @@ packages = ["harness_bench"]
 [dependency-groups]
 dev = [
     "ruff>=0.15.12",
-    "langchain-openai>=1.2.1",
-    "langchain-gigachat>=0.5.0",
-    "deepagents-gigachat>=0.0.3",
+    "langchain-openai==1.2.2",
+    "langchain-gigachat==0.5.1",
+    "deepagents-gigachat==0.0.3",
 ]
 
 [tool.ruff]
