@@ -29,8 +29,8 @@ from harness_bench.tasks_hard import HARD_TASKS
 from harness_bench.tasks_memory import MEMORY_TASKS
 from harness_bench.tasks_more import MORE_TASKS
 from harness_bench.tasks_skills import SKILL_TASKS
-from harness_bench.tasks_vcs import VCS_TASKS
 from harness_bench.tasks_tbench_lite import TBENCH_LITE_TASKS
+from harness_bench.tasks_vcs import VCS_TASKS
 from harness_bench.verifiers import (
     all_of,
     file_contains,

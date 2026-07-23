@@ -38,6 +38,7 @@ def _drive(task_id: str, workspace: str) -> None:
     """Subprocess: drive the ai-assistant full Runtime on one task in cwd=workspace."""
     sys.path.insert(0, ENGINE)
     import logging
+
     logging.basicConfig(level=logging.ERROR)
     for noisy in ("runtime", "coordinator", "skill_worker", "agent_worker",
                   "llm_client", "function_registry"):
@@ -53,9 +54,10 @@ def _drive(task_id: str, workspace: str) -> None:
     rt_cfg["skill_timeout"] = 240
 
     import llm_client
+    from config import SBOL_SCENARIOS_DIR
     from function_registry import FunctionRegistry, load_environment
     from runtime import Runtime
-    from config import SBOL_SCENARIOS_DIR
+
     from harness_bench.tasks import get_task
 
     metrics = {"llm_calls": 0, "in": 0, "out": 0}
@@ -137,20 +139,21 @@ def _run_task(task, timeout: int) -> dict:
 def _write_json(path, results, tsv, harness_label="ai-assistant (full Runtime + coordinator) via gpt2giga"):
     rows = sorted(results, key=lambda x: x["task_id"])
     passed = sum(1 for x in results if x["passed"])
-    json.dump(
-        {
-            "task_set_version": tsv,
-            "harness": harness_label,
-            "model": "GigaChat-3.5-430B-A28B (IFT, via gpt2giga)",
-            "total": len(results),
-            "passed": passed,
-            "pass_rate": passed / max(len(results), 1),
-            "tasks": rows,
-        },
-        open(path, "w", encoding="utf-8"),
-        ensure_ascii=False,
-        indent=1,
-    )
+    with open(path, "w", encoding="utf-8") as output:
+        json.dump(
+            {
+                "task_set_version": tsv,
+                "harness": harness_label,
+                "model": "GigaChat-3.5-430B-A28B (IFT, via gpt2giga)",
+                "total": len(results),
+                "passed": passed,
+                "pass_rate": passed / max(len(results), 1),
+                "tasks": rows,
+            },
+            output,
+            ensure_ascii=False,
+            indent=1,
+        )
 
 
 def main() -> None:
@@ -188,11 +191,9 @@ def main() -> None:
     results: list[dict] = []
     with ThreadPoolExecutor(max_workers=args.concurrency) as ex:
         futs = {ex.submit(_run_task, t, args.timeout): t for t in tasks}
-        done = 0
-        for fu in as_completed(futs):
+        for done, fu in enumerate(as_completed(futs), 1):
             r = fu.result()
             results.append(r)
-            done += 1
             st = "PASS" if r["passed"] else "FAIL"
             print(f"[{done:3d}/{len(tasks)}] [{st}] {r['task_id']:34s} "
                   f"{r['elapsed_seconds']:6.1f}s — {r['message'][:80]}")
