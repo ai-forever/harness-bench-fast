@@ -1,7 +1,7 @@
 [project]
 name = "harness-bench-fast"
 version = "0.1.0"
-description = "Self-contained 298-task agent benchmark (file ops, code edits, CSV/SQLite/XLSX pipelines, memory discipline, agentic tasks)"
+description = "Self-contained 371-task agent benchmark (file ops, code edits, data pipelines, memory, agentic, adversarial, and terminal workflows)"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"

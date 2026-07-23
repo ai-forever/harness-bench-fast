@@ -67,10 +67,15 @@ def test_adversarial_pilot_belongs_to_its_revision() -> None:
     assert revision_for_task_id("task_337_adv_skill_missing_template").version == "0.11.0"
 
 
-def test_current_adversarial_completion_belongs_to_current_revision() -> None:
-    assert TASK_SET_VERSION == "0.13.0"
+def test_adversarial_completion_belongs_to_its_revision() -> None:
     # 0.13.0 completes the adversarial wave, tasks 338-351 (incl. the ~100 MB
     # context-discipline task 351).
     assert revision_for_task_id("task_338_adv_removed_stdlib").version == "0.13.0"
     assert revision_for_task_id("task_350_adv_contradictory_skills").version == "0.13.0"
     assert revision_for_task_id("task_351_adv_huge_file_no_slurp").version == "0.13.0"
+
+
+def test_current_tbench_lite_tasks_belong_to_current_revision() -> None:
+    assert TASK_SET_VERSION == "0.14.0"
+    assert revision_for_task_id("task_352_structured_log_summary").version == "0.14.0"
+    assert revision_for_task_id("task_371_test_result_aggregation").version == "0.14.0"

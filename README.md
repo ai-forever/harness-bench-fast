@@ -49,7 +49,7 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | deepagents | none | Llama 4 Maverick | 57/351 | 16.2% | 1,391 | 17,065,878 |
 | deepagents | none | yandex/gpt5-lite | 37/351 | 10.5% | 1,666 | 118,843,500 |
 
-A self-contained **351-task agent benchmark** (`task-set v0.13.0`) for evaluating LLM-backed
+A self-contained **371-task agent benchmark** (`task-set v0.14.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -86,7 +86,7 @@ uv venv && uv pip install -e ".[gigachat,openrouter]"
 # to the public profile.
 uv pip install -e ".[gigachat-profile]"
 
-# List all 351 tasks
+# List all 371 tasks
 uv run python -m harness_bench list
 
 # Show the benchmark task-set version and revision history
@@ -242,7 +242,7 @@ uv run python -m harness_bench apply-gold \
 
 ## What's inside
 
-### Tasks (351 total, task-set v0.13.0)
+### Tasks (371 total, task-set v0.14.0)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -257,6 +257,7 @@ uv run python -m harness_bench apply-gold \
 | `tasks_vcs.py` | 299–313 | version-control work: Git merge-conflict resolution (ours/theirs/both/manual, diff3 base sections, multi-hunk, multi-file), unified-diff apply/revert, unresolved-conflict detection, plus multi-file/multi-step workflows (scaled rename refactors, module split, ordered patch stacks, manifest-driven resolution, config deep-merge). |
 | `tasks_skills.py` | 314–330 | skill-discriminator wave: fictional brand/style guides, internal codebooks and policies, bespoke fixed formats, distractor/selection/negative-control skill axes, code-skill creation/repair, fictional DSL/protocol/library specs, spreadsheet reconciliation, and ArcFlux calculation methods. |
 | `tasks_adversarial.py` | 331–351 | adversarial/robustness wave: the agent must diagnose and work around a hostile environment — broken Python versions and imports, unreadable/mis-encoded/permission-locked files, instructions that contradict the environment, broken build commands and skills, and a ~100 MB log that must be streamed rather than read whole. |
+| `tasks_tbench_lite.py` | 352–371 | calibrated Terminal-Bench-inspired workflows: multi-source joins, event reconstruction, parsers, config precedence, conflict resolution, package refactors, SQLite migration, deterministic manifests, and retry-aware aggregation. |
 
 Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
@@ -283,6 +284,7 @@ changes do not need a task-set bump.
 | `0.10.0` | 2026-06-30 | 314–330 | 330 | Skill-discriminator wave with fictional skills, codebooks, policies, bespoke formats, selection/distractor axes, code-skill authoring/repair, and ArcFlux methods |
 | `0.11.0` | 2026-07-02 | 331–337 | 337 | Adversarial/robustness pilot: Python 2 port, broken build command, Windows-1251 file, permission-locked file, instruction naming a nonexistent file, hardcoded path, skill with missing template |
 | `0.13.0` | 2026-07-02 | 338–351 | 351 | Adversarial wave completed: removed-stdlib import, misleading `.python-version`, unneeded uninstallable dependency, `set -e` abort, npm-in-a-Python-project, gzip-masquerade, BOM/NUL log, AGENTS.md wrong layout, wrong tests dir, broken import path, broken package layout, malformed SKILL.md frontmatter, contradictory skills, and a ~100 MB log the agent must stream/grep rather than read whole |
+| `0.14.0` | 2026-07-23 | 352–371 | 371 | Calibrated Terminal-Bench-inspired wave with deterministic, offline, gold-verified multi-step tasks |
 
 ### Infrastructure
 
@@ -360,7 +362,8 @@ older-task-set (313-task) runs are not carried over.
 
 1. In one of the task modules (`tasks.py`, `tasks_extra.py`,
    `tasks_more.py`, `tasks_hard.py`, `tasks_extreme.py`,
-   `tasks_diagnostic.py`, `tasks_memory.py`, `tasks_skills.py` — pick the one that fits
+   `tasks_diagnostic.py`, `tasks_memory.py`, `tasks_skills.py`,
+   `tasks_tbench_lite.py` — pick the one that fits
    the wave / difficulty) describe a `Task(...)` — id, prompt,
    `setup_files`, `gold_files`, `verifier`.
 2. Wire it into the corresponding module's `*_TASKS` list — it gets

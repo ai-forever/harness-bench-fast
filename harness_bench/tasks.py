@@ -30,6 +30,7 @@ from harness_bench.tasks_memory import MEMORY_TASKS
 from harness_bench.tasks_more import MORE_TASKS
 from harness_bench.tasks_skills import SKILL_TASKS
 from harness_bench.tasks_vcs import VCS_TASKS
+from harness_bench.tasks_tbench_lite import TBENCH_LITE_TASKS
 from harness_bench.verifiers import (
     all_of,
     file_contains,
@@ -825,6 +826,7 @@ ALL_TASKS: list[Task] = [
     *VCS_TASKS,
     *SKILL_TASKS,
     *ADVERSARIAL_TASKS,
+    *TBENCH_LITE_TASKS,
 ]
 
 _TASK_INDEX: dict[str, Task] = {t.id: t for t in ALL_TASKS}
