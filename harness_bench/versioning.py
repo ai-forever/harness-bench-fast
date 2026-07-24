@@ -59,6 +59,7 @@ TASK_WAVES: tuple[TaskWave, ...] = (
     TaskWave("VCS", 299, 313),
     TaskWave("skills", 314, 330),
     TaskWave("adversarial", 331, 351),
+    TaskWave("tbench-lite", 352, 371),
 )
 
 
@@ -224,6 +225,18 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "skills, and a context-discipline-at-scale task (a ~100 MB log the "
             "agent must stream/grep rather than read whole). All gold-verified "
             "and offline."
+        ),
+    ),
+    TaskSetRevision(
+        version="0.14.0",
+        introduced="2026-07-23",
+        total_tasks=371,
+        added_task_numbers=(352, 371),
+        modules=("tasks_tbench_lite.py",),
+        notes=(
+            "Added twenty deterministic Terminal-Bench-inspired subtask tasks "
+            "for calibrating weaker coding agents. All checks are mechanical, "
+            "offline, and gold-verified."
         ),
     ),
 )

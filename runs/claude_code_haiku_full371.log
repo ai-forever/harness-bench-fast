@@ -1,0 +1,412 @@
+Writing results JSON to jobs/claude_code_haiku_full371.json
+[  1/371] [PASS] task_04_write_numbers                     20.6s — numbers.txt lines match
+[  2/371] [PASS] task_02_write_data_json                   20.8s — data.json has expected JSON keys
+[  3/371] [PASS] task_05_greet                             23.3s — greeting.py: mod.greet('Аня') == 'Привет, Аня!'
+[  4/371] [PASS] task_01_create_hello                      26.1s — hello.py ran and produced expected output
+[  5/371] [PASS] task_03_slugify                           46.7s — src/utils.py: mod.slugify('Hello, World!') == 'hello-world'; src/utils.py: mod.slugify('Foo Bar Baz') == 'foo-bar-baz'
+[  6/371] [PASS] task_06_toggle_debug                      31.7s — config.py contains all expected substrings; config.py free of forbidden substrings
+[  7/371] [PASS] task_09_replace_hello                     26.2s — greeting.py: mod.greet('Bob') == 'Hi, Bob!'
+[  8/371] [PASS] task_07_rename_function                   40.3s — app.py contains all expected substrings; app.py free of forbidden substrings; app.py ran and produced expected output
+[  9/371] [PASS] task_08_bump_version                      38.4s — version.py matches /^VERSION\s*=\s*"1\.0\.1"\s*$/
+[ 10/371] [PASS] task_10_bump_pyproject                    29.5s — pyproject.toml matches /^version\s*=\s*"0\.2\.0"\s*$/; pyproject.toml contains all expected substrings; pyproject.toml free of forbidden substrings
+[ 11/371] [PASS] task_12_extract_todos                     31.8s — todos.txt contains all expected substrings; todos.txt free of forbidden substrings
+[ 12/371] [PASS] task_11_count_py                          35.1s — count.txt matches expected content
+[ 13/371] [PASS] task_14_sum_numbers                       42.3s — sum.txt matches expected content
+[ 14/371] [FAIL] task_13_count_csv_lines                   48.8s — lines.txt content differs
+[ 15/371] [PASS] task_15_first_word                        36.6s — first_word.txt matches expected content
+[ 16/371] [PASS] task_16_add_type_hints                    35.3s — math_utils.py matches /def\s+add\s*\(\s*a\s*:\s*int\s*,\s*b\s*:\s*int\s*\)\s*->\s*int\s*:/; math_utils.py contains all expected substrings
+[ 17/371] [PASS] task_17_add_future_imports                37.2s — module.py matches /\Afrom __future__ import annotations\b/; module.py contains all expected substrings
+[ 18/371] [PASS] task_18_add_docstring                     36.5s — calc.py contains all expected substrings; calc.py: mod.calculate(21) == 42
+[ 19/371] [PASS] task_19_remove_old_func                   33.4s — mod.py free of forbidden substrings; mod.py contains all expected substrings; mod.py: mod.new_func() == 'new'
+[ 20/371] [PASS] task_20_move_function                     34.4s — a.py free of forbidden substrings; a.py contains all expected substrings; b.py contains all expected substrings; b.py: mod.helper() == 'help'
+[ 21/371] [PASS] task_22_delete_file                       22.8s — obsolete.py absent; keep.py exists; keep.py contains all expected substrings
+[ 22/371] [PASS] task_21_rename_file                       34.0s — oldname.txt absent; newname.txt contains all expected substrings
+[ 23/371] [PASS] task_23_append_log                        24.8s — log.txt lines match
+[ 24/371] [PASS] task_24_add_header_comment                30.1s — src/a.py matches /\A# \(c\) 2026 Acme Inc\./; src/b.py matches /\A# \(c\) 2026 Acme Inc\./; src/a.py contains all expected substrings; src/b.py contains all expected substrings
+[ 25/371] [PASS] task_26_add_json_key                      28.1s — config.json has expected JSON keys
+[ 26/371] [PASS] task_25_sort_lines                        37.7s — sorted.txt lines match
+[ 27/371] [PASS] task_27_update_dep_version                35.1s — package.json updated as expected
+[ 28/371] [PASS] task_28_csv_to_json                       33.2s — users.json contains the expected records
+[ 29/371] [PASS] task_29_create_gitignore                  31.0s — .gitignore lines match
+[ 30/371] [PASS] task_30_add_todo                          32.8s — tasks.txt lines match
+[ 31/371] [PASS] task_31_rename_in_multi                   36.0s — a.py free of forbidden substrings; b.py free of forbidden substrings; a.py contains all expected substrings; b.py contains all expected substrings
+[ 32/371] [PASS] task_32_count_words                       36.9s — words.txt matches expected content
+[ 33/371] [PASS] task_33_find_max                          27.5s — max.txt matches expected content
+[ 34/371] [PASS] task_35_remove_blank_lines                28.6s — cleaned.txt lines match
+[ 35/371] [PASS] task_34_filter_errors                     35.6s — errors.log lines match
+[ 36/371] [PASS] task_36_add_imports                       23.4s — script.py matches /\Aimport os\nimport sys\n/; script.py contains all expected substrings
+[ 37/371] [PASS] task_38_trim_trailing_ws                  28.9s — trimmed.txt lines match
+[ 38/371] [PASS] task_37_make_pytest_test                  31.8s — tests/test_math.py exists; tests/test_math.py contains all expected substrings
+[ 39/371] [PASS] task_39_reverse_lines                     25.0s — reversed.txt lines match
+[ 40/371] [PASS] task_40_merge_files                       27.8s — merged.txt lines match
+[ 41/371] [PASS] task_41_count_todos                       33.7s — count.txt matches expected content
+[ 42/371] [PASS] task_44_create_requirements               18.3s — requirements.txt lines match
+[ 43/371] [PASS] task_43_longest_line                      26.9s — longest.txt matches expected content
+[ 44/371] [PASS] task_42_snake_case                        30.8s — one.py free of forbidden substrings; two.py free of forbidden substrings; one.py contains all expected substrings; two.py contains all expected substrings
+[ 45/371] [PASS] task_45_inline_constant                   21.0s — retry.py free of forbidden substrings; retry.py contains all expected substrings; retry.py: mod.attempt() == ['try', 'try', 'try']
+[ 46/371] [PASS] task_46_add_init_export                   25.7s — src/__init__.py exists; src/__init__.py matches /__all__\s*=\s*\[\s*['\"]foo['\"]\s*,\s*['\"]bar['\"]\s*\]/
+[ 47/371] [PASS] task_48_append_eof_each                   27.3s — all logs/*.log end with EOF and keep original content
+[ 48/371] [PASS] task_49_csv_to_markdown                   29.3s — table.md looks like a valid markdown table
+[ 49/371] [PASS] task_50_fix_typo                          28.0s — docs/intro.md free of forbidden substrings; docs/usage.md free of forbidden substrings; docs/intro.md contains all expected substrings; docs/usage.md contains all expected substrings
+[ 50/371] [PASS] task_47_dedupe_lines                      43.3s — deduped.txt lines match
+[ 51/371] [PASS] task_51_count_total_lines                 25.6s — total.txt matches expected content
+[ 52/371] [PASS] task_53_add_shebang                       21.5s — script.py matches /\A#!/usr/bin/env python3\n/; script.py contains all expected substrings
+[ 53/371] [PASS] task_54_swap_csv_cols                     22.7s — users.csv columns swapped correctly
+[ 54/371] [PASS] task_52_find_files_with                   28.7s — files.txt has expected file names
+[ 55/371] [PASS] task_55_add_conftest                      26.6s — tests/conftest.py exists; tests/conftest.py contains all expected substrings
+[ 56/371] [PASS] task_57_add_main_guard                    23.6s — runme.py contains all expected substrings; runme.py matches /if __name__\s*==\s*['\"]__main__['\"]\s*:\s*\n\s+main\(\)/
+[ 57/371] [PASS] task_58_format_phones                     24.2s — phones.txt formatted correctly
+[ 58/371] [PASS] task_56_move_to_subdir                    35.2s — utils.py absent; utils/__init__.py exists; utils/__init__.py contains all expected substrings; utils/__init__.py: mod.slug('Hello') == 'hello'
+[ 59/371] [PASS] task_59_unique_words                      25.6s — unique_words.txt sorted unique words match
+[ 60/371] [PASS] task_61_add_env_var                       24.4s — .env lines match
+[ 61/371] [PASS] task_62_remove_env_var                    23.2s — .env lines match; .env free of forbidden substrings
+[ 62/371] [PASS] task_60_rename_dir                        37.2s — src/old/ renamed to src/new/ with content preserved
+[ 63/371] [PASS] task_64_add_logger_call                   28.6s — app.py contains all expected substrings; app.py matches /def\s+process\s*\(\s*x\s*\)\s*:\s*\n\s*print\(f\"processing \{x\}\"\)\s*\n\s*return\s+x\s*\*\s*2/
+[ 64/371] [PASS] task_63_nested_json_edit                  32.4s — database.host updated, other fields intact
+[ 65/371] [PASS] task_65_sum_floats                        29.3s — sum.txt matches expected content
+[ 66/371] [PASS] task_67_replace_in_logs                   28.9s — app.log free of forbidden substrings; app.log contains all expected substrings
+[ 67/371] [PASS] task_66_join_with_comma                   30.1s — csv.txt matches expected content
+[ 68/371] [PASS] task_68_add_two_keys                      28.7s — config.json has expected JSON keys
+[ 69/371] [PASS] task_69_remove_comments                   27.4s — script.py lines match
+[ 70/371] [PASS] task_72_wrap_in_function                  24.6s — script.py contains all expected substrings; script.py matches /if __name__\s*==\s*['\"]__main__['\"]\s*:\s*\n\s+main\(\)/
+[ 71/371] [PASS] task_71_count_assert                      25.9s — assert_count.txt matches expected content
+[ 72/371] [PASS] task_70_uppercase_first_column            32.0s — cities.csv lines match
+[ 73/371] [PASS] task_73_extract_emails                    26.0s — all three emails captured exactly once
+[ 74/371] [PASS] task_74_rename_class                      31.4s — model.py free of forbidden substrings; model.py contains all expected substrings
+[ 75/371] [PASS] task_76_create_dataclass                  22.2s — point.py contains all expected substrings; point.py: mod.Point(1.0, 2.0).x == 1.0; point.py: mod.Point(1.0, 2.0).y == 2.0
+[ 76/371] [PASS] task_77_tally_grades                      29.0s — tally.txt has correct counts (order-agnostic)
+[ 77/371] [PASS] task_75_squash_blank                      33.7s — squashed.txt has at most one blank line between content lines
+[ 78/371] [PASS] task_78_add_property                      29.5s — user.py contains all expected substrings; user.py free of forbidden substrings; user.py: mod.User('Alice').name == 'Alice'
+[ 79/371] [PASS] task_79_double_to_single_quotes           29.8s — greetings.py free of forbidden substrings; greetings.py contains all expected substrings; greetings.py: mod.greet() == 'Hello'; greetings.py: mod.short() == 'Hi'
+[ 80/371] [PASS] task_82_add_csv_column                    22.0s — users.csv lines match
+[ 81/371] [PASS] task_80_delete_lines_with                 33.5s — api.py free of forbidden substrings; api.py contains all expected substrings
+[ 82/371] [PASS] task_83_const_uppercase                   20.0s — constants.py free of forbidden substrings; constants.py lines match
+[ 83/371] [PASS] task_81_swap_lines                        24.0s — order.txt lines match
+[ 84/371] [PASS] task_84_concat_csvs                       23.8s — merged.csv lines match
+[ 85/371] [PASS] task_87_flip_booleans                     20.8s — flags.py lines match
+[ 86/371] [PASS] task_88_sort_imports                      22.5s — module.py matches /\Aimport json\nimport os\nimport re\nimport sys\n/; module.py contains all expected substrings
+[ 87/371] [PASS] task_86_extract_numbers                   29.7s — numbers.txt contains the four numbers in order
+[ 88/371] [PASS] task_85_add_logging_import                34.0s — app.py matches /\Aimport logging\nimport os\n/; app.py contains all expected substrings
+[ 89/371] [FAIL] task_89_create_pre_commit                 27.6s — .pre-commit-config.yaml lines differ
+[ 90/371] [PASS] task_91_kv_to_json                        21.0s — config.json has the three expected keys
+[ 91/371] [PASS] task_90_duplicate_function                24.2s — math_ops.py contains all expected substrings; math_ops.py: mod.add(2, 3) == 5; math_ops.py: mod.mul(2, 3) == 6
+[ 92/371] [PASS] task_92_count_chars                       21.6s — count.txt matches expected content
+[ 93/371] [PASS] task_93_split_rows                        25.6s — each data row of users.csv saved to rows/row_N.csv
+[ 94/371] [PASS] task_94_remove_unused                     33.6s — utils.py free of forbidden substrings; utils.py contains all expected substrings; utils.py: mod.keep_one() == 1; utils.py: mod.keep_two() == 2
+[ 95/371] [PASS] task_95_add_default_arg                   37.7s — repeater.py matches /def\s+repeat\s*\(\s*text\s*,\s*count\s*=\s*10\s*\)\s*:/; repeater.py: mod.repeat('ab') == 'abababababababababab'; repeater.py: mod.repeat('x', 3) == 'xxx'
+[ 96/371] [PASS] task_97_negate_filter                     31.5s — filters.py free of forbidden substrings; filters.py contains all expected substrings; filters.py: mod.is_odd(3) == True; filters.py: mod.is_odd(4) == False
+[ 97/371] [PASS] task_96_group_by_letter                   38.5s — groups.txt groups words by first letter as expected
+[ 98/371] [PASS] task_98_count_unique                      36.3s — unique_count.txt matches expected content
+[ 99/371] [PASS] task_99_add_readme                        27.1s — README.md lines match
+[100/371] [PASS] task_100_zero_balance                     31.3s — accounts.json has all balances zeroed out, names preserved
+[101/371] [PASS] task_101_csv_mean_score                   32.8s — mean.txt matches expected content
+[102/371] [PASS] task_102_csv_filter_adults                41.9s — adults.csv matches expected content
+[103/371] [PASS] task_103_csv_sort_desc                    36.6s — sorted.csv matches expected content
+[104/371] [PASS] task_104_csv_join                         41.1s — joined.csv matches expected content
+[105/371] [PASS] task_106_csv_group_count                  41.8s — counts.csv matches expected content
+[106/371] [PASS] task_105_csv_to_tsv                       55.6s — data.tsv matches expected content
+[107/371] [PASS] task_107_csv_max_row                      45.9s — max.csv matches expected content
+[108/371] [PASS] task_108_csv_dedupe                       41.7s — unique.csv matches expected content
+[109/371] [PASS] task_109_csv_add_total                    35.5s — invoices.csv matches expected content
+[110/371] [PASS] task_110_csv_count_above                  25.4s — count.txt matches expected content
+[111/371] [PASS] task_111_xlsx_extract_b2                  40.2s — value.txt matches expected content
+[112/371] [PASS] task_112_xlsx_sum_column                  41.2s — total.txt matches expected content
+[113/371] [PASS] task_114_jsonl_sum_amount                 38.1s — total.txt matches expected content
+[114/371] [PASS] task_115_json_extract_nested              34.6s — user.txt matches expected content
+[115/371] [PASS] task_113_xlsx_update_cell                 44.1s — inventory.xlsx[Inventory!C3] == 999
+[116/371] [PASS] task_116_json_filter_active               29.4s — active.json has the expected three records
+[117/371] [PASS] task_117_json_to_yaml                     36.6s — data.yaml decodes to the expected mapping
+[118/371] [PASS] task_118_jsonl_count_by_status            36.9s — tally.json matches expected counts
+[119/371] [PASS] task_119_yaml_bump_version                37.8s — config.yaml version bumped, other fields intact
+[120/371] [PASS] task_120_ini_add_section                  41.6s — settings.ini has the new [logging] section
+[121/371] [PASS] task_121_toml_add_dep                     31.1s — pyproject.toml dependencies extended
+[122/371] [PASS] task_122_yaml_to_json                     26.0s — config.json equals the YAML structure
+[123/371] [PASS] task_123_sqlite_count                     31.7s — count.txt matches expected content
+[124/371] [PASS] task_125_impl_fib                         24.8s — fib.py: mod.fib(0) == 0; fib.py: mod.fib(1) == 1; fib.py: mod.fib(10) == 55; fib.py: mod.fib(20) == 6765
+[125/371] [PASS] task_126_impl_count_vowels                18.8s — vowels.py: mod.count_vowels('hello') == 2; vowels.py: mod.count_vowels('AEIOU') == 5; vowels.py: mod.count_vowels('xyz') == 0; vowels.py: mod.count_vowels('Quick brown fox') == 4
+[126/371] [PASS] task_127_impl_is_palindrome               18.7s — palindrome.py: mod.is_palindrome('aba') == True; palindrome.py: mod.is_palindrome('abc') == False; palindrome.py: mod.is_palindrome('') == True; palindrome.py: mod.is_palindrome('aabbaa') == True
+[127/371] [PASS] task_124_sqlite_sum                       45.4s — total.txt matches expected content
+[128/371] [PASS] task_128_fix_bug                          20.6s — pytest tests/ passed
+[129/371] [PASS] task_130_impl_extract_phones              35.3s — pytest tests/ passed
+[130/371] [PASS] task_131_script_wordcount                 34.8s — count.txt matches expected content
+[131/371] [PASS] task_132_md5_hash                         32.7s — hash.txt matches expected content
+[132/371] [PASS] task_133_impl_factorial                   29.5s — factorial.py: mod.factorial(0) == 1; factorial.py: mod.factorial(5) == 120; factorial.py: mod.factorial(10) == 3628800
+[133/371] [PASS] task_129_implement_passing                50.6s — pytest tests/ passed
+[134/371] [PASS] task_134_run_and_capture                  17.9s — greet.py exists; out.txt matches expected content
+[135/371] [PASS] task_136_grep_files_with_todo             14.1s — files.txt has the four TODO-bearing files
+[136/371] [PASS] task_135_grep_count_imports               19.7s — count.txt matches expected content
+[137/371] [PASS] task_138_grep_yaml_with_key               23.3s — with_api_key.txt has the three configs that mention api_key
+[138/371] [PASS] task_137_grep_count_defs                  27.3s — count.txt matches expected content
+[139/371] [PASS] task_139_grep_log_errors                  27.0s — errors_count.txt matches expected content
+[140/371] [PASS] task_140_grep_emails                      26.9s — emails.txt has all four unique emails
+[141/371] [PASS] task_141_grep_classnames                  30.3s — classes.txt lines match
+[142/371] [PASS] task_142_grep_asserts                     29.8s — assert_count.txt matches expected content
+[143/371] [PASS] task_143_grep_largest_file                33.0s — largest.txt names the right file: big_project/file_09.py
+[144/371] [PASS] task_145_log_top_ip                       27.2s — top_ip.txt matches expected content
+[145/371] [PASS] task_144_grep_duplicate_funcs             38.2s — duplicates.txt lists exactly the duplicate function names
+[146/371] [PASS] task_147_log_filter_404                   28.0s — not_found.log has the three 404 lines
+[147/371] [PASS] task_149_sqlite_to_json                   23.9s — products.json has all 4 products with correct fields
+[148/371] [PASS] task_148_csv_to_xlsx                      34.1s — scores.xlsx contains the three rows from CSV
+[149/371] [PASS] task_146_log_count_5xx                    61.7s — err_count.txt matches expected content
+[150/371] [PASS] task_150_script_csv_total                 34.4s — sum.py exists and total.txt == 290
+[151/371] [PASS] task_151_pipeline_csv_to_json             35.5s — summary.json matches expected JSON
+[152/371] [PASS] task_152_sqlite_join_to_json              44.7s — users_totals.json matches expected JSON
+[153/371] [PASS] task_153_xlsx_to_markdown_report          45.6s — report.md has the three regions with correct totals
+[154/371] [PASS] task_155_log_count_per_endpoint           35.1s — endpoints.csv counts match
+[155/371] [PASS] task_156_csv_validate_split               30.1s — good.csv matches expected content; bad.csv matches expected content
+[156/371] [PASS] task_154_jsonl_into_sqlite                41.5s — events.db contains all 15 records from events.jsonl
+[157/371] [PASS] task_157_two_csv_diff                     19.4s — diff files have the expected names
+[158/371] [PASS] task_158_xlsx_split_sheets                25.9s — all three CSVs match the corresponding xlsx sheets
+[159/371] [PASS] task_159_unzip_extract                    26.7s — archive.zip extracted to extracted/ with all three files
+[160/371] [PASS] task_161_gzip_compress                    29.4s — input.txt.gz decompresses to the original input.txt content
+[161/371] [PASS] task_160_create_zip                       33.6s — bundle.zip contains the three files with correct content
+[162/371] [PASS] task_162_split_module_by_class            26.9s — big.py was split into alpha.py / beta.py / gamma.py
+[163/371] [PASS] task_164_add_type_hints_module            32.6s — utils.py matches /def\s+add\(\s*a:\s*int\s*,\s*b:\s*int\s*\)\s*->\s*int\s*:/; utils.py matches /def\s+greet\(\s*name:\s*str\s*\)\s*->\s*str\s*:/; utils.py matches /def\s+double\(\s*x:\s*int\s*\)\s*->\s*int\s*:/; utils.py: mod.add(2, 3) == 5; utils.py: mod.greet('Bob') == 'hi Bob'
+[164/371] [PASS] task_163_extract_constants                38.7s — constants moved out of app.py into constants.py
+[165/371] [PASS] task_166_convert_to_dataclass             29.2s — point.py contains all expected substrings; point.py free of forbidden substrings; point.py: mod.Point(1.0, 2.0).x == 1.0; point.py: mod.Point(1.0, 2.0).y == 2.0
+[166/371] [PASS] task_165_rename_across_files              42.6s — a.py free of forbidden substrings; b.py free of forbidden substrings; c.py free of forbidden substrings; common.py free of forbidden substrings; a.py contains all expected substrings; b.py contains all expected substrings; c.py contains all expected substrings; common.py contains all expected substrings
+[167/371] [PASS] task_167_impl_quicksort                   42.4s — pytest tests/ passed
+[168/371] [PASS] task_168_impl_binary_search               42.8s — pytest tests/ passed
+[169/371] [PASS] task_169_impl_balanced_parens             43.1s — pytest tests/ passed
+[170/371] [PASS] task_170_impl_lru_cache                   47.9s — pytest tests/ passed
+[171/371] [PASS] task_171_impl_linked_list                 40.7s — pytest tests/ passed
+[172/371] [PASS] task_172_impl_tree_inorder                41.3s — pytest tests/ passed
+[173/371] [PASS] task_173_impl_anagram                     34.0s — pytest tests/ passed
+[174/371] [PASS] task_175_csv_stats_basic                  26.6s — stats.json has mean, median, min, max within tolerance
+[175/371] [PASS] task_174_impl_two_sum                     47.8s — pytest tests/ passed
+[176/371] [PASS] task_176_csv_rolling_avg                  34.5s — rolling.csv has correct rolling averages with empty first two cells
+[177/371] [PASS] task_178_csv_pivot_count                  26.7s — pivot.csv matches expected content
+[178/371] [PASS] task_177_csv_histogram                    41.9s — histogram.json matches expected JSON
+[179/371] [PASS] task_179_csv_zscore_outliers              37.6s — outliers.csv has the expected outliers [100]
+[180/371] [PASS] task_181_csv_cumsum                       27.1s — cumulative.csv matches expected content
+[181/371] [PASS] task_182_csv_group_agg                    58.3s — agg.json has sum/mean/count per category within tolerance
+[182/371] [PASS] task_185_md_frontmatter                   41.9s — frontmatter.json matches expected mapping
+[183/371] [PASS] task_184_md_toc_gen                       42.2s — toc.md matches expected TOC
+[184/371] [PASS] task_183_xml_to_json                      64.1s — users.json has the 3 users with correct fields
+[185/371] [PASS] task_180_csv_percentiles                 110.4s — percentiles.json values within tolerance of expected
+[186/371] [PASS] task_188_csv_three_way_join               43.7s — joined.csv matches expected content
+[187/371] [PASS] task_186_find_call_sites                  47.0s — callers.txt has the two files that call target()
+[188/371] [PASS] task_189_log_hourly_counts                54.3s — hourly.csv counts match
+[189/371] [PASS] task_191_sqlite_revenue_report            24.6s — revenue.csv matches expected content
+[190/371] [PASS] task_192_rewrite_imports                  24.8s — code/a.py free of forbidden substrings; code/b.py free of forbidden substrings; code/a.py contains all expected substrings; code/b.py contains all expected substrings; code/c.py matches expected content
+[191/371] [PASS] task_187_dead_functions                   74.4s — dead.txt lists the two unused functions
+[192/371] [PASS] task_190_concat_dedupe_sort               50.4s — merged.csv matches expected content
+[193/371] [PASS] task_193_impl_memoize                     30.8s — pytest tests/ passed
+[194/371] [PASS] task_194_impl_context_manager             49.0s — pytest tests/ passed
+[195/371] [PASS] task_196_xlsx_to_csv_and_json             50.7s — data.csv and data.json both reflect the xlsx contents
+[196/371] [PASS] task_197_filter_md_by_tag                 35.3s — python_posts.txt has the three python-tagged posts
+[197/371] [PASS] task_195_impl_iterator                    58.2s — pytest tests/ passed
+[198/371] [PASS] task_198_tar_extract                      37.5s — bundle.tar.gz extracted to extracted/ with all three files
+[199/371] [PASS] task_199_sqlite_filtered_export           28.9s — big_clicks.csv matches expected content
+[200/371] [PASS] task_201_reconcile_vip_users              51.1s — vip_users.json matches expected JSON
+[201/371] [PASS] task_202_zip_sales_consolidation          67.6s — region_totals.csv matches expected content; top_region.txt matches expected content
+[202/371] [PASS] task_204_requests_to_http_client_migration  54.0s — requests API migrated in 3 files and report is correct
+[203/371] [PASS] task_203_sqlite_team_markdown_report      76.3s — team_report.md matches expected report
+[204/371] [PASS] task_205_impl_paid_aggregator             64.3s — pytest tests/ passed
+[205/371] [PASS] task_207_inventory_anomaly_report         46.2s — anomalies.json contains expected negative and unknown SKU sections
+[206/371] [PASS] task_208_pricing_api_migration            75.6s — core/pricing.py exists; app/service.py free of forbidden substrings; cli.py free of forbidden substrings; app/service.py contains all expected substrings; cli.py contains all expected substrings; pytest tests/ passed
+[207/371] [PASS] task_210_tar_manifest_with_hashes         45.4s — manifest.csv matches expected rows
+[208/371] [PASS] task_200_impl_priority_queue             185.0s — pytest tests/ passed
+[209/371] [PASS] task_211_impl_merge_intervals             43.9s — pytest tests/ passed
+[210/371] [PASS] task_206_reconcile_paid_revenue          146.9s — vip_revenue.csv matches expected rows
+[211/371] [FAIL] task_213_markdown_link_audit              49.3s — broken_links mismatch: ['http://legacy.local/page.', 'http://localhost:3000/dev'] != ['http://legacy.local/page', 'http://localhost:3000/dev']
+[212/371] [PASS] task_214_customer_data_quality_report     34.1s — dq_report.json matches expected quality checks
+[213/371] [PASS] task_209_request_latency_reconstruction  124.0s — latency_report.json has expected durations, top slow requests, and incomplete count
+[214/371] [PASS] task_217_extract_user_emails              39.8s — emails.json matches expected JSON
+[215/371] [PASS] task_215_source_todo_fixme_triage         59.7s — summary.json and triage.md match expected TODO/FIXME inventory
+[216/371] [PASS] task_218_build_runtime_config             46.1s — runtime_config.json has expected merged values
+[217/371] [PASS] task_216_category_revenue_rollup          74.0s — category_revenue.csv contains all expected substrings
+[218/371] [PASS] task_219_sql_paid_leaderboard             48.1s — paid_leaderboard.csv matches expected content
+[219/371] [PASS] task_212_merge_config_precedence         157.1s — effective_config.json matches expected merged precedence
+[220/371] [PASS] task_221_log_level_summary                42.5s — level_summary.json matches expected JSON
+[221/371] [FAIL] task_222_memory_name_pyproject            31.0s — MEMORY.md doesn't have a '- Имя: Анна Петрова' entry in list format
+[222/371] [FAIL] task_224_memory_mit_license               21.4s — LICENSE missing
+[223/371] [FAIL] task_223_memory_city_timezone_script      28.5s — now.py crashed: Traceback (most recent call last):
+[224/371] [PASS] task_225_memory_compute_age_bio           24.3s — bio.txt is short and contains name + correct age
+[225/371] [PASS] task_226_memory_requirements_dev          36.9s — requirements-dev.txt lists the user's dev tools
+[226/371] [PASS] task_227_memory_profile_json              36.3s — profile.json composed correctly from MEMORY.md
+[227/371] [PASS] task_228_memory_style_refactor            44.3s — src/utils.py free of forbidden substrings; src/utils.py: mod.get_user_name({"name": "Боб"}) == 'Боб'; src/utils.py: mod.build_greeting({"name": "Боб"}) == 'Hello, Боб!'; src/utils.py: mod.set_user_email({"name": "X"}, "y@z.com") == {'name': 'X', 'email': 'y@z.com'}; src/utils.py matches /def \w+\([^)]*\)\s*->\s*[^:\n]+:/
+[228/371] [FAIL] task_231_memory_refuse_secrets            16.7s — MEMORY.md doesn't note that the user uses Anthropic / Антропик
+[229/371] [PASS] task_229_memory_update_contacts           65.5s — MEMORY.md contains all expected substrings; MEMORY.md free of forbidden substrings; README.md contains all expected substrings; README.md free of forbidden substrings
+[230/371] [PASS] task_230_memory_forget_telegram           47.9s — Telegram removed from both MEMORY.md and contacts.json
+[231/371] [PASS] task_233_memory_endpoints_json            32.3s — endpoints.json correctly normalized from MEMORY.md facts
+[232/371] [PASS] task_232_memory_focus_day_schedule_rules  37.6s — focus day saved and scheduling rules implemented correctly
+[233/371] [PASS] task_234_memory_messenger_migration       27.8s — messenger successfully migrated to Mattermost
+[234/371] [PASS] task_220_python_import_migration         168.6s — src/core/math_ops.py exists; src/app/main.py free of forbidden substrings; tests/test_main.py free of forbidden substrings; pytest tests/ passed
+[235/371] [PASS] task_237_memory_preference_following_weekend_plan  31.7s — weekend plan follows preferences and avoids anti-preferences
+[236/371] [PASS] task_239_memory_multi_hop_salary          32.1s — salary calculations correct
+[237/371] [PASS] task_236_memory_contradiction_resolution_region  49.4s — latest region chosen and propagated across files
+[238/371] [PASS] task_240_memory_summarize_profile         28.2s — summary.txt is concise and includes key facts
+[239/371] [PASS] task_238_memory_abstention_unknown_phone  62.4s — unknown phone handled via abstention (null + explicit note)
+[240/371] [PASS] task_241_memory_instruction_reformat_json  32.3s — config.json reformatted with tabs and no trailing commas
+[241/371] [PASS] task_242_memory_knowledge_update_job_change  37.1s — job change propagated to all files
+[242/371] [PASS] task_235_memory_event_ordering_timeline   95.4s — timeline ordering and temporal calculations are correct
+[243/371] [PASS] task_243_memory_multi_session_packing_list  40.4s — packing list integrates all multi-session facts
+[244/371] [PASS] task_244_memory_save_multi_facts_env      24.7s — facts saved and .env.example generated
+[245/371] [PASS] task_246_memory_contradiction_latest_version  26.1s — latest version correctly identified from contradicting entries
+[246/371] [PASS] task_245_memory_temporal_deadline_urgency  35.2s — deadline urgency computed correctly
+[247/371] [PASS] task_249_memory_info_extraction_spec      33.0s — project spec extracted correctly from memory
+[248/371] [PASS] task_248_memory_forget_work_contacts      34.1s — work contacts forgotten from memory and YAML
+[249/371] [FAIL] task_247_memory_preference_dockerfile     52.8s — Dockerfile uses bare pip install (user prefers uv)
+[250/371] [PASS] task_251_memory_save_height_unit_convert  28.0s — height saved and conversion script works
+[251/371] [PASS] task_250_memory_abstention_dataclass      37.9s — dataclass with optional fields and correct instance
+[252/371] [PASS] task_256_terminal_event_summary           23.0s — job_summary.json matches expected aggregate
+[253/371] [PASS] task_253_memory_mixed_save_refuse_use     37.8s — facts saved, secret refused, README generated
+[254/371] [PASS] task_255_terminal_process_hotspots        33.1s — process_hotspots.json matches expected JSON
+[255/371] [PASS] task_252_memory_event_ordering_next_milestone  54.0s — next_milestone() correctly implements event-ordering logic
+[256/371] [PASS] task_254_terminal_log_status_matrix       56.0s — report/status_matrix.csv lines match
+[257/371] [PASS] task_257_tau2_airline_refusal             50.2s — policy refusal action is correct
+[258/371] [PASS] task_259_tau2_telecom_plan_switch         47.1s — telecom action matches upgrade rules
+[259/371] [PASS] task_261_swe_config_precedence            46.0s — pytest tests/ passed
+[260/371] [PASS] task_263_terminal_du_top_dirs             42.9s — reports/top_dirs.tsv lines match
+[261/371] [PASS] task_262_swe_csv_top_customers            55.0s — pytest tests/ passed
+[262/371] [PASS] task_264_terminal_env_precedence          39.2s — effective.env lines match
+[263/371] [PASS] task_265_terminal_makefile_plan           27.7s — build_order.txt lines match
+[264/371] [PASS] task_260_swe_version_parser              113.3s — pytest tests/ passed
+[265/371] [PASS] task_267_terminal_job_log_report          30.6s — job_report.json matches expected JSON
+[266/371] [PASS] task_266_terminal_sha256_manifest         42.0s — SHA256SUMS matches payload files
+[267/371] [PASS] task_268_terminal_permission_audit        36.3s — permission_findings.tsv lines match
+[268/371] [PASS] task_269_terminal_markdown_index          36.5s — docs_index.tsv lines match
+[269/371] [PASS] task_271_tau2_hotel_late_checkout         26.6s — hotel_action.json matches expected JSON
+[270/371] [PASS] task_270_tau2_bank_duplicate_charge       34.8s — bank_action.json matches expected JSON (free text: ('reason_code',))
+[271/371] [PASS] task_258_tau2_retail_partial_return      177.6s — retail action matches policy
+[272/371] [PASS] task_272_tau2_clinic_reschedule           27.5s — clinic_action.json matches expected JSON
+[273/371] [PASS] task_273_tau2_insurance_docs              25.7s — insurance_action.json matches expected JSON
+[274/371] [PASS] task_275_tau2_subscription_downgrade      27.1s — subscription_action.json matches expected JSON
+[275/371] [PASS] task_274_tau2_delivery_late_food          28.4s — delivery_action.json matches expected JSON
+[276/371] [PASS] task_277_swe_date_parser                  42.4s — pytest tests/ passed
+[277/371] [PASS] task_280_swe_pagination_one_based         29.6s — pytest tests/ passed
+[278/371] [PASS] task_276_tau2_baggage_delay               61.4s — baggage_action.json matches expected JSON
+[279/371] [PASS] task_279_swe_markdown_slug_duplicates     49.4s — pytest tests/ passed
+[280/371] [PASS] task_284_terminal_json_config_inventory   21.4s — enabled_ports.tsv lines match
+[281/371] [PASS] task_283_swe_inventory_allocate           33.6s — pytest tests/ passed
+[282/371] [PASS] task_281_swe_retry_backoff_cap            51.5s — pytest tests/ passed
+[283/371] [PASS] task_287_terminal_changelog_extract       17.8s — release_notes.md lines match
+[284/371] [PASS] task_288_terminal_artifact_filter         20.1s — publish_artifacts.txt lines match
+[285/371] [PASS] task_282_swe_safe_join                    86.6s — pytest tests/ passed
+[286/371] [PASS] task_285_terminal_patch_stat_summary      68.3s — patch_summary.tsv lines match
+[287/371] [PASS] task_290_tau2_car_rental_fee              27.6s — car_action.json matches expected JSON (free text: ('reason',))
+[288/371] [PASS] task_289_tau2_utility_payment_plan        30.5s — utility_action.json matches expected JSON
+[289/371] [PASS] task_291_tau2_student_extension           27.8s — edu_action.json matches expected JSON
+[290/371] [PASS] task_293_tau2_event_ticket_exchange       23.8s — event_action.json matches expected JSON
+[291/371] [PASS] task_292_tau2_pharmacy_refill             26.3s — pharmacy_action.json matches expected JSON (free text: ('reason',))
+[292/371] [PASS] task_278_swe_query_parser                202.2s — pytest tests/ passed
+[293/371] [PASS] task_294_swe_money_cents                  40.4s — pytest tests/ passed
+[294/371] [PASS] task_286_terminal_nginx_endpoint_classes 145.1s — endpoint_classes.tsv lines match
+[295/371] [PASS] task_295_swe_parse_tags                   47.9s — pytest tests/ passed
+[296/371] [PASS] task_297_swe_authz_admin                  29.2s — pytest tests/ passed
+[297/371] [PASS] task_296_swe_roman_parser                 55.6s — pytest tests/ passed
+[298/371] [PASS] task_300_resolve_conflict_take_ours       15.7s — config.py free of forbidden substrings; config.py lines match
+[299/371] [PASS] task_299_resolve_conflict_take_both       19.0s — utils.py free of forbidden substrings; utils.py: mod.add(2, 3) == 5; utils.py: mod.sub(5, 2) == 3; utils.py contains all expected substrings
+[300/371] [PASS] task_298_swe_median_even_empty            29.9s — pytest tests/ passed
+[301/371] [PASS] task_302_apply_unified_diff               35.6s — calc.py free of forbidden substrings; calc.py: mod.add(2, 3) == 5; calc.py: mod.sub(9, 4) == 5; calc.py: mod.mul(4, 5) == 20
+[302/371] [PASS] task_304_apply_patch_chain                42.6s — seq.py free of forbidden substrings; seq.py: mod.f(3) == 8; seq.py: mod.g(3) == 5; seq.py: mod.f(0) == 2
+[303/371] [PASS] task_305_resolve_and_propagate_rename     48.0s — core.py free of forbidden substrings; api.py free of forbidden substrings; cli.py free of forbidden substrings; pytest tests/ passed
+[304/371] [PASS] task_303_cascading_cross_file             52.6s — schema.py free of forbidden substrings; client.py free of forbidden substrings; server.py free of forbidden substrings; worker.py free of forbidden substrings; schema.py: mod.API_VERSION == 2; client.py: mod.endpoint() == '/v2/items'; server.py: mod.route() == '/v2/route'; worker.py: mod.queue() == 'v2-queue'; client.py free of forbidden substrings; server.py free of forbidden substrings; worker.py free of forbidden substrings
+[305/371] [PASS] task_301_resolve_conflict_take_theirs     71.8s — settings.json free of forbidden substrings; settings.json matches expected JSON
+[306/371] [PASS] task_306_compute_deep_merge               50.5s — merged.json free of forbidden substrings; merged.json matches expected JSON
+[307/371] [PASS] task_308_detect_unresolved_conflicts      29.0s — report.txt lists exactly the conflicted files
+[308/371] [PASS] task_307_resolve_many_files               75.0s — mod01.py free of forbidden substrings; mod01.py lines match; mod02.py free of forbidden substrings; mod02.py lines match; mod03.py free of forbidden substrings; mod03.py lines match; mod04.py free of forbidden substrings; mod04.py lines match; mod05.py free of forbidden substrings; mod05.py lines match; mod06.py free of forbidden substrings; mod06.py lines match; mod07.py free of forbidden substrings; mod07.py lines match; mod08.py free of forbidden substrings; mod08.py lines match; mod09.py free of forbidden substrings; mod09.py lines match; mod10.py free of forbidden substrings; mod10.py lines match; mod11.py free of forbidden substrings; mod11.py lines match; mod12.py free of forbidden substrings; mod12.py lines match; pytest tests/ passed
+[309/371] [PASS] task_311_apply_patch_stack_multifile      59.0s — a.py free of forbidden substrings; b.py free of forbidden substrings; c.py free of forbidden substrings; d.py free of forbidden substrings; a.py: mod.a() == 4; b.py: mod.b() == 30; c.py: mod.c() == 300; d.py: mod.d() == 3000; summary.json matches expected JSON
+[310/371] [PASS] task_312_policy_driven_merge              79.4s — m01.py free of forbidden substrings; m01.py lines match; m02.py free of forbidden substrings; m02.py lines match; m03.py free of forbidden substrings; m03.py lines match; m04.py free of forbidden substrings; m04.py lines match; m05.py free of forbidden substrings; m05.py lines match; m06.py free of forbidden substrings; m06.py lines match; m07.py free of forbidden substrings; m07.py lines match; m08.py free of forbidden substrings; m08.py lines match; m09.py free of forbidden substrings; m09.py lines match; m10.py free of forbidden substrings; m10.py lines match; m11.py free of forbidden substrings; m11.py lines match; m12.py free of forbidden substrings; m12.py lines match; m13.py free of forbidden substrings; m13.py lines match; m14.py free of forbidden substrings; m14.py lines match; m15.py free of forbidden substrings; m15.py lines match; m16.py free of forbidden substrings; m16.py lines match; resolved.json matches expected JSON; pytest tests/ passed
+[311/371] [PASS] task_313_aggregate_config_fragments       50.6s — final.json free of forbidden substrings; final.json matches expected JSON
+[312/371] [PASS] task_314_skill_r1_brand_landing           33.6s — index.html matches /#0b3d2e/; index.html matches /#e0552b/; index.html matches /#f4f1ea/; index.html contains all expected substrings; index.html matches /<h1[ >]/
+[313/371] [PASS] task_309_rename_refactor_scale           128.8s — lib.py free of forbidden substrings; c1.py free of forbidden substrings; c2.py free of forbidden substrings; c3.py free of forbidden substrings; c4.py free of forbidden substrings; c5.py free of forbidden substrings; c6.py free of forbidden substrings; c7.py free of forbidden substrings; c8.py free of forbidden substrings; c9.py free of forbidden substrings; c10.py free of forbidden substrings; c11.py free of forbidden substrings; c12.py free of forbidden substrings; pytest tests/ passed
+[314/371] [PASS] task_310_module_split                    128.8s — monolith.py absent; app.py free of forbidden substrings; pkg/geometry.py free of forbidden substrings; pytest tests/ passed
+[315/371] [PASS] task_315_skill_b1_failure_codebook        39.9s — all 8 failure reasons normalized to the correct codes
+[316/371] [PASS] task_318_skill_r2_style_guide_report      23.3s — report.txt matches /^[A-Z][A-Z ]+$/; report.txt contains all expected substrings; report.txt contains all expected substrings; report.txt contains all expected substrings
+[317/371] [PASS] task_319_skill_b2_ndr7_parse              41.8s — all NDR-7 records parsed with correct signed amounts
+[318/371] [PASS] task_321_skill_e2_negative_control_sum    30.1s — total.txt matches expected content
+[319/371] [PASS] task_317_skill_g2_repair_phone_skill      64.4s — skills/phone-normalizer/SKILL.md matches /^name:\s*phone-normalizer\s*$/; skills/phone-normalizer/scripts/normalize.py: mod.normalize_phone('(415) 555-2671') == '+14155552671'; skills/phone-normalizer/scripts/normalize.py: mod.normalize_phone('1-415-555-2671') == '+14155552671'; skills/phone-normalizer/scripts/normalize.py: mod.normalize_phone('+1 (415) 555-2671') == '+14155552671'; skills/phone-normalizer/scripts/normalize.py: mod.normalize_phone('+44 20 7946 0958') == '+442079460958'; skills/phone-normalizer/scripts/normalize.py: mod.normalize_phone('+49-30-901820') == '+4930901820'
+[320/371] [PASS] task_316_skill_b3_claim_triage_policy     64.8s — all 10 triage decisions correct (incl. precedence)
+[321/371] [PASS] task_320_skill_e1_codebook_with_distractors  40.7s — all 8 failure reasons normalized to the correct codes
+[322/371] [PASS] task_324_skill_a1_lumen_recipe_dsl        24.7s — LQ1 recipe produces score=96 and seal=S-47K
+[323/371] [PASS] task_322_skill_e3_codebook_selection      38.8s — all 8 failure reasons normalized to the correct codes
+[324/371] [PASS] task_326_skill_a3_quokka_library_quirk    37.7s — quokka_meter protocol followed for hidden sample counts
+[325/371] [PASS] task_327_skill_r3_act4_compliance_notice  18.6s — ACT-4 notice has exact required blocks, order, and final line
+[326/371] [PASS] task_325_skill_a2_q9_binary_protocol      44.0s — Q9 codec encodes/decodes hidden frames and rejects bad checksum
+[327/371] [PASS] task_331_adv_py2_to_py3                   32.4s — legacy.py ran and produced expected output
+[328/371] [PASS] task_329_skill_d1_arcflux_exposure        42.2s — ArcFlux exposure matches trapezoidal AF-3 method on visible and hidden data
+[329/371] [PASS] task_323_skill_g1_create_slugify_skill    90.0s — skills/slugify-tool/SKILL.md matches /^name:\s*slugify-tool\s*$/; skills/slugify-tool/SKILL.md matches /review-status:\s*draft/; skills/slugify-tool/TESTS.md exists; skills/slugify-tool/scripts/slugify.py: mod.slugify('Hello, World!') == 'hello-world'; skills/slugify-tool/scripts/slugify.py: mod.slugify('Foo  Bar Baz') == 'foo-bar-baz'
+[330/371] [PASS] task_328_skill_d2_meridian_reconcile_xlsx  57.2s — Meridian ledgers reconciled with normalized ids, tolerance, and same-currency rule
+[331/371] [PASS] task_332_adv_broken_build                 24.1s — dist/bundle.txt lines match
+[332/371] [PASS] task_330_skill_d1b_arcflux_multifile      58.3s — AF-4 exposure matches multi-file unit conversion and per-sensor integration
+[333/371] [PASS] task_333_adv_cp1251_decode                21.3s — result.json has expected JSON keys
+[334/371] [PASS] task_334_adv_locked_file                  20.3s — token.txt matches expected content
+[335/371] [PASS] task_335_adv_missing_config_file          29.2s — config.json updated to timeout=60
+[336/371] [PASS] task_336_adv_hardcoded_path               27.2s — analyze.py ran and produced expected output
+[337/371] [PASS] task_337_adv_skill_missing_template       27.4s — invoice.txt contains all expected substrings
+[338/371] [PASS] task_338_adv_removed_stdlib               27.9s — mapping.py ran and produced expected output
+[339/371] [PASS] task_339_adv_false_python_version         37.6s — pytest tests/ passed
+[340/371] [PASS] task_343_adv_gzip_masquerade              17.1s — secret.txt matches expected content
+[341/371] [PASS] task_340_adv_unneeded_dependency          31.6s — pad.py ran and produced expected output
+[342/371] [PASS] task_341_adv_set_e_abort                  30.4s — out.txt matches expected content
+[343/371] [PASS] task_342_adv_npm_in_python_project        36.9s — output.txt lines match
+[344/371] [PASS] task_345_adv_agentsmd_wrong_layout        21.1s — app/utils.py: mod.double(21) == 42; app/utils.py: mod.triple(2) == 6
+[345/371] [PASS] task_344_adv_dirty_log_sanitize           32.7s — error_codes.txt lines match
+[346/371] [PASS] task_346_adv_wrong_tests_dir              27.3s — pytest spec/ passed
+[347/371] [PASS] task_347_adv_broken_import_path           22.1s — main.py ran and produced expected output
+[348/371] [PASS] task_350_adv_contradictory_skills         16.3s — settings.txt contains all expected substrings; settings.txt free of forbidden substrings
+[349/371] [PASS] task_348_adv_broken_package_layout        37.8s — pytest tests/ passed
+[350/371] [FAIL] task_352_structured_log_summary           34.6s — summary.json JSON mismatch: expected {'overall': {'DEBUG': 1, 'INFO': 2, 'WARNING': 1, 'ERROR': 2}, 'by_component': {'api': {'DEBUG': 0, 'INFO': 1, 'WARNING': 1, 'ERROR': 1}, 'db': {'DEBUG': 0, 'INFO': 0, 'WARNING': 0, 'ERROR': 1}, 'worker': {'DEBUG': 1, 'INFO': 1, 'WARNING': 0, 'ERROR': 0}}, 'first_error_at': '2026-07-01T10:00:01Z', 'malformed_lines': 1}, got {'overall': {'DEBUG': 1, 'INFO': 3, 'WARNING': 1, 'ERROR': 3}, 'by_component': {'api': {'DEBUG': 0, 'INFO': 2, 'WARNING': 1, 'ERROR': 2}, 'db': {'DEBUG': 0, 'INFO': 0, 'WARNING': 0, 'ERROR': 1}, 'worker': {'DEBUG': 1, 'INFO': 1, 'WARNING': 0, 'ERROR': 0}}, 'first_error_at': '2026-07-01T10:00:01Z', 'malformed_lines': 1}
+[351/371] [PASS] task_351_adv_huge_file_no_slurp           37.1s — answer.json has expected JSON keys
+[352/371] [PASS] task_349_adv_malformed_skill_frontmatter  47.5s — .agents/skills/orbit-config/SKILL.md matches /\A---\n.*?\n---\n/; config.txt contains all expected substrings
+[353/371] [PASS] task_353_reconstruct_sessions             51.3s — sessions.csv matches expected CSV
+[354/371] [PASS] task_355_segment_audit                    32.2s — audit.json matches expected JSON
+[355/371] [PASS] task_359_retry_schedule                   26.9s — retry.py:retry_delays passed all cases
+[356/371] [PASS] task_357_request_latency                  56.3s — latency.csv matches expected CSV
+[357/371] [PASS] task_356_deduplicate_contacts             60.4s — contacts_clean.json matches expected JSON
+[358/371] [PASS] task_354_catalog_join                     80.9s — sellable.csv matches expected CSV; inventory_audit.json matches expected JSON
+[359/371] [PASS] task_360_safe_relative_path               57.6s — safe_relative_path passed all cases
+[360/371] [PASS] task_363_config_precedence                88.1s — resolved.json matches expected JSON; provenance.json matches expected JSON
+[361/371] [PASS] task_362_dependency_order                 96.7s — dependency_order passed all cases
+[362/371] [PASS] task_364_manifest_conflicts               64.2s — src/settings.py matches exactly; docs/api.md matches exactly; data/roles.txt matches exactly; src/settings.py free of forbidden substrings; docs/api.md free of forbidden substrings; data/roles.txt free of forbidden substrings
+[363/371] [PASS] task_367_invoice_reconciliation           30.4s — reconciliation.csv matches expected CSV
+[364/371] [PASS] task_366_checksum_manifest                66.5s — data/manifest.json matches expected JSON
+[365/371] [PASS] task_369_ini_update                       28.7s — service.ini updated correctly
+[366/371] [PASS] task_370_change_plan                      65.5s — app.py matches exactly; config.env matches exactly; README.md matches exactly; notes.txt matches exactly; applied.json matches expected JSON
+[367/371] [PASS] task_365_package_rename                  212.6s — blueledger absent; greenledger/__init__.py exists; greenledger/api.py matches exactly; greenledger/client.py matches exactly; greenledger/plugins/__init__.py matches exactly; greenledger/plugins/report.py matches exactly; app.py matches exactly; tests/test_api.py matches exactly; tests/test_client.py matches exactly; pyproject.toml matches exactly; README.md matches exactly; docs/current.md matches exactly; Dockerfile matches exactly; .github/workflows/test.yml matches exactly; CHANGELOG.md matches exactly; tests/data/legacy_blueledger.json matches exactly; migrations/legacy_blueledger.sql matches exactly
+[368/371] [FAIL] task_371_test_result_aggregation          66.3s — report.json JSON mismatch: expected {'total': 6, 'attempts_total': 9, 'passed': 3, 'failed': 2, 'skipped': 1, 'failed_tests': ['test_auth', 'test_export'], 'retried_tests': ['test_auth', 'test_login', 'test_search'], 'flaky_tests': ['test_search'], 'slowest': [{'name': 'test_export', 'duration_ms': 900}, {'name': 'test_search', 'duration_ms': 420}, {'name': 'test_auth', 'duration_ms': 250}]}, got {'total': 6, 'passed': 3, 'failed': 2, 'skipped': 1, 'attempts_total': 9, 'failed_tests': ['test_auth', 'test_export'], 'retried_tests': ['test_auth', 'test_login', 'test_search'], 'flaky_tests': ['test_auth', 'test_search'], 'slowest': [{'name': 'test_export', 'duration_ms': 900}, {'name': 'test_search', 'duration_ms': 420}, {'name': 'test_auth', 'duration_ms': 250}]}
+[369/371] [PASS] task_368_sqlite_migration                194.7s — SQLite migration is correct and idempotent
+[370/371] [FAIL] task_358_range_parser                    600.5s — CLI timed out after 600s
+[371/371] [PASS] task_361_jsonl_cleaner                   739.7s — JSONL cleaner produced the expected outputs
+
+================================================================
+Passed: 360/371
+
+Metrics:
+  K  pass@K
+  -  ------
+  1   97.0%
+
+Per-wave breakdown:
+  Wave                   Tasks  Passed       %
+  ---------------------  -----  ------  ------
+  core (1-30)               30      29   96.7%
+  extra (31-60)             30      30  100.0%
+  more (61-100)             40      39   97.5%
+  hard (101-150)            50      50  100.0%
+  extreme (151-205)         55      55  100.0%
+  diagnostic (206-221)      16      15   93.8%
+  memory (222-253)          32      27   84.4%
+  agentic (254-298)         45      45  100.0%
+  VCS (299-313)             15      15  100.0%
+  skills (314-330)          17      17  100.0%
+  adversarial (331-351)     21      21  100.0%
+  tbench-lite (352-371)     20      17   85.0%
+  Total                    371     360   97.0%
+
+Failures:
+  - task_13_count_csv_lines: lines.txt content differs
+  - task_89_create_pre_commit: .pre-commit-config.yaml lines differ
+  - task_213_markdown_link_audit: broken_links mismatch: ['http://legacy.local/page.', 'http://localhost:3000/dev'] != ['http://legacy.local/page', 'http://localhost:3000/dev']
+  - task_222_memory_name_pyproject: MEMORY.md doesn't have a '- Имя: Анна Петрова' entry in list format
+  - task_223_memory_city_timezone_script: now.py crashed: Traceback (most recent call last):
+  - task_224_memory_mit_license: LICENSE missing
+  - task_231_memory_refuse_secrets: MEMORY.md doesn't note that the user uses Anthropic / Антропик
+  - task_247_memory_preference_dockerfile: Dockerfile uses bare pip install (user prefers uv)
+  - task_352_structured_log_summary: summary.json JSON mismatch: expected {'overall': {'DEBUG': 1, 'INFO': 2, 'WARNING': 1, 'ERROR': 2}, 'by_component': {'api': {'DEBUG': 0, 'INFO': 1, 'WARNING': 1, 'ERROR': 1}, 'db': {'DEBUG': 0, 'INFO': 0, 'WARNING': 0, 'ERROR': 1}, 'worker': {'DEBUG': 1, 'INFO': 1, 'WARNING': 0, 'ERROR': 0}}, 'first_error_at': '2026-07-01T10:00:01Z', 'malformed_lines': 1}, got {'overall': {'DEBUG': 1, 'INFO': 3, 'WARNING': 1, 'ERROR': 3}, 'by_component': {'api': {'DEBUG': 0, 'INFO': 2, 'WARNING': 1, 'ERROR': 2}, 'db': {'DEBUG': 0, 'INFO': 0, 'WARNING': 0, 'ERROR': 1}, 'worker': {'DEBUG': 1, 'INFO': 1, 'WARNING': 0, 'ERROR': 0}}, 'first_error_at': '2026-07-01T10:00:01Z', 'malformed_lines': 1}
+  - task_358_range_parser: CLI timed out after 600s
+  - task_371_test_result_aggregation: report.json JSON mismatch: expected {'total': 6, 'attempts_total': 9, 'passed': 3, 'failed': 2, 'skipped': 1, 'failed_tests': ['test_auth', 'test_export'], 'retried_tests': ['test_auth', 'test_login', 'test_search'], 'flaky_tests': ['test_search'], 'slowest': [{'name': 'test_export', 'duration_ms': 900}, {'name': 'test_search', 'duration_ms': 420}, {'name': 'test_auth', 'duration_ms': 250}]}, got {'total': 6, 'passed': 3, 'failed': 2, 'skipped': 1, 'attempts_total': 9, 'failed_tests': ['test_auth', 'test_export'], 'retried_tests': ['test_auth', 'test_login', 'test_search'], 'flaky_tests': ['test_auth', 'test_search'], 'slowest': [{'name': 'test_export', 'duration_ms': 900}, {'name': 'test_search', 'duration_ms': 420}, {'name': 'test_auth', 'duration_ms': 250}]}
+
+Wrote results JSON to jobs/claude_code_haiku_full371.json
