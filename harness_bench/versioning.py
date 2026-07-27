@@ -268,10 +268,13 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "general-purpose interpreters and, per task, the one tool that "
             "would collapse the exercise. All checks are mechanical, offline, "
             "and gold-verified; the shell half needs bash on PATH. All "
-            "frontier-solvable: Claude Code 2.1.220 driving claude-opus-5 "
-            "(reasoning=default) passes 20/20 in a median of five agent steps "
-            "per task, which confirms the prompts are unambiguous and the help "
-            "text suffices to reach the exact expected artifact."
+            "frontier-solvable, confirmed on two independent agent harnesses "
+            "and providers: Claude Code 2.1.220 driving claude-opus-5 and Kimi "
+            "Code 0.29.0 driving moonshotai/kimi-k3 (both reasoning=default) "
+            "each pass 20/20, the former in a median of five agent steps per "
+            "task. Two harnesses agreeing rules out a quirk of one agent loop "
+            "and confirms the prompts are unambiguous and the help text "
+            "suffices to reach the exact expected artifact."
         ),
     ),
 )
