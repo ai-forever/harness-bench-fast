@@ -49,7 +49,7 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | deepagents | none | Llama 4 Maverick | 57/351 | 16.2% | 1,391 | 17,065,878 |
 | deepagents | none | yandex/gpt5-lite | 37/351 | 10.5% | 1,666 | 118,843,500 |
 
-A self-contained **371-task agent benchmark** (`task-set v0.14.0`) for evaluating LLM-backed
+A self-contained **391-task agent benchmark** (`task-set v0.15.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -86,7 +86,7 @@ uv venv && uv pip install -e ".[gigachat,openrouter]"
 # to the public profile.
 uv pip install -e ".[gigachat-profile]"
 
-# List all 371 tasks
+# List all 391 tasks
 uv run python -m harness_bench list
 
 # Show the benchmark task-set version and revision history
