@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -86,12 +87,22 @@ def test_cli_wave_is_registered_and_numbered() -> None:
         assert get_task(task.id) is task
 
 
+@pytest.mark.skipif(os.name == "nt", reason="Windows has no executable bit; chmod is a no-op there")
 def test_bespoke_tools_are_made_executable(tmp_path: Path) -> None:
     task = get_task("task_372_cli_logq_percentile_window")
     task.setup(tmp_path)
     tool = tmp_path / "tools" / "logq"
     assert tool.is_file()
     assert tool.stat().st_mode & 0o111, "tools/* must be executable for ./tools/<name> to work"
+
+
+def test_bespoke_tools_are_shipped_with_a_shebang(tmp_path: Path) -> None:
+    # The portable half of the same requirement: `./tools/<name>` needs the
+    # executable bit on POSIX, but everywhere it needs the interpreter line.
+    task = get_task("task_372_cli_logq_percentile_window")
+    task.setup(tmp_path)
+    first_line = (tmp_path / "tools" / "logq").read_text(encoding="utf-8").splitlines()[0]
+    assert first_line == "#!/usr/bin/env python3"
 
 
 # --- the wave's premise: the tools cannot be driven without reading --help ----
