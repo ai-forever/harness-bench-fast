@@ -163,7 +163,7 @@ def main() -> None:
     ap.add_argument("--all", action="store_true", help="Run all tasks")
     ap.add_argument("--concurrency", type=int, default=4)
     ap.add_argument("--timeout", type=int, default=300)
-    ap.add_argument("--json-output", default="ai_assistant_full_gigachat35_ift.json")
+    ap.add_argument("--json-output", default="runs/ai_assistant_full_gigachat35_ift.json")
     ap.add_argument("--harness-label", default="ai-assistant (full Runtime + coordinator) via gpt2giga",
                     help="Label written into the JSON 'harness' field (e.g. 'flat-harness').")
     args = ap.parse_args()
