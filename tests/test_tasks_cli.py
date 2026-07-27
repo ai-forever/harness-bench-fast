@@ -14,6 +14,7 @@ from harness_bench.tasks_cli import (
     _TOOL_SLICER,
     _TOOL_XTAB,
     CLI_TASKS,
+    _normalise_newlines,
     _script_produces,
 )
 
@@ -94,6 +95,23 @@ def test_bespoke_tools_are_made_executable(tmp_path: Path) -> None:
     tool = tmp_path / "tools" / "logq"
     assert tool.is_file()
     assert tool.stat().st_mode & 0o111, "tools/* must be executable for ./tools/<name> to work"
+
+
+def test_fixtures_are_normalised_to_lf(tmp_path: Path) -> None:
+    # `Task.setup` writes fixtures in text mode, so on Windows they land with
+    # CRLF. Python verifiers read back through universal newlines and never
+    # notice, but the shell half hands fixtures to real tools that do: a CRLF
+    # customers.csv made `join -o 1.1,2.2,2.3,1.3` splice the last column's CR
+    # into the middle of its output.
+    (tmp_path / "fixture.csv").write_bytes(b"a,b\r\n1,2\r\n")
+    _normalise_newlines(tmp_path)
+    assert (tmp_path / "fixture.csv").read_bytes() == b"a,b\n1,2\n"
+
+
+def test_every_cli_task_normalises_its_fixtures() -> None:
+    # The LF guarantee is delivered by the setup callback, so a task that ships
+    # without one silently opts out of it.
+    assert [task.id for task in CLI_TASKS if task.setup_callback is None] == []
 
 
 def test_bespoke_tools_are_shipped_with_a_shebang(tmp_path: Path) -> None:

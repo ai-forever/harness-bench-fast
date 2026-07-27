@@ -211,13 +211,38 @@ def _make_tools_executable(ws: Path) -> None:
             entry.chmod(entry.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
 
-def _setup_tools(*extra: Any):
-    """Build a `setup_callback` that chmods the tools and runs `extra` hooks."""
+def _normalise_newlines(ws: Path) -> None:
+    """Rewrite every fixture with LF endings.
+
+    `Task.setup` writes `setup_files` through `Path.write_text` in text mode, so
+    on Windows each fixture lands with CRLF. Python verifiers never notice —
+    they read back through universal newlines — but this wave feeds fixtures to
+    real shell tools, which do. `join -o 1.1,2.2,2.3,1.3` on a CRLF CSV splices
+    the trailing CR of the last column into the middle of its output.
+
+    Called before the binary hooks run, so only text fixtures exist yet.
+    """
+    for path in ws.rglob("*"):
+        if not path.is_file():
+            continue
+        data = path.read_bytes()
+        if b"\r\n" in data:
+            path.write_bytes(data.replace(b"\r\n", b"\n"))
+
+
+def _setup_wave(*extra: Any):
+    """Build the `setup_callback` every task in this wave uses.
+
+    Order matters: fixtures are normalised while they are still the only files
+    present, then the binary/procedural hooks run, then the tools get their
+    executable bit.
+    """
 
     def _callback(ws: Path) -> None:
-        _make_tools_executable(ws)
+        _normalise_newlines(ws)
         for hook in extra:
             hook(ws)
+        _make_tools_executable(ws)
 
     return _callback
 
@@ -1807,7 +1832,7 @@ def _write_stock_records(ws: Path) -> None:
     lines.insert(4, "1099  TRUNCATED")
     lines.insert(9, f"{1098:<6d}{'BAD-QTY':<10}{'WH2':<4}{'n/a':<6}{'1.00':<9}{'active':<12}")
     (ws / "stock").mkdir(parents=True, exist_ok=True)
-    (ws / "stock" / "records.fw").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (ws / "stock" / "records.fw").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 #: proto, src, dst, sport, dport, length, flags, corrupt
@@ -1893,7 +1918,7 @@ TASK_372 = Task(
         " что утилита выдаёт в режиме JSON, без переформатирования. " + _HELP_HINT
     ),
     setup_files={"tools/logq": _TOOL_LOGQ, "logs/service.lq": _SERVICE_LQ},
-    setup_callback=_setup_tools(),
+    setup_callback=_setup_wave(),
     gold_files={"report.json": json.dumps(_TASK_372_EXPECTED, ensure_ascii=False) + "\n"},
     verifier=_json_equals("report.json", _TASK_372_EXPECTED),
 )
@@ -1915,7 +1940,7 @@ TASK_373 = Task(
         + _HELP_HINT
     ),
     setup_files={"tools/logq": _TOOL_LOGQ, "logs/service.lq": _SERVICE_LQ},
-    setup_callback=_setup_tools(),
+    setup_callback=_setup_wave(),
     gold_files={"latency.csv": "key,value\napi,321.0\ncache,439.5\nworker,500.6\n"},
     verifier=_csv_equals(
         "latency.csv",
@@ -1940,7 +1965,7 @@ TASK_374 = Task(
         " печатает утилита. " + _HELP_HINT
     ),
     setup_files={"tools/pktool": _TOOL_PKTOOL},
-    setup_callback=_setup_tools(_write_capture),
+    setup_callback=_setup_wave(_write_capture),
     gold_files={
         "flows.csv": (
             "index,src,dport,length\n"
@@ -1986,7 +2011,7 @@ TASK_375 = Task(
         " proto_stats.json в JSON-формате утилиты, без изменений. " + _HELP_HINT
     ),
     setup_files={"tools/pktool": _TOOL_PKTOOL},
-    setup_callback=_setup_tools(_write_capture),
+    setup_callback=_setup_wave(_write_capture),
     gold_files={"proto_stats.json": json.dumps(_TASK_375_EXPECTED, ensure_ascii=False) + "\n"},
     verifier=_json_equals("proto_stats.json", _TASK_375_EXPECTED),
 )
@@ -2007,7 +2032,7 @@ TASK_376 = Task(
         " вывод утилиты в CSV как есть. " + _HELP_HINT
     ),
     setup_files={"tools/xtab": _TOOL_XTAB, "data/sales.csv": _SALES_CSV},
-    setup_callback=_setup_tools(),
+    setup_callback=_setup_wave(),
     gold_files={
         "share.csv": (
             ",Q1,Q2,Q3,TOTAL\n"
@@ -2060,7 +2085,7 @@ TASK_377 = Task(
         " В mean.json положи JSON-вывод утилиты без изменений. " + _HELP_HINT
     ),
     setup_files={"tools/xtab": _TOOL_XTAB, "data/sales.csv": _SALES_CSV},
-    setup_callback=_setup_tools(),
+    setup_callback=_setup_wave(),
     gold_files={"mean.json": json.dumps(_TASK_377_EXPECTED, ensure_ascii=False) + "\n"},
     verifier=_json_equals("mean.json", _TASK_377_EXPECTED),
 )
@@ -2101,7 +2126,7 @@ TASK_378 = Task(
         "conf/base.json": _CONF_BASE,
         "conf/overlay.json": _CONF_OVERLAY,
     },
-    setup_callback=_setup_tools(),
+    setup_callback=_setup_wave(),
     gold_files={"effective.env": _TASK_378_ENV},
     verifier=_text_equals("effective.env", _TASK_378_ENV),
 )
@@ -2146,7 +2171,7 @@ TASK_379 = Task(
             '}\n'
         ),
     },
-    setup_callback=_setup_tools(),
+    setup_callback=_setup_wave(),
     gold_files={"drift.json": json.dumps(_TASK_379_EXPECTED, indent=2, sort_keys=True) + "\n"},
     verifier=_json_equals("drift.json", _TASK_379_EXPECTED),
 )
@@ -2169,7 +2194,7 @@ TASK_380 = Task(
         " построчно, как есть. " + _HELP_HINT
     ),
     setup_files={"tools/depwalk": _TOOL_DEPWALK, "conf/deps.json": _DEPS_JSON},
-    setup_callback=_setup_tools(),
+    setup_callback=_setup_wave(),
     gold_files={"build_order.txt": _TASK_380_ORDER},
     verifier=_text_equals("build_order.txt", _TASK_380_ORDER),
 )
@@ -2191,7 +2216,7 @@ TASK_381 = Task(
         + _HELP_HINT
     ),
     setup_files={"tools/slicer": _TOOL_SLICER, "stock/layout.txt": _STOCK_LAYOUT},
-    setup_callback=_setup_tools(_write_stock_records),
+    setup_callback=_setup_wave(_write_stock_records),
     gold_files={
         "restock.csv": (
             "id,sku,warehouse,qty\n"
@@ -2244,7 +2269,7 @@ TASK_382 = Task(
         " командной строки. " + _SHELL_RULES
     ),
     setup_files={"tools/depwalk": _TOOL_DEPWALK, "conf/deps.json": _DEPS_JSON},
-    setup_callback=_setup_tools(),
+    setup_callback=_setup_wave(),
     gold_files={"solve.sh": _TASK_382_GOLD},
     verifier=_script_produces(
         "solve.sh",
@@ -2281,7 +2306,7 @@ TASK_383 = Task(
         " Агрегировать нужно поверх вывода pktool. " + _SHELL_RULES
     ),
     setup_files={"tools/pktool": _TOOL_PKTOOL},
-    setup_callback=_setup_tools(_write_capture),
+    setup_callback=_setup_wave(_write_capture),
     gold_files={"solve.sh": _TASK_383_GOLD},
     verifier=_script_produces(
         "solve.sh",
@@ -2319,7 +2344,7 @@ TASK_384 = Task(
         " вывода slicer. " + _SHELL_RULES
     ),
     setup_files={"tools/slicer": _TOOL_SLICER, "stock/layout.txt": _STOCK_LAYOUT},
-    setup_callback=_setup_tools(_write_stock_records),
+    setup_callback=_setup_wave(_write_stock_records),
     gold_files={"solve.sh": _TASK_384_GOLD},
     verifier=_script_produces(
         "solve.sh",
@@ -2371,6 +2396,7 @@ TASK_385 = Task(
         " использовать нельзя, порядок должен обеспечивать сам sort. " + _SHELL_RULES
     ),
     setup_files={"servers.csv": _SERVERS_CSV},
+    setup_callback=_setup_wave(),
     gold_files={"solve.sh": _TASK_385_GOLD},
     verifier=_script_produces(
         "solve.sh",
@@ -2454,6 +2480,7 @@ TASK_386 = Task(
         + _SHELL_RULES
     ),
     setup_files={"orders.csv": _ORDERS_CSV, "customers.csv": _CUSTOMERS_CSV},
+    setup_callback=_setup_wave(),
     gold_files={"solve.sh": _TASK_386_GOLD},
     verifier=_script_produces(
         "solve.sh",
@@ -2498,6 +2525,7 @@ TASK_387 = Task(
         "active.txt": "u-1021\nu-1003\nu-1042\nu-1077\nu-1099\nu-1012\n",
         "optedout.txt": "u-1099\nu-1055\nu-1012\nu-1003\n",
     },
+    setup_callback=_setup_wave(),
     gold_files={"solve.sh": _TASK_387_GOLD},
     verifier=_script_produces(
         "solve.sh",
@@ -2558,6 +2586,7 @@ TASK_388 = Task(
         " лишних пробелов быть не должно. awk в этой задаче запрещён. " + _SHELL_RULES
     ),
     setup_files={"access.log": _ACCESS_LOG},
+    setup_callback=_setup_wave(),
     gold_files={"solve.sh": _TASK_388_GOLD},
     verifier=_script_produces(
         "solve.sh",
@@ -2587,7 +2616,7 @@ def _write_log_tree(ws: Path) -> None:
     for rel, count in files.items():
         target = ws / rel
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(("x" * 60 + "\n") * count, encoding="utf-8")
+        target.write_text(("x" * 60 + "\n") * count, encoding="utf-8", newline="\n")
 
 
 _TASK_389_GOLD = """\
@@ -2619,7 +2648,7 @@ TASK_389 = Task(
         + _SHELL_RULES
     ),
     setup_files={},
-    setup_callback=_write_log_tree,
+    setup_callback=_setup_wave(_write_log_tree),
     gold_files={"solve.sh": _TASK_389_GOLD},
     verifier=_script_produces(
         "solve.sh",
@@ -2680,6 +2709,7 @@ TASK_390 = Task(
         " Группировку и арифметику делай в awk. " + _SHELL_RULES
     ),
     setup_files={"transactions.csv": _TRANSACTIONS_CSV},
+    setup_callback=_setup_wave(),
     gold_files={"solve.sh": _TASK_390_GOLD},
     verifier=_script_produces(
         "solve.sh",
@@ -2745,6 +2775,7 @@ TASK_391 = Task(
         " запрещён. " + _SHELL_RULES
     ),
     setup_files={"deploy.conf": _DEPLOY_CONF},
+    setup_callback=_setup_wave(),
     gold_files={"solve.sh": _TASK_391_GOLD},
     verifier=_script_produces(
         "solve.sh",
