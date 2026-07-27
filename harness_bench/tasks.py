@@ -22,6 +22,7 @@ from pathlib import Path
 from harness_bench.core import Task, VerifyResult
 from harness_bench.tasks_adversarial import ADVERSARIAL_TASKS
 from harness_bench.tasks_agentic import AGENTIC_TASKS
+from harness_bench.tasks_cli import CLI_TASKS
 from harness_bench.tasks_diagnostic import DIAGNOSTIC_TASKS
 from harness_bench.tasks_extra import EXTRA_TASKS
 from harness_bench.tasks_extreme import EXTREME_TASKS
@@ -827,6 +828,7 @@ ALL_TASKS: list[Task] = [
     *SKILL_TASKS,
     *ADVERSARIAL_TASKS,
     *TBENCH_LITE_TASKS,
+    *CLI_TASKS,
 ]
 
 _TASK_INDEX: dict[str, Task] = {t.id: t for t in ALL_TASKS}

@@ -60,6 +60,7 @@ TASK_WAVES: tuple[TaskWave, ...] = (
     TaskWave("skills", 314, 330),
     TaskWave("adversarial", 331, 351),
     TaskWave("tbench-lite", 352, 371),
+    TaskWave("cli", 372, 391),
 )
 
 
@@ -237,6 +238,40 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "Added twenty deterministic Terminal-Bench-inspired subtask tasks "
             "for calibrating weaker coding agents. All checks are mechanical, "
             "offline, and gold-verified."
+        ),
+    ),
+    TaskSetRevision(
+        version="0.15.0",
+        introduced="2026-07-27",
+        total_tasks=391,
+        added_task_numbers=(372, 391),
+        modules=("tasks_cli.py",),
+        notes=(
+            "Added a twenty-task CLI-composition wave. Thirteen tasks drive "
+            "bespoke command-line tools shipped per task (logq, pktool, xtab, "
+            "cfgctl, depwalk, slicer) built so that reading --help is the only "
+            "way in. Their surface is deliberately unconventional — a leading "
+            "verb, --src/--cap/--map instead of --input, value mini-languages "
+            "like --span LO..HI, --pick level=ERROR,WARN and --slice 1:5, "
+            "--shape instead of --format — so a guessed familiar-looking "
+            "invocation exits non-zero rather than half-working. On top of "
+            "that the semantics that decide the answer (exclusive upper "
+            "bounds, nearest-rank percentiles, margins summed before "
+            "normalisation, corrupt-record policy, first-occurrence list "
+            "dedupe) appear only in the --help epilog, so even reimplementing "
+            "the work by hand requires reading it. Two tools read binary or "
+            "fixed-width payloads. The remaining seven tasks exercise POSIX "
+            "tools (multi-key sort, join with -1/-2/-a/-e/-o, comm, grep -oE "
+            "with uniq -c, find predicates with xargs -0, awk aggregation, sed "
+            "ranges with capture groups): the agent writes solve.sh and the "
+            "verifier deletes the artifact and executes the script, rejecting "
+            "general-purpose interpreters and, per task, the one tool that "
+            "would collapse the exercise. All checks are mechanical, offline, "
+            "and gold-verified; the shell half needs bash on PATH. All "
+            "frontier-solvable: Claude Code 2.1.220 driving claude-opus-5 "
+            "(reasoning=default) passes 20/20 in a median of five agent steps "
+            "per task, which confirms the prompts are unambiguous and the help "
+            "text suffices to reach the exact expected artifact."
         ),
     ),
 )

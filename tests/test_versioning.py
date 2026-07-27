@@ -75,7 +75,13 @@ def test_adversarial_completion_belongs_to_its_revision() -> None:
     assert revision_for_task_id("task_351_adv_huge_file_no_slurp").version == "0.13.0"
 
 
-def test_current_tbench_lite_tasks_belong_to_current_revision() -> None:
-    assert TASK_SET_VERSION == "0.14.0"
+def test_tbench_lite_tasks_belong_to_their_revision() -> None:
     assert revision_for_task_id("task_352_structured_log_summary").version == "0.14.0"
     assert revision_for_task_id("task_371_test_result_aggregation").version == "0.14.0"
+
+
+def test_current_cli_tasks_belong_to_current_revision() -> None:
+    # 0.15.0 adds the CLI-composition wave, tasks 372-391.
+    assert TASK_SET_VERSION == "0.15.0"
+    assert revision_for_task_id("task_372_cli_logq_percentile_window").version == "0.15.0"
+    assert revision_for_task_id("task_391_cli_sed_section_extract").version == "0.15.0"
