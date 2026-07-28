@@ -68,6 +68,15 @@ def _csv_equals(rel: str, fieldnames: list[str], expected_rows: list[dict[str, s
 
 
 def _text_equals(rel: str, expected: str):
+    """Exact text match, normalising only the trailing newline.
+
+    These tasks have the agent rewrite source and config files, and whether an
+    editor leaves a final newline is not something any prompt specifies. Byte
+    comparison therefore failed correct edits over a character nobody asked
+    about. Same convention as the CLI wave's `_text_equals`; everything before
+    the final newline is still compared exactly.
+    """
+
     def _verify(ws: Path) -> VerifyResult:
         path = ws / rel
         if not path.is_file():
@@ -76,7 +85,7 @@ def _text_equals(rel: str, expected: str):
             actual = path.read_text(encoding="utf-8")
         except UnicodeDecodeError as exc:
             return VerifyResult(False, f"{rel} is not UTF-8: {exc}")
-        if actual != expected:
+        if actual.rstrip("\n") != expected.rstrip("\n"):
             return VerifyResult(False, f"{rel} mismatch: expected {expected!r}, got {actual!r}")
         return VerifyResult(True, f"{rel} matches exactly")
 

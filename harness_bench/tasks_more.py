@@ -159,6 +159,23 @@ TASK_64 = Task(
 # ---------------------------------------------------------------------------
 # 65. sum_floats_3decimals
 # ---------------------------------------------------------------------------
+def _verify_task_65(ws: Path) -> VerifyResult:
+    """The sum rounded to three decimals, in any spelling of that value."""
+    p = ws / "sum.txt"
+    if not p.exists():
+        return VerifyResult(False, "sum.txt missing")
+    text = p.read_text(encoding="utf-8").strip()
+    if "," in text:
+        return VerifyResult(False, f"sum.txt uses a comma decimal separator: {text!r}")
+    try:
+        value = float(text)
+    except ValueError:
+        return VerifyResult(False, f"sum.txt is not a number: {text!r}")
+    if round(value, 3) != 7.5:
+        return VerifyResult(False, f"sum.txt is {text!r}, expected the sum 7.5")
+    return VerifyResult(True, f"sum.txt holds the correct sum ({text})")
+
+
 TASK_65 = Task(
     id="task_65_sum_floats",
     name="Sum floats with 3 decimal places",
@@ -171,7 +188,11 @@ TASK_65 = Task(
     ),
     setup_files={"numbers.txt": "1.5\n2.25\n3.125\n0.625\n"},
     gold_files={"sum.txt": "7.500\n"},
-    verifier=file_text_equals("sum.txt", "7.500"),
+    # The fixture sums to exactly 7.5, so "round to three decimals" and "format
+    # with three decimals" diverge: `round(total, 3)` prints 7.5 and byte
+    # comparison rejected it. The prompt asks for a rounded value, so compare
+    # the value — 7.5, 7.50 and 7.500 all pass, 7.6 does not.
+    verifier=_verify_task_65,
 )
 
 

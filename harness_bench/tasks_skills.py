@@ -1317,6 +1317,9 @@ Rules:
 6. If a B row exists but the absolute variance is greater than 2, status is
    `REVIEW`.
 7. Output rows in the same order as ledger A.
+8. Normalization is for matching only. Write ids exactly as they appear in the
+   source: `invoice_id` verbatim from ledger A, `matched_id` verbatim from
+   ledger B.
 """
 
 
@@ -1373,8 +1376,17 @@ def _meridian_check(ws) -> VerifyResult:
         return VerifyResult(False, f"could not read reconciliation.csv: {exc}")
     if [c.strip() for c in (rows[0].keys() if rows else [])] != ["invoice_id", "status", "matched_id", "variance_cents"]:
         return VerifyResult(False, "reconciliation.csv must have columns invoice_id,status,matched_id,variance_cents")
-    if [r.get("invoice_id", "").strip() for r in rows] != list(expected):
-        return VerifyResult(False, "rows must be in ledger A order")
+    actual_ids = [r.get("invoice_id", "").strip() for r in rows]
+    if actual_ids != list(expected):
+        # Distinguish the two ways this goes wrong; the old message blamed
+        # ordering even when the ids were merely written in normalized form.
+        if sorted(actual_ids) == sorted(expected):
+            return VerifyResult(False, f"rows are out of ledger A order: {actual_ids!r}")
+        return VerifyResult(
+            False,
+            f"invoice_id column is {actual_ids!r}, expected the ledger A ids {list(expected)!r} "
+            f"written exactly as they appear in the source",
+        )
     wrong = []
     for row in rows:
         inv = row.get("invoice_id", "").strip()

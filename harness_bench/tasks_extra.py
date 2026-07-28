@@ -491,9 +491,16 @@ def _verify_task_48(ws: Path) -> VerifyResult:
         ("second.log", "two beta"),
         ("third.log", "three gamma"),
     ]:
-        lines = (log_dir / name).read_text().splitlines()
-        if lines[-1] != "EOF":
-            return VerifyResult(False, f"logs/{name}: last line is {lines[-1]!r}, expected 'EOF'")
+        lines = (log_dir / name).read_text(encoding="utf-8").splitlines()
+        # Ignore trailing blank lines: "EOF" is still the last content line if a
+        # tool left an extra newline behind, and no prompt forbids one.
+        while lines and not lines[-1].strip():
+            lines.pop()
+        if not lines or lines[-1] != "EOF":
+            return VerifyResult(
+                False,
+                f"logs/{name}: last line is {lines[-1] if lines else None!r}, expected 'EOF'",
+            )
         if original_first_line not in lines:
             return VerifyResult(
                 False, f"logs/{name}: lost original line {original_first_line!r}"
