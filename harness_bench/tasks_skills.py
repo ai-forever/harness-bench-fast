@@ -786,7 +786,17 @@ G1_CREATE_SKILL = Task(
     name="Create a slugify skill following the Acme authoring standard",
     tags=("skill", "create", "code-skill", "medium"),
     prompt=(
-        "Создай новый скилл в каталоге skills/slugify-tool, который умеет"
+        # The fixture ships the Acme standard under `.agents/skills/` and
+        # `.claude/skills/`, so an agent that reads it there naturally writes the
+        # new skill alongside it — the discovery convention of the whole
+        # ecosystem. That made the task measure "does the literal path beat the
+        # surrounding convention" instead of "can the agent author a skill to a
+        # bespoke standard", and it flipped between runs. The destination is now
+        # unambiguous.
+        "Создай новый скилл в каталоге skills/slugify-tool — именно в обычном"
+        " каталоге skills/ в корне рабочей директории, а НЕ в каталогах"
+        " обнаружения скиллов (.agents/skills или .claude/skills), даже если"
+        " другие скиллы лежат там. Скилл должен уметь"
         " приводить произвольный текст к URL-безопасному slug. Скрипт"
         " scripts/slugify.py должен экспортировать функцию slugify(text: str)"
         # "заменить любые пробелы на дефис" read literally gives `.replace(" ", "-")`,
