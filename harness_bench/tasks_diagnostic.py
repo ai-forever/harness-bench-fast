@@ -746,6 +746,32 @@ _SALES_216 = (
     "X,10,1\n"
 )
 _ROLLUP_216 = "category,revenue\nbooks,380\ntech,150\nfood,80\n"
+_ROLLUP_ROWS_216 = [("books", 380.0), ("tech", 150.0), ("food", 80.0)]
+
+
+def _verify_task_216(ws: Path) -> VerifyResult:
+    """Header, row order and row set are strict; the revenue number is numeric."""
+    p = ws / "category_revenue.csv"
+    if not p.exists():
+        return VerifyResult(False, "category_revenue.csv missing")
+    lines = [ln.strip() for ln in p.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    if not lines:
+        return VerifyResult(False, "category_revenue.csv is empty")
+    header = [c.strip() for c in lines[0].split(",")]
+    if header != ["category", "revenue"]:
+        return VerifyResult(False, f"header is {header!r}, expected ['category', 'revenue']")
+    rows = []
+    for ln in lines[1:]:
+        parts = [c.strip() for c in ln.split(",")]
+        if len(parts) != 2:
+            return VerifyResult(False, f"row {ln!r} is not 'category,revenue'")
+        try:
+            rows.append((parts[0], float(parts[1])))
+        except ValueError:
+            return VerifyResult(False, f"row {ln!r} has a non-numeric revenue")
+    if rows != _ROLLUP_ROWS_216:
+        return VerifyResult(False, f"rows are {rows!r}, expected {_ROLLUP_ROWS_216!r}")
+    return VerifyResult(True, "category_revenue.csv has the expected rows in revenue order")
 TASK_216 = Task(
     id="task_216_category_revenue_rollup",
     name="Join products/sales and roll up revenue by category",
@@ -761,9 +787,10 @@ TASK_216 = Task(
     setup_files={"products.csv": _PRODUCTS_216, "sales.csv": _SALES_216},
     gold_files={"category_revenue.csv": _ROLLUP_216},
     # Substring presence ignored the header, the ordering the prompt specifies,
-    # and any extra rows — a file with the three numbers in the wrong order plus
-    # a garbage line passed. The deliverable is compared as text.
-    verifier=file_text_equals("category_revenue.csv", _ROLLUP_216),
+    # and extra rows. Exact text is too strict in the other direction: revenue
+    # is a sum of qty*price, so 380 and 380.0 are the same answer and the prompt
+    # never asks for an integer. Compare the rows with the numbers parsed.
+    verifier=_verify_task_216,
 )
 
 

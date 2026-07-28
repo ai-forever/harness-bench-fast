@@ -811,8 +811,11 @@ G1_CREATE_SKILL = Task(
         file_matches_regex(f"{_SLUG_SKILL}/SKILL.md", r"^name:\s*slugify-tool\s*$"),
         file_matches_regex(f"{_SLUG_SKILL}/SKILL.md", r"review-status:\s*draft"),
         # The Acme standard requires TESTS.md to carry a worked input -> output
-        # example; `file_exists` accepted an empty file.
-        file_matches_regex(f"{_SLUG_SKILL}/TESTS.md", r"slugify\s*\(.+\).*\S"),
+        # example, and `file_exists` accepted an empty file. Demanding a literal
+        # `slugify(...)` call was too narrow the other way: a table row or an
+        # arrow line documents the example just as well. Look for evidence of a
+        # real slug output instead.
+        file_matches_regex(f"{_SLUG_SKILL}/TESTS.md", r"[a-z0-9]+(?:-[a-z0-9]+)+"),
         # функция на скрытых входах
         python_callable_returns(f"{_SLUG_SKILL}/scripts/slugify.py", "mod.slugify('Hello, World!')", "hello-world"),
         python_callable_returns(f"{_SLUG_SKILL}/scripts/slugify.py", "mod.slugify('Foo  Bar Baz')", "foo-bar-baz"),

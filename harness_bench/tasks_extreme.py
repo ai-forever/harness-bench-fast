@@ -1539,10 +1539,13 @@ def _verify_task_179(ws: Path) -> VerifyResult:
     if lines[0].lower() not in {"value"}:
         return VerifyResult(False, f"outliers.csv first line is {lines[0]!r}, expected 'value'")
     try:
-        actual = sorted(int(line) for line in lines[1:])
+        # Parsed as float: the z-score arithmetic runs in floating point, so a
+        # value read back as 100.0 is the same answer as 100 and the prompt
+        # never asks for integer formatting.
+        actual = sorted(float(line) for line in lines[1:])
     except ValueError:
-        return VerifyResult(False, f"outliers.csv has non-int rows: {lines[1:]!r}")
-    expected = sorted(_Z_OUTLIERS)
+        return VerifyResult(False, f"outliers.csv has non-numeric rows: {lines[1:]!r}")
+    expected = sorted(float(v) for v in _Z_OUTLIERS)
     if actual == expected:
         return VerifyResult(True, f"outliers.csv has the expected outliers {expected}")
     return VerifyResult(False, f"outliers.csv {actual!r} != expected {expected!r}")

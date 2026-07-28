@@ -625,9 +625,20 @@ def _verify_jsonl_cleaner(ws: Path) -> VerifyResult:
     )
     if result.returncode != 0:
         return VerifyResult(False, f"clean_jsonl.py failed: {result.stderr.strip()[:400]}")
-    expected_clean = '{"id":1,"name":"A2"}\n{"id":2,"name":"Б"}\n'
-    if clean.read_text(encoding="utf-8") != expected_clean:
-        return VerifyResult(False, "clean output is wrong")
+    # Compare parsed records, not bytes. "компактный JSON" pins the separators
+    # but says nothing about `ensure_ascii`, so a Cyrillic name may legitimately
+    # arrive as "Б" or as "\\u0411" — both are compact JSON of the same record.
+    # Order, contents and compactness are all still enforced.
+    expected_clean = [{"id": 1, "name": "A2"}, {"id": 2, "name": "Б"}]
+    clean_lines = [ln for ln in clean.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    try:
+        actual_clean = [json.loads(ln) for ln in clean_lines]
+    except json.JSONDecodeError as exc:
+        return VerifyResult(False, f"clean output is not one JSON object per line: {exc}")
+    if actual_clean != expected_clean:
+        return VerifyResult(False, f"clean output is wrong: {actual_clean!r}")
+    if any(", " in ln or ": " in ln for ln in clean_lines):
+        return VerifyResult(False, "clean output is not compact (spaces after separators)")
     expected_errors = [
         {"line": "2", "error": "invalid_json"},
         {"line": "4", "error": "missing_id"},
