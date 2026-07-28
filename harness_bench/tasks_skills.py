@@ -434,7 +434,7 @@ G2_SKILL_REPAIR = Task(
     gold_files={_PHONE_SCRIPT: _PHONE_GOLD},
     verifier=all_of(
         # форма: фронтматтер скилла остался валиден
-        file_matches_regex("skills/phone-normalizer/SKILL.md", r"^name:\s*phone-normalizer\s*$"),
+        file_matches_regex("skills/phone-normalizer/SKILL.md", r"^name:\s*[\"']?phone-normalizer[\"']?\s*$"),
         # функция: на скрытых входах (включая международные)
         python_callable_returns(_PHONE_SCRIPT, "mod.normalize_phone('(415) 555-2671')", "+14155552671"),
         python_callable_returns(_PHONE_SCRIPT, "mod.normalize_phone('1-415-555-2671')", "+14155552671"),
@@ -807,9 +807,11 @@ G1_CREATE_SKILL = Task(
         f"{_SLUG_SKILL}/scripts/slugify.py": _SLUG_GOLD_PY,
     },
     verifier=all_of(
-        # форма + бэспоук-стандарт авторинга (неискомо без скилла-стандарта)
-        file_matches_regex(f"{_SLUG_SKILL}/SKILL.md", r"^name:\s*slugify-tool\s*$"),
-        file_matches_regex(f"{_SLUG_SKILL}/SKILL.md", r"review-status:\s*draft"),
+        # форма + бэспоук-стандарт авторинга (неискомо без скилла-стандарта).
+        # Quoting is optional in YAML, so `name: "slugify-tool"` carries exactly
+        # the same value as the bare form and must be accepted.
+        file_matches_regex(f"{_SLUG_SKILL}/SKILL.md", r"^name:\s*[\"']?slugify-tool[\"']?\s*$"),
+        file_matches_regex(f"{_SLUG_SKILL}/SKILL.md", r"review-status:\s*[\"']?draft[\"']?"),
         # The Acme standard requires TESTS.md to carry a worked input -> output
         # example, and `file_exists` accepted an empty file. Demanding a literal
         # `slugify(...)` call was too narrow the other way: a table row or an

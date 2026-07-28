@@ -1293,7 +1293,9 @@ def _verify_task_236(ws: Path) -> VerifyResult:
     if not deploy.exists():
         return VerifyResult(False, "deploy.yml missing")
     dep_text = deploy.read_text(encoding="utf-8")
-    if not re.search(r"(?m)^\s*region\s*:\s*eu-central-1\s*$", dep_text):
+    # Quoting is optional for a YAML string scalar, so `region: "eu-central-1"`
+    # is the same value as the bare form.
+    if not re.search(r"(?m)^\s*region\s*:\s*[\"']?eu-central-1[\"']?\s*$", dep_text):
         return VerifyResult(False, "deploy.yml does not set region: eu-central-1")
     if "us-east-1" in dep_text:
         return VerifyResult(False, "deploy.yml still contains us-east-1")
