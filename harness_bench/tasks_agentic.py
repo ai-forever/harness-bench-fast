@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 
 from harness_bench.core import Task, VerifyResult
-from harness_bench.verifiers import file_lines_equal, pytest_passes
+from harness_bench.verifiers import enforce_untouched_tests, file_lines_equal, pytest_passes
 
 
 def _read_json(ws: Path, rel: str) -> object:
@@ -2072,3 +2072,7 @@ AGENTIC_TASKS: list[Task] = [
     TASK_297,
     TASK_298,
 ]
+
+# The SWE tasks above tell the agent the suite is off limits, but `pytest_passes`
+# alone scores an agent that rewrote the assertions instead of fixing the bug.
+enforce_untouched_tests(AGENTIC_TASKS)

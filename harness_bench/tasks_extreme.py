@@ -362,12 +362,16 @@ TASK_156 = Task(
 
 
 # 157. two_csv_diff — report rows only in A, only in B
-_A_ROWS = {"alpha", "bravo", "charlie", "delta", "echo"}
-_B_ROWS = {"bravo", "charlie", "foxtrot", "golf", "echo"}
+# Lists, not sets: joining a set puts the rows in hash order, so a.csv and b.csv
+# differed between runs. Scoring was unaffected (the verifier sorts), but the
+# fixture was not reproducible and every dataset export snapshotted a different
+# file.
+_A_ROWS = ["alpha", "bravo", "charlie", "delta", "echo"]
+_B_ROWS = ["bravo", "charlie", "echo", "foxtrot", "golf"]
 _A_CSV = "name\n" + "\n".join(_A_ROWS) + "\n"
 _B_CSV = "name\n" + "\n".join(_B_ROWS) + "\n"
-_ONLY_A = sorted(_A_ROWS - _B_ROWS)  # alpha, delta
-_ONLY_B = sorted(_B_ROWS - _A_ROWS)  # foxtrot, golf
+_ONLY_A = sorted(set(_A_ROWS) - set(_B_ROWS))  # alpha, delta
+_ONLY_B = sorted(set(_B_ROWS) - set(_A_ROWS))  # foxtrot, golf
 
 
 def _verify_task_157(ws: Path) -> VerifyResult:
@@ -1600,7 +1604,13 @@ def _verify_task_180(ws: Path) -> VerifyResult:
         if got is None:
             return VerifyResult(False, f"percentiles.json missing key {key!r}")
         try:
-            if abs(float(got) - float(want)) > 0.5:
+            # Tolerance covers the legitimate percentile conventions rather than
+            # one of them. The prompt blesses `statistics`, whose default
+            # `quantiles` method is exclusive and lands up to 0.9 away from the
+            # numpy-style interpolation the gold uses — so a textbook stdlib
+            # solution used to fail. Values span 1..100, so 1.5 still separates
+            # p25 from p50 and cannot be satisfied by a wrong answer.
+            if abs(float(got) - float(want)) > 1.5:
                 return VerifyResult(False, f"percentiles.json[{key}] = {got!r}, expected {want!r}")
         except (TypeError, ValueError):
             return VerifyResult(False, f"percentiles.json[{key}] not numeric: {got!r}")
@@ -1616,8 +1626,9 @@ TASK_180 = Task(
         " произвольном порядке) в колонке value. Посчитай для них пять"
         " перцентилей: 25-й, 50-й, 75-й, 90-й, 95-й. Сохрани результат в"
         " percentiles.json как объект с ключами 'p25', 'p50', 'p75', 'p90',"
-        " 'p95' и числовыми значениями (можно округлять до целых или с"
-        " точностью до 0.5). Допустимо использовать numpy/statistics."
+        " 'p95' и числовыми значениями. Конкретная конвенция перцентиля не важна"
+        " — подойдёт любая общепринятая; допустимо использовать numpy/statistics"
+        " или посчитать вручную."
     ),
     setup_files={"values.csv": "value\n" + "\n".join(str(v) for v in sorted(_PERC_VALUES, reverse=True)) + "\n"},
     gold_files={"percentiles.json": json.dumps(_PERC_GOLD) + "\n"},

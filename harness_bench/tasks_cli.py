@@ -62,6 +62,13 @@ from harness_bench.core import Task, VerifyResult
 #: is composing CLI tools, and "write a Python one-liner" sidesteps it entirely.
 _FORBIDDEN_INTERPRETERS = ("python", "python3", "perl", "node", "ruby", "php", "deno")
 
+#: Common implementation names for a banned tool. Banning `awk` has to ban the
+#: implementations too, or the exercise is sidestepped by spelling it `gawk`.
+_TOOL_ALIASES: dict[str, tuple[str, ...]] = {
+    "awk": ("gawk", "mawk", "nawk", "busybox"),
+    "sed": ("gsed",),
+}
+
 
 def _read_text(path: Path, rel: str) -> str | VerifyResult:
     try:
@@ -127,11 +134,37 @@ def _csv_equals(rel: str, expected_rows: list[list[str]], *, delimiter: str = ",
     return _verify
 
 
+def _strip_shell_comments(source: str) -> str:
+    """Blank out `#` comments so the ban is matched against code only.
+
+    A comment is a `#` that opens a word outside quotes — the shell's own rule,
+    which keeps `${var#prefix}` and `'a#b'` intact. Without this the ban fires
+    on prose: a script that says `# count edges per node`, or that restates the
+    task's own "no awk, no sed" constraint, is rejected while being correct.
+    """
+    out = []
+    for line in source.splitlines():
+        quote: str | None = None
+        cut = len(line)
+        for i, ch in enumerate(line):
+            if quote is not None:
+                if ch == quote:
+                    quote = None
+            elif ch in "'\"":
+                quote = ch
+            elif ch == "#" and (i == 0 or line[i - 1].isspace()):
+                cut = i
+                break
+        out.append(line[:cut])
+    return "\n".join(out)
+
+
 def _script_produces(
     script_rel: str,
     outputs: dict[str, Any],
     *,
     banned_tools: tuple[str, ...] = (),
+    must_use: tuple[str, ...] = (),
     allowed_note: str = "",
     timeout: int = 90,
 ):
@@ -145,10 +178,24 @@ def _script_produces(
     interpreters. Tasks use it to close the shortcut that would collapse the
     exercise — banning `awk` in a `join` task, for instance, since one `awk`
     invocation can otherwise stand in for the whole toolset being measured.
+
+    `must_use` names the inputs the answer has to be derived from — the fixture
+    file, the shipped tool, or both. Regenerating an artifact is not by itself
+    evidence of work: every expected output here is a handful of lines, so
+    `printf 'serde,4\\nutils,3\\n' > hotspots.csv` regenerates it perfectly
+    while reading nothing. Requiring the script to name its inputs closes that
+    shortcut.
     """
-    forbidden = _FORBIDDEN_INTERPRETERS + banned_tools
+    forbidden = _FORBIDDEN_INTERPRETERS + banned_tools + tuple(
+        variant
+        for name in banned_tools
+        for variant in _TOOL_ALIASES.get(name, ())
+    )
+    # Match a bare command or one reached through a path, so `/usr/bin/python3`,
+    # `./python3` and `../bin/perl` are caught rather than slipping past a
+    # lookbehind that treats `/` as part of an innocent word.
     pattern = re.compile(
-        r"(?<![\w./-])(" + "|".join(re.escape(name) for name in forbidden) + r")(?![\w.-])"
+        r"(?<![\w.-])(?:[\w.-]*/)*(" + "|".join(re.escape(name) for name in forbidden) + r")(?![\w.-])"
     )
 
     def _verify(ws: Path) -> VerifyResult:
@@ -161,11 +208,26 @@ def _script_produces(
         source = _read_text(script, script_rel)
         if isinstance(source, VerifyResult):
             return source
-        banned = sorted({match.group(1) for match in pattern.finditer(source)})
+        # An agent editing on Windows saves CRLF; bash then reads `set -o pipefail\r`
+        # and dies on "invalid option name". That is a line-ending accident, not a
+        # failure to compose CLI tools, so normalise before running.
+        raw = script.read_bytes()
+        if b"\r\n" in raw:
+            script.write_bytes(raw.replace(b"\r\n", b"\n"))
+            source = source.replace("\r\n", "\n")
+        code = _strip_shell_comments(source)
+        banned = sorted({match.group(1) for match in pattern.finditer(code)})
         if banned:
             return VerifyResult(
                 False,
                 f"{script_rel} uses a tool this task forbids: {banned!r}. {allowed_note}",
+            )
+        missing = [name for name in must_use if name not in code]
+        if missing:
+            return VerifyResult(
+                False,
+                f"{script_rel} never references {missing!r}; the answer must be derived from the "
+                f"task's inputs, not written out literally",
             )
         for rel in outputs:
             (ws / rel).unlink(missing_ok=True)
@@ -2274,6 +2336,7 @@ TASK_382 = Task(
     verifier=_script_produces(
         "solve.sh",
         {"hotspots.csv": "serde,4\nutils,3\ncore,2\n"},
+        must_use=("conf/deps.json", "tools/depwalk"),
         allowed_note="Вся обработка должна быть на CLI-утилитах.",
     ),
 )
@@ -2311,6 +2374,7 @@ TASK_383 = Task(
     verifier=_script_produces(
         "solve.sh",
         {"ports.tsv": "443\t16\t9091\n80\t3\t2488\n0\t3\t1612\n53\t4\t1376\n"},
+        must_use=("tools/pktool",),
         allowed_note="Агрегация должна быть сделана утилитами командной строки.",
     ),
 )
@@ -2349,6 +2413,7 @@ TASK_384 = Task(
     verifier=_script_produces(
         "solve.sh",
         {"warehouse_value.csv": "WH1,5,1114.70\nWH2,3,1091.55\nWH3,2,260.50\n"},
+        must_use=("stock/layout.txt", "tools/slicer"),
         allowed_note="Считать нужно утилитами командной строки.",
     ),
 )
@@ -2410,6 +2475,7 @@ TASK_385 = Task(
                 "web-21,eu-west,88\n"
             )
         },
+        must_use=("servers.csv",),
         banned_tools=("awk", "sed"),
         allowed_note="Разрешены только sort, cut, head, tail, tr и grep.",
     ),
@@ -2485,6 +2551,7 @@ TASK_386 = Task(
     verifier=_script_produces(
         "solve.sh",
         {"enriched.csv": _TASK_386_EXPECTED},
+        must_use=("customers.csv", "orders.csv"),
         banned_tools=("awk", "sed"),
         allowed_note="Соединять нужно утилитой join.",
     ),
@@ -2530,6 +2597,7 @@ TASK_387 = Task(
     verifier=_script_produces(
         "solve.sh",
         {"campaign.txt": "u-1021\nu-1042\n"},
+        must_use=("active.txt", "enrolled.txt", "optedout.txt"),
         banned_tools=("awk", "sed"),
         allowed_note="Пересечение и разность нужно считать утилитой comm.",
     ),
@@ -2591,6 +2659,7 @@ TASK_388 = Task(
     verifier=_script_produces(
         "solve.sh",
         {"top_errors.csv": "/api/orders,4\n/api/users,4\n/api/reports,2\n/api/billing,1\n"},
+        must_use=("access.log",),
         banned_tools=("awk",),
         allowed_note="Считать частоты нужно через sort и uniq -c.",
     ),
@@ -2660,6 +2729,7 @@ TASK_389 = Task(
                 "logs/root.log,12\n"
             )
         },
+        must_use=("logs",),
         banned_tools=("awk",),
         allowed_note="Отбирать файлы нужно через find и xargs -0.",
     ),
@@ -2721,6 +2791,7 @@ TASK_390 = Task(
                 "transport,2,6.00,3.00\n"
             )
         },
+        must_use=("transactions.csv",),
         allowed_note="Группировать нужно средствами командной строки.",
     ),
 )
@@ -2788,6 +2859,7 @@ TASK_391 = Task(
                 "runtime.replicas=6\n"
             )
         },
+        must_use=("deploy.conf",),
         banned_tools=("awk",),
         allowed_note="Вырезать секцию и переписывать строки нужно через sed.",
     ),

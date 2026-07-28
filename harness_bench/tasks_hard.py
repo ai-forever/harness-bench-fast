@@ -31,12 +31,12 @@ from harness_bench.core import Task, VerifyResult
 from harness_bench.verifiers import (
     all_of,
     file_contains,
-    file_exists,
     file_lines_equal,
     file_matches_regex,
     file_text_equals,
     pytest_passes,
     python_callable_returns,
+    python_runs,
     xlsx_cell_equals,
 )
 
@@ -57,7 +57,8 @@ TASK_101 = Task(
         "В файле scores.csv 30 строк данных (после строки-заголовка name,score)."
         " Посчитай среднее арифметическое по столбцу score и запиши его одной"
         " строкой в файл mean.txt, округлив до двух знаков после запятой (точка"
-        " как десятичный разделитель, например '64.50')."
+        " как десятичный разделитель, в формате '12.34' — ровно два знака, даже"
+        " если второй нулевой)."
     ),
     setup_files={"scores.csv": _SCORES_CSV},
     gold_files={"mean.txt": "64.50\n"},
@@ -1149,7 +1150,10 @@ TASK_134 = Task(
         "out.txt": _HELLO_GOLD_STDOUT + "\n",
     },
     verifier=all_of(
-        file_exists("greet.py"),
+        # `file_exists` accepted an empty greet.py, and the expected stdout is
+        # quoted in the prompt — so `touch greet.py; echo ... > out.txt` passed
+        # without writing or running a script. Execute it instead.
+        python_runs("greet.py", expected_stdout=_HELLO_GOLD_STDOUT),
         file_text_equals("out.txt", _HELLO_GOLD_STDOUT),
     ),
 )
@@ -1213,7 +1217,10 @@ def _verify_task_136(ws: Path) -> VerifyResult:
         return VerifyResult(False, "files.txt missing")
     raw = [line.strip() for line in p.read_text().splitlines() if line.strip()]
     # Accept either bare filenames or relative paths starting with project/.
-    normalised = {line.split("/")[-1] for line in raw}
+    # Split on both separators: on Windows an agent using pathlib/os.walk
+    # emits "project\\file.txt", which a forward-slash-only split left intact
+    # and the comparison then rejected.
+    normalised = {line.replace("\\", "/").split("/")[-1] for line in raw}
     if normalised != _TODO_NAMES:
         return VerifyResult(
             False,
@@ -1288,7 +1295,10 @@ def _verify_task_138(ws: Path) -> VerifyResult:
     if not p.exists():
         return VerifyResult(False, "with_api_key.txt missing")
     raw = [line.strip() for line in p.read_text().splitlines() if line.strip()]
-    normalised = {line.split("/")[-1] for line in raw}
+    # Split on both separators: on Windows an agent using pathlib/os.walk
+    # emits "project\\file.txt", which a forward-slash-only split left intact
+    # and the comparison then rejected.
+    normalised = {line.replace("\\", "/").split("/")[-1] for line in raw}
     if normalised != _YAML_NAMES_WITH_KEY:
         return VerifyResult(
             False,
@@ -1487,7 +1497,9 @@ def _verify_task_143(ws: Path) -> VerifyResult:
     p = ws / "largest.txt"
     if not p.exists():
         return VerifyResult(False, "largest.txt missing")
-    actual = p.read_text().strip()
+    # Normalise the separator: on Windows a pathlib-based solution writes
+    # "big_project\\file.py", which is the same answer.
+    actual = p.read_text(encoding="utf-8").strip().replace("\\", "/")
     expected_variants = {_BIG_BIGGEST, f"big_project/{_BIG_BIGGEST}"}
     if actual in expected_variants:
         return VerifyResult(True, f"largest.txt names the right file: {actual}")
@@ -1803,8 +1815,11 @@ _TX150_CSV = "id,amount\n" + "".join(f"{i + 1},{a}\n" for i, a in enumerate(_TX1
 
 
 def _verify_task_150(ws: Path) -> VerifyResult:
-    if not (ws / "sum.py").exists():
-        return VerifyResult(False, "sum.py missing")
+    # Existence alone let an empty sum.py through, leaving the "write a program
+    # that computes the total" half of the task ungraded. Run it.
+    ran = python_runs("sum.py", expected_stdout=str(_TX150_TOTAL))(ws)
+    if not ran.passed:
+        return ran
     if not (ws / "total.txt").exists():
         return VerifyResult(False, "total.txt missing")
     actual = (ws / "total.txt").read_text().strip()

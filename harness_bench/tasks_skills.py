@@ -27,7 +27,6 @@ from harness_bench.core import Task, VerifyResult
 from harness_bench.verifiers import (
     all_of,
     file_contains,
-    file_exists,
     file_matches_regex,
     file_text_equals,
     python_callable_returns,
@@ -790,10 +789,13 @@ G1_CREATE_SKILL = Task(
         "Создай новый скилл в каталоге skills/slugify-tool, который умеет"
         " приводить произвольный текст к URL-безопасному slug. Скрипт"
         " scripts/slugify.py должен экспортировать функцию slugify(text: str)"
-        " -> str: привести к нижнему регистру, заменить любые пробелы на дефис,"
-        " удалить все символы кроме латиницы a-z, цифр 0-9 и дефиса, и убрать"
-        " дефисы по краям. Оформи скилл строго по внутреннему стандарту"
-        " авторинга скиллов Acme."
+        # "заменить любые пробелы на дефис" read literally gives `.replace(" ", "-")`,
+        # which turns a double space into "--" and fails the hidden 'Foo  Bar Baz'
+        # case. The collapsing rule has to be stated, since nothing else does.
+        " -> str: привести к нижнему регистру, заменить каждую последовательность"
+        " подряд идущих пробельных символов на один дефис, удалить все символы"
+        " кроме латиницы a-z, цифр 0-9 и дефиса, и убрать дефисы по краям."
+        " Оформи скилл строго по внутреннему стандарту авторинга скиллов Acme."
     ),
     setup_files={
         ".claude/skills/acme-skill-standard/SKILL.md": _AUTHORING_STANDARD,
@@ -808,7 +810,9 @@ G1_CREATE_SKILL = Task(
         # форма + бэспоук-стандарт авторинга (неискомо без скилла-стандарта)
         file_matches_regex(f"{_SLUG_SKILL}/SKILL.md", r"^name:\s*slugify-tool\s*$"),
         file_matches_regex(f"{_SLUG_SKILL}/SKILL.md", r"review-status:\s*draft"),
-        file_exists(f"{_SLUG_SKILL}/TESTS.md"),
+        # The Acme standard requires TESTS.md to carry a worked input -> output
+        # example; `file_exists` accepted an empty file.
+        file_matches_regex(f"{_SLUG_SKILL}/TESTS.md", r"slugify\s*\(.+\).*\S"),
         # функция на скрытых входах
         python_callable_returns(f"{_SLUG_SKILL}/scripts/slugify.py", "mod.slugify('Hello, World!')", "hello-world"),
         python_callable_returns(f"{_SLUG_SKILL}/scripts/slugify.py", "mod.slugify('Foo  Bar Baz')", "foo-bar-baz"),

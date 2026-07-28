@@ -22,6 +22,7 @@ from harness_bench.core import Task, VerifyResult
 from harness_bench.verifiers import (
     all_of,
     file_contains,
+    file_does_not_exist,
     file_exists,
     file_not_contains,
     file_text_equals,
@@ -62,7 +63,11 @@ def _json_file_matches_loose(rel: str, expected, *, ordered: bool = False):
 def _verify_csv_rows(path: Path, expected_header: list[str], expected_rows: list[list[str]]) -> VerifyResult:
     if not path.exists():
         return VerifyResult(False, f"{path.name} missing")
-    lines = [line.strip() for line in path.read_text().splitlines() if line.strip()]
+    # Backslashes are normalised to "/" so a path column produced on Windows
+    # ("docs\\a.txt" from os.walk / pathlib) compares equal to the POSIX form the
+    # prompts describe.
+    text = path.read_text(encoding="utf-8").replace("\\", "/")
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
     if not lines:
         return VerifyResult(False, f"{path.name} is empty")
     header = [x.strip() for x in lines[0].split(",")]
@@ -539,9 +544,13 @@ TASK_212 = Task(
 
 
 # 213. Markdown link audit
+# No URL is followed by a sentence period: the verifier compares links
+# literally, so a glued full stop turned the standard `https?://\S+` scan into a
+# failure over punctuation the prompt never mentions. The task measures link
+# classification, not trailing-dot trimming.
 _DOCS_213 = {
-    "docs/a.md": "See https://example.com/a and http://legacy.local/page.\n",
-    "docs/b.md": "Ref: https://example.com/b and https://docs.site/help.\n",
+    "docs/a.md": "See https://example.com/a and http://legacy.local/page for details\n",
+    "docs/b.md": "Ref: https://example.com/b and https://docs.site/help for more\n",
     "docs/c.md": "Internal http://localhost:3000/dev and https://example.com/c\n",
 }
 _DOMAINS_213 = {"example.com": 3, "docs.site": 1, "legacy.local": 1, "localhost:3000": 1}
@@ -634,7 +643,11 @@ TASK_214 = Task(
         "  - invalid_emails: список id, у которых email не содержит символ '@',\n"
         "  - invalid_ages: список id, у которых age не целое неотрицательное число,\n"
         "  - missing_country_ids: список id, у которых пустое country.\n"
-        "Все списки — строки id, отсортированные по возрастанию."
+        # The fixture repeats the bad-email row on purpose, so whether an id may
+        # appear twice decides the answer and has to be stated.
+        "Все списки — строки id, отсортированные по возрастанию, без повторов:"
+        " каждый id входит в список не более одного раза, даже если подходящих"
+        " строк с этим id несколько."
     ),
     setup_files={"customers.csv": _CUSTOMERS_214},
     gold_files={"dq_report.json": json.dumps(_DQ_214) + "\n"},
@@ -673,7 +686,9 @@ def _verify_task_215(ws: Path) -> VerifyResult:
         return VerifyResult(False, f"summary.json invalid JSON: {exc}")
     if summary != _SUMMARY_215:
         return VerifyResult(False, f"summary mismatch: {summary!r} != {_SUMMARY_215!r}")
-    triage = t.read_text().strip()
+    # Same separator normalisation as _verify_csv_rows: "src\\a.py:2" is the
+    # same finding as "src/a.py:2".
+    triage = t.read_text(encoding="utf-8").replace("\\", "/").strip()
     if triage != _TRIAGE_215.strip():
         return VerifyResult(False, "triage.md content differs from expected structured report")
     return VerifyResult(True, "summary.json and triage.md match expected TODO/FIXME inventory")
@@ -687,15 +702,18 @@ TASK_215 = Task(
         "Просканируй все .py файлы под src/ и найди строки с TODO и FIXME.\n"
         "Создай:\n"
         "  - summary.json с ключами todo_count и fixme_count,\n"
-        "  - triage.md в формате:\n"
-        "      ## TODO\n"
-        "      - <path>:<line> <text>\n"
-        "      ...\n"
-        "      ## FIXME\n"
-        "      - <path>:<line> <text>\n"
-        "    где <text> — содержимое комментария начиная с маркера TODO:/FIXME:\n"
-        "    (то есть префикс сохраняется). Пример строки:\n"
-        "      - src/a.py:2 TODO: refactor\n"
+        "  - triage.md.\n"
+        # Quoted at column 0 because that is how triage.md must be written. The
+        # block used to be indented for readability while the verifier compared
+        # it literally, punishing agents that copied what they were shown.
+        "Формат triage.md — буквально, без ведущих пробелов:\n"
+        "## TODO\n"
+        "- <path>:<line> <text>\n"
+        "...\n"
+        "## FIXME\n"
+        "- <path>:<line> <text>\n"
+        "где <text> — содержимое комментария начиная с маркера TODO:/FIXME:"
+        " (то есть префикс сохраняется), например `- src/a.py:2 TODO: refactor`.\n"
         "Секции и порядок строк внутри каждой секции — по path asc, затем line asc.\n"
         "Между секциями ровно одна пустая строка."
     ),
@@ -742,7 +760,10 @@ TASK_216 = Task(
     ),
     setup_files={"products.csv": _PRODUCTS_216, "sales.csv": _SALES_216},
     gold_files={"category_revenue.csv": _ROLLUP_216},
-    verifier=file_contains("category_revenue.csv", "books,380", "tech,150", "food,80"),
+    # Substring presence ignored the header, the ordering the prompt specifies,
+    # and any extra rows — a file with the three numbers in the wrong order plus
+    # a garbage line passed. The deliverable is compared as text.
+    verifier=file_text_equals("category_revenue.csv", _ROLLUP_216),
 )
 
 
@@ -896,6 +917,12 @@ TASK_220 = Task(
     },
     verifier=all_of(
         file_exists("src/core/math_ops.py"),
+        # The prompt calls for a move, not a copy; without this an agent that
+        # left the original in place scored full marks on a quarter of the work.
+        file_does_not_exist("src/utils/math.py"),
+        # `file_not_contains` is satisfied by an empty file, so require the
+        # rewritten import to actually be there.
+        file_contains("src/app/main.py", "src.core.math_ops"),
         file_not_contains("src/app/main.py", "utils.math"),
         file_not_contains("tests/test_main.py", "utils.math"),
         pytest_passes("tests"),

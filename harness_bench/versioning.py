@@ -277,6 +277,60 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "suffices to reach the exact expected artifact."
         ),
     ),
+    TaskSetRevision(
+        version="0.16.0",
+        introduced="2026-07-28",
+        total_tasks=391,
+        added_task_numbers=(0, 0),
+        modules=(
+            "core.py",
+            "verifiers.py",
+            "tasks.py",
+            "tasks_extra.py",
+            "tasks_more.py",
+            "tasks_hard.py",
+            "tasks_extreme.py",
+            "tasks_diagnostic.py",
+            "tasks_memory.py",
+            "tasks_agentic.py",
+            "tasks_skills.py",
+            "tasks_adversarial.py",
+            "tasks_cli.py",
+        ),
+        notes=(
+            "No tasks added or removed; an audit of all 391 corrected defects "
+            "that gold-verification cannot see, since gold writes a "
+            "precomputed constant and the verifier checks that same constant. "
+            "Scores are not comparable with 0.15.0 and earlier. Four classes "
+            "were fixed. (1) Winnable without work: task 35 passed on a "
+            "verbatim copy of its fixture because file_lines_equal drops the "
+            "blank lines the task asks to remove; task 101 quoted its own "
+            "answer as a format example; task 335 passed on an untouched "
+            "workspace, so an idle agent scored the same as one that spotted "
+            "the contradiction; task 341 named both the file and its contents; "
+            "and the ten shell tasks accepted a hardcoded printf. (2) Correct "
+            "work rejected: task 89 said 'отступы сохраняй' over a block the "
+            "verifier wanted dedented — half its observed failures were agents "
+            "obeying the prompt; tasks 222/232 accepted one phrasing of a "
+            "memory key the convention never prescribes; task 180 blessed "
+            "`statistics` while pinning numpy's percentile convention; task "
+            "323 said 'заменить любые пробелы' but tested run-collapsing; task "
+            "349 graded the harness by checking only one of two identical "
+            "skill copies. (3) Prompt requirements left ungraded: eighteen "
+            "tasks forbade editing the tests with nothing but pytest_passes "
+            "behind it, so rewriting the suite to `assert True` scored full "
+            "marks; tasks 231/253 skipped dot-files and so could not see a "
+            "secret written to .env; task 220's required deletion and task "
+            "216's ordering went unchecked. (4) Platform and self-pollution: "
+            "Task.setup now writes fixtures as UTF-8 with LF, so byte-level "
+            "tasks are no longer unwinnable on Windows; path separators are "
+            "normalised where a path is compared; solve.sh saved with CRLF no "
+            "longer dies on 'set: pipefail\\r'; the interpreter ban no longer "
+            "fires on comments nor is evaded by /usr/bin/python3 or gawk; and "
+            "counting tasks are scoped to src/ so a helper script the agent "
+            "writes is not itself counted."
+        ),
+    ),
 )
 
 CURRENT_TASK_SET_REVISION = TASK_SET_REVISIONS[-1]

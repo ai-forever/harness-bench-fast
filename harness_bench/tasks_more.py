@@ -450,9 +450,17 @@ def _verify_task_75(ws: Path) -> VerifyResult:
     p = ws / "squashed.txt"
     if not p.exists():
         return VerifyResult(False, "squashed.txt missing")
-    text = p.read_text()
+    text = p.read_text(encoding="utf-8")
     if "\n\n\n" in text:
         return VerifyResult(False, "squashed.txt still has 2+ consecutive blank lines")
+    # The prompt says each run collapses to *exactly one* blank line, but only
+    # the "no runs of 2+" half was checked, so deleting every blank line passed.
+    if text.strip() != "one\n\ntwo\n\nthree":
+        return VerifyResult(
+            False,
+            "each run of blank lines must collapse to exactly one blank line; "
+            f"got {text!r}",
+        )
     expected_content_lines = ["one", "two", "three"]
     content_lines = [line for line in text.splitlines() if line.strip()]
     if content_lines != expected_content_lines:
@@ -918,14 +926,18 @@ TASK_89 = Task(
     name="Create .pre-commit-config.yaml",
     tags=("create", "config", "easy"),
     prompt=(
+        # The block is quoted at column 0, exactly as the file must be written.
+        # It used to be indented two spaces for readability while the verifier
+        # demanded the dedented form — so "отступы сохраняй" actively misled, and
+        # half the observed failures on this task were agents obeying it.
         "Создай в корне рабочей директории файл .pre-commit-config.yaml со"
-        " следующими ровно четырьмя непустыми строками (в указанном порядке,"
-        " отступы сохраняй):\n"
-        "  repos:\n"
-        "    - repo: https://github.com/astral-sh/ruff-pre-commit\n"
-        "      rev: v0.6.0\n"
-        "      hooks:\n"
-        " Никаких других строк добавлять не нужно."
+        " следующими ровно четырьмя непустыми строками — скопируй блок ниже"
+        " буквально, вместе с отступами:\n"
+        "repos:\n"
+        "  - repo: https://github.com/astral-sh/ruff-pre-commit\n"
+        "    rev: v0.6.0\n"
+        "    hooks:\n"
+        "Никаких других строк добавлять не нужно."
     ),
     setup_files={},
     gold_files={
@@ -1254,10 +1266,11 @@ TASK_99 = Task(
     name="Create a short README.md",
     tags=("create", "docs", "easy"),
     prompt=(
+        # Quoted at column 0, the way the file must actually look.
         "Создай в корне рабочей директории файл README.md. В нём должно быть"
         " ровно две непустые строки в указанном порядке:\n"
-        "  # demo\n"
-        "  Описание проекта."
+        "# demo\n"
+        "Описание проекта."
     ),
     setup_files={},
     gold_files={"README.md": "# demo\nОписание проекта.\n"},

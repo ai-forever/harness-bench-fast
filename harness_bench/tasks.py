@@ -265,17 +265,19 @@ TASK_11 = Task(
     id="task_11_count_py",
     name="Count .py files into count.txt",
     tags=("read", "search", "medium"),
+    # Scoped to src/ so a .py helper the agent writes in the working directory
+    # is not itself counted.
     prompt=(
-        "Посчитай, сколько в текущей рабочей директории файлов с расширением"
-        " .py (включая вложенные подкаталоги). Запиши получившееся число одной"
+        "Посчитай, сколько внутри каталога src файлов с расширением .py"
+        " (включая вложенные подкаталоги). Запиши получившееся число одной"
         " строкой в файл count.txt — без лишних пробелов, текста или префиксов."
     ),
     setup_files={
-        "main.py": "",
-        "a/foo.py": "",
-        "b/bar.py": "",
-        "c/baz.txt": "",
-        "nested/inner/deep.py": "",
+        "src/main.py": "",
+        "src/a/foo.py": "",
+        "src/b/bar.py": "",
+        "src/c/baz.txt": "",
+        "src/nested/inner/deep.py": "",
     },
     gold_files={"count.txt": "4\n"},
     verifier=file_text_equals("count.txt", "4"),

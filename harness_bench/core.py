@@ -53,11 +53,19 @@ class Task:
     tags: tuple[str, ...] = ()
 
     def setup(self, workspace: Path) -> None:
-        """Write the task's setup files into `workspace`."""
+        """Write the task's setup files into `workspace`.
+
+        Written with an explicit LF terminator and UTF-8 encoding so a fixture
+        is byte-identical on every platform. Without `newline=""` Python
+        translates `\\n` to `\\r\\n` on Windows, which silently changes file
+        sizes and hashes, breaks fixtures handed to real shell tools, and makes
+        byte-level tasks unwinnable there; without `encoding` the writes follow
+        the locale codec and Cyrillic fixtures raise on a cp1251 console.
+        """
         for rel, content in self.setup_files.items():
             target = workspace / rel
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(content)
+            target.write_text(content, encoding="utf-8", newline="")
         if self.setup_callback is not None:
             self.setup_callback(workspace)
 
@@ -79,7 +87,7 @@ class Task:
                     parent = parent.parent
             else:
                 target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_text(content)
+                target.write_text(content, encoding="utf-8", newline="")
         if self.gold_callback is not None:
             self.gold_callback(workspace)
 

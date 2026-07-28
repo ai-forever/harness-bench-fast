@@ -144,7 +144,10 @@ TASK_35 = Task(
         "notes.txt": "первая\n\nвторая\n  \nтретья\n\n\nчетвёртая\n",
     },
     gold_files={"cleaned.txt": "первая\nвторая\nтретья\nчетвёртая\n"},
-    verifier=file_lines_equal("cleaned.txt", ["первая", "вторая", "третья", "четвёртая"]),
+    # `file_lines_equal` filters blank lines before comparing — which is exactly
+    # the work being asked for, so under it `cp notes.txt cleaned.txt` passes.
+    # The deliverable has to be compared as text.
+    verifier=file_text_equals("cleaned.txt", "первая\nвторая\nтретья\nчетвёртая"),
 )
 
 
@@ -286,15 +289,21 @@ TASK_41 = Task(
     id="task_41_count_todos",
     name="Count occurrences of TODO across files",
     tags=("read", "search", "medium"),
+    # Scoped to src/ for the same reason as task 51: a helper script written in
+    # the working directory contains the literal "TODO" and inflates the count.
+    # The "occurrences, not lines" rule is spelled out because one fixture line
+    # holds two of them and `grep -c` — the reflex answer — reports lines: of the
+    # observed failures, most answered 4.
     prompt=(
         "Посчитай общее число вхождений слова 'TODO' (с учётом регистра, точное"
-        " совпадение подстроки) во всех файлах в текущей директории и подкаталогах."
+        " совпадение подстроки) во всех файлах внутри каталога src и его"
+        " подкаталогах. Если в одной строке несколько вхождений — считай каждое."
         " Запиши получившееся число одной строкой в файл count.txt."
     ),
     setup_files={
-        "a.py": "# TODO: fix\nx = 1\n",
-        "b.py": "y = 2  # TODO\n# nothing here\n# TODO and TODO\n",
-        "c.txt": "TODO\n",
+        "src/a.py": "# TODO: fix\nx = 1\n",
+        "src/b.py": "y = 2  # TODO\n# nothing here\n# TODO and TODO\n",
+        "src/c.txt": "TODO\n",
     },
     gold_files={"count.txt": "5\n"},
     verifier=file_text_equals("count.txt", "5"),
@@ -598,18 +607,22 @@ TASK_51 = Task(
     id="task_51_count_total_lines",
     name="Sum lines across all .py files",
     tags=("read", "search", "compute", "medium"),
+    # Scoped to src/ so a helper script the agent writes in the working
+    # directory is not itself counted. When the scope was "рабочая директория",
+    # an agent that solved this the obvious way — write count.py, run it —
+    # produced an answer that was correct for the directory as it stood and
+    # wrong for the grader; observed failures were 14/16/19/20 against 10.
     prompt=(
-        "Посчитай суммарное количество строк во всех .py-файлах в рабочей"
-        " директории (включая подкаталоги). Считай каждую строку файла,"
-        " включая пустые. Запиши получившееся число одной строкой в файл"
-        " total.txt."
+        "Посчитай суммарное количество строк во всех .py-файлах внутри каталога"
+        " src (включая его подкаталоги). Считай каждую строку файла, включая"
+        " пустые. Запиши получившееся число одной строкой в файл total.txt."
     ),
     setup_files={
-        "a.py": "x = 1\nprint(x)\n",  # 2 lines
-        "b.py": "y = 2\n\nprint(y)\n",  # 3 lines
-        "pkg/c.py": "z = 3\n",  # 1 line
-        "pkg/sub/d.py": "w = 4\nprint(w)\n\n# trailing\n",  # 4 lines
-        "notes.txt": "ignored",  # not .py
+        "src/a.py": "x = 1\nprint(x)\n",  # 2 lines
+        "src/b.py": "y = 2\n\nprint(y)\n",  # 3 lines
+        "src/pkg/c.py": "z = 3\n",  # 1 line
+        "src/pkg/sub/d.py": "w = 4\nprint(w)\n\n# trailing\n",  # 4 lines
+        "src/notes.txt": "ignored",  # not .py
     },
     gold_files={"total.txt": "10\n"},
     verifier=file_text_equals("total.txt", "10"),
@@ -643,17 +656,20 @@ TASK_52 = Task(
     id="task_52_find_files_with",
     name="List files containing MARKER",
     tags=("read", "search", "medium"),
+    # Scoped to src/: any helper the agent writes must itself contain the
+    # literal "MARKER" to search for it, which made the helper a legitimate hit
+    # in the directory being scanned.
     prompt=(
-        "Найди все файлы в текущей рабочей директории (без подкаталогов), в"
-        " которых встречается подстрока MARKER. Запиши их имена (без префиксов"
-        " вроде путей) в файл files.txt — каждое имя на отдельной строке. Порядок"
+        "Найди все файлы в каталоге src (без подкаталогов), в которых"
+        " встречается подстрока MARKER. Запиши их имена (без префиксов вроде"
+        " путей) в файл files.txt — каждое имя на отдельной строке. Порядок"
         " не важен."
     ),
     setup_files={
-        "alpha.py": "# MARKER\nx = 1\n",
-        "beta.py": "y = 2\n",
-        "gamma.py": "z = 3  # has MARKER inline\n",
-        "delta.py": "w = 4\n",
+        "src/alpha.py": "# MARKER\nx = 1\n",
+        "src/beta.py": "y = 2\n",
+        "src/gamma.py": "z = 3  # has MARKER inline\n",
+        "src/delta.py": "w = 4\n",
     },
     gold_files={"files.txt": "alpha.py\ngamma.py\n"},
     verifier=_verify_task_52,

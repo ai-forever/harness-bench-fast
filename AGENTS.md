@@ -8,10 +8,10 @@ When reporting итоговую таблицу benchmark runs for this repositor
 |---|---|---:|---:|---:|---:|
 
 Rules:
-- Include only completed runs with exactly 391 tasks (current task-set v0.15.0) unless the user asks for partials.
+- Include only completed runs with exactly 391 tasks (current task-set v0.16.0) unless the user asks for partials.
 - Sort rows by `score` descending.
 - Use `passed` as `<passed>/391` and `score` as a percentage with one decimal place.
-- Do not mix task-set versions in one table. Earlier runs scored against 371 tasks (v0.14.0) are not comparable to v0.15.0 runs; if both must appear, split the table and name the task-set version in each.
+- Do not mix task-set versions in one table. Earlier runs are not comparable: v0.14.0 scored 371 tasks, and v0.16.0 corrected defects across the 391 of v0.15.0 without changing their number. If more than one version must appear, split the table and name the task-set version in each.
 - Do not include artifact links or artifact paths in the main table unless explicitly requested.
 - Use the human-readable harness and model names, not only the JSON filename.
 - Include `steps` and `tokens` from the run JSON when present.

@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from harness_bench.core import Verifier, VerifyResult
+from harness_bench.core import Task, Verifier, VerifyResult
 
 
 def _read_utf8_text(path: Path, rel: str) -> str | VerifyResult:
@@ -287,6 +287,66 @@ def python_callable_returns(rel: str, call_expr: str, expected: Any) -> Verifier
         )
 
     return _check
+
+
+def files_unchanged(expected: dict[str, str]) -> Verifier:
+    """Pass when each file in `expected` still holds its original content.
+
+    For tasks whose prompt forbids touching something — almost always the test
+    suite. Without this the only check is that the suite passes, which an agent
+    satisfies by weakening the assertions instead of fixing the bug, scoring
+    full marks with the defect untouched.
+
+    Comparison ignores line endings and trailing whitespace so a harmless
+    rewrite through a text editor is not punished; any change to the actual
+    assertions is caught.
+    """
+
+    def _normalise(text: str) -> str:
+        return "\n".join(line.rstrip() for line in text.splitlines()).strip()
+
+    def _check(ws: Path) -> VerifyResult:
+        for rel, original in expected.items():
+            p = ws / rel
+            if not p.exists():
+                return VerifyResult(False, f"{rel} was deleted; this task forbids modifying it")
+            actual = _read_utf8_text(p, rel)
+            if isinstance(actual, VerifyResult):
+                return actual
+            if _normalise(actual) != _normalise(original):
+                return VerifyResult(False, f"{rel} was modified; this task forbids modifying it")
+        return VerifyResult(True, f"protected files untouched: {sorted(expected)}")
+
+    return _check
+
+
+def enforce_untouched_tests(tasks: list[Task]) -> list[Task]:
+    """Wire `files_unchanged` into every task whose prompt forbids editing tests.
+
+    Applied once over a wave's task list rather than repeated in each task, so
+    a task cannot be added with the prohibition in its prompt and no check
+    behind it — which is exactly how eighteen of them ended up scoring an agent
+    that rewrote the suite to `assert True` and never touched the bug.
+
+    A task is in scope when its prompt says the tests must not change; the
+    protected set is every setup file whose name looks like a test module.
+    """
+    prohibition = re.compile(r"(?i)(тест\w*|test[\w./]*)[^.]{0,60}менять нельзя|не меняй\s+\S*test")
+
+    for task in tasks:
+        if not prohibition.search(task.prompt):
+            continue
+        protected = {
+            rel: content
+            for rel, content in task.setup_files.items()
+            if rel.rsplit("/", 1)[-1].startswith("test_") or rel.rsplit("/", 1)[-1].endswith("_test.py")
+        }
+        if not protected:
+            raise ValueError(
+                f"{task.id}: prompt forbids editing tests but no test fixture was found to protect"
+            )
+        task.verifier = all_of(files_unchanged(protected), task.verifier)
+    return tasks
 
 
 def all_of(*verifiers: Verifier) -> Verifier:
