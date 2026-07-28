@@ -49,6 +49,7 @@ import shutil
 import stat
 import struct
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -61,6 +62,11 @@ from harness_bench.core import Task, VerifyResult
 #: Interpreters banned from `solve.sh`. The point of the shell half of the wave
 #: is composing CLI tools, and "write a Python one-liner" sidesteps it entirely.
 _FORBIDDEN_INTERPRETERS = ("python", "python3", "perl", "node", "ruby", "php", "deno")
+
+#: File the shipped tools append to when they run. Lexical checks on `solve.sh`
+#: cannot tell "drove the tool" from "mentioned its name", so the tools record
+#: their own invocations and the verifier reads that instead of guessing.
+_TOOL_CALL_LOG = ".hb_tool_calls"
 
 #: Common implementation names for a banned tool. Banning `awk` has to ban the
 #: implementations too, or the exercise is sidestepped by spelling it `gawk`.
@@ -193,9 +199,14 @@ def _script_produces(
     )
     # Match a bare command or one reached through a path, so `/usr/bin/python3`,
     # `./python3` and `../bin/perl` are caught rather than slipping past a
-    # lookbehind that treats `/` as part of an innocent word.
+    # lookbehind that treats `/` as part of an innocent word. The optional
+    # version suffix matters too: `python3.12`, `python3.11` and `python2` are
+    # the same interpreter under a different filename, and a trailing-dot
+    # lookahead let every one of them walk straight through the ban.
     pattern = re.compile(
-        r"(?<![\w.-])(?:[\w.-]*/)*(" + "|".join(re.escape(name) for name in forbidden) + r")(?![\w.-])"
+        r"(?<![\w.-])(?:[\w.-]*/)*("
+        + "|".join(re.escape(name) for name in forbidden)
+        + r")(?:\d+(?:\.\d+)*)?(?![\w-])"
     )
 
     def _verify(ws: Path) -> VerifyResult:
@@ -216,7 +227,9 @@ def _script_produces(
             script.write_bytes(raw.replace(b"\r\n", b"\n"))
             source = source.replace("\r\n", "\n")
         code = _strip_shell_comments(source)
-        banned = sorted({match.group(1) for match in pattern.finditer(code)})
+        # Report the command as it was written — `python3.12`, not the `python`
+        # stem — so the message names what the agent actually typed.
+        banned = sorted({match.group(0).rsplit("/", 1)[-1] for match in pattern.finditer(code)})
         if banned:
             return VerifyResult(
                 False,
@@ -229,6 +242,11 @@ def _script_produces(
                 f"{script_rel} never references {missing!r}; the answer must be derived from the "
                 f"task's inputs, not written out literally",
             )
+        # The reference check above is lexical, and lexical checks prove nothing:
+        # `echo active.txt >/dev/null` satisfies it while the answer is printf'd
+        # verbatim. The real test is whether the output depends on the input, so
+        # after the scored run the inputs are emptied and the script is run
+        # again; an answer that survives that was not computed from anything.
         for rel in outputs:
             (ws / rel).unlink(missing_ok=True)
         try:
@@ -254,23 +272,124 @@ def _script_produces(
             if not result.passed:
                 return VerifyResult(False, f"after running {script_rel}: {result.message}")
             messages.append(result.message)
+
+        if must_use:
+            starved = _rerun_with_empty_inputs(ws, bash, script_rel, must_use, outputs, timeout)
+            if starved is not None:
+                return starved
         return VerifyResult(True, f"{script_rel} ran; " + "; ".join(messages))
 
     return _verify
 
 
-def _make_tools_executable(ws: Path) -> None:
-    """Give every shipped `tools/*` file the executable bit.
+def _rerun_with_empty_inputs(
+    ws: Path,
+    bash: str,
+    script_rel: str,
+    must_use: tuple[str, ...],
+    outputs: dict[str, Any],
+    timeout: int,
+) -> VerifyResult | None:
+    """Re-run the script with its declared inputs emptied.
 
-    `Task.setup` writes plain text files, so without this the agent could only
-    run the tools through an interpreter — which several tasks ban.
+    Returns a failure when the expected artifacts come back anyway, which means
+    the answer was baked into the script rather than computed. Returns None when
+    the script's output legitimately depends on its inputs.
+
+    Everything happens in a throwaway copy so the scored artifacts are untouched.
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        sandbox = Path(tmp) / "ws"
+        shutil.copytree(ws, sandbox, symlinks=True)
+        for rel in must_use:
+            target = sandbox / rel
+            if target.is_dir():
+                for child in sorted(target.rglob("*")):
+                    if child.is_file():
+                        child.write_text("", encoding="utf-8")
+            elif target.is_file():
+                target.write_text("", encoding="utf-8")
+        for rel in outputs:
+            (sandbox / rel).unlink(missing_ok=True)
+        try:
+            subprocess.run(  # noqa: S603 — trusted local benchmark
+                [bash, script_rel],
+                cwd=sandbox,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=timeout,
+                check=False,
+            )
+        except subprocess.TimeoutExpired:
+            return None
+        for rel, expected in outputs.items():
+            check = expected if callable(expected) else _text_equals(rel, expected)
+            if (sandbox / rel).exists() and check(sandbox).passed:
+                return VerifyResult(
+                    False,
+                    f"{script_rel} still produced the expected {rel} after its inputs "
+                    f"{list(must_use)!r} were emptied, so the answer is hardcoded rather "
+                    f"than derived from the task's data",
+                )
+    return None
+
+
+def _instrument_tools(ws: Path) -> None:
+    """Make every shipped tool record that it ran, and give it the exec bit.
+
+    `Task.setup` writes plain text files, so without the executable bit the
+    agent could only run the tools through an interpreter — which several tasks
+    ban.
+
+    The recording matters for measurement. This wave exists to test whether an
+    agent can drive an unfamiliar command-line tool, but the verifiers only see
+    the artifact, and an artifact is equally reachable by reading the tool's
+    source and reimplementing it, or by working the answer out by hand. Lexical
+    checks on `solve.sh` cannot close that gap either: any check for a filename
+    is satisfied by naming the file in a comment. So each tool appends its own
+    name to `_TOOL_CALL_LOG` on startup, and the verifier reads that.
+
+    The log path is absolute and baked in at setup time, so it still lands in
+    the workspace if the agent runs the tool from a subdirectory.
     """
     tools = ws / "tools"
     if not tools.is_dir():
         return
-    for entry in tools.iterdir():
-        if entry.is_file():
-            entry.chmod(entry.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    log_path = (ws / _TOOL_CALL_LOG).resolve()
+    for entry in sorted(tools.iterdir()):
+        if not entry.is_file():
+            continue
+        lines = entry.read_text(encoding="utf-8").splitlines(keepends=True)
+        if lines and lines[0].startswith("#!"):
+            probe = (
+                "import os as _hb_os, sys as _hb_sys\n"
+                "try:\n"
+                f"    with open({str(log_path)!r}, 'a', encoding='utf-8') as _hb_f:\n"
+                "        _hb_f.write(_hb_os.path.basename(_hb_sys.argv[0]) + '\\n')\n"
+                "except OSError:\n"
+                "    pass\n"
+            )
+            # After any `from __future__` import, which the language requires to
+            # be the first statement in the file.
+            after = max(
+                (i for i, ln in enumerate(lines) if ln.startswith("from __future__")),
+                default=0,
+            )
+            lines.insert(after + 1, probe)
+            entry.write_text("".join(lines), encoding="utf-8", newline="")
+        entry.chmod(entry.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+
+def _tools_invoked(ws: Path) -> set[str]:
+    """Names of the shipped tools that actually ran in this workspace."""
+    log = ws / _TOOL_CALL_LOG
+    if not log.is_file():
+        return set()
+    return {line.strip() for line in log.read_text(encoding="utf-8").splitlines() if line.strip()}
+
+
 
 
 def _normalise_newlines(ws: Path) -> None:
@@ -304,7 +423,7 @@ def _setup_wave(*extra: Any):
         _normalise_newlines(ws)
         for hook in extra:
             hook(ws)
-        _make_tools_executable(ws)
+        _instrument_tools(ws)
 
     return _callback
 
