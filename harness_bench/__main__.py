@@ -528,7 +528,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_or.add_argument(
         "--forward-reasoning-history",
         action="store_true",
-        help="Forward assistant reasoning_content in subsequent model requests.",
+        help=(
+            "Replay assistant reasoning traces (reasoning_content / reasoning) "
+            "in subsequent model requests. Changes token spend and scores, so "
+            "runs that differ in this flag are not comparable."
+        ),
     )
     _add_metric_args(p_or)
     p_or.add_argument(
