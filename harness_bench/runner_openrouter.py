@@ -323,6 +323,7 @@ def build_agent(
     recursion_limit: int = 80,
     max_tokens: int | None = None,
     harness_profile: str | None = None,
+    forward_reasoning_history: bool = False,
 ) -> Any:
     """Build a stock `deepagents` agent backed by an OpenRouter model.
 
@@ -335,7 +336,8 @@ def build_agent(
     """
     from deepagents import create_deep_agent
     from deepagents.backends import LocalShellBackend
-    from langchain_openai import ChatOpenAI
+
+    from harness_bench.chat_openai import ReasoningAwareChatOpenAI
 
     _apply_internal_tagme_defaults()
     backend = LocalShellBackend(
@@ -346,11 +348,12 @@ def build_agent(
     model_kwargs: dict[str, Any] = {}
     if max_tokens is not None:
         model_kwargs["max_tokens"] = max_tokens
-    model = ChatOpenAI(
+    model = ReasoningAwareChatOpenAI(
         model=model_name,
         base_url=os.getenv("OPENROUTER_BASE_URL", DEFAULT_BASE_URL),
         api_key=_openrouter_api_key(),
         timeout=float(os.getenv("HARNESS_BENCH_REQUEST_TIMEOUT", "600")),
+        forward_reasoning_history=forward_reasoning_history,
         **model_kwargs,
     )
     # Always close the virtual_mode shell/file-tool path split (see
@@ -380,6 +383,7 @@ def run_task(
     max_tokens: int | None = None,
     harness_profile: str | None = None,
     transient_attempts: int = DEFAULT_TRANSIENT_ATTEMPTS,
+    forward_reasoning_history: bool = False,
 ) -> TaskRun:
     if transient_attempts < 1:
         raise ValueError("transient_attempts must be positive")
@@ -406,6 +410,7 @@ def run_task(
                     recursion_limit=recursion_limit,
                     max_tokens=max_tokens,
                     harness_profile=harness_profile,
+                    forward_reasoning_history=forward_reasoning_history,
                 )
                 invocation_result = invoke_agent_with_stats(
                     agent,
@@ -464,6 +469,7 @@ def run_all(
     transient_attempts: int = DEFAULT_TRANSIENT_ATTEMPTS,
     fail_on_runtime_error: bool = False,
     rerun_on_fail: bool = False,
+    forward_reasoning_history: bool = False,
 ) -> list[TaskRun]:
     _load_env_from_dotenv()
     _ensure_openrouter_key()
@@ -500,6 +506,7 @@ def run_all(
                     max_tokens=max_tokens,
                     harness_profile=harness_profile,
                     transient_attempts=transient_attempts,
+                    forward_reasoning_history=forward_reasoning_history,
                 )
                 run = _mark_attempt(run, attempt, attempts)
                 results.append(run)
@@ -536,6 +543,7 @@ def run_all(
                 max_tokens=max_tokens,
                 harness_profile=harness_profile,
                 transient_attempts=transient_attempts,
+                forward_reasoning_history=forward_reasoning_history,
             ): (task, attempt)
             for task, attempt in pending_attempts
         }

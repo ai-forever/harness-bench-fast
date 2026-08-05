@@ -179,6 +179,7 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         transient_attempts=args.transient_attempts,
         fail_on_runtime_error=args.fail_on_runtime_error,
         rerun_on_fail=args.rerun_on_fail,
+        forward_reasoning_history=args.forward_reasoning_history,
     )
     _summarize_run(results, metric_ks)
     _maybe_report_json(args, results)
@@ -523,6 +524,11 @@ def build_parser() -> argparse.ArgumentParser:
             "Total attempts for transient model HTTP/timeout/transport errors "
             "before counting the task as failed (default: 5)."
         ),
+    )
+    p_or.add_argument(
+        "--forward-reasoning-history",
+        action="store_true",
+        help="Forward assistant reasoning_content in subsequent model requests.",
     )
     _add_metric_args(p_or)
     p_or.add_argument(

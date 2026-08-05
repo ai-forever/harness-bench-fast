@@ -147,6 +147,9 @@ uv run python -m harness_bench run-openrouter \
 # run-openrouter retries transient HTTP/timeout/transport model errors up to
 # 5 total attempts per task before counting them as task failures. Override
 # with --transient-attempts if needed.
+# Add --forward-reasoning-history to preserve OpenAI-compatible
+# reasoning_content across agent turns. By default it is retained only in the
+# AIMessage metadata and omitted from subsequent model requests.
 
 # Run stock deepagents + GigaChat while bypassing the GigaChat harness
 # profile even if deepagents-gigachat is installed.
