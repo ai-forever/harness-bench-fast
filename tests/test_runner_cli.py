@@ -541,7 +541,9 @@ _PI_SESSION = """\
 
 
 def _write_pi_session(tmp_path: Path) -> Path:
-    path = tmp_path / "2026-08-07T09-52-47-884Z_019fdba3-b90c-7440-b88b-94148b3635cf.jsonl"
+    sessions_dir = tmp_path / ".pi" / "sessions"
+    sessions_dir.mkdir(parents=True)
+    path = sessions_dir / "2026-08-07T09-52-47-884Z_019fdba3-b90c-7440-b88b-94148b3635cf.jsonl"
     path.write_text(_PI_SESSION, encoding="utf-8")
     return path
 

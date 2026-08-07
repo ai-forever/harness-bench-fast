@@ -903,8 +903,8 @@ def _ouroboros_result_stats(workspace: Path | None) -> dict[str, int] | None:
 def _pi_session_stats(workspace: Path | None) -> dict[str, int] | None:
     """Extract effort metrics from a pi coding agent session file (JSONL).
 
-    The pi coding agent CLI writes a JSONL session per run. When
-    invoked with ``--session-dir .`` the file lands in the task workspace,
+    The pi coding agent CLI writes a JSONL session per run. When invoked
+    with ``--session-dir ./.pi/sessions`` the file lands in the task workspace,
     with one JSON object per line:
       - ``{"type":"message","message":{"role":"assistant", ...}}`` carries
         ``usage`` (``input``/``output``/``cacheRead``/``cacheWrite``/
@@ -912,13 +912,16 @@ def _pi_session_stats(workspace: Path | None) -> dict[str, int] | None:
         (``name`` + ``arguments.command`` for bash).
       - ``{"type":"message","message":{"role":"toolResult", ...}}`` mirrors
         tool execution but carries no usage, so we skip it for counting.
+    Q: Why is the magic path .pi/sessions used?
+    A: Because some tasks check that the secret has not been landed to disk by scanning
+       top level files of the workspace. But they skip agents' special subdirectories.
     """
     if workspace is None:
         return None
 
     candidates: list[Path] = []
     try:
-        candidates = sorted(workspace.glob("*.jsonl"))
+        candidates = sorted(workspace.glob("./.pi/sessions/*.jsonl"))
     except OSError:
         return None
     if not candidates:
