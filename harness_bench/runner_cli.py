@@ -900,6 +900,109 @@ def _ouroboros_result_stats(workspace: Path | None) -> dict[str, int] | None:
     return _with_default_agent_metrics(stats)
 
 
+def _pi_session_stats(workspace: Path | None) -> dict[str, int] | None:
+    """Extract effort metrics from a pi coding agent session file (JSONL).
+
+    The pi coding agent CLI writes a JSONL session per run. When
+    invoked with ``--session-dir .`` the file lands in the task workspace,
+    with one JSON object per line:
+      - ``{"type":"message","message":{"role":"assistant", ...}}`` carries
+        ``usage`` (``input``/``output``/``cacheRead``/``cacheWrite``/
+        ``totalTokens``) and ``content`` items with ``type:"toolCall"``
+        (``name`` + ``arguments.command`` for bash).
+      - ``{"type":"message","message":{"role":"toolResult", ...}}`` mirrors
+        tool execution but carries no usage, so we skip it for counting.
+    """
+    if workspace is None:
+        return None
+
+    candidates: list[Path] = []
+    try:
+        candidates = sorted(workspace.glob("*.jsonl"))
+    except OSError:
+        return None
+    if not candidates:
+        return None
+
+    stats: dict[str, int] = {}
+    assistant_messages = 0
+    tool_calls = 0
+    shell_commands = 0
+    llm_calls = 0
+    input_tokens = 0
+    output_tokens = 0
+    total_tokens = 0
+
+    for path in candidates:
+        try:
+            payloads = _iter_json_payloads(path.read_text(encoding="utf-8"))
+        except OSError:
+            continue
+        for payload in payloads:
+            if payload.get("type") != "message":
+                continue
+            message = payload.get("message")
+            if not isinstance(message, dict):
+                continue
+            role = message.get("role")
+            if role != "assistant":
+                continue
+            assistant_messages += 1
+            llm_calls += 1
+
+            usage = message.get("usage")
+            if isinstance(usage, dict):
+                usage_stats = _pi_usage_stats(usage)
+                input_tokens += usage_stats.get("agent_input_tokens", 0)
+                output_tokens += usage_stats.get("agent_output_tokens", 0)
+                total_tokens += usage_stats.get("agent_total_tokens", 0)
+
+            content = message.get("content")
+            if not isinstance(content, list):
+                continue
+            for part in content:
+                if not isinstance(part, dict) or part.get("type") != "toolCall":
+                    continue
+                tool_calls += 1
+                name = part.get("name")
+                if isinstance(name, str) and _tool_name_is_shell(name):
+                    shell_commands += 1
+
+    if not assistant_messages:
+        return None
+
+    stats["agent_steps"] = tool_calls
+    stats["agent_tool_calls"] = tool_calls
+    stats["agent_shell_commands"] = shell_commands
+    stats["agent_llm_calls"] = llm_calls
+    stats["agent_events"] = assistant_messages
+    if input_tokens or output_tokens:
+        stats["agent_input_tokens"] = input_tokens
+        stats["agent_output_tokens"] = output_tokens
+        stats["agent_total_tokens"] = total_tokens
+    return _with_default_agent_metrics(stats)
+
+
+def _pi_usage_stats(usage: dict[str, object]) -> dict[str, int]:
+    """Map a pi session ``usage`` object to harness agent_* metrics.
+
+    pi reports ``input`` as fresh (non-cached) prompt tokens, ``output`` as
+    completion tokens, and ``cacheRead``/``cacheWrite`` separately. To match
+    the harness convention that ``input_tokens`` reflects the real context
+    size (Anthropic-style cache folding), fold cache reads into input and
+    recompute total from the parts.
+    """
+    stats: dict[str, int] = {}
+    input_tokens = _int_or_none(usage.get("input")) or 0
+    output_tokens = _int_or_none(usage.get("output")) or 0
+    cache_read = _int_or_none(usage.get("cacheRead")) or 0
+    cache_write = _int_or_none(usage.get("cacheWrite")) or 0
+    stats["agent_input_tokens"] = input_tokens + cache_read + cache_write
+    stats["agent_output_tokens"] = output_tokens
+    stats["agent_total_tokens"] = input_tokens + output_tokens + cache_read + cache_write
+    return stats
+
+
 def _task_run_with_cli_stats(
     *,
     task_id: str,
@@ -925,6 +1028,8 @@ def _task_run_with_cli_stats(
         stats = _ouroboros_result_stats(stats_workspace or workspace)
     if stats is None:
         stats = _mini_swe_agent_traj_stats(stats_workspace or workspace)
+    if stats is None:
+        stats = _pi_session_stats(stats_workspace or workspace)
     return TaskRun(
         task_id=task_id,
         passed=passed,
