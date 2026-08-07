@@ -11,6 +11,7 @@ from harness_bench.runner_cli import (
     _grok_json_event_stats,
     _mini_swe_agent_traj_stats,
     _ouroboros_result_stats,
+    _pi_session_stats,
     _task_run_with_cli_stats,
 )
 
@@ -525,3 +526,74 @@ def test_task_run_stats_can_read_mini_traj_without_kept_workspace(tmp_path: Path
     assert run.agent_shell_commands == 1
     assert run.agent_llm_calls == 1
     assert run.agent_total_tokens == 9
+
+
+_PI_SESSION = """\
+{"type":"session","version":3,"id":"019fdba3-b90c-7440-b88b-94148b3635cf","timestamp":"2026-08-07T09:52:47.884Z","cwd":"/tmp/ws"}
+{"type":"model_change","id":"83443fa4","parentId":null,"timestamp":"2026-08-07T09:52:49.057Z","provider":"cpa","modelId":"deepseek-v4-flash"}
+{"type":"message","id":"8ff4de59","parentId":"630b66b5","timestamp":"2026-08-07T09:52:49.083Z","message":{"role":"user","content":[{"type":"text","text":"create hello.py"}],"timestamp":1786096369078}}
+{"type":"message","id":"5d3d9f54","parentId":"332c1a89","timestamp":"2026-08-07T09:52:54.567Z","message":{"role":"assistant","content":[{"type":"thinking","thinking":"plan"},{"type":"toolCall","id":"call_1","name":"write","arguments":{"path":"hello.py","content":"print(\\"Hello, world!\\")"}}],"api":"openai-completions","provider":"cpa","model":"deepseek-v4-flash","usage":{"input":4518,"output":107,"cacheRead":0,"cacheWrite":0,"reasoning":42,"totalTokens":4625,"cost":{"total":0.00066248}},"stopReason":"toolUse","timestamp":1786096369126}}
+{"type":"message","id":"66bbc527","parentId":"5d3d9f54","timestamp":"2026-08-07T09:52:54.573Z","message":{"role":"toolResult","toolCallId":"call_1","toolName":"write","content":[{"type":"text","text":"ok"}],"isError":false,"timestamp":1786096374573}}
+{"type":"message","id":"1cb6865a","parentId":"f1940f84","timestamp":"2026-08-07T09:53:00.148Z","message":{"role":"assistant","content":[{"type":"toolCall","id":"call_2","name":"bash","arguments":{"command":"python3 hello.py"}}],"api":"openai-completions","provider":"cpa","model":"deepseek-v4-flash","usage":{"input":4647,"output":54,"cacheRead":0,"cacheWrite":0,"totalTokens":4701,"cost":{"total":0.0006657}},"stopReason":"toolUse","timestamp":1786096374600}}
+{"type":"message","id":"40259b98","parentId":"1cb6865a","timestamp":"2026-08-07T09:53:00.178Z","message":{"role":"toolResult","toolCallId":"call_2","toolName":"bash","content":[{"type":"text","text":"Hello, world!\\n"}],"isError":false,"timestamp":1786096380178}}
+{"type":"message","id":"dc6dea21","parentId":"c7d21010","timestamp":"2026-08-07T09:53:02.858Z","message":{"role":"assistant","content":[{"type":"text","text":"Done."}],"api":"openai-completions","provider":"cpa","model":"deepseek-v4-flash","usage":{"input":798,"output":61,"cacheRead":3840,"cacheWrite":0,"totalTokens":4699,"cost":{"total":0.000139552}},"stopReason":"stop","timestamp":1786096380179}}
+"""
+
+
+def _write_pi_session(tmp_path: Path) -> Path:
+    sessions_dir = tmp_path / ".pi" / "sessions"
+    sessions_dir.mkdir(parents=True)
+    path = sessions_dir / "2026-08-07T09-52-47-884Z_019fdba3-b90c-7440-b88b-94148b3635cf.jsonl"
+    path.write_text(_PI_SESSION, encoding="utf-8")
+    return path
+
+
+def test_pi_session_stats_count_tools_and_tokens(tmp_path: Path) -> None:
+    _write_pi_session(tmp_path)
+
+    assert _pi_session_stats(tmp_path) == {
+        "agent_steps": 2,
+        "agent_tool_calls": 2,
+        "agent_shell_commands": 1,
+        "agent_events": 3,
+        "agent_llm_calls": 3,
+        "agent_input_tokens": 13803,
+        "agent_output_tokens": 222,
+        "agent_total_tokens": 14025,
+    }
+
+
+def test_pi_session_stats_folds_cache_into_input(tmp_path: Path) -> None:
+    _write_pi_session(tmp_path)
+
+    stats = _pi_session_stats(tmp_path)
+    # input folds cacheRead into input per the harness convention:
+    # 4518 + 4647 + (798 fresh + 3840 cacheRead) = 13803
+    assert stats["agent_input_tokens"] == 13803
+    assert stats["agent_total_tokens"] == 14025
+    # Without cache folding, input would be 9963 — sanity-check the fold happened.
+    assert stats["agent_input_tokens"] != 4518 + 4647 + 798
+
+
+def test_pi_session_stats_absent_file_returns_none(tmp_path: Path) -> None:
+    assert _pi_session_stats(tmp_path) is None
+
+
+def test_task_run_stats_dispatches_to_pi_parser(tmp_path: Path) -> None:
+    _write_pi_session(tmp_path)
+
+    run = _task_run_with_cli_stats(
+        task_id="task_fake",
+        passed=True,
+        message="ok",
+        elapsed_seconds=0.1,
+        result=subprocess.CompletedProcess(["pi"], 0, "Done.", ""),
+        workspace=tmp_path,
+    )
+
+    assert run.agent_steps == 2
+    assert run.agent_shell_commands == 1
+    assert run.agent_llm_calls == 3
+    assert run.agent_input_tokens == 13803
+    assert run.agent_output_tokens == 222
+    assert run.agent_total_tokens == 14025
