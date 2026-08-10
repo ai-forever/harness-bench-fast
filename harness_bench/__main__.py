@@ -24,13 +24,8 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-from harness_bench.chains import (
-    CHAINSET_VERSION,
-    STANDARD_CHAIN_IDS,
-    all_chains,
-    get_chain,
-)
 from harness_bench.harbor_export import export_harbor_dataset
+from harness_bench.marathon import MARATHON_VERSION, marathon_task_ids
 from harness_bench.metrics import default_metric_ks
 from harness_bench.runner import (
     TaskRun,
@@ -41,19 +36,16 @@ from harness_bench.runner import (
     summarize,
     verify_gold,
 )
-from harness_bench.runner_chain import (
-    BACKENDS as CHAIN_BACKENDS,
-)
-from harness_bench.runner_chain import (
-    DEFAULT_TRANSIENT_ATTEMPTS as CHAIN_TRANSIENT_ATTEMPTS,
-)
-from harness_bench.runner_chain import (
-    DEFAULT_TURN_TIMEOUT_SECONDS,
-    TASK_LIST_FILENAME,
-    run_chains,
-    summarize_chains,
-)
 from harness_bench.runner_cli import DEFAULT_CLI_COMMAND, DEFAULT_TIMEOUT_SECONDS, run_all_cli
+from harness_bench.runner_marathon import (
+    BACKENDS as MARATHON_BACKENDS,
+)
+from harness_bench.runner_marathon import (
+    DEFAULT_SECONDS_PER_TASK,
+    TASK_LIST_FILENAME,
+    run_marathon,
+    summarize_marathon,
+)
 from harness_bench.runner_openrouter import DEFAULT_OPENROUTER_MODEL
 from harness_bench.runner_openrouter import run_all as run_all_openrouter
 from harness_bench.runner_pure import run_all as run_all_pure
@@ -327,72 +319,42 @@ def _cmd_verify_task(args: argparse.Namespace) -> int:
     return 0 if result.passed else 1
 
 
-def _cmd_chains(args: argparse.Namespace) -> int:
-    chains = all_chains()
-    selected = [get_chain(cid) for cid in args.chain] if args.chain else list(chains.values())
+def _cmd_marathon_tasks(args: argparse.Namespace) -> int:
+    task_ids = marathon_task_ids()
     if args.json:
-        payload = {
-            "chainset_version": CHAINSET_VERSION,
-            "chains": [
-                {
-                    "chain_id": spec.chain_id,
-                    "length": spec.length,
-                    "note": spec.note,
-                    "task_ids": list(spec.task_ids),
-                }
-                for spec in selected
-            ],
-        }
-        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        print(json.dumps(
+            {"marathon_version": MARATHON_VERSION, "task_ids": list(task_ids)},
+            ensure_ascii=False,
+            indent=2,
+        ))
         return 0
-    print(f"Chainset version: {CHAINSET_VERSION}")
-    for spec in selected:
-        print(f"\n{spec.chain_id} ({spec.length} tasks) — {spec.note}")
-        for position, task_id in enumerate(spec.task_ids, start=1):
-            print(f"  {position:3d}. {task_id}")
+    print(f"Marathon order {MARATHON_VERSION}: {len(task_ids)} tasks")
+    for position, task_id in enumerate(task_ids, start=1):
+        print(f"  {position:3d}. {task_id}")
     return 0
 
 
-def _resolve_chain_ids(args: argparse.Namespace) -> list[str]:
-    chain_ids: list[str] = []
-    if args.all_standard:
-        chain_ids.extend(STANDARD_CHAIN_IDS)
-    if args.chain:
-        chain_ids.extend(cid for cid in args.chain if cid not in chain_ids)
-    if not chain_ids:
-        raise SystemExit(
-            "No chains selected. Pass --chain <id> (repeatable; see "
-            "`python -m harness_bench chains`) or --all-standard for M1-M10."
-        )
-    return chain_ids
-
-
-def _cmd_run_chain(args: argparse.Namespace) -> int:
-    chain_ids = _resolve_chain_ids(args)
+def _cmd_run_marathon(args: argparse.Namespace) -> int:
     _announce_json_output(args)
-    results = run_chains(
-        chain_ids,
-        delivery=args.delivery,
+    result = run_marathon(
         backend=args.backend,
         model_name=args.model,
         cli_command=args.cli_command,
+        first=args.first,
         recursion_limit=args.recursion_limit,
         max_tokens=args.max_tokens,
         harness_profile=args.harness_profile,
-        keep_workspace=args.keep,
-        turn_timeout=args.turn_timeout,
-        chain_timeout=args.chain_timeout,
-        transient_attempts=args.transient_attempts,
-        concurrency=args.concurrency,
         context_window=args.context_window,
         forward_reasoning_history=args.forward_reasoning_history,
+        keep_workspace=args.keep,
+        timeout=args.timeout,
         json_output=args.json_output,
     )
-    summarize_chains(results)
-    _maybe_report_json(args, results)
+    summarize_marathon(result)
+    _maybe_report_json(args, [result])
     if args.allow_task_failures:
         return 0
-    return 0 if all(turn.passed_final for r in results for turn in r.turns) else 1
+    return 0 if all(task.passed for task in result.tasks) else 1
 
 
 def _cmd_export_harbor(args: argparse.Namespace) -> int:
@@ -774,138 +736,97 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_cli.set_defaults(func=_cmd_run_cli)
 
-    p_chains = sub.add_parser(
-        "chains",
-        help=f"List marathon chains of chainset {CHAINSET_VERSION} (see run-chain).",
+    p_tasks = sub.add_parser(
+        "marathon-tasks",
+        help=f"Print the marathon task order ({MARATHON_VERSION}).",
     )
-    p_chains.add_argument(
-        "--chain",
-        action="append",
-        help="Chain id to show (repeatable). Shows all chains if omitted.",
-    )
-    p_chains.add_argument("--json", action="store_true", help="Emit JSON")
-    p_chains.set_defaults(func=_cmd_chains)
+    p_tasks.add_argument("--json", action="store_true", help="Emit JSON")
+    p_tasks.set_defaults(func=_cmd_marathon_tasks)
 
-    p_chain = sub.add_parser(
-        "run-chain",
+    p_mar = sub.add_parser(
+        "run-marathon",
         help=(
-            "Marathon mode: one agent session solves a chain of tasks "
-            "sequentially in a single context (endurance / context-degradation "
-            "measurement). See `chains` for available chain ids."
+            "Hand one agent session every eligible task at once and measure "
+            "how far it gets and how much it solves. Long-horizon endurance, "
+            "not per-task ability — see `marathon-tasks` for the order."
         ),
     )
-    p_chain.add_argument(
-        "--chain",
-        action="append",
-        help="Chain id (repeatable), e.g. S5, M1..M10, P2, P3, E100.",
-    )
-    p_chain.add_argument(
-        "--all-standard",
-        action="store_true",
-        help="Run all standard chains M1-M10.",
-    )
-    p_chain.add_argument(
-        "--delivery",
-        choices=("turns", "batch", "file"),
-        default="turns",
+    p_mar.add_argument(
+        "--first",
+        type=_positive_int,
+        default=None,
+        metavar="N",
         help=(
-            "turns: each task is a new user message in one growing session "
-            "(deepagents backends only). batch: all tasks in one combined "
-            "prompt (works with --cli-command too). file: tasks are written to "
-            f"{TASK_LIST_FILENAME} and the agent is told to work through the "
-            "list — the only delivery that fits long chains, whose combined "
-            "prompts exceed a 32k window on their own. Default: turns."
+            "Run only the first N tasks of the order instead of all of them. "
+            "For smoke-testing the runner; N and the full run share positions, "
+            "so a task sits at the same place in both."
         ),
     )
-    p_chain.add_argument(
+    p_mar.add_argument(
+        "--backend",
+        choices=MARATHON_BACKENDS,
+        default="gigachat",
+        help=(
+            "Agent backend: gigachat (env creds, harness profile when "
+            "installed), gigachat-pure (no profile), or openrouter (--model). "
+            "Ignored when --cli-command is set. Default: gigachat."
+        ),
+    )
+    p_mar.add_argument(
+        "--model", default=None, help="OpenRouter model id (with --backend openrouter)."
+    )
+    p_mar.add_argument(
+        "--cli-command",
+        default=None,
+        help=(
+            "External CLI agent command prefix; the kickoff prompt is appended "
+            "as the final argument, e.g. 'kimi-cli --quiet --yolo -m k3 -p'."
+        ),
+    )
+    p_mar.add_argument(
         "--context-window",
         type=int,
         default=None,
         help=(
             "Model input budget in tokens. Sizes the deepagents summarization "
-            "middleware; without it the middleware waits for a fixed 170k "
-            "tokens and a smaller window overflows first. Set it for any long "
-            "chain."
+            "middleware, which otherwise waits for a fixed 170k tokens and lets "
+            "a smaller window overflow first. Its token counter assumes four "
+            "characters per token and under-counts Russian and code by roughly "
+            "1.4x, so set this below the real window."
         ),
     )
-    p_chain.add_argument(
-        "--backend",
-        choices=CHAIN_BACKENDS,
-        default="gigachat",
-        help=(
-            "Agent backend for deepagents deliveries: gigachat (env creds, "
-            "harness profile when installed), gigachat-pure (no profile), or "
-            "openrouter (--model). Ignored when --cli-command is set. "
-            "Default: gigachat."
-        ),
-    )
-    p_chain.add_argument(
-        "--model",
-        default=None,
-        help="OpenRouter model id (with --backend openrouter).",
-    )
-    p_chain.add_argument(
-        "--cli-command",
-        default=None,
-        help=(
-            "External CLI agent command prefix (batch delivery only); the "
-            "combined chain prompt is appended as the final argument, e.g. "
-            "'kimi-cli --quiet --yolo -m k3 -p'."
-        ),
-    )
-    p_chain.add_argument(
+    p_mar.add_argument(
         "--recursion-limit",
-        type=int,
+        type=_positive_int,
         default=None,
         help=(
-            "LangGraph recursion limit. turns: per turn (default 80). "
-            "batch: whole chain (default min(1200, 60×length))."
+            "Step cap for the whole session (default: 60 x task count). The "
+            "per-task default of the solo runners starves a marathon."
         ),
     )
-    p_chain.add_argument(
+    p_mar.add_argument(
+        "--timeout",
+        type=float,
+        default=None,
+        help=(
+            "Whole-run wall-clock cap in seconds (default: "
+            f"{DEFAULT_SECONDS_PER_TASK} x task count). A timeout does not stop "
+            "an in-process agent, so a run that overruns is reported as scored "
+            "against a moving workspace."
+        ),
+    )
+    p_mar.add_argument(
         "--max-tokens",
         type=int,
         default=None,
         help="Optional ChatOpenAI max_tokens override (openrouter backend).",
     )
-    p_chain.add_argument(
+    p_mar.add_argument(
         "--harness-profile",
         default=None,
         help="Bridge a built-in deepagents harness profile (openrouter backend).",
     )
-    p_chain.add_argument(
-        "--turn-timeout",
-        type=float,
-        default=None,
-        help=(
-            "Per-turn wall-clock timeout in seconds; turns delivery only "
-            f"(default: {DEFAULT_TURN_TIMEOUT_SECONDS:.0f}). A turn that times "
-            "out and leaves the agent still running ends the chain, because "
-            "later turns would be verified against a workspace it is still "
-            "writing to. Use --chain-timeout for batch/file."
-        ),
-    )
-    p_chain.add_argument(
-        "--chain-timeout",
-        type=float,
-        default=None,
-        help=(
-            "Whole-chain timeout in seconds for batch delivery "
-            "(default: 300 × chain length)."
-        ),
-    )
-    p_chain.add_argument(
-        "--transient-attempts",
-        type=_positive_int,
-        default=None,
-        help=(
-            "Attempts per turn on transient model errors before the chain is "
-            f"terminated; turns delivery only (default: "
-            f"{CHAIN_TRANSIENT_ATTEMPTS}). batch/file run the whole chain in "
-            "one invocation, where transients are retried by the model client."
-        ),
-    )
-    p_chain.add_argument(
+    p_mar.add_argument(
         "--forward-reasoning-history",
         action="store_true",
         help=(
@@ -914,14 +835,16 @@ def build_parser() -> argparse.ArgumentParser:
             "that differ in this flag are not comparable."
         ),
     )
-    p_chain.add_argument(
-        "--concurrency",
-        type=_positive_int,
-        default=1,
-        help="Run up to N chains in parallel (turns within a chain are sequential).",
+    p_mar.add_argument(
+        "--keep",
+        action="store_true",
+        help=(
+            "Keep the workspace. Recommended: the JSON is written when the run "
+            f"ends, and {TASK_LIST_FILENAME} plus the task directories can be "
+            "scored offline if it is killed first."
+        ),
     )
-    p_chain.add_argument("--keep", action="store_true", help="Keep chain workspaces")
-    p_chain.add_argument(
+    p_mar.add_argument(
         "--json-output",
         dest="json_output",
         nargs="?",
@@ -930,17 +853,17 @@ def build_parser() -> argparse.ArgumentParser:
         type=normalize_json_output_path,
         metavar="PATH",
         help=(
-            "Write the chain-mode JSON report to this path (bare filenames go "
-            "under jobs/). If the file exists, chains already completed in it "
-            "are skipped (chain-level resume)."
+            "Write the marathon JSON report to this path (bare filenames go "
+            "under jobs/). The task order is written there before the agent "
+            "starts, so a killed run still records what it was running."
         ),
     )
-    p_chain.add_argument(
+    p_mar.add_argument(
         "--allow-task-failures",
         action="store_true",
-        help="Exit 0 even when some chain tasks fail.",
+        help="Exit 0 even when some tasks fail.",
     )
-    p_chain.set_defaults(func=_cmd_run_chain)
+    p_mar.set_defaults(func=_cmd_run_marathon)
 
     return parser
 
