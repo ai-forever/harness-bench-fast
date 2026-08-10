@@ -16,6 +16,7 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 
 | Harness | Profile | Model | Result | % | Steps | Tokens |
 | --- | --- | --- | ---: | ---: | ---: | ---: |
+| pi | — | GLM-5.2 (high) | 391/391 | 100.0% | 2,272 | 13,274,530 |
 | Kimi CLI | — | Kimi K3 | 390/391 | 99.7% | — | — |
 | Claude Code CLI | — | Claude Haiku 4.5 | 380/391 | 97.2% | 1,645 | 176,430,286 |
 | opencode | — | GLM-5.2 (self-hosted) | 362/391 | 92.6% | — | — |
