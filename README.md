@@ -341,8 +341,10 @@ changes do not need a task-set bump.
 | `runner_cli.py` | Alternative driver that shells out to an external CLI agent (`free-code`, `claude`, etc.). Default: `free-code -p --model haiku --dangerously-skip-permissions`. Detects Claude-Code-style CLIs and auto-injects workspace `AGENTS.md` via `--append-system-prompt`. |
 | `runner_openrouter.py` | Runner for any OpenAI-compatible OpenRouter model via `langchain-openai`. Does **not** apply any harness profile — measures raw `deepagents` defaults against the chosen model. |
 | `runner_pure.py` | Stock `deepagents` + GigaChat runner that bypasses `deepagents-gigachat` profile lookup even when that package is installed. Useful as a no-profile baseline, not a direct raw-API baseline. |
+| `chains.py` | Chain composition for chain mode: which tasks run together, in what order, under a `CHAINSET_VERSION` of its own. Deterministic from a fixed seed and pinned by a hash test. |
+| `runner_chain.py` | Chain-mode runner: one agent session, N tasks, three delivery modes. Per-task subdirectories, directory fingerprints, two-phase (retention) verification. |
 | `harbor_export.py` | Additive Harbor export layer. Generates local Harbor task directories from the same Python task registry; does not replace the no-Docker local runners. |
-| `__main__.py` | CLI: `list`, `version`, `run`, `run-pure`, `run-cli`, `run-openrouter`, `verify-gold`, `verify-task`, `apply-gold`, `export-harbor`. |
+| `__main__.py` | CLI: `list`, `version`, `run`, `run-pure`, `run-cli`, `run-openrouter`, `chains`, `run-chain`, `verify-gold`, `verify-task`, `apply-gold`, `export-harbor`. |
 
 Each task is independent: the runner creates a fresh
 `tempfile.TemporaryDirectory`, writes `setup_files` (and optionally
@@ -353,6 +355,110 @@ security sandbox: `execute` still spawns a real shell on the host and
 the runners inherit environment variables. The benchmark is meant for a
 trusted local environment. After the agent stops, the per-task verifier
 inspects the workspace.
+
+## Chain mode (marathon)
+
+Every runner above gives each task a clean session, which answers *can the
+model do this task*. Chain mode keeps **one session for a whole chain of
+tasks** and answers a different question: can it still work after an hour of
+accumulated history, and does its later work break what it already finished.
+
+The two questions separate models far more sharply than the solo bench does,
+and a solo score predicts a chain score poorly: a model that solves 87% of the
+tasks one at a time can still declare itself finished a dozen tasks into a
+342-task session.
+
+```bash
+# What chains exist and what is in them
+uv run python -m harness_bench chains
+uv run python -m harness_bench chains --chain M1 --json
+
+# Smoke the runner on a 5-task chain
+uv run python -m harness_bench run-chain --chain S5
+
+# The ten standard 20-task chains
+uv run python -m harness_bench run-chain --all-standard --json-output chains.json
+
+# Marathon: every eligible task in one session, via an external CLI agent
+uv run python -m harness_bench run-chain --chain ALL --delivery file --keep \
+  --chain-timeout 14400 --recursion-limit 5000 \
+  --cli-command 'kimi-cli --quiet --yolo -m k3 -p'
+```
+
+### Chains
+
+Chains are versioned **separately from the task set** (`CHAINSET_VERSION`,
+currently `v1`) and built by a seeded shuffle, so every model runs the same
+tasks in the same order. `S5` is a smoke chain; `M1`–`M10` are disjoint
+20-task chains; `M1a`/`M1b` are their halves, directly comparable to the full
+chain at half the depth; `P2`/`P3` are `M1` rotated, which separates position
+effects from task difficulty; `E100` is a 100-task endurance chain; and `ALL`
+is every eligible task, with `A50`/`A100`/`A200` as *prefixes* of it, so
+position 40 means the same thing in all four.
+
+Chains cover **342 of the 391 tasks**. The memory (222–253) and skills
+(314–330) waves are excluded by construction: both are wired to the workspace
+root and cannot be scoped to one task's subdirectory. Chain numbers are
+therefore **not comparable with the solo leaderboard** above.
+
+Order is shuffled on purpose. The registry runs roughly easy-to-hard, so on a
+registry-ordered chain "reached position 60" would mean "did the 60 easiest
+tasks" and depth would be confounded with difficulty.
+
+### Delivery modes
+
+| `--delivery` | How the tasks arrive | Retention measured |
+| --- | --- | --- |
+| `turns` (default) | Each task is a new user message appended to one growing history. deepagents backends only. | **yes** |
+| `batch` | All tasks in a single combined prompt, worked through in one invocation. Also works with `--cli-command`, which makes chains possible for agents with no resume API. | no |
+| `file` | The task list is written to `TASKS.md` and the agent is told to work through it. | no |
+
+`file` is the only delivery that fits a long chain: 342 prompts come to ~31k
+tokens, which does not fit a 32k window *before any work starts*. Paging
+through the list is itself part of what long-horizon work measures.
+
+Only `turns` hands control back between tasks, so only `turns` can verify a
+task twice — right after its own turn and again at the end of the chain. That
+difference is retention: how much finished work the session destroyed later.
+`batch` and `file` verify once, at the end, and report retention as **not
+measured** rather than as zero breakage.
+
+### Reading the results
+
+- **`reached`** — batch and file deliveries cannot watch the agent walk the
+  list, so the runner fingerprints every task directory before the run and
+  treats an untouched one as never reached. Without this, "solved 50 of 342"
+  would read the same whether the agent worked through everything and failed
+  292 or stopped at task 50.
+- **`terminated_at_position`** with `termination_reason` — where and why the
+  chain ended. `agent stopped before the end of the list` is not a crash: the
+  agent decided it was done, which is the most common long-horizon failure and
+  must not be confused with running out of context.
+- **`retention_broken`** — `null` when the delivery could not measure it.
+- **`completed`** — the chain was scored and the numbers are usable. An agent
+  that failed, looped or quit early still counts as completed; a chain scored
+  while a timed-out agent was **still running** does not, and a resume re-runs
+  it instead of publishing it.
+- **`scoring_raced`** — a timeout does not stop an in-process agent (Python
+  cannot kill the thread), so the runner waits it out and, if it is still
+  going, says the verdicts were taken against a moving workspace.
+
+### Flags that matter on long chains
+
+- `--context-window N` — the agent's input budget. Without it the deepagents
+  summarization middleware waits for a fixed 170k tokens and a smaller window
+  overflows before compaction ever triggers. Note the middleware counts tokens
+  by a 4-chars-per-token heuristic that under-counts non-English text by
+  roughly 1.4×, so set this **below** the real window.
+- `--recursion-limit N` — the step cap. The default (80 per turn, or
+  `min(1200, 60 × length)` for a whole batched chain) starves a long marathon;
+  budget several steps per task.
+- `--chain-timeout N` — whole-chain wall clock. The default is 300s × length,
+  which for 342 tasks is over a day.
+- `--keep` — batch and file deliveries write their JSON only when the chain
+  ends, so on a multi-hour run keep the workspace: verification does not
+  mutate it, and a killed run can still be scored offline. The artifact does
+  record the plan (task order, subdirectories, command) from the start.
 
 ## Harbor export
 

@@ -182,6 +182,11 @@ def set_results_json_command(command: str | None) -> None:
     _RESULTS_JSON_COMMAND = command
 
 
+def results_json_command() -> str | None:
+    """The command recorded in benchmark JSON files written from here on."""
+    return _RESULTS_JSON_COMMAND
+
+
 def _timestamped_json_name() -> str:
     return f"{datetime.now():%Y%m%d_%H%M%S_%f}.json"
 

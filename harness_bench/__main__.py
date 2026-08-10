@@ -385,6 +385,7 @@ def _cmd_run_chain(args: argparse.Namespace) -> int:
         transient_attempts=args.transient_attempts,
         concurrency=args.concurrency,
         context_window=args.context_window,
+        forward_reasoning_history=args.forward_reasoning_history,
         json_output=args.json_output,
     )
     summarize_chains(results)
@@ -875,10 +876,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_chain.add_argument(
         "--turn-timeout",
         type=float,
-        default=DEFAULT_TURN_TIMEOUT_SECONDS,
+        default=None,
         help=(
-            "Per-turn wall-clock timeout in seconds for turns delivery "
-            f"(default: {DEFAULT_TURN_TIMEOUT_SECONDS:.0f})."
+            "Per-turn wall-clock timeout in seconds; turns delivery only "
+            f"(default: {DEFAULT_TURN_TIMEOUT_SECONDS:.0f}). A turn that times "
+            "out and leaves the agent still running ends the chain, because "
+            "later turns would be verified against a workspace it is still "
+            "writing to. Use --chain-timeout for batch/file."
         ),
     )
     p_chain.add_argument(
@@ -893,10 +897,21 @@ def build_parser() -> argparse.ArgumentParser:
     p_chain.add_argument(
         "--transient-attempts",
         type=_positive_int,
-        default=CHAIN_TRANSIENT_ATTEMPTS,
+        default=None,
         help=(
             "Attempts per turn on transient model errors before the chain is "
-            f"terminated (default: {CHAIN_TRANSIENT_ATTEMPTS})."
+            f"terminated; turns delivery only (default: "
+            f"{CHAIN_TRANSIENT_ATTEMPTS}). batch/file run the whole chain in "
+            "one invocation, where transients are retried by the model client."
+        ),
+    )
+    p_chain.add_argument(
+        "--forward-reasoning-history",
+        action="store_true",
+        help=(
+            "Replay assistant reasoning traces in subsequent model requests "
+            "(openrouter backend). Changes token spend and scores, so runs "
+            "that differ in this flag are not comparable."
         ),
     )
     p_chain.add_argument(

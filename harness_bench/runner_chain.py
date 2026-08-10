@@ -54,6 +54,7 @@ from harness_bench.runner import (
     _message_usage,
     _tool_call_name,
     normalize_json_output_path,
+    results_json_command,
 )
 from harness_bench.tasks import get_task
 from harness_bench.versioning import TASK_SET_VERSION, task_number
@@ -68,7 +69,38 @@ DEFAULT_CHAIN_SECONDS_PER_TASK = 300
 DEFAULT_TRANSIENT_ATTEMPTS = 5
 _TRANSIENT_BACKOFF_SCHEDULE = (15, 30, 60, 120)
 
+_ORPHAN_GRACE_SECONDS = 30.0
+"""How long to wait for a timed-out invocation to finish before scoring anyway."""
+
+
+class ChainInvokeTimeout(TaskTimeoutError):
+    """An invocation hit its wall-clock cap.
+
+    Carries the worker thread because giving up on an invocation does not end
+    it: the agent runs on until its graph does, and everything it writes after
+    the timeout lands in a workspace that is being scored.
+    """
+
+    def __init__(self, message: str, thread: threading.Thread) -> None:
+        super().__init__(message)
+        self.thread = thread
+
 _AGENT_TOKEN_KEYS = ("agent_input_tokens", "agent_output_tokens", "agent_total_tokens")
+
+_TURN_STAT_KEYS = (
+    "agent_steps",
+    "agent_tool_calls",
+    "agent_shell_commands",
+    "agent_events",
+    "agent_llm_calls",
+    # Per-tool counts answer what the totals cannot: whether the session
+    # delegated to subagents (`task` has its own context, so a marathon routed
+    # through it is not one conversation) and which call an agent repeated
+    # when it got stuck — the Lightning marathon died on 188 identical
+    # `write_file` refusals, which is invisible in the totals.
+    "agent_tool_calls_by_name",
+    *_AGENT_TOKEN_KEYS,
+)
 
 _RESULTS_JSON_LOCK = threading.Lock()
 
@@ -122,7 +154,13 @@ class TurnRecord:
     task_id: str
     subdir: str
     reached: bool = False
-    passed_immediate: bool = False
+    passed_immediate: bool | None = None
+    """Verdict taken right after this task's turn, or ``None`` when the
+    delivery cannot take one. Only ``turns`` hands control back between tasks;
+    ``batch``/``file`` run the whole chain in a single invocation and can only
+    verify once, at the end. ``None`` means "not measured" and must never be
+    collapsed into ``False`` — the difference against ``passed_final`` is the
+    retention signal, and a delivery that cannot measure it has to say so."""
     message_immediate: str = ""
     passed_final: bool = False
     message_final: str = ""
@@ -153,14 +191,7 @@ class TurnRecord:
             "context_messages_before": self.context_messages_before,
             "context_chars_before": self.context_chars_before,
         }
-        for key in (
-            "agent_steps",
-            "agent_tool_calls",
-            "agent_shell_commands",
-            "agent_events",
-            "agent_llm_calls",
-            *_AGENT_TOKEN_KEYS,
-        ):
+        for key in _TURN_STAT_KEYS:
             payload[key] = self.stats.get(key)
         return payload
 
@@ -178,11 +209,26 @@ class ChainRunResult:
     elapsed_seconds: float = 0.0
     error: str | None = None
     workspace: Path | None = None
+    scoring_raced: bool = False
+    """The chain was scored while a timed-out invocation was still running, so
+    the workspace could change under the verifier. See ``_settle_invocation``."""
     chain_stats: dict[str, int] = field(default_factory=dict)
     completed: bool = False
+    """The chain was scored and the numbers are usable. False means the run
+    was cut short in a way that makes its verdicts untrustworthy, not merely
+    that the agent failed or stopped early — those are results, and keep
+    ``completed`` True with ``termination_reason`` set."""
 
     @property
-    def immediate_passed(self) -> int:
+    def retention_measured(self) -> bool:
+        """Whether this chain has a per-task verdict to compare the final one
+        against. Only ``turns`` verifies between tasks."""
+        return any(turn.passed_immediate is not None for turn in self.turns)
+
+    @property
+    def immediate_passed(self) -> int | None:
+        if not self.retention_measured:
+            return None
         return sum(1 for t in self.turns if t.passed_immediate)
 
     @property
@@ -190,7 +236,12 @@ class ChainRunResult:
         return sum(1 for t in self.turns if t.passed_final)
 
     @property
-    def retention_broken(self) -> int:
+    def retention_broken(self) -> int | None:
+        """Tasks solved at their own turn and broken by later work — ``None``
+        when the delivery never took a per-task verdict. Reporting 0 there
+        would read as "nothing was broken" when nothing was watched."""
+        if not self.retention_measured:
+            return None
         return sum(1 for t in self.turns if t.passed_immediate and not t.passed_final)
 
     def to_payload(self) -> dict[str, Any]:
@@ -205,6 +256,8 @@ class ChainRunResult:
             "elapsed_seconds": self.elapsed_seconds,
             "error": self.error,
             "workspace": str(self.workspace) if self.workspace else None,
+            "scoring_raced": self.scoring_raced,
+            "retention_measured": self.retention_measured,
             "immediate_passed": self.immediate_passed,
             "final_passed": self.final_passed,
             "retention_broken": self.retention_broken,
@@ -366,6 +419,7 @@ def make_agent_factory(
     max_tokens: int | None = None,
     harness_profile: str | None = None,
     context_window: int | None = None,
+    forward_reasoning_history: bool = False,
 ) -> Any:
     """Return ``factory(chain_root) -> agent`` for a deepagents backend."""
     if backend == "gigachat":
@@ -396,6 +450,10 @@ def make_agent_factory(
             max_tokens=max_tokens,
             harness_profile=harness_profile,
             context_window=context_window,
+            # Chains are where dropping reasoning hurts most: the loss compounds
+            # over every turn of one session, and on our SGLang stand replaying
+            # it was worth 9.6pp on the solo set alone.
+            forward_reasoning_history=forward_reasoning_history,
         )
     raise SystemExit(f"Unknown chain backend: {backend!r}. Choose from {BACKENDS}.")
 
@@ -431,10 +489,32 @@ def _invoke_with_timeout(
     thread.start()
     thread.join(timeout)
     if thread.is_alive():
-        raise TaskTimeoutError(f"turn exceeded the {timeout:.0f}s per-turn timeout")
+        raise ChainInvokeTimeout(
+            f"invocation exceeded its {timeout:.0f}s timeout", thread
+        )
     if "error" in box:
         raise box["error"]
     return box.get("result")
+
+
+def _settle_invocation(exc: ChainInvokeTimeout, progress: Any) -> bool:
+    """Wait out a timed-out invocation. Returns True if it is still running.
+
+    Python cannot kill a thread, so a timeout does not stop the agent: it keeps
+    holding its connection and writing into the very workspace the runner is
+    about to fingerprint, verify and (with ``--keep``) hand back for offline
+    re-checking. Most timeouts are near-misses, so a short grace period usually
+    turns the race into no race at all; when it does not, the caller must say
+    the score was taken against a moving target rather than quietly publish it.
+    """
+    exc.thread.join(_ORPHAN_GRACE_SECONDS)
+    if not exc.thread.is_alive():
+        return False
+    progress(
+        f"  ! the timed-out agent is still running after "
+        f"{_ORPHAN_GRACE_SECONDS}s — scoring may race its writes"
+    )
+    return True
 
 
 def _history_chars(messages: list[Any]) -> int:
@@ -559,7 +639,19 @@ def run_chain_turns(
                 except TaskTimeoutError as exc:
                     turn.error = str(exc)
                     turn.stats = _turn_delta_stats(stats, [])
-                    break  # turn failed; chain continues with pre-turn history
+                    if isinstance(exc, ChainInvokeTimeout) and _settle_invocation(
+                        exc, progress
+                    ):
+                        # The agent is still writing into this workspace, so
+                        # every later turn would be verified against a tree
+                        # that moves on its own. Stop here: a short chain with
+                        # honest numbers beats a long one nobody can reproduce.
+                        result.scoring_raced = True
+                        terminate_reason = (
+                            f"turn timeout at position {position} left the agent "
+                            f"running; chain stopped so scoring stays meaningful"
+                        )
+                    break  # otherwise the turn failed and the chain goes on
                 except Exception as exc:  # noqa: BLE001 — classified below
                     if _is_context_overflow_error(exc):
                         turn.error = f"context overflow: {exc}"
@@ -632,7 +724,7 @@ def run_chain_turns(
                 break
 
         _final_verify(result, tasks, chain_root)
-        result.completed = True
+        result.completed = not result.scoring_raced
         return result
     finally:
         result.elapsed_seconds = time.monotonic() - started
@@ -702,6 +794,8 @@ def run_chain_batch_agent(
         except Exception as exc:  # noqa: BLE001 — chain-level failure, still verify
             if isinstance(exc, TaskTimeoutError):
                 result.error = f"chain timed out after {timeout:.0f}s"
+                if isinstance(exc, ChainInvokeTimeout):
+                    result.scoring_raced = _settle_invocation(exc, progress)
             elif _is_graph_recursion_error(exc):
                 result.error = "graph recursion limit reached"
             elif _is_context_overflow_error(exc):
@@ -719,27 +813,39 @@ def run_chain_batch_agent(
             )
 
         _mark_untouched_as_not_reached(result, chain_root, before)
-        for task, turn in zip(tasks, result.turns, strict=True):
-            if not turn.reached:
-                progress(
-                    f"  [{spec.chain_id} {turn.position:02d}/{total}] [----] {task.id}"
-                )
-                continue
-            verify = task.verify(chain_root / turn.subdir)
-            turn.passed_immediate = verify.passed
-            turn.message_immediate = verify.message
-            turn.passed_final = verify.passed
-            turn.message_final = verify.message
-            status = "PASS" if verify.passed else "FAIL"
-            progress(
-                f"  [{spec.chain_id} {turn.position:02d}/{total}] [{status}] {task.id}"
-            )
-        result.completed = True
+        _verify_batch_chain(result, tasks, chain_root, progress=progress)
+        result.completed = not result.scoring_raced
         return result
     finally:
         result.elapsed_seconds = time.monotonic() - started
         if workspace_keepalive is not None:
             workspace_keepalive.cleanup()
+
+
+def _verify_batch_chain(
+    result: ChainRunResult,
+    tasks: list[Task],
+    chain_root: Path,
+    *,
+    progress: Any,
+) -> None:
+    """Score a batch/file chain: one verdict per task, taken at the chain's end.
+
+    Deliberately leaves ``passed_immediate`` unset. The whole chain ran inside
+    a single invocation, so there was never a moment between tasks at which to
+    take a first verdict; copying the final one into it would manufacture a
+    perfect retention score out of an unasked question.
+    """
+    total = len(result.turns)
+    for task, turn in zip(tasks, result.turns, strict=True):
+        head = f"  [{result.chain_id} {turn.position:02d}/{total}]"
+        if not turn.reached:
+            progress(f"{head} [----] {task.id}")
+            continue
+        verify = task.verify(chain_root / turn.subdir)
+        turn.passed_final = verify.passed
+        turn.message_final = verify.message
+        progress(f"{head} [{'PASS' if verify.passed else 'FAIL'}] {task.id}")
 
 
 def run_chain_batch_cli(
@@ -837,21 +943,7 @@ def run_chain_batch_cli(
             result.chain_stats = stats or {}
 
         _mark_untouched_as_not_reached(result, chain_root, before)
-        for task, turn in zip(tasks, result.turns, strict=True):
-            if not turn.reached:
-                progress(
-                    f"  [{spec.chain_id} {turn.position:02d}/{total}] [----] {task.id}"
-                )
-                continue
-            verify = task.verify(chain_root / turn.subdir)
-            turn.passed_immediate = verify.passed
-            turn.message_immediate = verify.message
-            turn.passed_final = verify.passed
-            turn.message_final = verify.message
-            status = "PASS" if verify.passed else "FAIL"
-            progress(
-                f"  [{spec.chain_id} {turn.position:02d}/{total}] [{status}] {task.id}"
-            )
+        _verify_batch_chain(result, tasks, chain_root, progress=progress)
         result.completed = True
         return result
     finally:
@@ -891,6 +983,7 @@ def chain_results_to_payload(
     total = len(turns)
     final_passed = sum(1 for t in turns if t.passed_final)
     immediate_passed = sum(1 for t in turns if t.passed_immediate)
+    retention_measured = any(result.retention_measured for result in results)
     chain_rates = [
         r.final_passed / len(r.task_ids) for r in results if r.task_ids
     ]
@@ -919,9 +1012,20 @@ def chain_results_to_payload(
             "total": total,
             "passed": final_passed,
             "pass_rate": (final_passed / total) if total else 0.0,
-            "immediate_passed": immediate_passed,
-            "immediate_pass_rate": (immediate_passed / total) if total else 0.0,
-            "retention_broken": sum(r.retention_broken for r in results),
+            "scoring_raced": any(result.scoring_raced for result in results),
+            # None, not 0: batch/file deliveries verify once at the end, so
+            # there is no earlier verdict to compare against. A zero here would
+            # be read as "nothing was broken" when nothing was watched.
+            "retention_measured": retention_measured,
+            "immediate_passed": immediate_passed if retention_measured else None,
+            "immediate_pass_rate": (
+                (immediate_passed / total) if retention_measured and total else None
+            ),
+            "retention_broken": (
+                sum(r.retention_broken or 0 for r in results)
+                if retention_measured
+                else None
+            ),
             "marathon_score": (
                 sum(chain_rates) / len(chain_rates) if chain_rates else 0.0
             ),
@@ -959,8 +1063,18 @@ def _write_chain_results_json(
         )
 
 
+def _turn_outcome(turn: TurnRecord) -> bool:
+    """The verdict to score a turn by: its own if the delivery took one."""
+    return turn.passed_final if turn.passed_immediate is None else turn.passed_immediate
+
+
 def _position_quartile_rates(results: list[ChainRunResult]) -> list[tuple[str, int, int]]:
-    """Immediate pass counts bucketed by position quartile across chains."""
+    """Pass counts bucketed by position quartile across chains.
+
+    This is the depth-degradation read: with the order shuffled by seed, the
+    quartiles hold equally hard tasks, so a falling tail is the long horizon
+    and not the task mix.
+    """
     buckets: dict[int, list[TurnRecord]] = {1: [], 2: [], 3: [], 4: []}
     for result in results:
         length = len(result.task_ids)
@@ -973,9 +1087,7 @@ def _position_quartile_rates(results: list[ChainRunResult]) -> list[tuple[str, i
     for quartile in (1, 2, 3, 4):
         turns = buckets[quartile]
         if turns:
-            rows.append(
-                (f"Q{quartile}", sum(1 for t in turns if t.passed_immediate), len(turns))
-            )
+            rows.append((f"Q{quartile}", sum(1 for t in turns if _turn_outcome(t)), len(turns)))
     return rows
 
 
@@ -983,30 +1095,38 @@ def summarize_chains(results: list[ChainRunResult]) -> None:
     print()
     print("=" * 64)
     header = ["Chain", "Len", "Immediate", "Final", "Broken", "Died@", "Time"]
+    def _cell(value: int | None) -> str:
+        return "-" if value is None else str(value)
+
     rows = []
     for result in results:
         rows.append(
             [
                 result.chain_id,
                 str(len(result.task_ids)),
-                str(result.immediate_passed),
+                _cell(result.immediate_passed),
                 str(result.final_passed),
-                str(result.retention_broken),
+                _cell(result.retention_broken),
                 str(result.terminated_at_position or "-"),
                 f"{result.elapsed_seconds:.0f}s",
             ]
         )
     turns = [turn for result in results for turn in result.turns]
     total = len(turns)
+    retention_measured = any(result.retention_measured for result in results)
     immediate = sum(1 for t in turns if t.passed_immediate)
     final = sum(1 for t in turns if t.passed_final)
     rows.append(
         [
             "Total",
             str(total),
-            str(immediate),
+            _cell(immediate if retention_measured else None),
             str(final),
-            str(sum(r.retention_broken for r in results)),
+            _cell(
+                sum(r.retention_broken or 0 for r in results)
+                if retention_measured
+                else None
+            ),
             "-",
             f"{sum(r.elapsed_seconds for r in results):.0f}s",
         ]
@@ -1030,21 +1150,40 @@ def summarize_chains(results: list[ChainRunResult]) -> None:
     print()
     print(f"Marathon score (mean final pass over chains): {marathon * 100:.1f}%")
     if total:
+        if retention_measured:
+            print(
+                f"Immediate pass: {immediate}/{total} ({immediate / total * 100:.1f}%)   "
+                f"Final pass: {final}/{total} ({final / total * 100:.1f}%)"
+            )
+        else:
+            print(f"Final pass: {final}/{total} ({final / total * 100:.1f}%)")
+    if retention_measured:
+        if immediate:
+            survived = sum(1 for t in turns if t.passed_immediate and t.passed_final)
+            print(
+                f"Retention: {survived}/{immediate} solved tasks survived to chain end "
+                f"({survived / immediate * 100:.1f}%)"
+            )
+    else:
         print(
-            f"Immediate pass: {immediate}/{total} ({immediate / total * 100:.1f}%)   "
-            f"Final pass: {final}/{total} ({final / total * 100:.1f}%)"
+            "Retention: not measured — this delivery verifies once, at the end of "
+            "the chain, so there is no earlier verdict to break."
         )
-    if immediate:
-        survived = sum(1 for t in turns if t.passed_immediate and t.passed_final)
+
+    raced = [result for result in results if result.scoring_raced]
+    if raced:
+        print()
         print(
-            f"Retention: {survived}/{immediate} solved tasks survived to chain end "
-            f"({survived / immediate * 100:.1f}%)"
+            f"WARNING: {', '.join(r.chain_id for r in raced)} scored while a "
+            "timed-out agent was still running. The workspace could move under "
+            "the verifier, so treat these numbers as provisional."
         )
 
     quartiles = _position_quartile_rates(results)
     if quartiles:
         print()
-        print("Immediate pass by position quartile:")
+        label = "Immediate" if retention_measured else "Final"
+        print(f"{label} pass by position quartile:")
         print(
             "  "
             + "   ".join(
@@ -1087,7 +1226,14 @@ def summarize_chains(results: list[ChainRunResult]) -> None:
 def _resume_completed_chains(
     json_output: Path | None, requested: list[str]
 ) -> dict[str, ChainRunResult]:
-    """Load chains already completed in a previous run of the same output file."""
+    """Load chains already completed in a previous run of the same output file.
+
+    Keyed on ``completed``, which now means "scored and trustworthy" rather
+    than "the runner reached the end of the function". A chain that hit its
+    step cap or that the agent abandoned early is a result and is kept; one
+    scored against a workspace a timed-out agent was still writing to is not,
+    and comes back as pending so the resume re-runs it.
+    """
     if json_output is None or not json_output.exists():
         return {}
     try:
@@ -1103,29 +1249,27 @@ def _resume_completed_chains(
         for turn_payload in chain_payload.get("turns") or []:
             stats = {
                 key: value
-                for key in (
-                    "agent_steps",
-                    "agent_tool_calls",
-                    "agent_shell_commands",
-                    "agent_events",
-                    "agent_llm_calls",
-                    *_AGENT_TOKEN_KEYS,
-                )
-                if isinstance(value := turn_payload.get(key), int)
+                for key in _TURN_STAT_KEYS
+                if (value := turn_payload.get(key)) is not None
             }
+            immediate = turn_payload.get("passed_immediate")
             turns.append(
                 TurnRecord(
                     position=turn_payload.get("position", 0),
                     task_id=turn_payload.get("task_id", ""),
                     subdir=turn_payload.get("subdir", ""),
                     reached=bool(turn_payload.get("reached")),
-                    passed_immediate=bool(turn_payload.get("passed_immediate")),
+                    # Kept nullable on purpose: collapsing "not measured" into
+                    # False here would resurrect the fake-100%-retention bug on
+                    # every resumed run.
+                    passed_immediate=None if immediate is None else bool(immediate),
                     message_immediate=turn_payload.get("message_immediate") or "",
                     passed_final=bool(turn_payload.get("passed_final")),
                     message_final=turn_payload.get("message_final") or "",
                     elapsed_seconds=turn_payload.get("elapsed_seconds") or 0.0,
                     error=turn_payload.get("error"),
                     context_messages_before=turn_payload.get("context_messages_before"),
+                    context_chars_before=turn_payload.get("context_chars_before"),
                     stats=stats,
                 )
             )
@@ -1138,10 +1282,28 @@ def _resume_completed_chains(
             termination_reason=chain_payload.get("termination_reason"),
             elapsed_seconds=chain_payload.get("elapsed_seconds") or 0.0,
             error=chain_payload.get("error"),
+            scoring_raced=bool(chain_payload.get("scoring_raced")),
             chain_stats=chain_payload.get("chain_stats") or {},
             completed=True,
         )
     return completed
+
+
+def _planned_chain(spec: ChainSpec, delivery: str) -> ChainRunResult:
+    """A not-yet-run chain, so a partial artifact still states the plan."""
+    subdirs = [
+        _subdir_name(position, task_id, spec.length)
+        for position, task_id in enumerate(spec.task_ids, start=1)
+    ]
+    return ChainRunResult(
+        chain_id=spec.chain_id,
+        task_ids=spec.task_ids,
+        delivery=delivery,
+        turns=[
+            TurnRecord(position=position, task_id=task_id, subdir=subdirs[position - 1])
+            for position, task_id in enumerate(spec.task_ids, start=1)
+        ],
+    )
 
 
 def run_chains(
@@ -1155,11 +1317,12 @@ def run_chains(
     max_tokens: int | None = None,
     harness_profile: str | None = None,
     keep_workspace: bool = False,
-    turn_timeout: float = DEFAULT_TURN_TIMEOUT_SECONDS,
+    turn_timeout: float | None = None,
     chain_timeout: float | None = None,
-    transient_attempts: int = DEFAULT_TRANSIENT_ATTEMPTS,
+    transient_attempts: int | None = None,
     concurrency: int = 1,
     context_window: int | None = None,
+    forward_reasoning_history: bool = False,
     json_output: str | Path | None = None,
 ) -> list[ChainRunResult]:
     """Run the requested chains and return their results (see module docstring)."""
@@ -1168,6 +1331,31 @@ def run_chains(
 
     specs = [get_chain(chain_id) for chain_id in chain_ids]
     via_file = delivery == "file"
+    # Both settings are per-turn, and batch/file deliveries have exactly one
+    # turn. Saying so beats letting an operator set a timeout that never
+    # applies and read the resulting run as if it had.
+    if delivery in ("batch", "file"):
+        ignored = [
+            name
+            for name, value in (
+                ("--turn-timeout", turn_timeout),
+                ("--transient-attempts", transient_attempts),
+            )
+            if value is not None
+        ]
+        if ignored:
+            print(
+                f"Note: {' and '.join(ignored)} — turns delivery only, ignored "
+                f"here. This chain is a single invocation: cap it with "
+                f"--chain-timeout, and transient errors are retried inside the "
+                f"model client."
+            )
+    turn_timeout = (
+        DEFAULT_TURN_TIMEOUT_SECONDS if turn_timeout is None else turn_timeout
+    )
+    transient_attempts = (
+        DEFAULT_TRANSIENT_ATTEMPTS if transient_attempts is None else transient_attempts
+    )
     if cli_command is not None:
         if delivery not in ("batch", "file"):
             raise SystemExit(
@@ -1192,14 +1380,22 @@ def run_chains(
     ]
 
     def _write_partial(extra: ChainRunResult | None = None) -> None:
-        snapshot = [*results, *([extra] if extra is not None else [])]
-        snapshot.sort(key=lambda r: chain_ids.index(r.chain_id))
+        done = {result.chain_id: result for result in results}
+        if extra is not None:
+            done[extra.chain_id] = extra
+        # Chains that have not produced a result yet go in as placeholders, so
+        # the file always describes the whole plan. batch/file deliveries write
+        # nothing until a chain ends — hours on a marathon — and a run killed
+        # before that used to leave no record of what it was even running.
+        snapshot = [
+            done.get(spec.chain_id) or _planned_chain(spec, delivery) for spec in specs
+        ]
         _write_chain_results_json(
             snapshot,
             json_path,
             delivery=delivery,
             backend_label=backend_label,
-            command=None,
+            command=results_json_command(),
         )
 
     def _run_one(spec: ChainSpec) -> ChainRunResult:
@@ -1224,6 +1420,7 @@ def run_chains(
                 max_tokens=max_tokens,
                 harness_profile=harness_profile,
                 context_window=context_window,
+                forward_reasoning_history=forward_reasoning_history,
             )
             return run_chain_batch_agent(
                 spec,
@@ -1239,6 +1436,7 @@ def run_chains(
             max_tokens=max_tokens,
             harness_profile=harness_profile,
             context_window=context_window,
+            forward_reasoning_history=forward_reasoning_history,
         )
         # Per-turn checkpointing matters on long chains (E100 runs for over an
         # hour): a crash mid-chain must not lose the finished turns. Only safe
@@ -1253,6 +1451,7 @@ def run_chains(
             on_turn=on_turn,
         )
 
+    _write_partial()  # the plan on disk before the first agent starts
     if concurrency <= 1 or len(pending) <= 1:
         for spec in pending:
             result = _run_one(spec)

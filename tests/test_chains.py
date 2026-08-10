@@ -2,21 +2,31 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
+from pathlib import Path
+
 import harness_bench.chains as chains_module
 from harness_bench.chains import (
     CHAIN_LENGTH,
+    CHAINSET_VERSION,
     HALF_CHAIN_IDS,
     STANDARD_CHAIN_IDS,
     all_chains,
     get_chain,
 )
+from harness_bench.runner import set_results_json_command
 from harness_bench.runner_chain import (
     ChainRunResult,
     TurnRecord,
     _batch_prompt,
+    _planned_chain,
+    _resume_completed_chains,
     _subdir_name,
     _turn_prompt,
+    _write_chain_results_json,
     chain_results_to_payload,
+    run_chains,
 )
 from harness_bench.tasks import get_task
 from harness_bench.versioning import task_number
@@ -27,6 +37,23 @@ def test_chainset_is_deterministic() -> None:
     chains_module._CHAINS = None  # force a rebuild
     second = {cid: spec.task_ids for cid, spec in all_chains().items()}
     assert first == second
+
+
+def test_chainset_is_pinned_to_its_version() -> None:
+    """Chains come out of a seeded shuffle over the task registry, so adding or
+    removing one task reshuffles most of them — 21 of 38 when this was written
+    — while CHAINSET_VERSION still says v1. Runs from either side would then
+    carry the same stamp without being the same chains. Changing the set is
+    fine; changing it silently is not, so bump CHAINSET_VERSION and this hash
+    together."""
+    digest = hashlib.sha256(
+        json.dumps(
+            {cid: list(spec.task_ids) for cid, spec in all_chains().items()},
+            sort_keys=True,
+        ).encode()
+    ).hexdigest()[:16]
+
+    assert (CHAINSET_VERSION, digest) == ("v1", "a7c266e04f150206")
 
 
 def test_standard_chains_shape() -> None:
@@ -176,3 +203,101 @@ def test_chain_payload_shape_and_aggregates() -> None:
     assert flattened[0]["position"] == 1
     assert flattened[1]["passed_immediate"] is True
     assert flattened[2]["reached"] is False
+
+
+def _one_turn_chain(**overrides: object) -> ChainRunResult:
+    turn_fields: dict[str, object] = {
+        "position": 1,
+        "task_id": "task_05_greet",
+        "subdir": "t1_task_05_greet",
+    }
+    turn_fields.update(overrides.pop("turn", {}))  # type: ignore[arg-type]
+    return ChainRunResult(
+        chain_id="S5",
+        task_ids=("task_05_greet",),
+        delivery="file",
+        turns=[TurnRecord(**turn_fields)],  # type: ignore[arg-type]
+        **overrides,  # type: ignore[arg-type]
+    )
+
+
+def test_resume_preserves_unmeasured_retention_and_context_size(tmp_path: Path) -> None:
+    """A resume rewrites the whole artifact out of what it read back, so a
+    field dropped on the way in is gone from the published run."""
+    written = _one_turn_chain(
+        completed=True,
+        turn={
+            "reached": True,
+            "passed_final": True,
+            "message_final": "ok",
+            "context_messages_before": 12,
+            "context_chars_before": 3456,
+            "stats": {"agent_steps": 4, "agent_tool_calls_by_name": {"execute": 3}},
+        },
+    )
+    path = tmp_path / "chain.json"
+    _write_chain_results_json(
+        [written], path, delivery="file", backend_label="stub", command=None
+    )
+
+    turn = _resume_completed_chains(path, ["S5"])["S5"].turns[0]
+
+    assert turn.passed_immediate is None  # "not measured" must survive the trip
+    assert turn.context_chars_before == 3456
+    assert turn.stats["agent_tool_calls_by_name"] == {"execute": 3}
+
+
+def test_a_chain_scored_against_a_live_agent_is_re_run_not_resumed(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "chain.json"
+    _write_chain_results_json(
+        [_one_turn_chain(scoring_raced=True, completed=False)],
+        path,
+        delivery="file",
+        backend_label="stub",
+        command=None,
+    )
+
+    assert _resume_completed_chains(path, ["S5"]) == {}
+
+
+def test_planned_chains_state_the_plan_before_anything_runs() -> None:
+    """batch/file deliveries produce nothing until a chain ends — hours on a
+    marathon — so the artifact has to describe the run from the start."""
+    spec = get_chain("S5")
+
+    payload = chain_results_to_payload(
+        [_planned_chain(spec, "file")], delivery="file", backend_label="stub"
+    )
+
+    chain = payload["chains"][0]
+    assert chain["completed"] is False
+    assert chain["task_ids"] == list(spec.task_ids)
+    assert chain["turns"][0]["subdir"] == f"t01_{spec.task_ids[0]}"
+
+
+def test_chain_artifact_records_the_command(tmp_path: Path) -> None:
+    """Chain runs turn a dozen knobs — delivery, window, step cap, reasoning —
+    and the artifact is the only place the combination is written down."""
+    command = "python -m harness_bench run-chain --chain ALL --delivery file"
+    path = tmp_path / "chain.json"
+    set_results_json_command(command)
+    try:
+        run_chains([], delivery="file", json_output=path)
+    finally:
+        set_results_json_command(None)
+
+    assert json.loads(path.read_text(encoding="utf-8"))["command"] == command
+
+
+def test_turn_only_flags_are_called_out_on_a_batch_delivery(
+    tmp_path: Path, capsys: object
+) -> None:
+    run_chains(
+        [], delivery="file", turn_timeout=30.0, json_output=tmp_path / "chain.json"
+    )
+
+    out = capsys.readouterr().out  # type: ignore[attr-defined]
+    assert "--turn-timeout" in out
+    assert "turns delivery only" in out
