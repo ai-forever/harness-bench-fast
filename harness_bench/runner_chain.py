@@ -630,6 +630,7 @@ def run_chain_turns(
             input_messages = [*messages, user_message]
 
             terminate_reason: str | None = None
+            raced = False
             for attempt in range(1, transient_attempts + 1):
                 stats = AgentRunStatsCollector()
                 try:
@@ -646,6 +647,7 @@ def run_chain_turns(
                         # every later turn would be verified against a tree
                         # that moves on its own. Stop here: a short chain with
                         # honest numbers beats a long one nobody can reproduce.
+                        raced = True
                         result.scoring_raced = True
                         terminate_reason = (
                             f"turn timeout at position {position} left the agent "
@@ -696,10 +698,20 @@ def run_chain_turns(
                         delta = []
                         messages = input_messages
                     turn.stats = _turn_delta_stats(stats, delta)
-                    verify = task.verify(task_workspace)
-                    turn.passed_immediate = verify.passed
-                    turn.message_immediate = verify.message
                     break
+
+            if not raced:
+                # However the turn ended, its work is on disk and whether that
+                # work satisfies the task is a fact worth measuring. Verifying
+                # only the clean path files "never checked" as "failed": on a
+                # model that exhausts its step budget — Lightning does it on
+                # 134 turns of this chainset — the step cap would look like an
+                # inability to solve anything, and `passed_final` would then
+                # exceed `passed_immediate` for no real reason. Skipped only
+                # when a timed-out agent is still writing here.
+                verify = task.verify(task_workspace)
+                turn.passed_immediate = verify.passed
+                turn.message_immediate = verify.message
 
             turn.elapsed_seconds = time.monotonic() - turn_started
             status = "PASS" if turn.passed_immediate else "FAIL"

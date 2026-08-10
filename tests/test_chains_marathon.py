@@ -229,6 +229,38 @@ def test_summary_never_claims_retention_it_did_not_measure(
     assert "100.0%)" not in out
 
 
+class _SolvesThenBlowsTheStepBudget:
+    """Finishes the task, then dies on the recursion limit — which is what a
+    model that keeps poking after the work is done actually does."""
+
+    def __init__(self, workspace: Path) -> None:
+        self.workspace = workspace
+        self.calls = 0
+
+    def invoke(self, payload: dict, **_kwargs: object) -> dict:
+        from langgraph.errors import GraphRecursionError
+
+        self.calls += 1
+        directory = sorted(p for p in self.workspace.iterdir() if p.is_dir())[-1]
+        get_task(directory.name.split("_", 1)[1]).apply_gold(directory)
+        raise GraphRecursionError("Recursion limit of 80 reached")
+
+
+def test_a_turn_that_runs_out_of_steps_is_still_verified() -> None:
+    """The step cap ends the turn, not the work: whatever landed on disk before
+    it is a real outcome. Verifying only the clean path records "never checked"
+    as "failed", which shows up as `passed_final` exceeding `passed_immediate`
+    for tasks that were finished all along."""
+    result = run_chain_turns(
+        get_chain("S5"), _SolvesThenBlowsTheStepBudget, progress=lambda _m: None
+    )
+
+    assert all(turn.error == "graph recursion limit reached" for turn in result.turns)
+    assert result.immediate_passed == 5
+    assert result.final_passed == 5
+    assert result.retention_broken == 0
+
+
 class _NeverReturns:
     """Blocks until released — a turn that outlives its timeout."""
 
