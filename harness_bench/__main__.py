@@ -24,6 +24,12 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from harness_bench.chains import (
+    CHAINSET_VERSION,
+    STANDARD_CHAIN_IDS,
+    all_chains,
+    get_chain,
+)
 from harness_bench.harbor_export import export_harbor_dataset
 from harness_bench.metrics import default_metric_ks
 from harness_bench.runner import (
@@ -34,6 +40,18 @@ from harness_bench.runner import (
     set_results_json_command,
     summarize,
     verify_gold,
+)
+from harness_bench.runner_chain import (
+    BACKENDS as CHAIN_BACKENDS,
+)
+from harness_bench.runner_chain import (
+    DEFAULT_TRANSIENT_ATTEMPTS as CHAIN_TRANSIENT_ATTEMPTS,
+)
+from harness_bench.runner_chain import (
+    DEFAULT_TURN_TIMEOUT_SECONDS,
+    TASK_LIST_FILENAME,
+    run_chains,
+    summarize_chains,
 )
 from harness_bench.runner_cli import DEFAULT_CLI_COMMAND, DEFAULT_TIMEOUT_SECONDS, run_all_cli
 from harness_bench.runner_openrouter import DEFAULT_OPENROUTER_MODEL
@@ -307,6 +325,73 @@ def _cmd_verify_task(args: argparse.Namespace) -> int:
         status = "OK" if result.passed else "BAD"
         print(f"[{status}] {task.id}: {result.message}")
     return 0 if result.passed else 1
+
+
+def _cmd_chains(args: argparse.Namespace) -> int:
+    chains = all_chains()
+    selected = [get_chain(cid) for cid in args.chain] if args.chain else list(chains.values())
+    if args.json:
+        payload = {
+            "chainset_version": CHAINSET_VERSION,
+            "chains": [
+                {
+                    "chain_id": spec.chain_id,
+                    "length": spec.length,
+                    "note": spec.note,
+                    "task_ids": list(spec.task_ids),
+                }
+                for spec in selected
+            ],
+        }
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return 0
+    print(f"Chainset version: {CHAINSET_VERSION}")
+    for spec in selected:
+        print(f"\n{spec.chain_id} ({spec.length} tasks) — {spec.note}")
+        for position, task_id in enumerate(spec.task_ids, start=1):
+            print(f"  {position:3d}. {task_id}")
+    return 0
+
+
+def _resolve_chain_ids(args: argparse.Namespace) -> list[str]:
+    chain_ids: list[str] = []
+    if args.all_standard:
+        chain_ids.extend(STANDARD_CHAIN_IDS)
+    if args.chain:
+        chain_ids.extend(cid for cid in args.chain if cid not in chain_ids)
+    if not chain_ids:
+        raise SystemExit(
+            "No chains selected. Pass --chain <id> (repeatable; see "
+            "`python -m harness_bench chains`) or --all-standard for M1-M10."
+        )
+    return chain_ids
+
+
+def _cmd_run_chain(args: argparse.Namespace) -> int:
+    chain_ids = _resolve_chain_ids(args)
+    _announce_json_output(args)
+    results = run_chains(
+        chain_ids,
+        delivery=args.delivery,
+        backend=args.backend,
+        model_name=args.model,
+        cli_command=args.cli_command,
+        recursion_limit=args.recursion_limit,
+        max_tokens=args.max_tokens,
+        harness_profile=args.harness_profile,
+        keep_workspace=args.keep,
+        turn_timeout=args.turn_timeout,
+        chain_timeout=args.chain_timeout,
+        transient_attempts=args.transient_attempts,
+        concurrency=args.concurrency,
+        context_window=args.context_window,
+        json_output=args.json_output,
+    )
+    summarize_chains(results)
+    _maybe_report_json(args, results)
+    if args.allow_task_failures:
+        return 0
+    return 0 if all(turn.passed_final for r in results for turn in r.turns) else 1
 
 
 def _cmd_export_harbor(args: argparse.Namespace) -> int:
@@ -687,6 +772,160 @@ def build_parser() -> argparse.ArgumentParser:
         help="Exit 0 when the harness completes even if some benchmark tasks fail.",
     )
     p_cli.set_defaults(func=_cmd_run_cli)
+
+    p_chains = sub.add_parser(
+        "chains",
+        help=f"List marathon chains of chainset {CHAINSET_VERSION} (see run-chain).",
+    )
+    p_chains.add_argument(
+        "--chain",
+        action="append",
+        help="Chain id to show (repeatable). Shows all chains if omitted.",
+    )
+    p_chains.add_argument("--json", action="store_true", help="Emit JSON")
+    p_chains.set_defaults(func=_cmd_chains)
+
+    p_chain = sub.add_parser(
+        "run-chain",
+        help=(
+            "Marathon mode: one agent session solves a chain of tasks "
+            "sequentially in a single context (endurance / context-degradation "
+            "measurement). See `chains` for available chain ids."
+        ),
+    )
+    p_chain.add_argument(
+        "--chain",
+        action="append",
+        help="Chain id (repeatable), e.g. S5, M1..M10, P2, P3, E100.",
+    )
+    p_chain.add_argument(
+        "--all-standard",
+        action="store_true",
+        help="Run all standard chains M1-M10.",
+    )
+    p_chain.add_argument(
+        "--delivery",
+        choices=("turns", "batch", "file"),
+        default="turns",
+        help=(
+            "turns: each task is a new user message in one growing session "
+            "(deepagents backends only). batch: all tasks in one combined "
+            "prompt (works with --cli-command too). file: tasks are written to "
+            f"{TASK_LIST_FILENAME} and the agent is told to work through the "
+            "list — the only delivery that fits long chains, whose combined "
+            "prompts exceed a 32k window on their own. Default: turns."
+        ),
+    )
+    p_chain.add_argument(
+        "--context-window",
+        type=int,
+        default=None,
+        help=(
+            "Model input budget in tokens. Sizes the deepagents summarization "
+            "middleware; without it the middleware waits for a fixed 170k "
+            "tokens and a smaller window overflows first. Set it for any long "
+            "chain."
+        ),
+    )
+    p_chain.add_argument(
+        "--backend",
+        choices=CHAIN_BACKENDS,
+        default="gigachat",
+        help=(
+            "Agent backend for deepagents deliveries: gigachat (env creds, "
+            "harness profile when installed), gigachat-pure (no profile), or "
+            "openrouter (--model). Ignored when --cli-command is set. "
+            "Default: gigachat."
+        ),
+    )
+    p_chain.add_argument(
+        "--model",
+        default=None,
+        help="OpenRouter model id (with --backend openrouter).",
+    )
+    p_chain.add_argument(
+        "--cli-command",
+        default=None,
+        help=(
+            "External CLI agent command prefix (batch delivery only); the "
+            "combined chain prompt is appended as the final argument, e.g. "
+            "'kimi-cli --quiet --yolo -m k3 -p'."
+        ),
+    )
+    p_chain.add_argument(
+        "--recursion-limit",
+        type=int,
+        default=None,
+        help=(
+            "LangGraph recursion limit. turns: per turn (default 80). "
+            "batch: whole chain (default min(1200, 60×length))."
+        ),
+    )
+    p_chain.add_argument(
+        "--max-tokens",
+        type=int,
+        default=None,
+        help="Optional ChatOpenAI max_tokens override (openrouter backend).",
+    )
+    p_chain.add_argument(
+        "--harness-profile",
+        default=None,
+        help="Bridge a built-in deepagents harness profile (openrouter backend).",
+    )
+    p_chain.add_argument(
+        "--turn-timeout",
+        type=float,
+        default=DEFAULT_TURN_TIMEOUT_SECONDS,
+        help=(
+            "Per-turn wall-clock timeout in seconds for turns delivery "
+            f"(default: {DEFAULT_TURN_TIMEOUT_SECONDS:.0f})."
+        ),
+    )
+    p_chain.add_argument(
+        "--chain-timeout",
+        type=float,
+        default=None,
+        help=(
+            "Whole-chain timeout in seconds for batch delivery "
+            "(default: 300 × chain length)."
+        ),
+    )
+    p_chain.add_argument(
+        "--transient-attempts",
+        type=_positive_int,
+        default=CHAIN_TRANSIENT_ATTEMPTS,
+        help=(
+            "Attempts per turn on transient model errors before the chain is "
+            f"terminated (default: {CHAIN_TRANSIENT_ATTEMPTS})."
+        ),
+    )
+    p_chain.add_argument(
+        "--concurrency",
+        type=_positive_int,
+        default=1,
+        help="Run up to N chains in parallel (turns within a chain are sequential).",
+    )
+    p_chain.add_argument("--keep", action="store_true", help="Keep chain workspaces")
+    p_chain.add_argument(
+        "--json-output",
+        dest="json_output",
+        nargs="?",
+        const="",
+        default="",
+        type=normalize_json_output_path,
+        metavar="PATH",
+        help=(
+            "Write the chain-mode JSON report to this path (bare filenames go "
+            "under jobs/). If the file exists, chains already completed in it "
+            "are skipped (chain-level resume)."
+        ),
+    )
+    p_chain.add_argument(
+        "--allow-task-failures",
+        action="store_true",
+        help="Exit 0 even when some chain tasks fail.",
+    )
+    p_chain.set_defaults(func=_cmd_run_chain)
 
     return parser
 

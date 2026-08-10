@@ -324,6 +324,7 @@ def build_agent(
     max_tokens: int | None = None,
     harness_profile: str | None = None,
     forward_reasoning_history: bool = False,
+    context_window: int | None = None,
 ) -> Any:
     """Build a stock `deepagents` agent backed by an OpenRouter model.
 
@@ -348,6 +349,11 @@ def build_agent(
     model_kwargs: dict[str, Any] = {}
     if max_tokens is not None:
         model_kwargs["max_tokens"] = max_tokens
+    if context_window is not None:
+        # Lets the deepagents summarization middleware size itself against the
+        # real window; without a profile it waits for a fixed 170k tokens and
+        # a smaller window overflows first. See runner.build_agent.
+        model_kwargs["profile"] = {"max_input_tokens": context_window}
     model = ReasoningAwareChatOpenAI(
         model=model_name,
         base_url=os.getenv("OPENROUTER_BASE_URL", DEFAULT_BASE_URL),
@@ -361,6 +367,19 @@ def build_agent(
     _apply_execute_cwd_fix(model)
     if harness_profile:
         _apply_source_harness_profile(model, harness_profile)
+        # Parts of the GigaChat profile read the current task workspace off a
+        # module global (`MemoryTaskMiddleware` gates its memory nudge on
+        # `<workspace>/AGENTS.md` existing). Without this call the middleware is
+        # silently inert, so a bridged `gigachat` profile would measure the
+        # memory wave in a weaker configuration than `runner.py` does. Only
+        # reached when a profile was explicitly bridged, so profile-less
+        # OpenRouter runs stay bit-for-bit unchanged.
+        try:
+            from deepagents_gigachat import set_workspace_path
+        except ImportError:
+            pass
+        else:
+            set_workspace_path(workspace)
     # Memory tasks (222–231) ship an AGENTS.md fixture; pre-existing 221
     # tasks do not. `LocalShellBackend(virtual_mode=True)` maps
     # `/AGENTS.md` to `<workspace>/AGENTS.md`.
