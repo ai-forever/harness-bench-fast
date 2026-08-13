@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+import builtins
 import os
 import subprocess
+import sys
 from pathlib import Path
-from types import SimpleNamespace
+from types import ModuleType, SimpleNamespace
 from typing import cast
 
 import pytest
 from langgraph.errors import GraphRecursionError
 
 from harness_bench import __main__ as bench_main
+from harness_bench import runner
 from harness_bench.core import Task, VerifyResult
 from harness_bench.runner import TaskRun, run_task, write_results_json
 from harness_bench.tasks import get_task
@@ -1025,3 +1028,40 @@ def test_sequential_progress_output_is_cp1251_safe(
     output = capsys.readouterr().out
     assert "[START] task_fake: Fake task" in output
     output.encode("cp1251")
+
+
+def test_harness_profile_registers_once_per_process(monkeypatch, tmp_path: Path) -> None:
+    """Registering per task stacks middleware layers until resolution blows the stack.
+
+    `register_harness_profile` merges additively, so the Nth registration builds
+    a resolution N frames deep — past ~450 tasks every agent build raises
+    RecursionError. The workspace pointer still has to move every task.
+    """
+    registrations: list[int] = []
+    workspaces: list[Path] = []
+    fake = ModuleType("deepagents_gigachat")
+    fake.register_harness = lambda: registrations.append(1)  # type: ignore[attr-defined]
+    fake.set_workspace_path = workspaces.append  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "deepagents_gigachat", fake)
+    monkeypatch.setattr(runner, "_HARNESS_PROFILE_REGISTERED", False)
+
+    for index in range(500):
+        runner._ensure_harness_profile(tmp_path / f"ws{index}")
+
+    assert registrations == [1]
+    assert len(workspaces) == 500
+    assert workspaces[-1] == tmp_path / "ws499"
+
+
+def test_harness_profile_absent_package_is_not_an_error(monkeypatch, tmp_path: Path) -> None:
+    real_import = builtins.__import__
+
+    def _no_gigachat(name: str, *args: object, **kwargs: object) -> object:
+        if name == "deepagents_gigachat":
+            raise ImportError("not installed")
+        return real_import(name, *args, **kwargs)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(builtins, "__import__", _no_gigachat)
+    monkeypatch.setattr(runner, "_HARNESS_PROFILE_REGISTERED", False)
+
+    runner._ensure_harness_profile(tmp_path)
