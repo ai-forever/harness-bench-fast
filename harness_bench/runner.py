@@ -22,6 +22,11 @@ from harness_bench.versioning import TASK_SET_VERSION, TASK_WAVES, TaskWave, tas
 DEFAULT_JOBS_DIR = Path("jobs")
 """Default directory for CLI-specified benchmark JSON/checkpoint files."""
 
+_HARNESS_PROFILE_LOCK = threading.Lock()
+_HARNESS_PROFILE_REGISTERED = False
+"""Guards the one-shot `deepagents-gigachat` profile registration (see
+`_ensure_harness_profile`)."""
+
 _AGENT_METRIC_FIELDS = (
     "agent_steps",
     "agent_tool_calls",
@@ -546,6 +551,34 @@ def _task_run_with_agent_stats(
     )
 
 
+def _ensure_harness_profile(workspace: Path) -> None:
+    """Register the optional `deepagents-gigachat` profile, point it at `workspace`.
+
+    Registration is explicit so editable/local installs behave like entry-point
+    installs, and it happens **once per process**: `register_harness_profile`
+    merges additively, so registering per task stacks another lazily-resolved
+    middleware layer on the `gigachat` key every time. The resolved content
+    stays identical, but each layer adds a frame to the resolution that runs on
+    every agent build, and past ~450 registrations it exhausts Python's stack —
+    every later task then dies with `RecursionError` before reaching the model.
+    A 391-task run survives by luck; `--attempts 16` does not.
+
+    Only the workspace pointer is per task: middleware reads it to tell a memory
+    task from an ordinary one.
+    """
+    try:
+        from deepagents_gigachat import register_harness, set_workspace_path
+    except ImportError:
+        return
+
+    global _HARNESS_PROFILE_REGISTERED
+    with _HARNESS_PROFILE_LOCK:
+        if not _HARNESS_PROFILE_REGISTERED:
+            register_harness()
+            _HARNESS_PROFILE_REGISTERED = True
+    set_workspace_path(workspace)
+
+
 def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     """Build a deep agent backed by GigaChat and rooted at `workspace`.
 
@@ -556,16 +589,7 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     from deepagents.backends import LocalShellBackend
     from langchain_gigachat import GigaChat
 
-    # The deepagents-gigachat harness profile is optional. When installed,
-    # register it explicitly so editable/local installs work the same way as
-    # entry-point installs and so AgentsMdInjectMiddleware knows this task's
-    # workspace. Without it the agent runs on stock deepagents defaults.
-    try:
-        from deepagents_gigachat import register_harness, set_workspace_path
-        register_harness()
-        set_workspace_path(workspace)
-    except ImportError:
-        pass
+    _ensure_harness_profile(workspace)
 
     backend = LocalShellBackend(
         root_dir=workspace,
