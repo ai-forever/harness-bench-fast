@@ -316,6 +316,26 @@ def _apply_execute_cwd_fix(model: Any) -> None:
         _APPLIED_PROFILE_KEYS.add(("__execute_cwd_fix__", target_key))
 
 
+def _point_gigachat_profile_at(workspace: Path) -> None:
+    """Tell the bridged GigaChat profile which workspace this task runs in.
+
+    Part of that profile reads the current workspace off a module global rather
+    than off agent state: `MemoryTaskMiddleware` gates its nudge on
+    `<workspace>/AGENTS.md` existing. `runner.py` sets it per task; this runner
+    did not, so a bridged `gigachat` profile ran with the middleware silently
+    inert and measured the memory wave in a weaker configuration than the
+    native runner does.
+
+    Only called when a profile was explicitly bridged, so profile-less
+    OpenRouter runs are unaffected.
+    """
+    try:
+        from deepagents_gigachat import set_workspace_path
+    except ImportError:
+        return
+    set_workspace_path(workspace)
+
+
 def build_agent(
     workspace: Path,
     *,
@@ -361,6 +381,7 @@ def build_agent(
     _apply_execute_cwd_fix(model)
     if harness_profile:
         _apply_source_harness_profile(model, harness_profile)
+        _point_gigachat_profile_at(workspace)
     # Memory tasks (222–231) ship an AGENTS.md fixture; pre-existing 221
     # tasks do not. `LocalShellBackend(virtual_mode=True)` maps
     # `/AGENTS.md` to `<workspace>/AGENTS.md`.
