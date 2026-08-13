@@ -1030,6 +1030,7 @@ def test_sequential_progress_output_is_cp1251_safe(
     output.encode("cp1251")
 
 
+
 def test_harness_profile_registers_once_per_process(monkeypatch, tmp_path: Path) -> None:
     """Registering per task stacks middleware layers until resolution blows the stack.
 
@@ -1065,3 +1066,37 @@ def test_harness_profile_absent_package_is_not_an_error(monkeypatch, tmp_path: P
     monkeypatch.setattr(runner, "_HARNESS_PROFILE_REGISTERED", False)
 
     runner._ensure_harness_profile(tmp_path)
+
+
+def test_bridged_profile_learns_the_task_workspace(monkeypatch, tmp_path: Path) -> None:
+    """`MemoryTaskMiddleware` reads the workspace off a module global, not state.
+
+    Without this call a bridged `gigachat` profile runs with that middleware
+    inert, so `run-openrouter` measures the memory wave in a weaker
+    configuration than the native runner.
+    """
+    from harness_bench import runner_openrouter
+
+    seen: list[Path] = []
+    fake = ModuleType("deepagents_gigachat")
+    fake.set_workspace_path = seen.append  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "deepagents_gigachat", fake)
+
+    runner_openrouter._point_gigachat_profile_at(tmp_path / "ws")
+
+    assert seen == [tmp_path / "ws"]
+
+
+def test_bridged_profile_without_the_package_is_not_an_error(monkeypatch, tmp_path: Path) -> None:
+    from harness_bench import runner_openrouter
+
+    real_import = builtins.__import__
+
+    def _no_gigachat(name: str, *args: object, **kwargs: object) -> object:
+        if name == "deepagents_gigachat":
+            raise ImportError("not installed")
+        return real_import(name, *args, **kwargs)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(builtins, "__import__", _no_gigachat)
+
+    runner_openrouter._point_gigachat_profile_at(tmp_path)
