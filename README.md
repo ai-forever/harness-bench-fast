@@ -342,8 +342,10 @@ changes do not need a task-set bump.
 | `runner_cli.py` | Alternative driver that shells out to an external CLI agent (`free-code`, `claude`, etc.). Default: `free-code -p --model haiku --dangerously-skip-permissions`. Detects Claude-Code-style CLIs and auto-injects workspace `AGENTS.md` via `--append-system-prompt`. |
 | `runner_openrouter.py` | Runner for any OpenAI-compatible OpenRouter model via `langchain-openai`. Does **not** apply any harness profile — measures raw `deepagents` defaults against the chosen model. |
 | `runner_pure.py` | Stock `deepagents` + GigaChat runner that bypasses `deepagents-gigachat` profile lookup even when that package is installed. Useful as a no-profile baseline, not a direct raw-API baseline. |
+| `marathon.py` | The marathon task order: every eligible task, one seeded shuffle, under a `MARATHON_VERSION` of its own. Pinned by a hash test so it cannot drift when the registry changes. |
+| `runner_marathon.py` | Marathon runner: one agent session is handed the whole set at once. Per-task subdirectories, directory fingerprints to recover how far the agent got, one verification pass at the end. |
 | `harbor_export.py` | Additive Harbor export layer. Generates local Harbor task directories from the same Python task registry; does not replace the no-Docker local runners. |
-| `__main__.py` | CLI: `list`, `version`, `run`, `run-pure`, `run-cli`, `run-openrouter`, `verify-gold`, `verify-task`, `apply-gold`, `export-harbor`. |
+| `__main__.py` | CLI: `list`, `version`, `run`, `run-pure`, `run-cli`, `run-openrouter`, `marathon-tasks`, `run-marathon`, `verify-gold`, `verify-task`, `apply-gold`, `export-harbor`. |
 
 Each task is independent: the runner creates a fresh
 `tempfile.TemporaryDirectory`, writes `setup_files` (and optionally
@@ -354,6 +356,94 @@ security sandbox: `execute` still spawns a real shell on the host and
 the runners inherit environment variables. The benchmark is meant for a
 trusted local environment. After the agent stops, the per-task verifier
 inspects the workspace.
+
+## Marathon mode
+
+Every runner above gives each task a clean session, which answers *can the
+model do this task*. The marathon hands one agent session **the whole task set
+at once** and answers the question a per-task score cannot: *how far does it
+get*.
+
+Nothing paces the agent and nothing hands control back. It receives every
+task's workspace already set up, the list of them in `TASKS.md`, and one
+instruction: work through it. The runner looks at the workspace only when the
+session is over.
+
+A solo score predicts a marathon score poorly. A model that solves 87% of the
+tasks one at a time can still announce it is finished a dozen tasks into the
+list.
+
+```bash
+# The order, and what is in it
+uv run python -m harness_bench marathon-tasks
+
+# Smoke the runner on the first few tasks
+uv run python -m harness_bench run-marathon --first 5
+
+# The real thing, through an external CLI agent
+uv run python -m harness_bench run-marathon --keep \
+  --timeout 14400 --recursion-limit 5000 \
+  --cli-command 'kimi-cli --quiet --yolo -m k3 -p' \
+  --json-output marathon_kimi_k3.json
+
+# ...or through a deepagents backend
+uv run python -m harness_bench run-marathon --keep --context-window 180000 \
+  --json-output marathon_gigachat.json
+```
+
+### What comes out
+
+- **solved** — how many of the tasks the workspace satisfies at the end.
+- **got as far as** — the furthest task whose directory the agent touched.
+  Recovered from a fingerprint of every task directory taken before the run:
+  no task in the set is solvable without writing something, so an untouched
+  directory was never worked on. Without this, "solved 50 of 342" reads the
+  same whether the agent worked through everything and failed 292 or stopped
+  at task 50 — opposite findings.
+- **solved of reached** — accuracy where it actually did work, as opposed to
+  coverage of the whole list.
+- **stopped because** — ran out of context, hit the step cap, timed out, or
+  `agent stopped before the end of the list`. The last is not an error and is
+  the most common way a long horizon ends.
+- **solved by position quartile** — the depth read. The order is shuffled by
+  seed, so the quartiles hold equally hard tasks and a falling tail is the
+  horizon rather than the task mix.
+
+### The task set
+
+The marathon covers **342 of the 391 tasks**. The memory (222–253) and skills
+(314–330) waves are excluded by construction: each task needs its own
+subdirectory or fixtures collide by filename, and both of those waves are
+wired to the *workspace root* — memory through a root `AGENTS.md` convention,
+skills through root-level `.agents/skills` discovery — so neither can be
+scoped to its own task, and several of them would collide with each other over
+the single root. **Marathon scores are therefore not comparable with the solo
+leaderboard.**
+
+The order is fixed by a seed, versioned as `MARATHON_VERSION`, and pinned by a
+hash test: changing the task registry changes positions, and published runs
+are reported against those positions, so the version has to move with it.
+
+`--first N` runs a prefix of the same order, so a task sits at the same
+position in a 5-task smoke and in the full run.
+
+### Flags that matter
+
+- `--context-window N` — the agent's input budget. Without it the deepagents
+  summarization middleware waits for a fixed 170k tokens and a smaller window
+  overflows before compaction ever triggers. Its token counter assumes four
+  characters per token and under-counts Russian and code by roughly 1.4×, so
+  set this **below** the real window.
+- `--recursion-limit N` — the step cap for the whole session (default: 60 ×
+  task count). The per-task defaults of the solo runners starve a marathon.
+- `--timeout N` — whole-run wall clock (default: 300s × task count). Note that
+  a timeout does not stop an in-process agent — Python cannot kill the thread
+  — so a run that overruns is waited out and, if the agent is still going,
+  reported as scored against a moving workspace (`scoring_raced`).
+- `--keep` — the JSON is written when the run ends, which is hours in. Keeping
+  the workspace means a killed run can still be scored offline; verification
+  does not mutate it. The task order and command are written to the JSON
+  before the agent starts.
 
 ## Harbor export
 
