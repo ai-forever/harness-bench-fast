@@ -12,6 +12,23 @@ the OpenAI harness profile built into deepagents, `none` = stock deepagents
 defaults, `—` = not applicable (non-deepagents harnesses).
 GigaChat rows are the IFT stand, build `32.9.23.6`.
 
+**Every `GigaChat`-profile row above was produced with `deepagents-gigachat`
+0.0.3.** The pin now installs **0.0.4**, which is a result-affecting change, so a
+fresh install no longer reproduces those rows. Measured on GigaChat 3.5 (IFT),
+k=4 per version with versions interleaved on one stand: 0.0.3 342.0/391 (87.5%,
+sd 3.9) against 0.0.4 **352.8/391 (90.2%**, sd 2.8 over 6 runs, steps 3,262,
+tokens 6,049,158) — **+10.8 tasks**, with every 0.0.4 run above every 0.0.3 run.
+The gain is 0.0.4's deterministic-output gate, which blocks writing a derived
+value that was never computed. GigaChat 3 Ultra / Pro / Lightning have **not**
+been re-measured on 0.0.4, so their rows stay as published rather than mixing two
+profile versions in one table.
+
+On weaker models the same gate costs rather than pays: on the GigaChat-3.1-10B
+reasoning line it drives the agent to retry the blocked write until the graph
+budget is gone (−14.5 pp, step-limit hits 3.6% → 33.6%). Pin `0.0.3` if your
+model cannot act on a tool-level refusal; see
+[deepagents-gigachat#7](https://github.com/ai-forever/deepagents-gigachat/issues/7).
+
 Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 
 | Harness | Profile | Model | Result | % | Steps | Tokens |
