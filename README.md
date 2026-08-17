@@ -48,12 +48,15 @@ Public landing page: <https://ai-forever.github.io/harness-bench-fast/>
 | deepagents | none | GPT-OSS-120B | 186/391 | 47.6% | 2,193 | 23,831,283 |
 | deepagents | GigaChat | GigaChat 3 Lightning | 178/391 | 45.5% | 2,520 | 2,275,821 |
 
-Two notes on reading the table. The GigaChat profile is worth 7-10 points and
+Three notes on reading the table. The GigaChat profile is worth 7-10 points and
 roughly halves the token spend, which the two profiled/unprofiled GigaChat pairs
-show directly. And a larger model is not automatically a more capable agent:
+show directly. A larger model is not automatically a more capable agent:
 GPT-OSS-120B places below its own 20B sibling because it frequently answers in
 prose instead of calling a tool, scoring 0/15 on the VCS wave and 2/20 on
-CLI-composition while remaining competitive on single-shot waves.
+CLI-composition while remaining competitive on single-shot waves. And each row
+is a single full run with non-deterministic sampling: repeat runs of the same
+mid-scale setup differ by ±1-2 pp, so rows within ~3 points of each other are
+a tie, not a ranking — models near the ceiling are much more stable.
 
 <details>
 <summary>Earlier results on task-set v0.13.0 (351 tasks) — not comparable</summary>
@@ -405,9 +408,10 @@ needed when invoking Harbor's own local runner.
 
 ## Results
 
-The published results table (full 351-task set, `v0.13.0`) is kept at the top of
-this README. Only one run per harness + model setup is listed; superseded and
-older-task-set (313-task) runs are not carried over.
+The published results table (full 391-task set, `task-set v0.16.0`) is kept at
+the top of this README. Only one run per harness + model setup is listed;
+superseded and older-task-set runs are not carried over (the last v0.13.0
+table is kept in a collapsed section for reference only).
 
 ### Scoring rules
 

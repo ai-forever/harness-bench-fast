@@ -246,7 +246,7 @@ h3 {
 
 .task-strip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1px;
   margin-bottom: 64px;
   border: 1px solid var(--line);
