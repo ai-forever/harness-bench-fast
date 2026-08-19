@@ -25,6 +25,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from harness_bench.harbor_export import export_harbor_dataset
+from harness_bench.marathon import MARATHON_VERSION, marathon_task_ids
 from harness_bench.metrics import default_metric_ks
 from harness_bench.runner import (
     TaskRun,
@@ -36,6 +37,15 @@ from harness_bench.runner import (
     verify_gold,
 )
 from harness_bench.runner_cli import DEFAULT_CLI_COMMAND, DEFAULT_TIMEOUT_SECONDS, run_all_cli
+from harness_bench.runner_marathon import (
+    BACKENDS as MARATHON_BACKENDS,
+)
+from harness_bench.runner_marathon import (
+    DEFAULT_SECONDS_PER_TASK,
+    TASK_LIST_FILENAME,
+    run_marathon,
+    summarize_marathon,
+)
 from harness_bench.runner_openrouter import DEFAULT_OPENROUTER_MODEL
 from harness_bench.runner_openrouter import run_all as run_all_openrouter
 from harness_bench.runner_pure import run_all as run_all_pure
@@ -307,6 +317,44 @@ def _cmd_verify_task(args: argparse.Namespace) -> int:
         status = "OK" if result.passed else "BAD"
         print(f"[{status}] {task.id}: {result.message}")
     return 0 if result.passed else 1
+
+
+def _cmd_marathon_tasks(args: argparse.Namespace) -> int:
+    task_ids = marathon_task_ids()
+    if args.json:
+        print(json.dumps(
+            {"marathon_version": MARATHON_VERSION, "task_ids": list(task_ids)},
+            ensure_ascii=False,
+            indent=2,
+        ))
+        return 0
+    print(f"Marathon order {MARATHON_VERSION}: {len(task_ids)} tasks")
+    for position, task_id in enumerate(task_ids, start=1):
+        print(f"  {position:3d}. {task_id}")
+    return 0
+
+
+def _cmd_run_marathon(args: argparse.Namespace) -> int:
+    _announce_json_output(args)
+    result = run_marathon(
+        backend=args.backend,
+        model_name=args.model,
+        cli_command=args.cli_command,
+        first=args.first,
+        recursion_limit=args.recursion_limit,
+        max_tokens=args.max_tokens,
+        harness_profile=args.harness_profile,
+        context_window=args.context_window,
+        forward_reasoning_history=args.forward_reasoning_history,
+        keep_workspace=args.keep,
+        timeout=args.timeout,
+        json_output=args.json_output,
+    )
+    summarize_marathon(result)
+    _maybe_report_json(args, [result])
+    if args.allow_task_failures:
+        return 0
+    return 0 if all(task.passed for task in result.tasks) else 1
 
 
 def _cmd_export_harbor(args: argparse.Namespace) -> int:
@@ -687,6 +735,135 @@ def build_parser() -> argparse.ArgumentParser:
         help="Exit 0 when the harness completes even if some benchmark tasks fail.",
     )
     p_cli.set_defaults(func=_cmd_run_cli)
+
+    p_tasks = sub.add_parser(
+        "marathon-tasks",
+        help=f"Print the marathon task order ({MARATHON_VERSION}).",
+    )
+    p_tasks.add_argument("--json", action="store_true", help="Emit JSON")
+    p_tasks.set_defaults(func=_cmd_marathon_tasks)
+
+    p_mar = sub.add_parser(
+        "run-marathon",
+        help=(
+            "Hand one agent session every eligible task at once and measure "
+            "how far it gets and how much it solves. Long-horizon endurance, "
+            "not per-task ability — see `marathon-tasks` for the order."
+        ),
+    )
+    p_mar.add_argument(
+        "--first",
+        type=_positive_int,
+        default=None,
+        metavar="N",
+        help=(
+            "Run only the first N tasks of the order instead of all of them. "
+            "For smoke-testing the runner; N and the full run share positions, "
+            "so a task sits at the same place in both."
+        ),
+    )
+    p_mar.add_argument(
+        "--backend",
+        choices=MARATHON_BACKENDS,
+        default="gigachat",
+        help=(
+            "Agent backend: gigachat (env creds, harness profile when "
+            "installed), gigachat-pure (no profile), or openrouter (--model). "
+            "Ignored when --cli-command is set. Default: gigachat."
+        ),
+    )
+    p_mar.add_argument(
+        "--model", default=None, help="OpenRouter model id (with --backend openrouter)."
+    )
+    p_mar.add_argument(
+        "--cli-command",
+        default=None,
+        help=(
+            "External CLI agent command prefix; the kickoff prompt is appended "
+            "as the final argument, e.g. 'kimi-cli --quiet --yolo -m k3 -p'."
+        ),
+    )
+    p_mar.add_argument(
+        "--context-window",
+        type=int,
+        default=None,
+        help=(
+            "Model input budget in tokens. Sizes the deepagents summarization "
+            "middleware, which otherwise waits for a fixed 170k tokens and lets "
+            "a smaller window overflow first. Its token counter assumes four "
+            "characters per token and under-counts Russian and code by roughly "
+            "1.4x, so set this below the real window."
+        ),
+    )
+    p_mar.add_argument(
+        "--recursion-limit",
+        type=_positive_int,
+        default=None,
+        help=(
+            "Step cap for the whole session (default: 60 x task count). The "
+            "per-task default of the solo runners starves a marathon."
+        ),
+    )
+    p_mar.add_argument(
+        "--timeout",
+        type=float,
+        default=None,
+        help=(
+            "Whole-run wall-clock cap in seconds (default: "
+            f"{DEFAULT_SECONDS_PER_TASK} x task count). A timeout does not stop "
+            "an in-process agent, so a run that overruns is reported as scored "
+            "against a moving workspace."
+        ),
+    )
+    p_mar.add_argument(
+        "--max-tokens",
+        type=int,
+        default=None,
+        help="Optional ChatOpenAI max_tokens override (openrouter backend).",
+    )
+    p_mar.add_argument(
+        "--harness-profile",
+        default=None,
+        help="Bridge a built-in deepagents harness profile (openrouter backend).",
+    )
+    p_mar.add_argument(
+        "--forward-reasoning-history",
+        action="store_true",
+        help=(
+            "Replay assistant reasoning traces in subsequent model requests "
+            "(openrouter backend). Changes token spend and scores, so runs "
+            "that differ in this flag are not comparable."
+        ),
+    )
+    p_mar.add_argument(
+        "--keep",
+        action="store_true",
+        help=(
+            "Keep the workspace. Recommended: the JSON is written when the run "
+            f"ends, and {TASK_LIST_FILENAME} plus the task directories can be "
+            "scored offline if it is killed first."
+        ),
+    )
+    p_mar.add_argument(
+        "--json-output",
+        dest="json_output",
+        nargs="?",
+        const="",
+        default="",
+        type=normalize_json_output_path,
+        metavar="PATH",
+        help=(
+            "Write the marathon JSON report to this path (bare filenames go "
+            "under jobs/). The task order is written there before the agent "
+            "starts, so a killed run still records what it was running."
+        ),
+    )
+    p_mar.add_argument(
+        "--allow-task-failures",
+        action="store_true",
+        help="Exit 0 even when some tasks fail.",
+    )
+    p_mar.set_defaults(func=_cmd_run_marathon)
 
     return parser
 

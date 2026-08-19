@@ -8,7 +8,7 @@ import threading
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, fields, replace
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -175,6 +175,11 @@ def _payload_reruns_on_continue(item: dict[str, Any]) -> bool:
 
 def _task_run_reruns_on_continue(run: TaskRun) -> bool:
     return _is_cli_timeout_error(run.error)
+
+
+def results_json_command() -> str | None:
+    """The command recorded in benchmark JSON files written from here on."""
+    return _RESULTS_JSON_COMMAND
 
 
 def set_results_json_command(command: str | None) -> None:
@@ -405,9 +410,9 @@ def _message_usage(message: Any) -> list[Any]:
     return usages
 
 
-def agent_stats_from_result(invocation_result: Any) -> dict[str, int]:
+def agent_stats_from_result(invocation_result: Any) -> dict[str, Any]:
     """Best-effort step/token extraction from a LangGraph/deepagents result."""
-    stats: dict[str, int] = {}
+    stats: dict[str, Any] = {}
     if not isinstance(invocation_result, dict):
         return stats
 
@@ -420,6 +425,7 @@ def agent_stats_from_result(invocation_result: Any) -> dict[str, int]:
     tool_calls = 0
     shell_commands = 0
     llm_calls = 0
+    by_tool: dict[str, int] = {}
     for message in messages:
         role = _message_role(message)
         if role not in ("human", "user", "system"):
@@ -429,7 +435,9 @@ def agent_stats_from_result(invocation_result: Any) -> dict[str, int]:
             tool_calls += len(calls)
             llm_calls += 1
             for call in calls:
-                if _tool_call_name(call) == "execute":
+                name = _tool_call_name(call)
+                by_tool[name] = by_tool.get(name, 0) + 1
+                if name == "execute":
                     shell_commands += 1
         elif role in ("ai", "assistant"):
             llm_calls += 1
@@ -441,6 +449,11 @@ def agent_stats_from_result(invocation_result: Any) -> dict[str, int]:
     stats["agent_tool_calls"] = tool_calls
     stats["agent_shell_commands"] = shell_commands
     stats["agent_llm_calls"] = llm_calls
+    # Per-tool counts answer questions the totals cannot: whether the session
+    # delegated to subagents (`task`, whose own context is separate, so a
+    # marathon routed through it would not be one conversation), and which
+    # call an agent repeated when it got stuck.
+    stats["agent_tool_calls_by_name"] = by_tool
     return stats
 
 
@@ -474,8 +487,8 @@ class AgentRunStatsCollector:
 
         return _Handler()
 
-    def merged(self, invocation_result: Any | None = None) -> dict[str, int]:
-        stats = dict(self.stats)
+    def merged(self, invocation_result: Any | None = None) -> dict[str, Any]:
+        stats: dict[str, Any] = dict(self.stats)
         if invocation_result is not None:
             for key, value in agent_stats_from_result(invocation_result).items():
                 if (
@@ -536,10 +549,14 @@ def _task_run_with_agent_stats(
     passed: bool,
     message: str,
     elapsed_seconds: float,
-    stats: dict[str, int] | None,
+    stats: dict[str, Any] | None,
     error: str | None = None,
     workspace: Path | None = None,
 ) -> TaskRun:
+    # Only the metrics `TaskRun` declares: the stats dict also carries
+    # chain-oriented entries (e.g. per-tool call counts) that a solo task row
+    # does not model, and splatting those straight in would raise TypeError.
+    known = {f.name for f in fields(TaskRun)}
     return TaskRun(
         task_id=task_id,
         passed=passed,
@@ -547,7 +564,7 @@ def _task_run_with_agent_stats(
         elapsed_seconds=elapsed_seconds,
         error=error,
         workspace=workspace,
-        **(stats or {}),
+        **{key: value for key, value in (stats or {}).items() if key in known},
     )
 
 
@@ -579,11 +596,20 @@ def _ensure_harness_profile(workspace: Path) -> None:
     set_workspace_path(workspace)
 
 
-def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
+def build_agent(
+    workspace: Path, *, recursion_limit: int = 80, context_window: int | None = None
+) -> Any:
     """Build a deep agent backed by GigaChat and rooted at `workspace`.
 
     Imports happen here so `--gold` / `list` modes can run without GigaChat
     credentials configured.
+
+    `context_window` advertises the model's input budget so the deepagents
+    summarization middleware can size itself against it. Without it the model
+    profile is empty and the middleware falls back to a fixed 170k-token
+    trigger, which never fires on a smaller window — the session simply
+    overflows. Only matters on long single-context runs (marathon mode); solo
+    runs never come close, so the default leaves them untouched.
     """
     from deepagents import create_deep_agent
     from deepagents.backends import LocalShellBackend
@@ -612,6 +638,7 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
         max_retries=20,
         retry_backoff_factor=1.0,
         retry_on_status_codes=(403, 429, 500, 502, 503, 504),
+        **({"profile": {"max_input_tokens": context_window}} if context_window else {}),
     )
     # Memory tasks (222–231) ship an AGENTS.md fixture; pre-existing 221
     # tasks do not, so MemoryMiddleware is wired in only when the fixture is

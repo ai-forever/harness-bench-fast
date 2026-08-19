@@ -344,6 +344,7 @@ def build_agent(
     max_tokens: int | None = None,
     harness_profile: str | None = None,
     forward_reasoning_history: bool = False,
+    context_window: int | None = None,
 ) -> Any:
     """Build a stock `deepagents` agent backed by an OpenRouter model.
 
@@ -368,6 +369,11 @@ def build_agent(
     model_kwargs: dict[str, Any] = {}
     if max_tokens is not None:
         model_kwargs["max_tokens"] = max_tokens
+    if context_window is not None:
+        # Lets the deepagents summarization middleware size itself against the
+        # real window; without a profile it waits for a fixed 170k tokens and
+        # a smaller window overflows first. See runner.build_agent.
+        model_kwargs["profile"] = {"max_input_tokens": context_window}
     model = ReasoningAwareChatOpenAI(
         model=model_name,
         base_url=os.getenv("OPENROUTER_BASE_URL", DEFAULT_BASE_URL),
