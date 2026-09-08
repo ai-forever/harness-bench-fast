@@ -37,6 +37,7 @@ SMOKE = [
 def _drive(task_id: str, workspace: str) -> None:
     """Subprocess: drive the ai-assistant full Runtime on one task in cwd=workspace."""
     sys.path.insert(0, ENGINE)
+    sys.path.insert(1, str(Path(ENGINE).parent))  # repo root — для harness.* импортов
     import logging
     logging.basicConfig(level=logging.ERROR)
     for noisy in ("runtime", "coordinator", "skill_worker", "agent_worker",
@@ -52,9 +53,9 @@ def _drive(task_id: str, workspace: str) -> None:
     rt_cfg["agent_timeout"] = 240
     rt_cfg["skill_timeout"] = 240
 
-    import llm_client
+    import llm.llm_client as llm_client
     from config import SBOL_SCENARIOS_DIR
-    from function_registry import FunctionRegistry, load_environment
+    from registry import FunctionRegistry, load_environment
     from runtime import Runtime
 
     from harness_bench.tasks import get_task
@@ -66,6 +67,14 @@ def _drive(task_id: str, workspace: str) -> None:
         usage = getattr(result, "usage", None) or {}
         metrics["in"] += usage.get("prompt_tokens", 0) or 0
         metrics["out"] += usage.get("completion_tokens", 0) or 0
+        if os.environ.get("AA_BENCH_DEBUG_SYSPROMPT"):
+            with open("/tmp/aa_bench_llm_calls_debug.jsonl", "a", encoding="utf-8") as fh:
+                fh.write(json.dumps(
+                    {"component": component,
+                     "messages": [str(m)[:2000] for m in messages],
+                     "result": str(getattr(result, "content", result))[:2000],
+                     "tool_calls": str(getattr(result, "tool_calls", None))[:2000]},
+                    ensure_ascii=False) + "\n")
 
     llm_client.register_llm_hook(hook)
 
@@ -75,8 +84,72 @@ def _drive(task_id: str, workspace: str) -> None:
     ws = Path(workspace)
     rt = Runtime(registry, env.customer_id, work_dir=ws)
     os.chdir(ws)
+    # Паритет с runner_cli.py: для CC-style CLI бенч инжектит workspace
+    # AGENTS.md через --append-system-prompt, т.е. в system prompt агента,
+    # который реально пишет файлы. У нас файлы пишут process/skill workers,
+    # а не координатор, поэтому одного упоминания в user message мало —
+    # координатор теряет конвенции при делегировании. Патчим билдеры
+    # system prompt'ов (в этом субпроцессе), добавляя AGENTS.md хвостом.
+    prompt = task.prompt
+    agents_md = ws / "AGENTS.md"
+    if agents_md.is_file():
+        agents_text = agents_md.read_text(encoding="utf-8")
+        block = (
+            "\n\n## Инструкции воркспейса (AGENTS.md)\n"
+            "В рабочей директории лежит AGENTS.md с обязательными конвенциями. "
+            "Следуй им при любой работе с файлами:\n\n" + agents_text
+        )
+        import context.builder as ctx_builder
+        _orig_proc = ctx_builder.build_process_system_prompt
+        _orig_skill = ctx_builder.build_skill_system_prompt
+
+        def _proc_patched(*a, **kw):
+            out = _orig_proc(*a, **kw) + block
+            if os.environ.get("AA_BENCH_DEBUG_SYSPROMPT"):
+                Path("/tmp/aa_bench_worker_sysprompt.txt").write_text(out, encoding="utf-8")
+            return out
+
+        def _skill_patched(*a, **kw):
+            return _orig_skill(*a, **kw) + block
+
+        ctx_builder.build_process_system_prompt = _proc_patched
+        ctx_builder.build_skill_system_prompt = _skill_patched
+        # Воркеры импортируют билдеры по имени — патчим и там.
+        import workers.process_worker as _pw
+        _pw.build_process_system_prompt = _proc_patched
+        import workers.skill_worker as _sw
+        _sw.build_skill_system_prompt = _skill_patched
+        # Координатор дистиллирует инструкцию воркеру и теряет исходное
+        # сообщение пользователя — memory-правила AGENTS.md («пользователь
+        # сообщил факт → сохрани в MEMORY.md») для воркера не срабатывают.
+        # CC-style CLI видит сырое сообщение + AGENTS.md одним агентом.
+        # Паритет: прокидываем оригинал в task воркера.
+        _user_block = (
+            "<original_user_message>\n"
+            f"{task.prompt}\n"
+            "</original_user_message>\n\n"
+            "Инструкция координатора: "
+        )
+        _orig_run = _pw.ProcessWorker.run
+        _orig_run_async = _pw.ProcessWorker.run_async
+
+        def _run_patched(self, task, context="", cancel_event=None):
+            return _orig_run(self, _user_block + task, context, cancel_event)
+
+        async def _run_async_patched(self, task, context="", cancel_check=None):
+            return await _orig_run_async(self, _user_block + task, context, cancel_check)
+
+        _pw.ProcessWorker.run = _run_patched
+        _pw.ProcessWorker.run_async = _run_async_patched
+        # Координатору конвенции доносим через user message (файлы он не пишет).
+        prompt = (
+            "<workspace-instructions source=\"AGENTS.md\">\n"
+            f"{agents_text}\n"
+            "</workspace-instructions>\n\n"
+            f"{prompt}"
+        )
     try:
-        rt.process_user_message(task.prompt)
+        rt.process_user_message(prompt)
     except Exception as exc:  # noqa: BLE001 — report, don't crash the orchestrator
         print(json.dumps({"drive_error": str(exc)[:300], **metrics}))
         return
@@ -143,7 +216,7 @@ def _write_json(path, results, tsv, harness_label="ai-assistant (full Runtime + 
             {
                 "task_set_version": tsv,
                 "harness": harness_label,
-                "model": "GigaChat-3.5-430B-A28B (IFT, via gpt2giga)",
+                "model": os.environ.get("HARNESS_LLM_MODEL", "GigaChat-3.5-432B-A28B") + " (IFT, via gpt2giga)",
                 "total": len(results),
                 "passed": passed,
                 "pass_rate": passed / max(len(results), 1),

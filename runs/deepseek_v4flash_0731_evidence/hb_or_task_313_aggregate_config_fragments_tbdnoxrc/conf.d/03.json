@@ -1,0 +1,7 @@
+{
+<<<<<<< HEAD
+"debug": false, "tags": ["x"]
+=======
+"debug": true, "tags": ["x", "z"]
+>>>>>>> feature
+}

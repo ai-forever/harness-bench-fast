@@ -380,6 +380,7 @@ def test_deepagents_result_stats_count_steps_and_tokens() -> None:
         "agent_tool_calls": 2,
         "agent_shell_commands": 1,
         "agent_llm_calls": 2,
+        "agent_tool_calls_by_name": {"execute": 1, "write_file": 1},
     }
 
 

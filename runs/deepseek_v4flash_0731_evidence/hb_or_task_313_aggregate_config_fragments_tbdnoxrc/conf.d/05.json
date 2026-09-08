@@ -1,0 +1,7 @@
+{
+<<<<<<< HEAD
+"workers": 5, "tags": ["k"]
+=======
+"workers": 8, "tags": ["w"]
+>>>>>>> feature
+}

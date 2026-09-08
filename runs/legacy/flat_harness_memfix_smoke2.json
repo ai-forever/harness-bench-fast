@@ -1,0 +1,58 @@
+{
+ "task_set_version": "0.14.0",
+ "harness": "flat-harness",
+ "model": "GigaChat-3.5-432B-A28B (IFT, via gpt2giga)",
+ "total": 4,
+ "passed": 1,
+ "pass_rate": 0.25,
+ "tasks": [
+  {
+   "task_id": "task_224_memory_mit_license",
+   "name": "Memory: read name+year, generate MIT LICENSE",
+   "passed": false,
+   "message": "LICENSE does not match /Иван\\s+Иванов|Иванов\\s+Иван|Ivan\\s+Ivanov|Ivanov\\s+Ivan/",
+   "elapsed_seconds": 20.5,
+   "agent_llm_calls": 4,
+   "agent_input_tokens": 15761,
+   "agent_output_tokens": 511,
+   "agent_total_tokens": 16272,
+   "timed_out": false
+  },
+  {
+   "task_id": "task_225_memory_compute_age_bio",
+   "name": "Memory: read birth year, compute age, write bio.txt",
+   "passed": false,
+   "message": "bio.txt should match 'Пётр Сидоров, 36 …' (age as digit right after the name)",
+   "elapsed_seconds": 16.3,
+   "agent_llm_calls": 4,
+   "agent_input_tokens": 5405,
+   "agent_output_tokens": 313,
+   "agent_total_tokens": 5718,
+   "timed_out": false
+  },
+  {
+   "task_id": "task_226_memory_requirements_dev",
+   "name": "Memory: read dev tools, write requirements-dev.txt",
+   "passed": true,
+   "message": "requirements-dev.txt lists the user's dev tools",
+   "elapsed_seconds": 21.7,
+   "agent_llm_calls": 5,
+   "agent_input_tokens": 17056,
+   "agent_output_tokens": 764,
+   "agent_total_tokens": 17820,
+   "timed_out": false
+  },
+  {
+   "task_id": "task_233_memory_endpoints_json",
+   "name": "Memory: compose endpoints.json with derived URLs and ordering",
+   "passed": false,
+   "message": "endpoints.json missing",
+   "elapsed_seconds": 19.8,
+   "agent_llm_calls": 5,
+   "agent_input_tokens": 7037,
+   "agent_output_tokens": 480,
+   "agent_total_tokens": 7517,
+   "timed_out": false
+  }
+ ]
+}

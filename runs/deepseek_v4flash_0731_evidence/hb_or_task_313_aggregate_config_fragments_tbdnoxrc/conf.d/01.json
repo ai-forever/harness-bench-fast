@@ -1,0 +1,7 @@
+{
+<<<<<<< HEAD
+"name": "old", "tags": ["x"]
+=======
+"name": "app", "tags": ["x"]
+>>>>>>> feature
+}

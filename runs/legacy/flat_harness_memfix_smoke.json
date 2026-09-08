@@ -1,0 +1,46 @@
+{
+ "task_set_version": "0.14.0",
+ "harness": "flat-harness",
+ "model": "GigaChat-3.5-432B-A28B (IFT, via gpt2giga)",
+ "total": 3,
+ "passed": 0,
+ "pass_rate": 0.0,
+ "tasks": [
+  {
+   "task_id": "task_222_memory_name_pyproject",
+   "name": "Memory: save name on first mention, use in pyproject.toml",
+   "passed": false,
+   "message": "MEMORY.md doesn't have a '- Имя: Анна Петрова' entry in list format",
+   "elapsed_seconds": 46.3,
+   "agent_llm_calls": 10,
+   "agent_input_tokens": 29329,
+   "agent_output_tokens": 1884,
+   "agent_total_tokens": 31213,
+   "timed_out": false
+  },
+  {
+   "task_id": "task_223_memory_city_timezone_script",
+   "name": "Memory: save city, derive timezone in script",
+   "passed": false,
+   "message": "MEMORY.md doesn't have a '- Город: Москва' line",
+   "elapsed_seconds": 16.3,
+   "agent_llm_calls": 4,
+   "agent_input_tokens": 26237,
+   "agent_output_tokens": 352,
+   "agent_total_tokens": 26589,
+   "timed_out": false
+  },
+  {
+   "task_id": "task_229_memory_update_contacts",
+   "name": "Memory: update email+github in MEMORY.md and README.md",
+   "passed": false,
+   "message": "README.md missing substrings: ['alice.new@mail.ru', 'alice2026']",
+   "elapsed_seconds": 17.1,
+   "agent_llm_calls": 6,
+   "agent_input_tokens": 20720,
+   "agent_output_tokens": 425,
+   "agent_total_tokens": 21145,
+   "timed_out": false
+  }
+ ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "app",
+  "retries": 3,
+  "debug": true,
+  "workers": 8,
+  "tags": ["w", "x", "y", "z"]
+}

@@ -1,0 +1,58 @@
+{
+ "task_set_version": "0.14.0",
+ "harness": "flat-harness",
+ "model": "GigaChat-3.5-432B-A28B (IFT, via gpt2giga)",
+ "total": 4,
+ "passed": 4,
+ "pass_rate": 1.0,
+ "tasks": [
+  {
+   "task_id": "task_01_create_hello",
+   "name": "Create hello.py that prints Hello, world!",
+   "passed": true,
+   "message": "hello.py ran and produced expected output",
+   "elapsed_seconds": 19.6,
+   "agent_llm_calls": 4,
+   "agent_input_tokens": 25857,
+   "agent_output_tokens": 282,
+   "agent_total_tokens": 26139,
+   "timed_out": false
+  },
+  {
+   "task_id": "task_05_greet",
+   "name": "Implement greeting.py:greet",
+   "passed": true,
+   "message": "greeting.py: mod.greet('Аня') == 'Привет, Аня!'",
+   "elapsed_seconds": 24.9,
+   "agent_llm_calls": 4,
+   "agent_input_tokens": 16883,
+   "agent_output_tokens": 424,
+   "agent_total_tokens": 17307,
+   "timed_out": false
+  },
+  {
+   "task_id": "task_06_toggle_debug",
+   "name": "Toggle DEBUG in config.py",
+   "passed": true,
+   "message": "config.py contains all expected substrings; config.py free of forbidden substrings",
+   "elapsed_seconds": 27.8,
+   "agent_llm_calls": 5,
+   "agent_input_tokens": 16761,
+   "agent_output_tokens": 312,
+   "agent_total_tokens": 17073,
+   "timed_out": false
+  },
+  {
+   "task_id": "task_11_count_py",
+   "name": "Count .py files into count.txt",
+   "passed": true,
+   "message": "count.txt matches expected content",
+   "elapsed_seconds": 29.2,
+   "agent_llm_calls": 5,
+   "agent_input_tokens": 17385,
+   "agent_output_tokens": 386,
+   "agent_total_tokens": 17771,
+   "timed_out": false
+  }
+ ]
+}
