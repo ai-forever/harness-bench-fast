@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 import sys
+import traceback
 from pathlib import Path
 
 
@@ -105,22 +106,19 @@ def main() -> int:
         try:
             from openrouter_agent import is_transient_model_error
 
-            retryable = is_transient_model_error(exc)
+            retryable = bool(stats and stats.endpoint_unavailable(exc)) and is_transient_model_error(exc)
         except ImportError:
             retryable = False
         exhausted = exc.__class__.__name__ in {"GraphRecursionError"}
-        # Context/model request validation errors are model failures; launch,
-        # authentication, transport, provider and worker errors invalidate a run.
-        context = any(
-            word in str(exc).lower()
-            for word in ("context length", "context_length", "maximum context", "too many tokens")
+        kind = (
+            "infrastructure" if stats and stats.endpoint_unavailable(exc)
+            else "recursion_limit" if exhausted else "model_error"
         )
-        kind = "recursion_limit" if exhausted else "context_limit" if context else "infrastructure"
         emit(
             {
                 "type": "hbf_deepagents_result",
                 "failure_kind": kind,
-                "message": f"{type(exc).__name__}: {exc}",
+                "message": traceback.format_exc(),
                 "retryable": retryable,
                 "stats": {**stats.merged(), **stats.extra()} if stats else {},
             }

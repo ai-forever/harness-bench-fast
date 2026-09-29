@@ -321,13 +321,15 @@ def run_task(
                     stats,
                     min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
                 )
-            except Exception as exc:  # noqa: BLE001 — retry transient model failures.
+                result = task.verify(workspace_path)
+            except (Exception, SystemExit) as exc:  # noqa: BLE001 — retry transient model failures.
                 run = _agent_exception_task_run(
                     exc,
                     task_id=task.id,
                     elapsed_seconds=time.monotonic() - started,
                     recursion_limit=recursion_limit,
                     workspace=workspace_path if keep_workspace else None,
+                    endpoint_unavailable=stats.endpoint_unavailable(exc),
                 )
                 last_run = replace(
                     run,
@@ -335,20 +337,11 @@ def run_task(
                     **stats.extra(),
                     agent_compactions=count_compactions(workspace_path),
                 )
-                if _is_transient_model_error(exc) and attempt < transient_attempts:
+                if run.failure_kind == "infrastructure" and _is_transient_model_error(exc) and attempt < transient_attempts:
                     continue
-                if _is_transient_model_error(exc):
-                    return replace(
-                        last_run,
-                        message=(
-                            last_run.message
-                            or f"transient model error after {transient_attempts} attempts"
-                        ),
-                    )
                 return last_run
             _dump_trace(task.id, invocation_result)
             compactions = count_compactions(workspace_path)
-            result = task.verify(workspace_path)
             run = _task_run_with_agent_stats(
                 task_id=task.id,
                 passed=result.passed,
@@ -469,7 +462,7 @@ def run_all(
                 print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
                 if keep_workspace and run.workspace:
                     print(f"  workspace: {run.workspace}")
-                if fail_on_runtime_error and run.error:
+                if run.failure_kind == "infrastructure" or (fail_on_runtime_error and run.error):
                     results.sort(key=lambda r: (*_task_sort_key(r.task_id), r.attempt))
                     _write_partial_results_json(results, json_output)
                     return results
@@ -520,7 +513,7 @@ def run_all(
                 )
                 if keep_workspace and run.workspace:
                     print(f"           workspace: {run.workspace}")
-            if fail_on_runtime_error and run.error:
+            if run.failure_kind == "infrastructure" or (fail_on_runtime_error and run.error):
                 stop_without_wait = True
                 for pending_future in future_to_task:
                     if pending_future is not future:

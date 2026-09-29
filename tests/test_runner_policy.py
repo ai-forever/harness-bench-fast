@@ -498,7 +498,11 @@ def test_openrouter_run_task_retries_transient_model_errors(monkeypatch) -> None
             nonlocal calls
             calls += 1
             if calls == 1:
-                raise RuntimeError("temporary transport reset")
+                import httpx
+                exc = httpx.ReadTimeout("temporary transport reset")
+                for callback in _kwargs["config"]["callbacks"]:
+                    callback.on_llm_error(exc)
+                raise exc
             return {"messages": [{"role": "assistant", "content": "done"}]}
 
     class _PassingTask:
@@ -517,7 +521,6 @@ def test_openrouter_run_task_retries_transient_model_errors(monkeypatch) -> None
         "build_agent",
         lambda *_args, **_kwargs: _EventuallyPassingAgent(),
     )
-    monkeypatch.setattr(runner_openrouter, "_is_transient_model_error", lambda _exc: True)
 
     result = runner_openrouter.run_task(cast(Task, _PassingTask()), transient_attempts=5)
 

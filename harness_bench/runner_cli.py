@@ -1547,6 +1547,11 @@ def run_task_cli(
             result = subprocess.CompletedProcess(base_argv, -1, exc.stdout, exc.stderr)
         except Exception:  # noqa: BLE001 — preserve setup/launcher/verifier evidence
             kind, error = "infrastructure", traceback.format_exc()
+            if phase == "verify":
+                kind = "model_error"
+                run = _task_run_with_cli_stats(task_id=task.id, passed=False, message=error,
+                    elapsed_seconds=time.monotonic()-started, result=result,
+                    workspace=workspace if keep_workspace else None, stats_workspace=workspace)
         except KeyboardInterrupt:
             kind, error = "interrupted", f"Interrupted during {phase}"
             raise
@@ -1668,7 +1673,7 @@ def run_all_cli(
                 print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
                 if keep_workspace and run.workspace:
                     print(f"  workspace: {run.workspace}")
-                if fail_on_runtime_error and run.error:
+                if run.failure_kind == "infrastructure" or (fail_on_runtime_error and run.error):
                     break
         except KeyboardInterrupt:
             _STOP_REQUESTED.set()
@@ -1705,9 +1710,6 @@ def run_all_cli(
             _task, attempt = future_to_task[future]
             run = _mark_attempt(retain_history(future.result(), attempt), attempt, attempts)
             results.append(run)
-            if fail_on_runtime_error and run.error:
-                for pending in future_to_task:
-                    pending.cancel()
             _write_partial_results_json(results, json_output)
             with print_lock:
                 completed += 1
@@ -1719,6 +1721,13 @@ def run_all_cli(
                 )
                 if keep_workspace and run.workspace:
                     print(f"           workspace: {run.workspace}")
+            if run.failure_kind == "infrastructure" or (fail_on_runtime_error and run.error):
+                interrupted = True
+                _STOP_REQUESTED.set()
+                _terminate_all_active_processes()
+                for pending in future_to_task:
+                    pending.cancel()
+                break
     except KeyboardInterrupt:
         interrupted = True
         _STOP_REQUESTED.set()

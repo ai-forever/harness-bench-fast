@@ -623,7 +623,9 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help=(
             "Exit non-zero and stop scheduling more tasks when a task fails with "
-            "an agent/runtime exception recorded in the JSON error field."
+            "an infrastructure error recorded in the JSON error field. Agent/tool "
+            "exceptions are scored failures; model endpoint unavailability "
+            "always invalidates the run, even without this flag."
         ),
     )
     p_or.add_argument("--isolation", choices=("bwrap", "none"), default="bwrap",

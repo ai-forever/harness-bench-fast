@@ -303,11 +303,13 @@ def test_native_worker_requires_one_terminal_event_before_verifier(
     assert not run.passed and run.failure_kind == "infrastructure"
 
 
-def test_native_worker_usage_and_reasoned_failure_survive(monkeypatch, tmp_path):
+@pytest.mark.parametrize("kind", ["recursion_limit", "model_error", "infrastructure"])
+def test_native_worker_usage_and_reasoned_failure_survive(monkeypatch, tmp_path, kind):
     event = {
         "type": "hbf_deepagents_result",
-        "failure_kind": "recursion_limit",
-        "message": "limit reached",
+        "failure_kind": kind,
+        "message": "Traceback: failure details",
+        "retryable": kind == "infrastructure",
         "stats": {
             "agent_steps": 4,
             "agent_input_tokens": 85,
@@ -315,18 +317,24 @@ def test_native_worker_usage_and_reasoned_failure_survive(monkeypatch, tmp_path)
             "agent_peak_input_tokens": 30,
         },
     }
-    monkeypatch.setattr(
-        runner_cli,
-        "_run_cli_subprocess",
-        lambda *args, **kwargs: subprocess.CompletedProcess(args, 1, json.dumps(event), ""),
-    )
+    calls = []
+
+    def execute(*args, **kwargs):
+        calls.append(1)
+        return subprocess.CompletedProcess(args, 1, json.dumps(event), "HTTP 503")
+
+    monkeypatch.setattr(runner_cli, "_run_cli_subprocess", execute)
+    monkeypatch.setattr(runner_cli, "_sleep_interruptibly", lambda seconds: None)
     run = runner_cli.run_task_cli(
         task(True),
         cli_command="worker",
         artifacts_root=tmp_path,
         extra_env={"HBF_WORKER_API_KEY": "offline"},
     )
-    assert not run.passed and run.failure_kind == "recursion_limit"
+    assert not run.passed and run.failure_kind == kind
+    assert bool(run.error) == (kind == "infrastructure")
+    assert run.message == event["message"]
+    assert len(calls) == (runner_cli.DEFAULT_TRANSIENT_RETRIES + 1 if kind == "infrastructure" else 1)
     assert (
         run.agent_steps == 4 and run.agent_input_tokens == 85 and run.agent_peak_input_tokens == 30
     )
