@@ -6,7 +6,7 @@
     <title>harness-bench results</title>
     <meta
       name="description"
-      content="harness-bench task-set v0.17.0 (411 tasks). Published results are still the v0.16.0 391-task set."
+      content="harness-bench task-set v0.17.0 (411 tasks): current results, plus the earlier v0.16.0 391-task leaderboard."
     >
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -17,7 +17,7 @@
           harness-bench
         </a>
         <div class="nav-links">
-          <a href="#leaderboard">Leaderboard</a>
+          <a href="#current">Leaderboard</a>
           <a href="#tasks">Task Set</a>
           <a href="https://github.com/ai-forever/harness-bench-fast">GitHub</a>
         </div>
@@ -39,7 +39,7 @@
             through context compaction.
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#leaderboard">View results</a>
+            <a class="button primary" href="#current">View results</a>
             <a class="button secondary" href="https://github.com/ai-forever/harness-bench-fast">
               Run the bench
             </a>
@@ -109,10 +109,54 @@
         </div>
       </section>
 
+      <section class="section" id="current" aria-labelledby="current-title">
+        <div class="section-heading">
+          <p class="eyebrow">Current results, task-set v0.17.0</p>
+          <h2 id="current-title">Leaderboard: 411 tasks</h2>
+          <p>
+            New runs are measured on the full 411-task set, including the
+            long-context wave (tasks 392–411). One full run per harness + model
+            setup, measured 2026-09-29. GigaChat rows use
+            <code>deepagents-gigachat</code> 0.0.4 through the native runner;
+            builds from the API responses are 32.9.16.9 (432B-A28B, IFT) and
+            3.5.16.9 (Ultra Reasoning, PROM). The Ultra Reasoning row was
+            measured with a client workaround for a PROM function-calling
+            defect (422 on parallel calls); see the README. Neither GigaChat
+            model solves a long-wave task.
+          </p>
+        </div>
+
+        <div class="leaderboard">
+          <article class="result-row" data-harness="deepagents" data-group="gigachat">
+            <div class="rank">1</div>
+            <div class="who">
+              <h3>deepagents + GigaChat profile</h3>
+              <p>GigaChat 3.5 432B-A28B (IFT)</p>
+            </div>
+            <div class="score">348/411</div>
+            <div class="percent">84.7%</div>
+            <div class="bar"><span style="width: 84.7%"></span></div>
+            <div class="meta">Long wave 0/20 · Steps 5,207 · Tokens 61,842,876</div>
+          </article>
+
+          <article class="result-row" data-harness="deepagents" data-group="gigachat">
+            <div class="rank">2</div>
+            <div class="who">
+              <h3>deepagents + GigaChat profile</h3>
+              <p>GigaChat 3.5 Ultra Reasoning (PROM, workaround)</p>
+            </div>
+            <div class="score">222/411</div>
+            <div class="percent">54.0%</div>
+            <div class="bar"><span style="width: 54.0%"></span></div>
+            <div class="meta">Long wave 0/20 · Steps 3,879 · Tokens 38,611,899</div>
+          </article>
+        </div>
+      </section>
+
       <section class="section" id="leaderboard" aria-labelledby="leaderboard-title">
         <div class="section-heading">
-          <p class="eyebrow">Published results, task-set v0.16.0</p>
-          <h2 id="leaderboard-title">Leaderboard</h2>
+          <p class="eyebrow">Earlier results, task-set v0.16.0</p>
+          <h2 id="leaderboard-title">Leaderboard: 391 tasks (v0.16.0)</h2>
           <p>
             Results below use the full 391-task set (task-set v0.16.0). The
             current task set is v0.17.0 (411 tasks); these rows are not runs of
@@ -337,14 +381,14 @@
     </main>
 
     <footer class="footer">
-      <span>harness-bench · task set v0.17.0 · published results v0.16.0</span>
+      <span>harness-bench · task set v0.17.0 · results for v0.17.0 and v0.16.0</span>
       <a href="https://github.com/ai-forever/harness-bench-fast">Source on GitHub</a>
     </footer>
 
     <script>
       (function () {
         var rows = Array.prototype.slice.call(
-          document.querySelectorAll(".leaderboard .result-row")
+          document.querySelectorAll("#leaderboard .leaderboard .result-row")
         );
         var chips = Array.prototype.slice.call(
           document.querySelectorAll(".filter-chips .chip")

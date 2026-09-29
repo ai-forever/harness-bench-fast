@@ -1,8 +1,31 @@
 # harness-bench
 
-Current task set: **411 tasks, `task-set v0.17.0`**. Tasks 392–411 are the long-context wave. No full run of v0.17.0 is published yet.
+Current task set: **411 tasks, `task-set v0.17.0`**. Tasks 392–411 are the long-context wave. New runs are measured on this version.
 
-## Published results (task-set v0.16.0, 391 tasks)
+## Results (task-set v0.17.0, 411 tasks)
+
+| Harness | Profile | Model | Result | % | Long wave (392–411) | Steps | Tokens |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| deepagents | GigaChat | GigaChat 3.5 432B-A28B (IFT) | 348/411 | 84.7% | 0/20 | 5,207 | 61,842,876 |
+| deepagents | GigaChat | GigaChat 3.5 Ultra Reasoning (PROM)¹ | 222/411 | 54.0% | 0/20 | 3,879 | 38,611,899 |
+
+Each row is one full run, measured 2026-09-29 with `deepagents-gigachat` **0.0.4** through
+the native `run` command (`--concurrency 3`, default timeout and step limit; the long-wave
+floors apply). Model builds from the API responses: `GigaChat-3.5-432B-A28B:32.9.16.9`
+and `GigaChat-3.5-Ultra-Reasoning:3.5.16.9`; reasoning level `default`.
+On tasks 1–391 the 432B run scores 348/391, in line with the six profile-0.0.4 runs
+on v0.16.0 below (352.8 ± 2.8). Neither GigaChat model solves a long-wave task: both
+return an incomplete result within minutes instead of reading the material.
+
+¹ On PROM this model plans several parallel function calls, returns only one of them,
+and keeps all of them under `functions_state_id`; the next request with a single
+function result then fails with `422 Function calls count does not match function
+results count` (88 of the first 294 tasks as-is). This row was measured with a wrapper
+that omits `functions_state_id` from outgoing messages, after which no 422 occurred and
+the model issues the remaining calls one at a time. It measures the model under that
+workaround, not the stock client.
+
+## Earlier results (task-set v0.16.0, 391 tasks)
 
 These runs are the full 391-task set. v0.17.0 adds twenty tasks, so a score here is not a score on the current set.
 `Steps` and `Tokens` are shown when the runner exposes them; `—` means the metric
@@ -543,9 +566,9 @@ with the isolated worker settings.
 
 ## Results
 
-The published results table (full 391-task set, `task-set v0.16.0`) is kept at
-the top of this README. The current task set is v0.17.0 (411 tasks); those
-published rows are not runs of it. Only one run per harness + model setup is
+The results tables are kept at the top of this README: the current task set
+v0.17.0 (411 tasks) first, then the earlier v0.16.0 (391 tasks) table, which is not
+comparable with it. Only one run per harness + model setup is
 listed; superseded and older-task-set runs are not carried over (the last
 v0.13.0 table is kept in a collapsed section for reference only).
 
