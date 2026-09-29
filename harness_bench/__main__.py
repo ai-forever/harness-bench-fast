@@ -44,6 +44,7 @@ from harness_bench.versioning import (
     CURRENT_TASK_SET_REVISION,
     TASK_SET_REVISIONS,
     TASK_SET_VERSION,
+    task_number,
     validate_task_set_metadata,
 )
 
@@ -68,18 +69,51 @@ def _exit_code(
     return 0 if all(getattr(r, "passed", False) for r in results) else 1
 
 
+def _has_task_range(args: argparse.Namespace) -> bool:
+    return getattr(args, "from_task", None) is not None or getattr(args, "to_task", None) is not None
+
+
+def _selected_tasks(args: argparse.Namespace) -> list:
+    """The `--suite` tasks, narrowed to `--from-task`..`--to-task` (task numbers, inclusive)."""
+    tasks = SUITES[getattr(args, "suite", "default")]
+    if not _has_task_range(args):
+        return tasks
+    low = getattr(args, "from_task", None) or 1
+    high = getattr(args, "to_task", None)
+    return [
+        task
+        for task in tasks
+        if (number := task_number(task.id)) is not None
+        and number >= low
+        and (high is None or number <= high)
+    ]
+
+
 def _task_ids(args: argparse.Namespace) -> list[str] | None:
-    """Explicit `--task` ids win; otherwise `--suite long` selects that wave."""
-    if args.task:
+    """Explicit `--task` ids win; otherwise the suite, narrowed by a task-number range."""
+    if getattr(args, "task", None):
         return args.task
-    suite = getattr(args, "suite", "default")
-    if suite != "default":
-        return [task.id for task in SUITES[suite]]
-    return None
+    if getattr(args, "suite", "default") == "default" and not _has_task_range(args):
+        return None
+    return [task.id for task in _selected_tasks(args)]
+
+
+def _validate_task_range(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if not _has_task_range(args):
+        return
+    if getattr(args, "task", None):
+        parser.error("--task cannot be combined with --from-task/--to-task")
+    low, high = getattr(args, "from_task", None), getattr(args, "to_task", None)
+    if (low is not None and low < 1) or (high is not None and high < 1):
+        parser.error("--from-task/--to-task take task numbers starting at 1")
+    if low is not None and high is not None and low > high:
+        parser.error(f"--from-task {low} is after --to-task {high}")
+    if not _selected_tasks(args):
+        parser.error("no tasks in the selected --suite fall inside --from-task/--to-task")
 
 
 def _cmd_list(args: argparse.Namespace) -> int:
-    tasks = SUITES[getattr(args, "suite", "default")]
+    tasks = _selected_tasks(args)
     for task in tasks:
         tags = f"  [{', '.join(task.tags)}]" if task.tags else ""
         print(f"  {task.id} — {task.name}{tags}")
@@ -773,6 +807,19 @@ def build_parser() -> argparse.ArgumentParser:
                 "wave inside it (tasks 392-411)."
             ),
         )
+    for command in ("list", "run", "run-openrouter", "run-pure", "run-cli", "verify-gold", "export-harbor"):
+        sub.choices[command].add_argument(
+            "--from-task",
+            type=int,
+            metavar="N",
+            help="Only tasks numbered N or higher (inclusive), e.g. 1; narrows --suite.",
+        )
+        sub.choices[command].add_argument(
+            "--to-task",
+            type=int,
+            metavar="M",
+            help="Only tasks numbered M or lower (inclusive), e.g. 391 to leave out the long wave.",
+        )
     return parser
 
 
@@ -784,6 +831,7 @@ def _command_for_argv(argv: list[str] | None) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    _validate_task_range(parser, args)
     set_results_json_command(_command_for_argv(argv))
     try:
         return int(args.func(args))

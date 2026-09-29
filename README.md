@@ -169,6 +169,12 @@ uv pip install -e ".[gigachat-profile]"
 # List all 411 tasks
 uv run python -m harness_bench list
 
+# Any contiguous block of task numbers (inclusive; list, run*, verify-gold,
+# export-harbor), e.g. everything except the long-context wave:
+uv run python -m harness_bench run-openrouter --model deepseek/deepseek-v4-flash \
+    --from-task 1 --to-task 391
+# A run over a subset is a partial run: it does not go into the 411-task table.
+
 # Show the benchmark task-set version and revision history
 uv run python -m harness_bench version --check
 
