@@ -6,7 +6,7 @@
     <title>harness-bench results</title>
     <meta
       name="description"
-      content="Latest harness-bench v0.16.0 (391-task) results across agent harnesses and models."
+      content="harness-bench task-set v0.17.0 (411 tasks). Published results are still the v0.16.0 391-task set."
     >
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -27,14 +27,16 @@
     <main>
       <section class="hero" aria-labelledby="title">
         <div class="hero-copy">
-          <p class="eyebrow">Latest benchmark: task-set v0.16.0</p>
-          <h1 id="title">391 mechanically verified coding-agent tasks</h1>
+          <p class="eyebrow">Current task set: v0.17.0</p>
+          <h1 id="title">411 mechanically verified coding-agent tasks</h1>
           <p class="lead">
             A compact benchmark for comparing agent harnesses on file edits,
             data transforms, pytest bug fixes, memory discipline, synthetic
             benchmark-like workflows, version-control work, skill discovery,
-            adversarial / hostile-environment handling, and CLI composition
-            with bespoke tools whose <code>--help</code> must actually be read.
+            adversarial / hostile-environment handling, CLI composition
+            with bespoke tools whose <code>--help</code> must actually be read,
+            and a long-context wave (tasks 392–411) that pushes the harness
+            through context compaction.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="#leaderboard">View results</a>
@@ -47,7 +49,7 @@
         <div class="score-panel" aria-label="Benchmark summary">
           <div class="summary-grid">
             <div>
-              <span class="metric">391</span>
+              <span class="metric">411</span>
               <span class="label">tasks</span>
             </div>
             <div>
@@ -60,7 +62,7 @@
             </div>
             <div>
               <span class="metric">99.7%</span>
-              <span class="label">top score</span>
+              <span class="label">top score on v0.16.0</span>
             </div>
           </div>
 
@@ -101,16 +103,21 @@
           <span class="strip-number">352-391</span>
           <span>Calibrated Terminal-Bench-inspired workflows and CLI composition: bespoke tools (<code>logq</code>, <code>pktool</code>, <code>xtab</code>, …) with unguessable flags, plus POSIX pipelines whose <code>solve.sh</code> the verifier executes</span>
         </div>
+        <div>
+          <span class="strip-number">392-411</span>
+          <span>Long-context wave: large reading workloads (novels, registers, mail, codebases, git history) with a 7200&nbsp;s / 3000-step floor, meant to drive context compaction</span>
+        </div>
       </section>
 
       <section class="section" id="leaderboard" aria-labelledby="leaderboard-title">
         <div class="section-heading">
-          <p class="eyebrow">Current results only</p>
+          <p class="eyebrow">Published results, task-set v0.16.0</p>
           <h2 id="leaderboard-title">Leaderboard</h2>
           <p>
-            Results below use the full 391-task set (task-set v0.16.0); the
-            v0.16.0 audit changed task semantics, so earlier scores are not
-            comparable. One full run per harness + model setup is listed.
+            Results below use the full 391-task set (task-set v0.16.0). The
+            current task set is v0.17.0 (411 tasks); these rows are not runs of
+            it, and the v0.16.0 audit already made earlier scores incomparable.
+            One full run per harness + model setup is listed.
             Filter by model group or a single harness; steps and tokens are
             shown only when the harness exposes them. GigaChat rows are the
             IFT stand, build 32.9.23.6; GigaChat-profile rows were measured
@@ -330,7 +337,7 @@
     </main>
 
     <footer class="footer">
-      <span>harness-bench · latest results for task-set v0.16.0</span>
+      <span>harness-bench · task set v0.17.0 · published results v0.16.0</span>
       <a href="https://github.com/ai-forever/harness-bench-fast">Source on GitHub</a>
     </footer>
 

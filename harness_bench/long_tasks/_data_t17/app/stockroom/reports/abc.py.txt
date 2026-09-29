@@ -1,0 +1,45 @@
+# -*- coding: utf-8 -*-
+"""ABC-анализ товаров по выручке за период.
+
+Товары сортируются по выручке по убыванию (при равенстве — по артикулу). Класс A —
+пока накопленная доля (включая сам товар) не превышает config.ABC_A процентов, B — до
+config.ABC_B, C — остальные. Первый товар всегда A. Товары без продаж и с
+неположительной выручкой в анализ не входят.
+"""
+
+from .. import config
+from ..money import D, fmt_money, q2
+from ..textable import render as _render
+from . import sales
+
+COLUMNS = [("rank", "№", "r"), ("sku", "Артикул"), ("name", "Наименование"), ("revenue", "Выручка", "r"),
+           ("share", "Доля, %", "r"), ("cum", "Накоп., %", "r"), ("cls", "Класс")]
+
+
+def build(db, date_from=None, date_to=None):
+    rows = [r for r in sales.build(db, date_from, date_to, group="sku") if r["revenue"] > 0]
+    rows.sort(key=lambda r: (-r["revenue"], r["sku"]))
+    total = sum((r["revenue"] for r in rows), D(0))
+    out = []
+    cum = D(0)
+    for n, r in enumerate(rows, 1):
+        share = r["revenue"] * 100 / total
+        cum += share
+        if n == 1 or cum <= config.ABC_A:
+            cls = "A"
+        elif cum <= config.ABC_B:
+            cls = "B"
+        else:
+            cls = "C"
+        out.append({"rank": n, "sku": r["sku"], "name": r["name"], "revenue": r["revenue"],
+                    "share": q2(share), "cum": q2(cum), "cls": cls})
+    return out
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, **opts)
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, revenue=fmt_money(r["revenue"]), share=fmt_money(r["share"]), cum=fmt_money(r["cum"]))
+            for r in rows]
+    return _render(COLUMNS, view, "text", title="ABC-анализ")

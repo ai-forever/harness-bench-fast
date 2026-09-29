@@ -1,0 +1,87 @@
+# -*- coding: utf-8 -*-
+import csv
+import os
+import shutil
+import tempfile
+import unittest
+
+from helpers import FIXTURES, make_db
+from stockroom import catalog, csvio, inventory
+from stockroom.errors import ValidationError
+from stockroom.money import D
+
+
+class ImportTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+
+    def test_import_items_skips_bad_rows(self):
+        report = csvio.import_items(self.db, str(FIXTURES / "items.csv"))
+        self.assertEqual(report["added"], 2)
+        self.assertEqual(report["updated"], 0)
+        self.assertEqual([n for n, _ in report["errors"]], [4, 5, 6])
+        self.assertEqual(catalog.getItem(self.db, "SALT")["price"], "25.50")
+        self.assertEqual(catalog.getItem(self.db, "COFFEE")["unit"], "упак")
+        self.assertEqual(catalog.getItem(self.db, "MILK")["price"], "89.90")
+
+    def test_import_items_update(self):
+        report = csvio.import_items(self.db, str(FIXTURES / "items.csv"), update=True)
+        self.assertEqual(report["updated"], 1)
+        self.assertEqual(catalog.getItem(self.db, "MILK")["name"], "Молоко 1 л (новое)")
+        self.assertEqual(catalog.getItem(self.db, "MILK")["price"], "95.00")
+
+    def test_semicolon_and_header_case(self):
+        report = csvio.import_items(self.db, str(FIXTURES / "items_semicolon.csv"))
+        self.assertEqual(report["added"], 2)
+        self.assertEqual(catalog.getItem(self.db, "COCOA")["price"], "310.00")
+        self.assertEqual(catalog.getItem(self.db, "HONEY")["vat"], "10")
+
+    def test_import_stock(self):
+        doc = csvio.import_stock(self.db, str(FIXTURES / "stock.csv"), "2024-03-15")
+        self.assertEqual(doc["supplier"], "OPENING")
+        self.assertEqual(doc["total"], "677.50")
+        self.assertEqual(inventory.on_hand(self.db, "MILK"), D(60))
+        self.assertEqual(self.db.data["suppliers"]["OPENING"]["name"], "Ввод остатков")
+
+    def test_import_stock_is_all_or_nothing(self):
+        with self.assertRaises(ValidationError) as ctx:
+            csvio.import_stock(self.db, str(FIXTURES / "stock_bad.csv"), "2024-03-15")
+        self.assertIn("строка 3", str(ctx.exception))
+        self.assertEqual(inventory.on_hand(self.db, "MILK"), D(50))
+
+
+class ExportTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+        self.tmp = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def _rows(self, name):
+        with open(os.path.join(self.tmp, name), encoding="utf-8") as fh:
+            return list(csv.reader(fh))
+
+    def test_export_items_roundtrip(self):
+        path = os.path.join(self.tmp, "items.csv")
+        self.assertEqual(csvio.export_items(self.db, path), 4)
+        rows = self._rows("items.csv")
+        self.assertEqual(rows[0], list(csvio.ITEM_COLUMNS))
+        other = make_db(stocked=False)
+        for sku in list(other.data["items"]):
+            del other.data["items"][sku]
+        report = csvio.import_items(other, path)
+        self.assertEqual(report["added"], 4)
+        self.assertEqual(catalog.getItem(other, "TEA")["unit"], "упак")
+
+    def test_export_stock_and_movements(self):
+        csvio.export_stock(self.db, os.path.join(self.tmp, "stock.csv"))
+        rows = self._rows("stock.csv")
+        self.assertEqual(rows[0], ["sku", "name", "qty", "value"])
+        self.assertIn(["SUGAR", "Сахар", "25.5", "1224.00"], rows)
+        n = csvio.export_movements(self.db, os.path.join(self.tmp, "mv.csv"), date_from="2024-03-02")
+        self.assertEqual(n, 3)
+
+
+if __name__ == "__main__":
+    unittest.main()

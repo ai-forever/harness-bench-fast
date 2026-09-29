@@ -1,0 +1,69 @@
+# -*- coding: utf-8 -*-
+"""Ночные задания (запускаются cron-ом скриптом ops/nightly.sh):
+
+1. резервная копия базы с ротацией (хранить KEEP_BACKUPS последних);
+2. письмо закупщику о товарах ниже неснижаемого остатка;
+3. напоминания покупателям с долгом старше DEBT_DAYS дней;
+4. фид для маркетплейса.
+
+run_nightly возвращает словарь с результатами шагов; ошибки шагов не прерывают
+остальные шаги, а попадают в результат (ключ "errors").
+"""
+
+import os
+
+from . import backup, notifications
+from .dates import add_days
+from .errors import StockError
+from .integrations import marketplace
+from .payments import ledger
+
+KEEP_BACKUPS = 14
+DEBT_DAYS = 30
+
+
+def rotate_backups(directory, prefix="stockroom-", keep=KEEP_BACKUPS):
+    files = sorted(f for f in os.listdir(directory) if f.startswith(prefix) and f.endswith(".json"))
+    removed = []
+    for name in files[:-keep] if keep else files:
+        os.unlink(os.path.join(directory, name))
+        removed.append(name)
+    return removed
+
+
+def overdue_customers(db, on_date, days=DEBT_DAYS):
+    """Покупатели, у которых есть неоплаченные отгрузки старше days дней (упрощённо:
+    долг на дату on_date - days больше суммы оплат после этой даты)."""
+    border = add_days(on_date, -days)
+    result = []
+    for code in sorted(db.data["customers"]):
+        rows = ledger(db, code, on_date)
+        old_debt = sum((r["debit"] - r["credit"] for r in rows if r["date"] <= border), 0)
+        later_paid = sum((r["credit"] for r in rows if r["date"] > border), 0)
+        if old_debt - later_paid > 0:
+            result.append(code)
+    return result
+
+
+def run_nightly(db, on_date, backup_dir=None, feed_path=None):
+    result = {"errors": []}
+    if backup_dir:
+        try:
+            target = os.path.join(backup_dir, "stockroom-%s.json" % on_date)
+            backup.backup(db, target)
+            result["backup"] = target
+            result["rotated"] = rotate_backups(backup_dir)
+        except (OSError, StockError) as exc:
+            result["errors"].append("backup: %s" % exc)
+    result["low_stock"] = notifications.low_stock_message(db)
+    result["reminders"] = {}
+    for code in overdue_customers(db, on_date):
+        msg = notifications.debt_message(db, code, on_date)
+        if msg:
+            result["reminders"][code] = msg
+    if feed_path:
+        try:
+            result["feed"] = marketplace.write_feed(db, feed_path, on_date)
+        except (OSError, StockError) as exc:
+            result["errors"].append("feed: %s" % exc)
+    return result

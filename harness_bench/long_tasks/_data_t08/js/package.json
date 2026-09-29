@@ -1,0 +1,12 @@
+{
+  "name": "chronorule",
+  "version": "3.4.1",
+  "description": "Calendar rules, production calendars, business days and RRULE-lite recurrences (Russian locale)",
+  "main": "src/index.js",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "node test/run.js"
+  }
+}

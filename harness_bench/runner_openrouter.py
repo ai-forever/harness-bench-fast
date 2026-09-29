@@ -12,7 +12,9 @@ import base64
 import json
 import os
 import re
+import shlex
 import ssl
+import sys
 import threading
 import time
 import urllib.error
@@ -25,6 +27,9 @@ from tempfile import TemporaryDirectory
 from typing import Any
 
 from harness_bench.core import Task
+from harness_bench.openrouter_agent import _point_gigachat_profile_at as _point_gigachat_profile_at
+from harness_bench.openrouter_agent import build_agent as _runtime_build_agent
+from harness_bench.openrouter_agent import is_transient_model_error as _is_transient_model_error
 from harness_bench.runner import (
     AgentRunStatsCollector,
     TaskRun,
@@ -48,14 +53,6 @@ from harness_bench.tasks import ALL_TASKS, get_task
 DEFAULT_OPENROUTER_MODEL = "qwen/qwen3.6-plus"
 DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 
-# OpenRouter models are constructed as `ChatOpenAI`, so deepagents resolves
-# their harness key under the `openai:` provider prefix (e.g.
-# `openai:anthropic/claude-sonnet-4.6`) rather than the model's native
-# Anthropic key. A built-in profile registered under `anthropic:...` therefore
-# never auto-applies here. `--harness-profile` bridges that gap: it copies a
-# registered source profile onto the model's resolved key so it applies.
-_PROFILE_LOCK = threading.Lock()
-_APPLIED_PROFILE_KEYS: set[tuple[str, str]] = set()
 _OPENROUTER_TOKEN_LOCK = threading.Lock()
 _OPENROUTER_AUTH_TOKEN: tuple[str, float] | None = None
 _TOKEN_REFRESH_MARGIN_SECONDS = 60.0
@@ -66,21 +63,6 @@ _INTERNAL_TAGME_AUTH_URL = (
 DEFAULT_TRANSIENT_ATTEMPTS = 5
 _TRANSIENT_STATUS_CODES = {408, 409, 429, 500, 502, 503, 504}
 
-# `LocalShellBackend(virtual_mode=True)` virtualizes the file tools (the model
-# writes `/x`, which maps to `<workspace>/x`) but NOT the `execute` shell, which
-# runs a real shell rooted at the absolute workspace path. A model that does
-# rename/move/delete via the shell with the same `/x` convention (`rm /old.txt`)
-# therefore hits the real system root, silently no-ops, and the agent loops
-# until the recursion limit. This one-line tool-description override tells the
-# model the shell's cwd IS the workspace, which closes the gap (measured
-# +14 tasks for Claude Sonnet 4.6 on this bench: 202 -> 216 / 231).
-_EXECUTE_CWD_OVERRIDE = (
-    "Run ONE shell command. Its working directory IS the workspace root, so use "
-    "paths RELATIVE to the current directory for filesystem operations the file "
-    "tools cannot do — delete/rename/move/mkdir (e.g. 'rm old.txt', 'mv a b', "
-    "'rm -r dir', 'mkdir -p sub'). NEVER prefix a path with '/'. Prefer "
-    "write_file / edit_file for creating or changing file content."
-)
 
 
 def _env_first(*names: str) -> str | None:
@@ -212,128 +194,57 @@ def _ensure_openrouter_key() -> None:
     _openrouter_api_key()
 
 
-def _is_transient_model_error(exc: BaseException) -> bool:
-    try:
-        import httpx
-        import openai
-    except ImportError:
-        httpx = None  # type: ignore[assignment]
-        openai = None  # type: ignore[assignment]
-
-    if openai is not None:
-        transient_openai_errors = tuple(
-            error_type
-            for name in (
-                "APIConnectionError",
-                "APITimeoutError",
-                "RateLimitError",
-                "InternalServerError",
-            )
-            if (error_type := getattr(openai, name, None)) is not None
-        )
-        if transient_openai_errors and isinstance(exc, transient_openai_errors):
-            return True
-        api_status_error = getattr(openai, "APIStatusError", None)
-        if api_status_error is not None and isinstance(exc, api_status_error):
-            return exc.status_code in _TRANSIENT_STATUS_CODES
-
-    if httpx is not None and isinstance(exc, (httpx.TimeoutException, httpx.TransportError)):
-        return True
-
-    return exc.__class__.__name__ in {
-        "APIConnectionError",
-        "APITimeoutError",
-        "RateLimitError",
-        "ReadTimeout",
-        "ConnectTimeout",
-        "TimeoutException",
-    }
 
 
-def _apply_source_harness_profile(model: Any, profile_spec: str) -> None:
-    """Bridge a registered built-in harness profile onto `model`'s resolved key.
 
-    `profile_spec` is the key a profile is registered under in deepagents'
-    harness registry (e.g. `anthropic:claude-sonnet-4-6` for the built-in
-    Claude Sonnet 4.6 profile). Because this runner builds OpenRouter models as
-    `ChatOpenAI`, deepagents would resolve them under `openai:<model>` and miss
-    the Anthropic-keyed built-in. We look up the source profile and re-register
-    it under the model's actual `provider:identifier` key so `create_deep_agent`
-    picks it up. Registration is global and idempotent per (source, target).
+
+
+
+
+
+
+
+
+
+
+
+
+def count_compactions(workspace: Path) -> int:
+    """Count deepagents auto-compactions from their on-disk history offload.
+
+    Every summarization appends one `## Summarized at …` section to
+    `conversation_history/<thread>.md` in the backend, i.e. in the workspace.
     """
-    from deepagents import register_harness_profile
-    from deepagents._models import get_model_identifier, get_model_provider
-    from deepagents.profiles.harness.harness_profiles import (
-        _ensure_harness_profiles_loaded,
-        _get_harness_profile,
+    history = workspace / "conversation_history"
+    if not history.is_dir():
+        return 0
+    return sum(
+        path.read_text(encoding="utf-8", errors="replace").count("## Summarized at ")
+        for path in history.glob("*.md")
     )
 
-    _ensure_harness_profiles_loaded()
-    source = _get_harness_profile(profile_spec)
-    if source is None:
-        raise SystemExit(
-            f"No registered harness profile found under {profile_spec!r}. "
-            "Pass a built-in spec such as 'anthropic:claude-sonnet-4-6'."
-        )
-    provider = get_model_provider(model)
-    identifier = get_model_identifier(model)
-    if not provider or not identifier:
-        raise SystemExit(
-            "Could not derive provider/identifier from the model to apply "
-            f"harness profile {profile_spec!r}."
-        )
-    target_key = f"{provider}:{identifier}"
-    with _PROFILE_LOCK:
-        if (profile_spec, target_key) in _APPLIED_PROFILE_KEYS:
-            return
-        register_harness_profile(target_key, source)
-        _APPLIED_PROFILE_KEYS.add((profile_spec, target_key))
 
+def _dump_trace(task_id: str, invocation_result: Any) -> None:
+    """Save the full message history when `HARNESS_BENCH_TRACE_DIR` is set.
 
-def _apply_execute_cwd_fix(model: Any) -> None:
-    """Register the `execute` cwd-relative override onto `model`'s resolved key.
-
-    Works around the `virtual_mode=True` file-tool/shell split described on
-    `_EXECUTE_CWD_OVERRIDE`. Registered additively, so it composes with any
-    `--harness-profile` the caller also bridges onto the same key. Idempotent
-    per resolved key, and a no-op when provider/identifier cannot be derived.
+    deepagents summarizes without mutating `state["messages"]`, so the final
+    state still holds every turn, including the ones compaction evicted.
     """
-    from deepagents import HarnessProfile, register_harness_profile
-    from deepagents._models import get_model_identifier, get_model_provider
-
-    provider = get_model_provider(model)
-    identifier = get_model_identifier(model)
-    if not provider or not identifier:
+    trace_dir = os.getenv("HARNESS_BENCH_TRACE_DIR")
+    if not trace_dir or not isinstance(invocation_result, dict):
         return
-    target_key = f"{provider}:{identifier}"
-    with _PROFILE_LOCK:
-        if ("__execute_cwd_fix__", target_key) in _APPLIED_PROFILE_KEYS:
-            return
-        register_harness_profile(
-            target_key,
-            HarnessProfile(tool_description_overrides={"execute": _EXECUTE_CWD_OVERRIDE}),
-        )
-        _APPLIED_PROFILE_KEYS.add(("__execute_cwd_fix__", target_key))
+    from langchain_core.messages import messages_to_dict
+
+    out = Path(trace_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    path = out / f"{task_id}_{time.strftime('%Y%m%dT%H%M%S')}.json"
+    messages = invocation_result.get("messages") or []
+    path.write_text(
+        json.dumps(messages_to_dict(messages), ensure_ascii=False, default=str),
+        encoding="utf-8",
+    )
 
 
-def _point_gigachat_profile_at(workspace: Path) -> None:
-    """Tell the bridged GigaChat profile which workspace this task runs in.
-
-    Part of that profile reads the current workspace off a module global rather
-    than off agent state: `MemoryTaskMiddleware` gates its nudge on
-    `<workspace>/AGENTS.md` existing. `runner.py` sets it per task; this runner
-    did not, so a bridged `gigachat` profile ran with the middleware silently
-    inert and measured the memory wave in a weaker configuration than the
-    native runner does.
-
-    Only called when a profile was explicitly bridged, so profile-less
-    OpenRouter runs are unaffected.
-    """
-    try:
-        from deepagents_gigachat import set_workspace_path
-    except ImportError:
-        return
-    set_workspace_path(workspace)
 
 
 def build_agent(
@@ -344,55 +255,16 @@ def build_agent(
     max_tokens: int | None = None,
     harness_profile: str | None = None,
     forward_reasoning_history: bool = False,
+    compact_at_tokens: int | None = None,
+    prompt_cache: bool = False,
+    no_subagents: bool = False,
 ) -> Any:
-    """Build a stock `deepagents` agent backed by an OpenRouter model.
-
-    No `register_harness()` call — the GigaChat-specific prompt / overrides are
-    intentionally bypassed. The `execute` cwd-relative override
-    (`_EXECUTE_CWD_OVERRIDE`) is always applied to fix the `virtual_mode=True`
-    shell/file-tool path split. When `harness_profile` is set, a registered
-    built-in deepagents harness profile (e.g. `anthropic:claude-sonnet-4-6`) is
-    additionally bridged onto the model's resolved key.
-    """
-    from deepagents import create_deep_agent
-    from deepagents.backends import LocalShellBackend
-
-    from harness_bench.chat_openai import ReasoningAwareChatOpenAI
-
+    """Build the same model used by the standalone isolated worker."""
     _apply_internal_tagme_defaults()
-    backend = LocalShellBackend(
-        root_dir=workspace,
-        virtual_mode=True,
-        inherit_env=True,
-    )
-    model_kwargs: dict[str, Any] = {}
-    if max_tokens is not None:
-        model_kwargs["max_tokens"] = max_tokens
-    model = ReasoningAwareChatOpenAI(
-        model=model_name,
-        base_url=os.getenv("OPENROUTER_BASE_URL", DEFAULT_BASE_URL),
-        api_key=_openrouter_api_key(),
-        timeout=float(os.getenv("HARNESS_BENCH_REQUEST_TIMEOUT", "600")),
-        forward_reasoning_history=forward_reasoning_history,
-        **model_kwargs,
-    )
-    # Always close the virtual_mode shell/file-tool path split (see
-    # `_EXECUTE_CWD_OVERRIDE`); merges additively with any bridged profile.
-    _apply_execute_cwd_fix(model)
-    if harness_profile:
-        _apply_source_harness_profile(model, harness_profile)
-        _point_gigachat_profile_at(workspace)
-    # Memory tasks (222–231) ship an AGENTS.md fixture; pre-existing 221
-    # tasks do not. `LocalShellBackend(virtual_mode=True)` maps
-    # `/AGENTS.md` to `<workspace>/AGENTS.md`.
-    memory_sources = ["/AGENTS.md"] if (workspace / "AGENTS.md").exists() else None
-    # Skill tasks ship `.agents/skills/`; wire SkillsMiddleware in only when
-    # present so the skill-less tasks stay unchanged (see runner.build_agent).
-    skill_sources = ["/.agents/skills"] if (workspace / ".agents" / "skills").is_dir() else None
-    agent = create_deep_agent(
-        model=model, backend=backend, memory=memory_sources, skills=skill_sources
-    )
-    return agent.with_config({"recursion_limit": recursion_limit})
+    return _runtime_build_agent(workspace, api_key=_openrouter_api_key(), model_name=model_name,
+        recursion_limit=recursion_limit, max_tokens=max_tokens, harness_profile=harness_profile,
+        forward_reasoning_history=forward_reasoning_history, compact_at_tokens=compact_at_tokens,
+        prompt_cache=prompt_cache, no_subagents=no_subagents)
 
 
 def run_task(
@@ -405,9 +277,13 @@ def run_task(
     harness_profile: str | None = None,
     transient_attempts: int = DEFAULT_TRANSIENT_ATTEMPTS,
     forward_reasoning_history: bool = False,
+    compact_at_tokens: int | None = None,
+    prompt_cache: bool = False,
+    no_subagents: bool = False,
 ) -> TaskRun:
     if transient_attempts < 1:
         raise ValueError("transient_attempts must be positive")
+    recursion_limit = max(recursion_limit, getattr(task, "min_recursion_limit", None) or 0)
 
     started = time.monotonic()
     last_run: TaskRun | None = None
@@ -432,11 +308,15 @@ def run_task(
                     max_tokens=max_tokens,
                     harness_profile=harness_profile,
                     forward_reasoning_history=forward_reasoning_history,
+                    compact_at_tokens=compact_at_tokens,
+                    prompt_cache=prompt_cache,
+                    no_subagents=no_subagents,
                 )
                 invocation_result = invoke_agent_with_stats(
                     agent,
                     {"messages": [{"role": "user", "content": task.prompt}]},
                     stats,
+                    min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
                 )
             except Exception as exc:  # noqa: BLE001 — retry transient model failures.
                 run = _agent_exception_task_run(
@@ -446,7 +326,12 @@ def run_task(
                     recursion_limit=recursion_limit,
                     workspace=workspace_path if keep_workspace else None,
                 )
-                last_run = replace(run, **stats.merged())
+                last_run = replace(
+                    run,
+                    **stats.merged(),
+                    **stats.extra(),
+                    agent_compactions=count_compactions(workspace_path),
+                )
                 if _is_transient_model_error(exc) and attempt < transient_attempts:
                     continue
                 if _is_transient_model_error(exc):
@@ -458,8 +343,10 @@ def run_task(
                         ),
                     )
                 return last_run
+            _dump_trace(task.id, invocation_result)
+            compactions = count_compactions(workspace_path)
             result = task.verify(workspace_path)
-            return _task_run_with_agent_stats(
+            run = _task_run_with_agent_stats(
                 task_id=task.id,
                 passed=result.passed,
                 message=result.message,
@@ -467,6 +354,7 @@ def run_task(
                 stats=stats.merged(invocation_result),
                 workspace=workspace_path if keep_workspace else None,
             )
+            return replace(run, **stats.extra(), agent_compactions=compactions)
         finally:
             if workspace_keepalive is not None:
                 workspace_keepalive.cleanup()
@@ -491,10 +379,46 @@ def run_all(
     fail_on_runtime_error: bool = False,
     rerun_on_fail: bool = False,
     forward_reasoning_history: bool = False,
+    compact_at_tokens: int | None = None,
+    prompt_cache: bool = False,
+    no_subagents: bool = False,
+    isolation: str = "none",
+    runtime_paths: tuple[str, ...] = (),
+    artifacts_root: Path | None = None,
 ) -> list[TaskRun]:
     _load_env_from_dotenv()
     _ensure_openrouter_key()
     json_output = normalize_json_output_path(json_output)
+    if isolation == "bwrap":
+        from harness_bench.runner import _task_timeout_seconds
+        from harness_bench.runner_cli import run_all_cli
+
+        if transient_attempts < 1:
+            raise ValueError("transient_attempts must be positive")
+        package = Path(__file__).resolve().parent
+        worker = package / "deepagents_worker.py"
+        command = [sys.executable, str(worker), "--model", model_name, "--recursion-limit", str(recursion_limit)]
+        for flag, value in (("--max-tokens", max_tokens), ("--harness-profile", harness_profile),
+                            ("--compact-at-tokens", compact_at_tokens)):
+            if value is not None:
+                command += [flag, str(value)]
+        for flag, enabled in (("--forward-reasoning-history", forward_reasoning_history),
+                              ("--prompt-cache", prompt_cache), ("--no-subagents", no_subagents)):
+            if enabled:
+                command.append(flag)
+        # Exact worker source files only, plus interpreter/site-packages. No
+        # task registry, verifier, benchmark repo or historical artifacts mount.
+        runtime = tuple(dict.fromkeys((*runtime_paths, sys.prefix, sys.base_prefix,
+            *(str(package / name) for name in ("deepagents_worker.py", "openrouter_agent.py", "chat_openai.py", "agent_stats.py")))))
+        return run_all_cli(task_ids, cli_command=shlex.join(command),
+            timeout=int(_task_timeout_seconds()), keep_workspace=keep_workspace,
+            concurrency=concurrency, attempts=attempts, json_output=json_output,
+            rerun_on_fail=rerun_on_fail, isolation=isolation, runtime_paths=runtime,
+            artifacts_root=artifacts_root, transient_retries=transient_attempts-1,
+            fail_on_runtime_error=fail_on_runtime_error,
+            extra_env_factory=lambda: {"HBF_WORKER_API_KEY": _openrouter_api_key()})
+    if isolation != "none":
+        raise ValueError(f"unknown isolation mode: {isolation}")
 
     if attempts < 1:
         raise ValueError("attempts must be positive")
@@ -528,6 +452,9 @@ def run_all(
                     harness_profile=harness_profile,
                     transient_attempts=transient_attempts,
                     forward_reasoning_history=forward_reasoning_history,
+                    compact_at_tokens=compact_at_tokens,
+                    prompt_cache=prompt_cache,
+                    no_subagents=no_subagents,
                 )
                 run = _mark_attempt(run, attempt, attempts)
                 results.append(run)
@@ -565,6 +492,9 @@ def run_all(
                 harness_profile=harness_profile,
                 transient_attempts=transient_attempts,
                 forward_reasoning_history=forward_reasoning_history,
+                compact_at_tokens=compact_at_tokens,
+                prompt_cache=prompt_cache,
+                no_subagents=no_subagents,
             ): (task, attempt)
             for task, attempt in pending_attempts
         }

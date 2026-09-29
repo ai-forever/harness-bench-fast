@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+"""Сборочный лист для кладовщика по новому заказу: что взять и из каких приходов.
+
+Подсказка строится по текущим слоям себестоимости в порядке их расхода (costing:
+самые старые первыми), без изменения базы, — именно из этих приходов товар будет
+списан при отгрузке. Если товара не хватает, в строке пишется «НЕ ХВАТАЕТ N».
+"""
+
+from ..costing import layers_for
+from ..dates import ru
+from ..errors import DocumentStateError
+from ..money import D, fmt_qty
+from ..orders import get_order
+from ..textable import render_text
+
+COLUMNS = [("n", "№", "r"), ("sku", "Артикул"), ("name", "Наименование"), ("qty", "Кол-во", "r"),
+           ("from", "Откуда брать")]
+
+
+def plan(db, order_id):
+    order = get_order(db, order_id)
+    if order["status"] != "new":
+        raise DocumentStateError("сборочный лист печатается только для нового заказа")
+    rows = []
+    for line in order["lines"]:
+        need = D(line["qty"])
+        parts = []
+        for layer in layers_for(db, line["sku"]):
+            if need <= 0:
+                break
+            take = min(need, D(layer["qty"]))
+            parts.append((layer["doc"], take))
+            need -= take
+        rows.append({"sku": line["sku"], "qty": D(line["qty"]), "parts": parts, "short": need if need > 0 else D(0)})
+    return rows
+
+
+def render_pick_list(db, order_id):
+    order = get_order(db, order_id)
+    rows = []
+    for n, r in enumerate(plan(db, order_id), 1):
+        src = ", ".join("%s: %s" % (doc, fmt_qty(q)) for doc, q in r["parts"])
+        if r["short"] > 0:
+            src += (", " if src else "") + "НЕ ХВАТАЕТ %s" % fmt_qty(r["short"])
+        rows.append({"n": n, "sku": r["sku"], "name": db.data["items"][r["sku"]]["name"], "qty": fmt_qty(r["qty"]),
+                     "from": src})
+    head = "СБОРОЧНЫЙ ЛИСТ к заказу %s от %s\n\n" % (order["id"], ru(order["date"]))
+    return head + render_text(COLUMNS, rows)

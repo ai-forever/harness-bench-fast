@@ -1,0 +1,93 @@
+# -*- coding: utf-8 -*-
+import unittest
+
+from helpers import make_db
+from stockroom import catalog, partners
+from stockroom.errors import DuplicateError, NotFound, ValidationError
+
+
+class CatalogTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db(stocked=False)
+
+    def test_add_normalises_fields(self):
+        item = catalog.addItem(self.db, "cocoa", "  Какао   порошок ", "310", vat="20%")
+        self.assertEqual(item["sku"], "COCOA")
+        self.assertEqual(item["name"], "Какао порошок")
+        self.assertEqual(item["price"], "310.00")
+        self.assertEqual(item["unit"], "шт")
+        self.assertTrue(item["active"])
+        self.assertEqual(self.db.data["stock"]["COCOA"], "0")
+
+    def test_default_vat_comes_from_meta(self):
+        item = catalog.add_item(self.db, "SALT", "Соль", "25")
+        self.assertEqual(item["vat"], "20")
+
+    def test_rejects_bad_values(self):
+        with self.assertRaises(ValidationError):
+            catalog.addItem(self.db, "X1", "Икс", "10", vat="18")
+        with self.assertRaises(ValidationError):
+            catalog.addItem(self.db, "X2", "Икс", "-1")
+        with self.assertRaises(DuplicateError):
+            catalog.addItem(self.db, "milk", "Молоко", "1")
+
+    def test_barcode_must_be_unique(self):
+        catalog.addItem(self.db, "A1", "Товар А", "1", barcode="4601234567893")
+        with self.assertRaises(DuplicateError):
+            catalog.addItem(self.db, "A2", "Товар Б", "1", barcode="4601234567893")
+
+    def test_get_and_list(self):
+        self.assertEqual(catalog.getItem(self.db, "milk")["name"], "Молоко 1 л")
+        with self.assertRaises(NotFound):
+            catalog.getItem(self.db, "NOPE")
+        self.assertEqual([i["sku"] for i in catalog.listItems(self.db)], ["BREAD", "MILK", "SUGAR", "TEA"])
+        self.assertEqual([i["sku"] for i in catalog.listItems(self.db, category="бакалея")], ["SUGAR", "TEA"])
+
+    def test_update_and_deactivate(self):
+        catalog.updateItem(self.db, "BREAD", price="47.5", min_qty="12")
+        item = catalog.getItem(self.db, "BREAD")
+        self.assertEqual(item["price"], "47.50")
+        self.assertEqual(item["min_qty"], "12")
+        with self.assertRaises(ValidationError):
+            catalog.updateItem(self.db, "BREAD", created="2020-01-01")
+        catalog.deactivateItem(self.db, "BREAD")
+        self.assertNotIn("BREAD", [i["sku"] for i in catalog.listItems(self.db)])
+        self.assertIn("BREAD", [i["sku"] for i in catalog.listItems(self.db, include_inactive=True)])
+
+    def test_search(self):
+        self.assertEqual([i["sku"] for i in catalog.findItems(self.db, "чай")], ["TEA"])
+        self.assertEqual([i["sku"] for i in catalog.findItems(self.db, "БАКАЛЕЯ")], ["SUGAR", "TEA"])
+        self.assertEqual(catalog.findItems(self.db, "  "), [])
+        self.assertEqual(catalog.categories(self.db), ["бакалея", "молочное", "хлеб"])
+
+
+class PartnersTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db(stocked=False)
+
+    def test_customers(self):
+        c2 = partners.get_customer(self.db, "C2")
+        self.assertEqual(c2["group"], "wholesale")
+        self.assertEqual(c2["discount"], "5")
+        self.assertEqual([c["code"] for c in partners.list_customers(self.db, group="retail")], ["C1", "C3"])
+        with self.assertRaises(ValidationError):
+            partners.add_customer(self.db, "C9", "Кто-то", group="vip")
+        with self.assertRaises(DuplicateError):
+            partners.add_customer(self.db, "C1", "Дубль")
+
+    def test_update_customer(self):
+        partners.update_customer(self.db, "C1", discount="2.5", blocked=True)
+        c1 = partners.get_customer(self.db, "C1")
+        self.assertEqual(c1["discount"], "2.5")
+        self.assertTrue(c1["blocked"])
+
+    def test_suppliers(self):
+        self.assertEqual([s["code"] for s in partners.list_suppliers(self.db)], ["SUP1", "SUP2"])
+        with self.assertRaises(NotFound):
+            partners.get_supplier(self.db, "SUP9")
+        with self.assertRaises(ValidationError):
+            partners.add_supplier(self.db, "SUP3", "Завод", inn="12")
+
+
+if __name__ == "__main__":
+    unittest.main()

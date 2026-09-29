@@ -1,0 +1,73 @@
+# -*- coding: utf-8 -*-
+"""Исключения складского учёта.
+
+Все ошибки приложения наследуются от StockError, CLI ловит именно его и печатает
+сообщение в stderr с кодом возврата 2. Не бросайте голый Exception из бизнес-логики:
+его CLI покажет трейсбеком, а бухгалтерия пугается трейсбеков.
+"""
+
+
+class StockError(Exception):
+    """Базовое исключение приложения."""
+
+    code = "error"
+
+    def __init__(self, message, **details):
+        Exception.__init__(self, message)
+        self.message = message
+        self.details = details
+
+    def __str__(self):
+        return self.message
+
+
+class NotFound(StockError):
+    """Сущность (товар, контрагент, документ) не найдена."""
+
+    code = "not_found"
+
+
+class ValidationError(StockError):
+    """Некорректные входные данные."""
+
+    code = "invalid"
+
+
+class DuplicateError(ValidationError):
+    """Сущность с таким кодом уже есть."""
+
+    code = "duplicate"
+
+
+class InsufficientStock(StockError):
+    """Недостаточно остатка для отгрузки/списания."""
+
+    code = "insufficient"
+
+    def __init__(self, sku, need, have):
+        StockError.__init__(
+            self,
+            "недостаточно остатка %s: нужно %s, есть %s" % (sku, need, have),
+            sku=sku, need=need, have=have,
+        )
+        self.sku = sku
+        self.need = need
+        self.have = have
+
+
+class DocumentStateError(StockError):
+    """Операция недопустима в текущем статусе документа."""
+
+    code = "state"
+
+
+class SchemaError(StockError):
+    """Файл базы повреждён или неизвестной версии."""
+
+    code = "schema"
+
+
+class RateMissing(StockError):
+    """Нет курса валюты на нужную дату."""
+
+    code = "no_rate"

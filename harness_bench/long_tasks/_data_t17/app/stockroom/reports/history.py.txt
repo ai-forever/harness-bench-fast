@@ -1,0 +1,41 @@
+# -*- coding: utf-8 -*-
+"""Карточка движения товара: все движения по артикулу с нарастающим остатком."""
+
+from ..catalog import getItem
+from ..dates import in_range
+from ..money import D, fmt_money, fmt_qty
+from ..textable import render as _render
+
+COLUMNS = [("date", "Дата"), ("doc", "Документ"), ("type", "Тип"), ("incoming", "Приход", "r"),
+           ("outgoing", "Расход", "r"), ("balance", "Остаток", "r"), ("cost", "Себестоимость", "r")]
+
+
+def build(db, sku, date_from=None, date_to=None):
+    item = getItem(db, sku)
+    balance = D(0)
+    rows = []
+    for mv in db.data["movements"]:
+        if mv["sku"] != item["sku"]:
+            continue
+        q = D(mv["qty"])
+        if mv["type"] in ("in", "return"):
+            incoming, outgoing = q, D(0)  # у сторно прихода q < 0
+        elif mv["type"] == "adjust":
+            incoming, outgoing = (q, D(0)) if q > 0 else (D(0), -q)
+        else:
+            incoming, outgoing = D(0), q
+        balance += incoming - outgoing
+        if in_range(mv["date"], date_from, date_to):
+            rows.append({"date": mv["date"], "doc": mv["doc"], "type": mv["type"], "incoming": incoming,
+                         "outgoing": outgoing, "balance": balance, "cost": D(mv["cost"])})
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, opts["sku"], opts.get("date_from"), opts.get("date_to"))
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, incoming=fmt_qty(r["incoming"]) if r["incoming"] else "",
+                 outgoing=fmt_qty(r["outgoing"]) if r["outgoing"] else "",
+                 balance=fmt_qty(r["balance"]), cost=fmt_money(r["cost"])) for r in rows]
+    return _render(COLUMNS, view, "text", title="Карточка товара %s" % opts["sku"].upper())

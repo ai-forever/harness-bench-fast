@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+"""Подтверждение заказа для покупателя (письмо): состав, суммы (pricing.order_amounts),
+ожидаемая дата отгрузки — следующий рабочий день после даты заказа (сб/вс пропускаются)."""
+
+import datetime
+
+from ..dates import parse_date, ru
+from ..money import fmt_money, fmt_qty
+from ..orders import get_order
+from ..partners import get_customer
+from ..pricing import order_amounts
+
+
+def next_working_day(date):
+    d = parse_date(date) + datetime.timedelta(days=1)
+    while d.weekday() >= 5:
+        d += datetime.timedelta(days=1)
+    return d.isoformat()
+
+
+def render_confirmation(db, order_id):
+    order = get_order(db, order_id)
+    cust = get_customer(db, order["customer"])
+    amounts = order_amounts(db, order)
+    lines = ["Тема: Заказ %s принят" % order["id"], "", "Здравствуйте, %s!" % cust["name"], "",
+             "Ваш заказ %s от %s принят в работу:" % (order["id"], ru(order["date"]))]
+    for l in amounts["lines"]:
+        item = db.data["items"][l["sku"]]
+        lines.append("  • %s — %s %s × %s = %s" % (item["name"], fmt_qty(l["qty"]), item.get("unit", "шт"),
+                                                 fmt_money(l["unit"]), fmt_money(l["net"])))
+    lines += ["", "Сумма без НДС: %s" % fmt_money(amounts["net"]), "НДС: %s" % fmt_money(amounts["vat"]),
+              "Итого: %s" % fmt_money(amounts["total"]), "",
+              "Ожидаемая дата отгрузки: %s" % ru(next_working_day(order["date"])), "", "-- ", db.meta("company") or ""]
+    return "\n".join(lines) + "\n"

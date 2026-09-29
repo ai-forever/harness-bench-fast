@@ -1,0 +1,56 @@
+# -*- coding: utf-8 -*-
+"""Ценники для торгового зала.
+
+Ценник показывает розничную цену с НДС для покупателя «с улицы» (без персональной
+скидки и без скидки за количество). Цена в валюте пересчитывается в рубли по последнему
+известному курсу. Если у товара есть скидки за количество, внизу
+печатается строка «от N шт — X руб.» для каждого порога.
+
+Формат одного ценника (ширина 32 символа):
+
+    +------------------------------+
+    |Молоко 1 л                    |
+    |MILK                    шт    |
+    |              98,89 руб.      |
+    |от 10 шт — 95,93 руб.         |
+    +------------------------------+
+"""
+
+from .catalog import getItem
+from .money import D, apply_discount, fmt_money, fmt_qty, q2
+from .pricing import get_breaks
+
+WIDTH = 30
+
+
+def retail_price(item, qty_discount=0, rate=1):
+    price = D(item["price"])
+    if D(rate) != 1:
+        price = q2(price * D(rate))
+    net = q2(apply_discount(price, qty_discount))
+    return q2(net + net * D(item["vat"]) / 100)
+
+
+def _row(text):
+    return "|" + text[:WIDTH].ljust(WIDTH) + "|"
+
+
+def render_label(db, sku):
+    item = getItem(db, sku)
+    rate = 1
+    if (item.get("currency") or db.base_currency()) != db.base_currency():
+        from .rates import get_rate
+
+        rate = get_rate(db, item["currency"])
+    border = "+" + "-" * WIDTH + "+"
+    lines = [border, _row(item["name"]), _row(item["sku"].ljust(WIDTH - 6) + item.get("unit", "шт")),
+             _row(("%s руб." % fmt_money(retail_price(item, 0, rate))).center(WIDTH))]
+    for br in get_breaks(db, item["sku"]):
+        lines.append(_row("от %s %s — %s руб." % (fmt_qty(br["min_qty"]), item.get("unit", "шт"),
+                                               fmt_money(retail_price(item, br["discount"], rate)))))
+    lines.append(border)
+    return "\n".join(lines)
+
+
+def render_labels(db, skus):
+    return "\n\n".join(render_label(db, s) for s in skus) + "\n"

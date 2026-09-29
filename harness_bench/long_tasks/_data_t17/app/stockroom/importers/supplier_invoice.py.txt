@@ -1,0 +1,74 @@
+# -*- coding: utf-8 -*-
+"""Загрузка приходной накладной поставщика из CSV (формат «УПД-выгрузка» оптовой базы).
+
+Колонки (заголовок обязателен, порядок любой, лишние игнорируются):
+
+    Артикул поставщика, Наименование, Количество, Цена без НДС, Ставка НДС
+
+Артикул поставщика сопоставляется с нашим через таблицу соответствий
+db.data["supplier_skus"][ПОСТАВЩИК][АРТИКУЛ_ПОСТАВЩИКА] = SKU (map_sku()). Строки с
+несопоставленным артикулом не загружаются — функция возвращает их списком, приход по
+остальным строкам проводится, если таких строк хотя бы одна (dry_run=True — ничего не
+проводить, только проверить).
+"""
+
+import csv
+import io
+
+from .. import catalog, receiving
+from ..errors import NotFound, ValidationError
+from ..money import D
+from ..partners import get_supplier
+
+COLUMNS = {"артикул поставщика": "code", "наименование": "name", "количество": "qty", "цена без ндс": "cost",
+           "ставка ндс": "vat"}
+
+
+def map_sku(db, supplier, supplier_code, sku):
+    get_supplier(db, supplier)
+    item = catalog.getItem(db, sku)
+    db.data.setdefault("supplier_skus", {}).setdefault(supplier, {})[supplier_code.strip()] = item["sku"]
+
+
+def mapped(db, supplier, supplier_code):
+    return db.data.get("supplier_skus", {}).get(supplier, {}).get(supplier_code.strip())
+
+
+def read_rows(text):
+    first = text.split("\n", 1)[0]
+    delimiter = ";" if first.count(";") >= first.count(",") else ","
+    reader = csv.DictReader(io.StringIO(text), delimiter=delimiter)
+    rows = []
+    for raw in reader:
+        row = {}
+        for k, v in raw.items():
+            key = COLUMNS.get((k or "").strip().lower())
+            if key:
+                row[key] = (v or "").strip()
+        rows.append(row)
+    return rows
+
+
+def load(db, supplier, path, date, dry_run=False):
+    get_supplier(db, supplier)
+    with open(path, "r", encoding="utf-8-sig") as fh:
+        rows = read_rows(fh.read())
+    lines, unknown = [], []
+    for n, row in enumerate(rows, 2):
+        for need in ("code", "qty", "cost"):
+            if not row.get(need):
+                raise ValidationError("строка %d: не заполнено поле %s" % (n, need))
+        sku = mapped(db, supplier, row["code"])
+        if sku is None:
+            unknown.append((n, row["code"], row.get("name", "")))
+            continue
+        try:
+            catalog.getItem(db, sku)
+        except NotFound:
+            unknown.append((n, row["code"], row.get("name", "")))
+            continue
+        lines.append({"sku": sku, "qty": D(row["qty"]), "cost": D(row["cost"])})
+    doc = None
+    if lines and not dry_run:
+        doc = receiving.receive(db, supplier, date, lines, note="накладная поставщика")
+    return {"receipt": doc, "lines": len(lines), "unknown": unknown}

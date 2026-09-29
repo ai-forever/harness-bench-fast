@@ -1,0 +1,100 @@
+# -*- coding: utf-8 -*-
+"""Деньги и количества.
+
+Все суммы и количества хранятся в базе строками и обрабатываются как Decimal.
+Округление — только коммерческое (ROUND_HALF_UP) до копеек через q2(). Float в
+денежных расчётах запрещён: однажды из-за него счёт разошёлся с 1С на копейку.
+"""
+
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
+
+ZERO = Decimal("0")
+CENT = Decimal("0.01")
+HUNDRED = Decimal("100")
+
+
+def D(value):
+    """Decimal из строки/числа/Decimal. Запятая допускается как разделитель.
+
+    >>> D("1 234,50")
+    Decimal('1234.50')
+    """
+    if isinstance(value, Decimal):
+        return value
+    if value is None or value == "":
+        return ZERO
+    if isinstance(value, float):
+        # float допускаем только на входе из старых файлов, через repr
+        value = repr(value)
+    text = str(value).strip().replace(" ", "").replace(" ", "").replace(",", ".")
+    try:
+        return Decimal(text)
+    except InvalidOperation:
+        raise ValueError("не число: %r" % (value,))
+
+
+def q2(value):
+    """Округление до копеек, половина — вверх (от нуля)."""
+    return D(value).quantize(CENT, rounding=ROUND_HALF_UP)
+
+
+def q3(value):
+    """Округление количества до 0.001 (для весового товара)."""
+    return D(value).quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
+
+
+def percent(value, pct):
+    """value * pct / 100 без округления."""
+    return D(value) * D(pct) / HUNDRED
+
+
+def apply_discount(value, pct):
+    """Цена со скидкой pct процентов, без округления."""
+    return D(value) * (HUNDRED - D(pct)) / HUNDRED
+
+
+def to_str(value):
+    """Каноническая строка для хранения в базе: без экспоненты, без лишних нулей
+    у количеств, но деньги храним как есть (q2 уже даёт два знака)."""
+    d = D(value)
+    if d == d.to_integral_value():
+        return str(d.quantize(Decimal(1)))
+    return format(d.normalize(), "f")
+
+
+def qty_str(value):
+    """Количество для хранения: целое без дробной части, иначе до 3 знаков."""
+    d = q3(value)
+    if d == d.to_integral_value():
+        return str(d.quantize(Decimal(1)))
+    return format(d.normalize(), "f")
+
+
+def money_str(value):
+    """Сумма для хранения: всегда два знака."""
+    return str(q2(value))
+
+
+def fmt_money(value, sep=" "):
+    """Сумма для печати: '1 234,50'."""
+    d = q2(value)
+    sign = "-" if d < 0 else ""
+    whole, frac = str(abs(d)).split(".")
+    groups = []
+    while len(whole) > 3:
+        groups.insert(0, whole[-3:])
+        whole = whole[:-3]
+    groups.insert(0, whole)
+    return sign + sep.join(groups) + "," + frac
+
+
+def fmt_qty(value):
+    """Количество для печати: '12', '1,5'."""
+    return qty_str(value).replace(".", ",")
+
+
+def is_positive(value):
+    try:
+        return D(value) > 0
+    except ValueError:
+        return False

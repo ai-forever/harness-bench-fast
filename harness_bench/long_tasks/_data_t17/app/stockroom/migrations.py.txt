@@ -1,0 +1,67 @@
+# -*- coding: utf-8 -*-
+"""Миграции схемы базы.
+
+История схем:
+
+* 1 — самая первая версия (2019): остаток и средняя себестоимость хранились прямо в
+  карточке товара (items[SKU].qty, items[SKU].cost), документы — списком.
+* 2 — остатки вынесены в stock, документы — словарём по номеру, себестоимость —
+  средняя (items[SKU].avg_cost).
+* 3 — себестоимость по FIFO-слоям (layers). Средняя себестоимость удалена; при
+  миграции для каждого товара создаётся один слой с документом "MIGR" на весь
+  остаток по бывшей средней цене.
+
+Каждая функция migrate_N_to_M получает словарь схемы N и возвращает словарь схемы M,
+не трогая исходный объект (глубокая копия), чтобы при ошибке файл остался цел.
+"""
+
+import copy
+
+from .money import D, money_str, qty_str
+
+MIGRATION_DATE = "2000-01-01"
+
+
+def migrate_1_to_2(data):
+    data = copy.deepcopy(data)
+    items = data.get("items", {})
+    stock = {}
+    for sku, item in items.items():
+        stock[sku] = qty_str(item.pop("qty", "0"))
+        item["avg_cost"] = money_str(item.pop("cost", "0"))
+    data["stock"] = stock
+    docs = data.get("documents", [])
+    if isinstance(docs, list):
+        data["documents"] = {d["id"]: d for d in docs}
+    data.setdefault("movements", [])
+    data["schema"] = 2
+    return data
+
+
+def migrate_2_to_3(data):
+    data = copy.deepcopy(data)
+    layers = {}
+    date = data.get("meta", {}).get("migrated_at") or MIGRATION_DATE
+    for sku, item in data.get("items", {}).items():
+        cost = item.pop("avg_cost", "0")
+        qty = D(data.get("stock", {}).get(sku, "0"))
+        if qty > 0:
+            layers[sku] = [{"doc": "MIGR", "line": 1, "date": date, "qty": qty_str(qty), "cost": money_str(cost)}]
+        else:
+            layers[sku] = []
+    data["layers"] = layers
+    data.setdefault("price_breaks", {})
+    data.setdefault("audit", [])
+    data["schema"] = 3
+    return data
+
+
+STEPS = {1: migrate_1_to_2, 2: migrate_2_to_3}
+
+
+def migrate(data, target):
+    version = data.get("schema", 1)
+    while version < target:
+        data = STEPS[version](data)
+        version = data["schema"]
+    return data

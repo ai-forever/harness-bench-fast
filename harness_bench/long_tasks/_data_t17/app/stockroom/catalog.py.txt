@@ -1,0 +1,152 @@
+# -*- coding: utf-8 -*-
+"""Справочник товаров.
+
+Самый старый модуль проекта (2019), отсюда camelCase в именах функций. Для нового
+кода есть snake_case-синонимы внизу файла; старые имена оставлены, потому что их
+вызывают скрипты бухгалтерии.
+
+Карточка товара (items[SKU]):
+
+    sku        артикул, заглавные латинские буквы/цифры/._-
+    name       наименование
+    unit       единица измерения (config.UNITS)
+    category   категория (свободный текст, может быть пустой)
+    price      цена продажи без НДС, строка с двумя знаками
+    vat        ставка НДС, проценты ("0", "10", "20")
+    min_qty    неснижаемый остаток (для отчёта «мало на складе»)
+    barcode    штрихкод EAN-8/EAN-13 или null
+    active     false — товар выведен из ассортимента (не продаётся, но остатки видны)
+    created    дата заведения карточки
+"""
+
+from . import audit, config, validators
+from .errors import DuplicateError, NotFound, ValidationError
+from .money import money_str, qty_str
+
+ITEM_FIELDS = ("sku", "name", "unit", "category", "price", "vat", "min_qty", "barcode", "active", "created")
+UPDATABLE = ("name", "unit", "category", "price", "vat", "min_qty", "barcode")
+VAT_RATES = ("0", "10", "20")
+
+
+def _vat(value, db):
+    if value in (None, ""):
+        value = db.meta("vat_default") or config.DEFAULT_VAT
+    v = str(value).strip().rstrip("%")
+    if v not in VAT_RATES:
+        raise ValidationError("ставка НДС должна быть 0, 10 или 20")
+    return v
+
+
+def addItem(db, sku, name, price, unit=None, vat=None, category=None, min_qty=0, barcode=None, date=None):
+    sku = validators.sku(sku)
+    items = db.data["items"]
+    if sku in items:
+        raise DuplicateError("товар %s уже есть в справочнике" % sku)
+    bc = validators.barcode(barcode)
+    if bc:
+        for other in items.values():
+            if other.get("barcode") == bc:
+                raise DuplicateError("штрихкод %s уже у товара %s" % (bc, other["sku"]))
+    item = {
+        "sku": sku,
+        "name": validators.name(name),
+        "unit": validators.unit(unit),
+        "category": (category or "").strip(),
+        "price": money_str(validators.non_negative(price, "цена")),
+        "vat": _vat(vat, db),
+        "min_qty": qty_str(validators.non_negative(min_qty or 0, "минимальный остаток")),
+        "barcode": bc,
+        "active": True,
+        "created": validators.date(date) if date else None,
+    }
+    items[sku] = item
+    db.data["stock"].setdefault(sku, "0")
+    db.data["layers"].setdefault(sku, [])
+    audit.log(db, item["created"], "item.add", sku=sku)
+    return item
+
+
+def getItem(db, sku):
+    key = (sku or "").strip().upper()
+    item = db.data["items"].get(key)
+    if item is None:
+        raise NotFound("нет товара %s" % sku)
+    return item
+
+
+def listItems(db, category=None, include_inactive=False):
+    result = []
+    for sku in sorted(db.data["items"]):
+        item = db.data["items"][sku]
+        if not include_inactive and not item.get("active", True):
+            continue
+        if category and item.get("category") != category:
+            continue
+        result.append(item)
+    return result
+
+
+def updateItem(db, sku, **fields):
+    item = getItem(db, sku)
+    for key, value in fields.items():
+        if key not in UPDATABLE:
+            raise ValidationError("поле %s нельзя изменить" % key)
+        if value is None:
+            continue
+        if key == "name":
+            item["name"] = validators.name(value)
+        elif key == "unit":
+            item["unit"] = validators.unit(value)
+        elif key == "category":
+            item["category"] = value.strip()
+        elif key == "price":
+            item["price"] = money_str(validators.non_negative(value, "цена"))
+        elif key == "vat":
+            item["vat"] = _vat(value, db)
+        elif key == "min_qty":
+            item["min_qty"] = qty_str(validators.non_negative(value, "минимальный остаток"))
+        elif key == "barcode":
+            item["barcode"] = validators.barcode(value)
+    audit.log(db, None, "item.update", sku=item["sku"], fields=",".join(sorted(k for k, v in fields.items() if v is not None)))
+    return item
+
+
+def deactivateItem(db, sku):
+    item = getItem(db, sku)
+    item["active"] = False
+    audit.log(db, None, "item.off", sku=item["sku"])
+    return item
+
+
+def activateItem(db, sku):
+    item = getItem(db, sku)
+    item["active"] = True
+    return item
+
+
+def findItems(db, text):
+    """Поиск по подстроке в артикуле, наименовании, категории или по штрихкоду (без учёта регистра)."""
+    needle = (text or "").strip().lower()
+    if not needle:
+        return []
+    found = []
+    for sku in sorted(db.data["items"]):
+        item = db.data["items"][sku]
+        hay = " ".join([item["sku"], item["name"], item.get("category") or "", item.get("barcode") or ""]).lower()
+        if needle in hay:
+            found.append(item)
+    return found
+
+
+def categories(db):
+    return sorted({i.get("category") or "" for i in db.data["items"].values()} - {""})
+
+
+# snake_case-синонимы для нового кода
+add_item = addItem
+get_item = getItem
+list_items = listItems
+update_item = updateItem
+deactivate_item = deactivateItem
+activate_item = activateItem
+find_items = findItems

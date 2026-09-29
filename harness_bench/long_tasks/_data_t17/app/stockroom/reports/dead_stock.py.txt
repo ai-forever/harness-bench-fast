@@ -1,0 +1,41 @@
+# -*- coding: utf-8 -*-
+"""Неликвиды: товары с ненулевым остатком без расхода (out/writeoff) за последние
+days дней до даты on_date. Сортировка — по стоимости остатка по убыванию."""
+
+from ..costing import value_of
+from ..dates import add_days, iso
+from ..inventory import on_hand
+from ..money import D, fmt_money, fmt_qty, q2
+from ..textable import render as _render
+
+COLUMNS = [("sku", "Артикул"), ("name", "Наименование"), ("qty", "Остаток", "r"), ("value", "Стоимость", "r"),
+           ("last_out", "Последний расход")]
+
+
+def build(db, on_date, days=90):
+    on_date = iso(on_date)
+    since = add_days(on_date, -int(days))
+    rows = []
+    for sku in sorted(db.data["items"]):
+        qty = on_hand(db, sku)
+        if qty <= 0:
+            continue
+        outs = [mv["date"] for mv in db.data["movements"]
+                if mv["sku"] == sku and mv["type"] in ("out", "writeoff") and mv["date"] <= on_date]
+        last = max(outs) if outs else None
+        if last is not None and last > since:
+            continue
+        rows.append({"sku": sku, "name": db.data["items"][sku]["name"], "qty": qty,
+                     "value": q2(value_of(db, sku)), "last_out": last})
+    rows.sort(key=lambda r: (-r["value"], r["sku"]))
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, opts["on_date"], opts.get("days", 90))
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, qty=fmt_qty(r["qty"]), value=fmt_money(r["value"]), last_out=r["last_out"] or "никогда")
+            for r in rows]
+    total = sum((r["value"] for r in rows), D(0))
+    return _render(COLUMNS, view, "text", title="Неликвиды", footer="Итого: %s" % fmt_money(total))

@@ -1,0 +1,127 @@
+# -*- coding: utf-8 -*-
+"""Импорт и экспорт CSV.
+
+Формат файлов — UTF-8 (BOM допускается), первая строка — заголовок. Разделитель
+определяется по заголовку: ';' (выгрузки из Excel) или ','. Порядок колонок
+произвольный, лишние колонки игнорируются, имена колонок нечувствительны к регистру.
+
+Импорт товаров (import_items): обязательные колонки sku, name, price; необязательные
+unit, category, vat, min_qty, barcode. Строки с ошибками пропускаются и попадают в
+отчёт, остальные загружаются. Уже существующие товары обновляются только с
+update=True (иначе — ошибка строки).
+
+Импорт начальных остатков (import_stock): колонки sku, qty, cost. Создаётся один
+приход от служебного поставщика OPENING («Ввод остатков»). Если хоть одна строка
+ошибочна — ничего не загружается (остатки должны сойтись с бухгалтерией целиком).
+
+Экспорт: export_items, export_stock (sku, name, qty, value), export_movements.
+Экспорт пишет разделитель ',' и точку в числах.
+"""
+
+import csv
+import io
+
+from . import catalog, receiving
+from .costing import value_of
+from .errors import NotFound, StockError, ValidationError
+from .inventory import on_hand
+from .money import q2
+from .partners import add_supplier
+
+ITEM_COLUMNS = ("sku", "name", "unit", "category", "price", "vat", "min_qty", "barcode")
+OPENING_SUPPLIER = "OPENING"
+
+
+def _read(path):
+    with open(path, "r", encoding="utf-8-sig", newline="") as fh:
+        text = fh.read()
+    first = text.split("\n", 1)[0]
+    delimiter = ";" if first.count(";") > first.count(",") else ","
+    reader = csv.DictReader(io.StringIO(text), delimiter=delimiter)
+    if not reader.fieldnames:
+        raise ValidationError("пустой CSV-файл: %s" % path)
+    rows = []
+    for raw in reader:
+        rows.append({(k or "").strip().lower(): (v or "").strip() for k, v in raw.items() if k is not None})
+    fields = [(f or "").strip().lower() for f in reader.fieldnames]
+    return fields, rows
+
+
+def _require(fields, names, path):
+    missing = [n for n in names if n not in fields]
+    if missing:
+        raise ValidationError("в %s нет колонок: %s" % (path, ", ".join(missing)))
+
+
+def import_items(db, path, update=False):
+    fields, rows = _read(path)
+    _require(fields, ("sku", "name", "price"), path)
+    report = {"added": 0, "updated": 0, "errors": []}
+    for n, row in enumerate(rows, 2):
+        try:
+            sku = row["sku"].upper()
+            opts = {k: row.get(k) or None for k in ("unit", "category", "vat", "min_qty", "barcode")}
+            if sku in db.data["items"]:
+                if not update:
+                    raise ValidationError("товар %s уже есть" % sku)
+                catalog.updateItem(db, sku, name=row["name"], price=row["price"], **opts)
+                report["updated"] += 1
+            else:
+                catalog.addItem(db, sku, row["name"], row["price"], unit=opts["unit"], vat=opts["vat"],
+                                category=opts["category"], min_qty=opts["min_qty"] or 0, barcode=opts["barcode"])
+                report["added"] += 1
+        except StockError as exc:
+            report["errors"].append((n, str(exc)))
+    return report
+
+
+def import_stock(db, path, date):
+    fields, rows = _read(path)
+    _require(fields, ("sku", "qty", "cost"), path)
+    lines = []
+    errors = []
+    for n, row in enumerate(rows, 2):
+        try:
+            item = catalog.getItem(db, row["sku"])
+            lines.append({"sku": item["sku"], "qty": row["qty"], "cost": row["cost"]})
+        except (NotFound, ValidationError) as exc:
+            errors.append((n, str(exc)))
+    if errors:
+        raise ValidationError("ошибки в файле остатков: " + "; ".join("строка %d: %s" % e for e in errors))
+    try:
+        db.data["suppliers"][OPENING_SUPPLIER]
+    except KeyError:
+        add_supplier(db, OPENING_SUPPLIER, "Ввод остатков")
+    return receiving.receive(db, OPENING_SUPPLIER, date, lines, note="импорт остатков")
+
+
+def _write(path, header, rows):
+    with open(path, "w", encoding="utf-8", newline="") as fh:
+        w = csv.writer(fh, lineterminator="\n")
+        w.writerow(header)
+        for row in rows:
+            w.writerow(["" if v is None else v for v in row])
+    return len(rows)
+
+
+def export_items(db, path):
+    rows = [[i.get(c) for c in ITEM_COLUMNS] for i in catalog.listItems(db, include_inactive=True)]
+    return _write(path, ITEM_COLUMNS, rows)
+
+
+def export_stock(db, path):
+    rows = []
+    for sku in sorted(db.data["items"]):
+        qty = on_hand(db, sku)
+        if qty == 0:
+            continue
+        rows.append([sku, db.data["items"][sku]["name"], str(qty), str(q2(value_of(db, sku)))])
+    return _write(path, ("sku", "name", "qty", "value"), rows)
+
+
+def export_movements(db, path, date_from=None, date_to=None):
+    from .reports import movements
+
+    rows = [[r["id"], r["date"], r["type"], r["sku"], str(r["qty"]), str(r["cost"]), r["doc"]]
+            for r in movements.build(db, date_from, date_to)]
+    return _write(path, ("id", "date", "type", "sku", "qty", "cost", "doc"), rows)

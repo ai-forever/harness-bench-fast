@@ -1,0 +1,45 @@
+# -*- coding: utf-8 -*-
+"""Закупочные цены по поставщикам: для каждого товара и поставщика — последняя цена
+прихода, минимальная и максимальная за период, число приходов. Сторнированные приходы
+не учитываются."""
+
+from ..dates import in_range
+from ..money import D, fmt_money
+from ..textable import render as _render
+
+COLUMNS = [("sku", "Артикул"), ("supplier", "Поставщик"), ("last_date", "Последний приход"),
+           ("last_cost", "Посл. цена", "r"), ("min_cost", "Мин.", "r"), ("max_cost", "Макс.", "r"),
+           ("count", "Приходов", "r")]
+
+
+def build(db, date_from=None, date_to=None, sku=None):
+    acc = {}
+    receipts = sorted((d for d in db.documents_of("receipt") if d.get("status") == "posted"),
+                      key=lambda d: (d["date"], d["id"]))
+    for doc in receipts:
+        if not in_range(doc["date"], date_from, date_to):
+            continue
+        for line in doc["lines"]:
+            if sku and line["sku"] != sku:
+                continue
+            key = (line["sku"], doc["supplier"])
+            cost = D(line["cost"])
+            a = acc.get(key)
+            if a is None:
+                acc[key] = {"sku": line["sku"], "supplier": doc["supplier"], "last_date": doc["date"],
+                            "last_cost": cost, "min_cost": cost, "max_cost": cost, "count": 1}
+            else:
+                a["last_date"], a["last_cost"] = doc["date"], cost
+                a["min_cost"] = min(a["min_cost"], cost)
+                a["max_cost"] = max(a["max_cost"], cost)
+                a["count"] += 1
+    return [acc[k] for k in sorted(acc)]
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, opts.get("date_from"), opts.get("date_to"), opts.get("sku"))
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, last_cost=fmt_money(r["last_cost"]), min_cost=fmt_money(r["min_cost"]),
+                 max_cost=fmt_money(r["max_cost"])) for r in rows]
+    return _render(COLUMNS, view, "text", title="Закупочные цены")

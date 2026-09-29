@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+"""Маржа по категориям товаров за период (на основе отчёта о продажах)."""
+
+from ..money import D, fmt_money, q2
+from ..textable import render as _render
+from . import sales
+
+COLUMNS = [("category", "Категория"), ("revenue", "Выручка", "r"), ("cost", "Себестоимость", "r"),
+           ("margin", "Маржа", "r"), ("margin_pct", "Маржа, %", "r")]
+
+
+def build(db, date_from=None, date_to=None):
+    acc = {}
+    for r in sales.build(db, date_from, date_to, group="sku"):
+        cat = db.data["items"][r["sku"]].get("category") or "(без категории)"
+        a = acc.setdefault(cat, {"revenue": D(0), "cost": D(0)})
+        a["revenue"] += r["revenue"]
+        a["cost"] += r["cost"]
+    rows = []
+    for cat in sorted(acc):
+        a = acc[cat]
+        margin = a["revenue"] - a["cost"]
+        pct = q2(margin * 100 / a["revenue"]) if a["revenue"] else None
+        rows.append({"category": cat, "revenue": a["revenue"], "cost": a["cost"], "margin": margin,
+                     "margin_pct": pct})
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, opts.get("date_from"), opts.get("date_to"))
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, revenue=fmt_money(r["revenue"]), cost=fmt_money(r["cost"]), margin=fmt_money(r["margin"]),
+                 margin_pct="" if r["margin_pct"] is None else fmt_money(r["margin_pct"])) for r in rows]
+    return _render(COLUMNS, view, "text", title="Маржа по категориям")

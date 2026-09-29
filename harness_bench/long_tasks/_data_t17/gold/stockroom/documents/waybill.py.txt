@@ -1,0 +1,28 @@
+# -*- coding: utf-8 -*-
+"""Накладная на отгрузку (для склада): без цен, с указанием, из каких приходов взят товар."""
+
+from ..dates import ru
+from ..errors import DocumentStateError
+from ..money import fmt_qty
+from ..orders import get_order
+from ..partners import get_customer
+from ..textable import render_text
+
+COLUMNS = [("n", "№", "r"), ("sku", "Артикул"), ("name", "Наименование"), ("qty", "Кол-во", "r"),
+           ("unit", "Ед."), ("source", "Партии")]
+
+
+def render_waybill(db, order_id):
+    order = get_order(db, order_id)
+    if order["status"] not in ("shipped", "partially_returned", "returned"):
+        raise DocumentStateError("накладная печатается только по отгруженному заказу")
+    cust = get_customer(db, order["customer"])
+    rows = []
+    for n, line in enumerate(order["lines"], 1):
+        item = db.data["items"][line["sku"]]
+        src = ", ".join("%s/%s×%s" % (a["doc"], a["line"], fmt_qty(a["qty"])) for a in line.get("allocations", []))
+        rows.append({"n": n, "sku": line["sku"], "name": item["name"], "qty": fmt_qty(line["qty"]),
+                     "unit": item.get("unit", "шт"), "source": src})
+    head = ["НАКЛАДНАЯ № %s от %s" % (order["id"], ru(order["shipped_date"])),
+            "Получатель: %s %s" % (cust["code"], cust["name"]), ""]
+    return "\n".join(head) + "\n" + render_text(COLUMNS, rows)

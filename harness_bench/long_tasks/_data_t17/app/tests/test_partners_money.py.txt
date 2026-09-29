@@ -1,0 +1,82 @@
+# -*- coding: utf-8 -*-
+import unittest
+
+from helpers import make_db
+from stockroom import inventory, orders, payments, pricing, purchasing, returns
+from stockroom.documents.act import act_data, render_act
+from stockroom.errors import DocumentStateError, NotFound, ValidationError
+from stockroom.money import D
+
+
+class PurchasingTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+        self.po = purchasing.create_po(self.db, "SUP1", "2024-03-10", ["MILK:40@54", "BREAD:20@27.5"])
+
+    def test_create(self):
+        self.assertEqual(self.po["id"], "PO-0001")
+        self.assertEqual(purchasing.po_amount(self.po), D("2710.00"))
+        self.assertEqual(inventory.on_hand(self.db, "MILK"), D(50), "заказ поставщику не меняет остатки")
+
+    def test_partial_then_full_receipt(self):
+        r1 = purchasing.receive_po(self.db, "PO-0001", "2024-03-12", {"MILK": 25})
+        self.assertEqual(r1["lines"], [{"sku": "MILK", "qty": "25", "cost": "54.00"}])
+        self.assertEqual(self.po["status"], "open")
+        self.assertEqual(purchasing.outstanding(self.po), {"MILK": D(15), "BREAD": D(20)})
+        r2 = purchasing.receive_po(self.db, "PO-0001", "2024-03-14")
+        self.assertEqual(len(r2["lines"]), 2)
+        self.assertEqual(self.po["status"], "closed")
+        self.assertEqual(self.po["receipts"], [r1["id"], r2["id"]])
+        self.assertEqual(inventory.on_hand(self.db, "MILK"), D(90))
+
+    def test_rules(self):
+        with self.assertRaises(ValidationError):
+            purchasing.receive_po(self.db, "PO-0001", "2024-03-12", {"MILK": 41})
+        with self.assertRaises(ValidationError):
+            purchasing.receive_po(self.db, "PO-0001", "2024-03-12", {"TEA": 1})
+        purchasing.close_po(self.db, "PO-0001")
+        self.assertTrue(self.po["closed_short"])
+        with self.assertRaises(DocumentStateError):
+            purchasing.receive_po(self.db, "PO-0001", "2024-03-12")
+        with self.assertRaises(NotFound):
+            purchasing.get_po(self.db, "PO-0009")
+
+
+class PaymentsTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+        self.s1 = orders.create_order(self.db, "C3", "2024-03-06", ["MILK:10", "TEA:10"])
+        orders.ship_order(self.db, self.s1["id"], "2024-03-07")
+        self.s2 = orders.create_order(self.db, "C3", "2024-03-09", ["BREAD:4"])
+        orders.ship_order(self.db, self.s2["id"], "2024-03-11")
+        payments.register_payment(self.db, "C3", "2024-03-10", "3000", order=self.s1["id"])
+
+    def test_balance_over_time(self):
+        t1 = pricing.order_total(self.db, self.s1["id"])
+        t2 = pricing.order_total(self.db, self.s2["id"])
+        self.assertEqual(payments.balance(self.db, "C3", "2024-03-06"), D(0))
+        self.assertEqual(payments.balance(self.db, "C3", "2024-03-10"), t1 - 3000)
+        self.assertEqual(payments.balance(self.db, "C3"), t1 + t2 - 3000)
+        returns.return_order(self.db, self.s2["id"], "2024-03-12")
+        self.assertEqual(payments.balance(self.db, "C3"), t1 - 3000)
+
+    def test_ledger_and_validation(self):
+        kinds = [(r["date"], r["kind"]) for r in payments.ledger(self.db, "C3")]
+        self.assertEqual(kinds, [("2024-03-07", "shipment"), ("2024-03-10", "payment"), ("2024-03-11", "shipment")])
+        with self.assertRaises(ValidationError):
+            payments.register_payment(self.db, "C1", "2024-03-10", "10", order=self.s1["id"])
+        with self.assertRaises(ValidationError):
+            payments.register_payment(self.db, "C1", "2024-03-10", "0")
+
+    def test_reconciliation_act(self):
+        data = act_data(self.db, "C3", "2024-03-08", "2024-03-31")
+        self.assertEqual(data["opening"], pricing.order_total(self.db, self.s1["id"]))
+        self.assertEqual([r["doc"] for r in data["rows"]], ["PAY-0001", "S-0002"])
+        self.assertEqual(data["closing"], payments.balance(self.db, "C3", "2024-03-31"))
+        text = render_act(self.db, "C3", "2024-03-08", "2024-03-31")
+        self.assertIn("АКТ СВЕРКИ с 08.03.2024 по 31.03.2024", text)
+        self.assertIn("Оплата", text)
+
+
+if __name__ == "__main__":
+    unittest.main()

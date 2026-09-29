@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+"""Инвентаризационная опись для печати: товары с учётным остатком и пустой графой
+«Факт» для записи ручкой. Порядок — по категории, затем по артикулу."""
+
+from ..inventory import on_hand
+from ..money import fmt_qty
+from ..textable import render as _render
+
+COLUMNS = [("n", "№", "r"), ("sku", "Артикул"), ("name", "Наименование"), ("unit", "Ед."),
+           ("book", "Учёт", "r"), ("fact", "Факт"), ("sign", "Подпись")]
+
+
+def build(db, category=None, include_zero=False):
+    items = [i for i in db.data["items"].values() if i.get("active", True)]
+    if category:
+        items = [i for i in items if i.get("category") == category]
+    items.sort(key=lambda i: (i.get("category") or "", i["sku"]))
+    rows = []
+    for item in items:
+        qty = on_hand(db, item["sku"])
+        if qty == 0 and not include_zero:
+            continue
+        rows.append({"n": len(rows) + 1, "sku": item["sku"], "name": item["name"], "unit": item.get("unit", "шт"),
+                     "book": qty, "fact": "", "sign": ""})
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, opts.get("category"), opts.get("include_inactive", False))
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, book=fmt_qty(r["book"]), fact="__________", sign="________") for r in rows]
+    return _render(COLUMNS, view, "text", title="Инвентаризационная опись",
+                   footer=["Председатель комиссии: ______________", "Члены комиссии: ______________"])

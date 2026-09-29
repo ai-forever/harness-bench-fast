@@ -1,0 +1,132 @@
+# -*- coding: utf-8 -*-
+"""Заказы покупателей: создание, отгрузка, отмена.
+
+Документ заказа (documents["S-0001"]):
+
+    {"id": "S-0001", "type": "order", "date": "2024-03-05", "customer": "C001",
+     "status": "new" | "shipped" | "cancelled" | "partially_returned" | "returned",
+     "lines": [{"sku": "MILK", "qty": "3",
+                "allocations": [{"doc": "R-0001", "line": 1, "date": ..., "qty": "3", "cost": "55.00"}]}],
+     "shipped_date": "2024-03-06", "return_doc": "RT-0001"}
+
+Строки с одинаковым артикулом при создании заказа складываются в одну.
+allocations появляются при отгрузке: из каких партий (FEFO) и по какой цене списан товар;
+партии с истёкшим к дате отгрузки сроком годности не отгружаются. Возвраты добавляют в
+распределения ключ "returned" — сколько из этой партии уже вернули.
+Отгрузка — «всё или ничего»: если хотя бы одного товара не хватает, ничего не
+списывается.
+"""
+
+import re
+
+from . import audit, catalog, costing, ids, inventory, validators
+from .dates import in_range
+from .errors import DocumentStateError, InsufficientStock, NotFound, ValidationError
+from .models import record_movement
+from .money import D, q2, qty_str
+from .partners import get_customer
+
+LINE_RE = re.compile(r"^\s*([^:\s]+)\s*:\s*([0-9]+(?:[.,][0-9]+)?)\s*$")
+
+
+def parse_line(text):
+    """'MILK:3' → {"sku": "MILK", "qty": Decimal("3")}."""
+    m = LINE_RE.match(text or "")
+    if not m:
+        raise ValidationError("строка заказа должна иметь вид SKU:КОЛ-ВО, получено %r" % (text,))
+    return {"sku": validators.sku(m.group(1)), "qty": D(m.group(2))}
+
+
+def create_order(db, customer, date, lines, note=None):
+    cust = get_customer(db, customer)
+    if cust.get("blocked"):
+        raise ValidationError("отгрузки покупателю %s заблокированы" % customer)
+    date = validators.date(date)
+    merged = {}
+    order = []
+    for raw in lines:
+        line = parse_line(raw) if isinstance(raw, str) else dict(raw)
+        item = catalog.getItem(db, line["sku"])
+        if not item.get("active", True):
+            raise ValidationError("товар %s выведен из ассортимента" % item["sku"])
+        qty = validators.positive_qty(line["qty"])
+        if item["sku"] in merged:
+            merged[item["sku"]] += qty
+        else:
+            merged[item["sku"]] = qty
+            order.append(item["sku"])
+    if not order:
+        raise ValidationError("пустой заказ")
+    doc_id = ids.next_id(db, "order")
+    doc = {"id": doc_id, "type": "order", "date": date, "customer": cust["code"], "status": "new",
+           "lines": [{"sku": s, "qty": qty_str(merged[s])} for s in order]}
+    if note:
+        doc["note"] = note
+    db.data["documents"][doc_id] = doc
+    audit.log(db, date, "order.new", doc=doc_id, customer=cust["code"])
+    return doc
+
+
+def get_order(db, order_id):
+    doc = db.data["documents"].get(order_id)
+    if doc is None or doc.get("type") != "order":
+        raise NotFound("нет заказа %s" % order_id)
+    return doc
+
+
+def list_orders(db, status=None, customer=None, date_from=None, date_to=None):
+    rows = []
+    for doc in db.documents_of("order"):
+        if status and doc.get("status") != status:
+            continue
+        if customer and doc.get("customer") != customer:
+            continue
+        if not in_range(doc["date"], date_from, date_to):
+            continue
+        rows.append(doc)
+    rows.sort(key=lambda d: (d["date"], d["id"]))
+    return rows
+
+
+def ship_order(db, order_id, date):
+    """Отгрузить заказ целиком. Списывает товар по FIFO, пишет движения out."""
+    doc = get_order(db, order_id)
+    if doc["status"] != "new":
+        raise DocumentStateError("заказ %s в статусе %s, отгрузить нельзя" % (order_id, doc["status"]))
+    date = validators.date(date)
+    if date < doc["date"]:
+        raise ValidationError("дата отгрузки раньше даты заказа")
+    need = {}
+    for line in doc["lines"]:
+        need[line["sku"]] = need.get(line["sku"], D(0)) + D(line["qty"])
+    for sku, qty in need.items():
+        have = costing.usable_qty(db, sku, date)
+        if have < qty:
+            raise InsufficientStock(sku, qty_str(qty), qty_str(have))
+    for line in doc["lines"]:
+        allocations = costing.consume(db, line["sku"], line["qty"], skip_expired_before=date)
+        inventory.change_stock(db, line["sku"], -D(line["qty"]))
+        cost = q2(costing.allocations_cost(allocations))
+        record_movement(db, date, "out", line["sku"], line["qty"], cost, order_id)
+        line["allocations"] = allocations
+    doc["status"] = "shipped"
+    doc["shipped_date"] = date
+    audit.log(db, date, "order.ship", doc=order_id)
+    return doc
+
+
+def cancel_order(db, order_id, date=None):
+    doc = get_order(db, order_id)
+    if doc["status"] != "new":
+        raise DocumentStateError("отменить можно только новый заказ, %s в статусе %s" % (order_id, doc["status"]))
+    doc["status"] = "cancelled"
+    audit.log(db, date, "order.cancel", doc=order_id)
+    return doc
+
+
+def shipped_cost(doc):
+    """Себестоимость отгруженного по заказу (сумма по распределениям), округлена построчно."""
+    total = D(0)
+    for line in doc.get("lines", []):
+        total += q2(costing.allocations_cost(line.get("allocations", [])))
+    return total

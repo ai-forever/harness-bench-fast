@@ -1,0 +1,36 @@
+# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from dataclasses import dataclass
+from decimal import Decimal
+
+from ..money import D
+
+
+@dataclass(frozen=True)
+class CustomerView:
+    code: str
+    name: str
+    discount: Decimal
+    group: str
+    blocked: bool
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "CustomerView":
+        return cls(
+            code=d["code"],
+            name=d["name"],
+            discount=D(d.get("discount", "0")),
+            group=d.get("group") or "retail",
+            blocked=bool(d.get("blocked", False)),
+        )
+
+    @classmethod
+    def load(cls, db, code: str) -> "CustomerView":
+        from ..partners import get_customer
+
+        return cls.from_dict(get_customer(db, code))
+
+    @property
+    def is_wholesale(self) -> bool:
+        return self.group == "wholesale"

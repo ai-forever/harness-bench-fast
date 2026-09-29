@@ -1,0 +1,32 @@
+# -*- coding: utf-8 -*-
+"""Задолженность покупателей на дату: отгружено, оплачено, возвращено, долг.
+Покупатели без движений не показываются."""
+
+from ..money import D, fmt_money
+from ..payments import ledger
+from ..textable import render as _render
+
+COLUMNS = [("customer", "Покупатель"), ("name", "Наименование"), ("shipped", "Отгружено", "r"),
+           ("paid", "Оплачено", "r"), ("returned", "Возвраты", "r"), ("debt", "Долг", "r")]
+
+
+def build(db, date_to=None):
+    rows = []
+    for code in sorted(db.data["customers"]):
+        entries = ledger(db, code, date_to)
+        if not entries:
+            continue
+        shipped = sum((e["debit"] for e in entries), D(0))
+        paid = sum((e["credit"] for e in entries if e["kind"] == "payment"), D(0))
+        returned = sum((e["credit"] for e in entries if e["kind"] == "return"), D(0))
+        rows.append({"customer": code, "name": db.data["customers"][code]["name"], "shipped": shipped,
+                     "paid": paid, "returned": returned, "debt": shipped - paid - returned})
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, opts.get("date_to"))
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, **{k: fmt_money(r[k]) for k in ("shipped", "paid", "returned", "debt")}) for r in rows]
+    return _render(COLUMNS, view, "text", title="Задолженность покупателей")

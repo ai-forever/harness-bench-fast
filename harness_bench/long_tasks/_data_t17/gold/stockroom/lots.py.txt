@@ -1,0 +1,42 @@
+# -*- coding: utf-8 -*-
+"""Партии товаров: просмотр остатков по партиям и сроки годности.
+
+lots_of(db, sku) — партии товара с ненулевым остатком в порядке расхода (FEFO):
+    [{"lot", "expiry", "qty", "cost", "doc", "date"}]   # qty, cost — Decimal, cost в рублях
+expiring(db, on_date, days=30) — партии всех товаров со сроком годности не позже
+    on_date + days (в т. ч. уже просроченные), с ненулевым остатком:
+    [{"sku", "name", "lot", "expiry", "qty", "days_left"}], days_left = expiry - on_date
+    (отрицательное — просрочено); сортировка по (expiry, sku, lot).
+"""
+
+from .catalog import getItem
+from .costing import fefo_layers
+from .dates import add_days, days_between, iso
+from .money import D
+
+
+def lots_of(db, sku):
+    item = getItem(db, sku)
+    rows = []
+    for layer in fefo_layers(db, item["sku"]):
+        if D(layer["qty"]) <= 0:
+            continue
+        rows.append({"lot": layer.get("lot") or "%s-%s" % (layer["doc"], layer["line"]),
+                     "expiry": layer.get("expiry"), "qty": D(layer["qty"]), "cost": D(layer["cost"]),
+                     "doc": layer["doc"], "date": layer["date"]})
+    return rows
+
+
+def expiring(db, on_date, days=30):
+    on_date = iso(on_date)
+    limit = add_days(on_date, int(days))
+    rows = []
+    for sku in sorted(db.data["layers"]):
+        for layer in db.data["layers"][sku]:
+            if not layer.get("expiry") or D(layer["qty"]) <= 0 or layer["expiry"] > limit:
+                continue
+            rows.append({"sku": sku, "name": db.data["items"][sku]["name"], "lot": layer.get("lot"),
+                         "expiry": layer["expiry"], "qty": D(layer["qty"]),
+                         "days_left": days_between(on_date, layer["expiry"])})
+    rows.sort(key=lambda r: (r["expiry"], r["sku"], r["lot"]))
+    return rows

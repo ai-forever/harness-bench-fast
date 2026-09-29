@@ -1,0 +1,116 @@
+# -*- coding: utf-8 -*-
+"""Цены продажи.
+
+Правила (утверждены коммерческим отделом, приказ № 14 от 2021 г.):
+
+1. Базовая цена — цена из карточки товара (без НДС).
+2. Для покупателей оптовой группы (group = "wholesale") базовая цена снижается на
+   config.WHOLESALE_DISCOUNT процентов с округлением до копеек.
+3. Скидка за количество: берётся строка таблицы price_breaks товара с наибольшим
+   min_qty, не превышающим количество в строке заказа; цена снижается на её
+   discount процентов с округлением до копеек.
+4. Персональная скидка покупателя (customer.discount) применяется последней, тоже
+   с округлением до копеек.
+5. Сумма строки без НДС = цена * количество, округлить до копеек; НДС строки =
+   сумма без НДС * ставку / 100, округлить до копеек; всего = сумма + НДС.
+6. Итоги документа — суммы по строкам (НДС не пересчитывается от итога).
+
+Цена не фиксируется в заказе: она считается по текущей карточке товара в момент
+печати счёта или построения отчёта. Параметр date зарезервирован под историю цен
+и сейчас не используется.
+
+ВНИМАНИЕ: та же логика продублирована в documents/invoice.py и reports/sales.py
+(исторически). При изменении правил меняйте все три места.
+"""
+
+from . import config
+from .catalog import getItem
+from .errors import ValidationError
+from .models import CustomerView, ItemView
+from .money import D, apply_discount, money_str, q2, qty_str
+
+
+def get_breaks(db, sku):
+    return sorted(db.data.get("price_breaks", {}).get(sku, []), key=lambda b: D(b["min_qty"]))
+
+
+def set_breaks(db, sku, breaks):
+    """breaks — список пар (min_qty, discount%) или строк 'MIN:DISC'."""
+    item = getItem(db, sku)
+    rows = []
+    for b in breaks:
+        if isinstance(b, str):
+            if ":" not in b:
+                raise ValidationError("скидка за количество задаётся как MIN:ПРОЦЕНТ")
+            b = b.split(":", 1)
+        min_qty, disc = D(b[0]), D(b[1])
+        if min_qty <= 0 or disc < 0 or disc >= 100:
+            raise ValidationError("некорректная скидка за количество: %s:%s" % (b[0], b[1]))
+        rows.append({"min_qty": qty_str(min_qty), "discount": qty_str(disc)})
+    rows.sort(key=lambda r: D(r["min_qty"]))
+    if len({r["min_qty"] for r in rows}) != len(rows):
+        raise ValidationError("повторяется порог количества")
+    db.data.setdefault("price_breaks", {})[item["sku"]] = rows
+    return rows
+
+
+def qty_break(db, sku, qty):
+    """Процент скидки за количество для qty (0, если порог не достигнут)."""
+    pct = D(0)
+    for b in get_breaks(db, sku):
+        if D(qty) >= D(b["min_qty"]):
+            pct = D(b["discount"])
+    return pct
+
+
+def base_price(db, item, customer):
+    price = item.price
+    if customer.is_wholesale:
+        price = q2(apply_discount(price, config.WHOLESALE_DISCOUNT))
+    return price
+
+
+def unit_price(db, sku, qty, customer_code, date=None):
+    """Цена единицы без НДС для покупателя с учётом всех скидок."""
+    item = ItemView.load(db, sku)
+    customer = CustomerView.load(db, customer_code)
+    price = base_price(db, item, customer)
+    price = q2(apply_discount(price, qty_break(db, item.sku, qty)))
+    price = q2(apply_discount(price, customer.discount))
+    return price
+
+
+def line_amounts(db, sku, qty, customer_code, date=None):
+    """Суммы строки: {"sku", "qty", "unit", "net", "vat_rate", "vat", "total"} (Decimal)."""
+    item = ItemView.load(db, sku)
+    qty = D(qty)
+    unit = unit_price(db, sku, qty, customer_code, date)
+    net = q2(unit * qty)
+    vat = q2(net * item.vat / 100)
+    return {"sku": item.sku, "qty": qty, "unit": unit, "net": net, "vat_rate": item.vat, "vat": vat, "total": net + vat}
+
+
+def order_amounts(db, order):
+    """Суммы заказа: {"lines": [...], "net", "vat", "total"}. order — словарь документа."""
+    lines = [line_amounts(db, l["sku"], l["qty"], order["customer"], order["date"]) for l in order["lines"]]
+    net = sum((l["net"] for l in lines), D(0))
+    vat = sum((l["vat"] for l in lines), D(0))
+    return {"lines": lines, "net": net, "vat": vat, "total": net + vat}
+
+
+def order_total(db, order_id):
+    """Сумма заказа с НДС (Decimal)."""
+    from .orders import get_order
+
+    return order_amounts(db, get_order(db, order_id))["total"]
+
+
+def price_list(db, customer_code, qty=1):
+    """Прайс для покупателя: список {"sku", "name", "price"} по активным товарам."""
+    rows = []
+    for sku in sorted(db.data["items"]):
+        item = db.data["items"][sku]
+        if not item.get("active", True):
+            continue
+        rows.append({"sku": sku, "name": item["name"], "price": money_str(unit_price(db, sku, qty, customer_code))})
+    return rows

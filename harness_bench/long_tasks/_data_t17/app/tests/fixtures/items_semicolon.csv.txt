@@ -1,0 +1,3 @@
+﻿SKU;Name;Price;VAT
+COCOA;Какао;310,00;20
+HONEY;Мёд;540;10

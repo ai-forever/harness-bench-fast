@@ -1,0 +1,77 @@
+# -*- coding: utf-8 -*-
+import unittest
+
+from helpers import make_db
+from stockroom import orders, pricing, receiving
+from stockroom.documents.invoice import invoice_data, render_invoice
+from stockroom.documents.receipt_note import render_receipt_note
+from stockroom.documents.waybill import render_waybill
+from stockroom.errors import DocumentStateError
+
+
+class InvoiceMatchesPricingTest(unittest.TestCase):
+    """Счёт считает цены сам — он обязан совпадать с pricing.py."""
+
+    def test_all_customers_and_quantities(self):
+        db = make_db()
+        for customer in ("C1", "C2", "C3"):
+            for qty in ("1", "9", "10", "49", "50", "73", "2.5"):
+                order = orders.create_order(db, customer, "2024-03-06", ["TEA:%s" % qty, "MILK:%s" % qty,
+                                                                         "SUGAR:1.237"])
+                data = invoice_data(db, order["id"])
+                expected = pricing.order_amounts(db, order)
+                self.assertEqual([l["price"] for l in data["lines"]], [l["unit"] for l in expected["lines"]])
+                self.assertEqual((data["net"], data["vat"], data["total"]),
+                                 (expected["net"], expected["vat"], expected["total"]))
+
+
+class InvoiceRenderTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+        self.order = orders.create_order(self.db, "C2", "2024-03-06", ["MILK:12", "TEA:10"])
+
+    def test_header_and_totals(self):
+        text = render_invoice(self.db, self.order["id"])
+        lines = text.splitlines()
+        self.assertEqual(lines[0], "ООО «Ромашка»")
+        self.assertEqual(lines[1], "СЧЁТ № S-0001 от 06.03.2024")
+        self.assertEqual(lines[2], "Покупатель: C2 Сеть «Дом»")
+        self.assertIn("Итого без НДС: 3 765,22", lines)
+        self.assertIn("НДС: 660,81", lines)
+        self.assertIn("Всего к оплате: 4 426,03", lines)
+
+    def test_line_rows(self):
+        text = render_invoice(self.db, self.order["id"])
+        row = [l for l in text.splitlines() if l.startswith("2 ")][0]
+        self.assertEqual(row.split(), ["2", "TEA", "Чай", "чёрный", "100", "пак.", "10", "упак", "284,29",
+                                       "2", "842,90", "20", "568,58", "3", "411,48"])
+
+    def test_cancelled_order_has_no_invoice(self):
+        orders.cancel_order(self.db, self.order["id"])
+        with self.assertRaises(DocumentStateError):
+            render_invoice(self.db, self.order["id"])
+
+
+class OtherFormsTest(unittest.TestCase):
+    def test_waybill_lists_source_receipts(self):
+        db = make_db()
+        order = orders.create_order(db, "C1", "2024-03-06", ["MILK:35"])
+        with self.assertRaises(DocumentStateError):
+            render_waybill(db, order["id"])
+        orders.ship_order(db, order["id"], "2024-03-07")
+        text = render_waybill(db, order["id"])
+        self.assertIn("НАКЛАДНАЯ № S-0001 от 07.03.2024", text)
+        self.assertIn("R-0001/1×30, R-0002/1×5", text)
+
+    def test_receipt_note(self):
+        db = make_db()
+        text = render_receipt_note(db, "R-0002")
+        self.assertIn("ПРИХОДНЫЙ ОРДЕР № R-0002 от 05.03.2024", text)
+        self.assertIn("Итого: 23 384,00", text)
+        doc = receiving.receive(db, "SUP1", "2024-03-10", ["BREAD:1@30"])
+        receiving.reverse_receipt(db, doc["id"], "2024-03-11")
+        self.assertIn("СТОРНИРОВАН 11.03.2024", render_receipt_note(db, doc["id"]))
+
+
+if __name__ == "__main__":
+    unittest.main()

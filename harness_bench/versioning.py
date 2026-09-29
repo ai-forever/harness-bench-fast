@@ -61,6 +61,7 @@ TASK_WAVES: tuple[TaskWave, ...] = (
     TaskWave("adversarial", 331, 351),
     TaskWave("tbench-lite", 352, 371),
     TaskWave("cli", 372, 391),
+    TaskWave("long", 392, 411),
 )
 
 
@@ -329,6 +330,22 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "fires on comments nor is evaded by /usr/bin/python3 or gawk; and "
             "counting tasks are scoped to src/ so a helper script the agent "
             "writes is not itself counted."
+        ),
+    ),
+    TaskSetRevision(
+        version="0.17.0",
+        introduced="2026-09-26",
+        total_tasks=411,
+        added_task_numbers=(392, 411),
+        modules=("long_tasks",),
+        notes=(
+            "Added the long-context wave, tasks 392-411, previously selectable "
+            "only via --suite long and kept out of the scored set. The tasks "
+            "themselves are unchanged: registry ids are now task_392_… through "
+            "task_411_…, while generator seeds and paraphrase fixtures stay on "
+            "long_NN_* so setup and gold do not move. Each task floors the "
+            "runner at 7200 s and 3000 graph steps. A full run of this "
+            "revision is not comparable with 0.16.0."
         ),
     ),
 )

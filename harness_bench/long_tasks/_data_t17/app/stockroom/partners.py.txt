@@ -1,0 +1,84 @@
+# -*- coding: utf-8 -*-
+"""Поставщики и покупатели.
+
+Покупатель (customers[CODE]):
+    code, name, inn, discount  — персональная скидка, проценты (строка),
+    group — ценовая группа: "retail" (розница) или "wholesale" (опт, см. pricing.py),
+    blocked — отгрузки запрещены (долги).
+Поставщик (suppliers[CODE]): code, name, inn, phone.
+"""
+
+from . import audit, validators
+from .errors import DuplicateError, NotFound, ValidationError
+from .money import to_str
+
+GROUPS = ("retail", "wholesale")
+
+
+def add_supplier(db, code, name, inn=None, phone=None):
+    code = validators.code(code, "код поставщика")
+    if code in db.data["suppliers"]:
+        raise DuplicateError("поставщик %s уже есть" % code)
+    sup = {"code": code, "name": validators.name(name), "inn": validators.inn(inn), "phone": (phone or "").strip() or None}
+    db.data["suppliers"][code] = sup
+    audit.log(db, None, "supplier.add", code=code)
+    return sup
+
+
+def get_supplier(db, code):
+    sup = db.data["suppliers"].get(code)
+    if sup is None:
+        raise NotFound("нет поставщика %s" % code)
+    return sup
+
+
+def list_suppliers(db):
+    return [db.data["suppliers"][k] for k in sorted(db.data["suppliers"])]
+
+
+def add_customer(db, code, name, discount=0, group="retail", inn=None):
+    code = validators.code(code, "код покупателя")
+    if code in db.data["customers"]:
+        raise DuplicateError("покупатель %s уже есть" % code)
+    if group not in GROUPS:
+        raise ValidationError("ценовая группа должна быть retail или wholesale")
+    cust = {
+        "code": code,
+        "name": validators.name(name),
+        "inn": validators.inn(inn),
+        "discount": to_str(validators.percent(discount or 0, "скидка")),
+        "group": group,
+        "blocked": False,
+    }
+    db.data["customers"][code] = cust
+    audit.log(db, None, "customer.add", code=code)
+    return cust
+
+
+def get_customer(db, code):
+    cust = db.data["customers"].get(code)
+    if cust is None:
+        raise NotFound("нет покупателя %s" % code)
+    return cust
+
+
+def list_customers(db, group=None):
+    rows = [db.data["customers"][k] for k in sorted(db.data["customers"])]
+    if group:
+        rows = [c for c in rows if c.get("group") == group]
+    return rows
+
+
+def update_customer(db, code, discount=None, group=None, blocked=None, name=None):
+    cust = get_customer(db, code)
+    if discount is not None:
+        cust["discount"] = to_str(validators.percent(discount, "скидка"))
+    if group is not None:
+        if group not in GROUPS:
+            raise ValidationError("ценовая группа должна быть retail или wholesale")
+        cust["group"] = group
+    if blocked is not None:
+        cust["blocked"] = bool(blocked)
+    if name is not None:
+        cust["name"] = validators.name(name)
+    return cust

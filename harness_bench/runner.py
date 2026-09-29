@@ -14,6 +14,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
 
+from harness_bench.agent_stats import AgentRunStatsCollector as AgentRunStatsCollector
+from harness_bench.agent_stats import _add_usage_counts as _add_usage_counts
+from harness_bench.agent_stats import agent_stats_from_result as agent_stats_from_result
 from harness_bench.core import Task, VerifyResult
 from harness_bench.metrics import PassMetric, compute_pass_metrics
 from harness_bench.tasks import ALL_TASKS, get_task
@@ -36,6 +39,8 @@ _AGENT_METRIC_FIELDS = (
     "agent_input_tokens",
     "agent_output_tokens",
     "agent_total_tokens",
+    "agent_peak_input_tokens",
+    "agent_compactions",
 )
 
 _RESULTS_JSON_COMMAND: str | None = None
@@ -128,6 +133,14 @@ class TaskRun:
     agent_input_tokens: int | None = None
     agent_output_tokens: int | None = None
     agent_total_tokens: int | None = None
+    # Largest prompt of a single model call, auto-compactions the harness
+    # performed, and gateway-reported spend (OpenRouter-style `usage.cost`).
+    # Only runners that can observe them fill these in.
+    agent_peak_input_tokens: int | None = None
+    agent_compactions: int | None = None
+    agent_cost_usd: float | None = None
+    failure_kind: str | None = None
+    execution_history: list[dict[str, Any]] | None = None
 
 
 def _load_env_from_dotenv() -> None:
@@ -166,15 +179,15 @@ def _is_cli_timeout_error(error: Any) -> bool:
 
 
 def _payload_reruns_on_continue(item: dict[str, Any]) -> bool:
-    if item.get("rerun_on_continue") is True:
-        return True
-    if item.get("failure_kind") == "timeout":
-        return True
-    return _is_cli_timeout_error(item.get("error"))
+    # Legacy timeout rows carried rerun_on_continue=True. A timeout is a scored
+    # model attempt and must not gain another attempt just because we resumed.
+    if item.get("failure_kind") == "timeout" or _is_cli_timeout_error(item.get("error")):
+        return False
+    return item.get("failure_kind") == "infrastructure"
 
 
 def _task_run_reruns_on_continue(run: TaskRun) -> bool:
-    return _is_cli_timeout_error(run.error)
+    return run.failure_kind == "infrastructure"
 
 
 def set_results_json_command(command: str | None) -> None:
@@ -219,6 +232,7 @@ def task_run_from_payload(item: dict[str, Any], *, attempts: int | None = None) 
     }
     error = item.get("error")
     message = item.get("message")
+    cost = item.get("agent_cost_usd")
     return TaskRun(
         task_id=task_id,
         passed=bool(item.get("passed")),
@@ -227,6 +241,9 @@ def task_run_from_payload(item: dict[str, Any], *, attempts: int | None = None) 
         error=error if isinstance(error, str) else None,
         attempt=attempt,
         attempts=attempts or saved_attempts,
+        agent_cost_usd=float(cost) if isinstance(cost, int | float) else None,
+        failure_kind=item.get("failure_kind") or ("timeout" if _is_cli_timeout_error(error) else None),
+        execution_history=item.get("execution_history"),
         **metric_values,
     )
 
@@ -327,169 +344,15 @@ def _task_attempts_payload(
     ]
 
 
-def _usage_token_counts(usage: Any) -> tuple[int | None, int | None, int | None]:
-    if not isinstance(usage, dict):
-        return None, None, None
-
-    input_tokens = (
-        _coerce_int(usage.get("input_tokens"))
-        or _coerce_int(usage.get("prompt_tokens"))
-        or _coerce_int(usage.get("prompt_eval_count"))
-    )
-    # Anthropic (Claude Code) bills cached context under separate cache fields;
-    # `input_tokens` is only the fresh, non-cached delta. Fold the cache reads
-    # and cache creation back in so token totals reflect the real context size.
-    cache_tokens = (_coerce_int(usage.get("cache_read_input_tokens")) or 0) + (
-        _coerce_int(usage.get("cache_creation_input_tokens")) or 0
-    )
-    if cache_tokens:
-        input_tokens = (input_tokens or 0) + cache_tokens
-    output_tokens = (
-        _coerce_int(usage.get("output_tokens"))
-        or _coerce_int(usage.get("completion_tokens"))
-        or _coerce_int(usage.get("eval_count"))
-    )
-    total_tokens = _coerce_int(usage.get("total_tokens"))
-    if total_tokens is None and (input_tokens is not None or output_tokens is not None):
-        total_tokens = (input_tokens or 0) + (output_tokens or 0)
-    return input_tokens, output_tokens, total_tokens
 
 
-def _add_usage_counts(stats: dict[str, int], usage: Any) -> None:
-    input_tokens, output_tokens, total_tokens = _usage_token_counts(usage)
-    if input_tokens is not None:
-        stats["agent_input_tokens"] = stats.get("agent_input_tokens", 0) + input_tokens
-    if output_tokens is not None:
-        stats["agent_output_tokens"] = stats.get("agent_output_tokens", 0) + output_tokens
-    if total_tokens is not None:
-        stats["agent_total_tokens"] = stats.get("agent_total_tokens", 0) + total_tokens
-
-
-def _message_role(message: Any) -> str | None:
-    role = getattr(message, "type", None) or getattr(message, "role", None)
-    if isinstance(message, dict):
-        role = message.get("type") or message.get("role")
-    return role if isinstance(role, str) else None
-
-
-def _message_tool_calls(message: Any) -> list[Any]:
-    tool_calls = getattr(message, "tool_calls", None)
-    if isinstance(message, dict):
-        tool_calls = message.get("tool_calls", tool_calls)
-    return tool_calls if isinstance(tool_calls, list) else []
-
-
-def _tool_call_name(tool_call: Any) -> str:
-    if isinstance(tool_call, dict):
-        name = tool_call.get("name") or tool_call.get("function", {}).get("name")
-        return name if isinstance(name, str) else ""
-    name = getattr(tool_call, "name", "")
-    return name if isinstance(name, str) else ""
-
-
-def _message_usage(message: Any) -> list[Any]:
-    usages: list[Any] = []
-    usage_metadata = getattr(message, "usage_metadata", None)
-    if isinstance(message, dict):
-        usage_metadata = message.get("usage_metadata", usage_metadata)
-    if usage_metadata:
-        usages.append(usage_metadata)
-
-    response_metadata = getattr(message, "response_metadata", None)
-    if isinstance(message, dict):
-        response_metadata = message.get("response_metadata", response_metadata)
-    if isinstance(response_metadata, dict):
-        for key in ("token_usage", "usage", "usage_metadata"):
-            if response_metadata.get(key):
-                usages.append(response_metadata[key])
-    return usages
-
-
-def agent_stats_from_result(invocation_result: Any) -> dict[str, int]:
-    """Best-effort step/token extraction from a LangGraph/deepagents result."""
-    stats: dict[str, int] = {}
-    if not isinstance(invocation_result, dict):
-        return stats
-
-    messages = invocation_result.get("messages")
-    if not isinstance(messages, list):
-        return stats
-
-    events = len(messages)
-    steps = 0
-    tool_calls = 0
-    shell_commands = 0
-    llm_calls = 0
-    for message in messages:
-        role = _message_role(message)
-        if role not in ("human", "user", "system"):
-            steps += 1
-        calls = _message_tool_calls(message)
-        if calls:
-            tool_calls += len(calls)
-            llm_calls += 1
-            for call in calls:
-                if _tool_call_name(call) == "execute":
-                    shell_commands += 1
-        elif role in ("ai", "assistant"):
-            llm_calls += 1
-        for usage in _message_usage(message):
-            _add_usage_counts(stats, usage)
-
-    stats["agent_events"] = events
-    stats["agent_steps"] = steps
-    stats["agent_tool_calls"] = tool_calls
-    stats["agent_shell_commands"] = shell_commands
-    stats["agent_llm_calls"] = llm_calls
-    return stats
-
-
-class AgentRunStatsCollector:
-    """LangChain callback collector for token usage emitted during agent runs."""
-
-    def __init__(self) -> None:
-        self.stats: dict[str, int] = {}
-
-    def as_callback(self) -> Any:
-        try:
-            from langchain_core.callbacks import BaseCallbackHandler
-        except ImportError:
-            return None
-
-        outer = self
-
-        class _Handler(BaseCallbackHandler):
-            def on_llm_end(self, response: Any, **_kwargs: Any) -> None:
-                outer.stats["agent_llm_calls"] = outer.stats.get("agent_llm_calls", 0) + 1
-                llm_output = getattr(response, "llm_output", None)
-                if isinstance(llm_output, dict):
-                    _add_usage_counts(outer.stats, llm_output.get("token_usage"))
-                    _add_usage_counts(outer.stats, llm_output.get("usage"))
-                for generations in getattr(response, "generations", []) or []:
-                    for generation in generations:
-                        message = getattr(generation, "message", None)
-                        if message is not None:
-                            for usage in _message_usage(message):
-                                _add_usage_counts(outer.stats, usage)
-
-        return _Handler()
-
-    def merged(self, invocation_result: Any | None = None) -> dict[str, int]:
-        stats = dict(self.stats)
-        if invocation_result is not None:
-            for key, value in agent_stats_from_result(invocation_result).items():
-                if (
-                    key.startswith("agent_")
-                    and key.endswith("_tokens")
-                    or key == "agent_llm_calls"
-                ):
-                    stats[key] = max(stats.get(key, 0), value)
-                else:
-                    stats[key] = value
-        return stats
-
-
-def invoke_agent_with_stats(agent: Any, payload: dict[str, Any], stats: AgentRunStatsCollector) -> Any:
+def invoke_agent_with_stats(
+    agent: Any,
+    payload: dict[str, Any],
+    stats: AgentRunStatsCollector,
+    *,
+    min_timeout_seconds: float | None = None,
+) -> Any:
     """Invoke the agent under the per-task wall-clock timeout.
 
     The invocation runs in a daemon thread and is joined for at most
@@ -511,7 +374,7 @@ def invoke_agent_with_stats(agent: Any, payload: dict[str, Any], stats: AgentRun
                 raise
             return agent.invoke(payload)
 
-    timeout = _task_timeout_seconds()
+    timeout = max(_task_timeout_seconds(), min_timeout_seconds or 0.0)
     box: dict[str, Any] = {}
 
     def _worker() -> None:
@@ -561,7 +424,7 @@ def _ensure_harness_profile(workspace: Path) -> None:
     stays identical, but each layer adds a frame to the resolution that runs on
     every agent build, and past ~450 registrations it exhausts Python's stack —
     every later task then dies with `RecursionError` before reaching the model.
-    A 391-task run survives by luck; `--attempts 16` does not.
+    A full-set run survives by luck; `--attempts 16` does not.
 
     Only the workspace pointer is per task: middleware reads it to tell a memory
     task from an ordinary one.
@@ -656,6 +519,7 @@ def run_task(
             deleted after the run — handy for debugging a failure.
         recursion_limit: Cap on agent loop iterations.
     """
+    recursion_limit = max(recursion_limit, getattr(task, "min_recursion_limit", None) or 0)
     workspace_keepalive: TemporaryDirectory | None = None
     try:
         if keep_workspace:
@@ -673,6 +537,7 @@ def run_task(
                 agent,
                 {"messages": [{"role": "user", "content": task.prompt}]},
                 stats,
+                min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
             )
         except Exception as exc:  # noqa: BLE001 — log and surface as task failure
             run = _agent_exception_task_run(
@@ -858,13 +723,16 @@ def summarize(
     """Print a pass/fail summary block at the end of a run."""
     total = len(results)
     passed = sum(1 for r in results if r.passed)
+    invalid = any(r.failure_kind == "infrastructure" for r in results)
+    if invalid:
+        print("INVALID MEASUREMENT: infrastructure failures; counts below are diagnostic only.")
     print()
     print("=" * 64)
     repeated_task_ids = len(_task_results_by_id(results)) < len(results)
     repeated_attempts = repeated_task_ids or any(r.attempts != 1 for r in results)
     label = "Passed attempts" if repeated_attempts else "Passed"
     print(f"{label}: {passed}/{total}")
-    metrics = compute_pass_metrics(results, pass_at_ks=pass_at_ks, pass_hat_ks=pass_hat_ks)
+    metrics = {} if invalid else compute_pass_metrics(results, pass_at_ks=pass_at_ks, pass_hat_ks=pass_hat_ks)
     if metrics:
         print()
         print("Metrics:")
@@ -1055,19 +923,32 @@ def results_to_payload(
             "agent_output_tokens": r.agent_output_tokens,
             "agent_total_tokens": r.agent_total_tokens,
         }
+        for optional in ("agent_peak_input_tokens", "agent_compactions", "agent_cost_usd"):
+            if (value := getattr(r, optional)) is not None:
+                task_payload[optional] = value
+        kind = r.failure_kind or ("timeout" if _is_cli_timeout_error(r.error) else None)
+        if kind:
+            task_payload["failure_kind"] = kind
+        if r.execution_history is not None:
+            task_payload["execution_history"] = r.execution_history
+            task_payload["executions"] = sum(not item.get("resume") for item in r.execution_history)
         if _task_run_reruns_on_continue(r):
-            task_payload["failure_kind"] = "timeout"
             task_payload["rerun_on_continue"] = True
         tasks_payload.append(task_payload)
+    infrastructure = sum(r.failure_kind == "infrastructure" for r in results)
     payload: dict[str, Any] = {"task_set_version": TASK_SET_VERSION}
     result_command = command if command is not None else _RESULTS_JSON_COMMAND
     if result_command:
         payload["command"] = result_command
     payload.update(
         {
+            "measurement_valid": infrastructure == 0,
+            "infrastructure_failures": infrastructure,
             "total": total,
             "passed": passed,
-            "pass_rate": (passed / total) if total else 0.0,
+            "pass_rate": None if infrastructure else ((passed / total) if total else 0.0),
+            "step_metric_coverage": sum(r.agent_steps is not None for r in results),
+            "token_metric_coverage": sum(r.agent_total_tokens is not None for r in results),
             "steps": _sum_run_metric(results, "agent_steps"),
             "tokens": _sum_run_metric(results, "agent_total_tokens"),
             "tasks": tasks_payload,

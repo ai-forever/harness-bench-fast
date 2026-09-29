@@ -1,0 +1,97 @@
+# -*- coding: utf-8 -*-
+"""Проверки входных данных. Каждая функция либо возвращает нормализованное
+значение, либо бросает ValidationError с понятным сообщением на русском."""
+
+import re
+
+from . import config
+from .dates import iso
+from .errors import ValidationError
+from .money import D
+
+SKU_RE = re.compile(r"^[A-Z0-9][A-Z0-9_.-]{0,31}$")
+CODE_RE = re.compile(r"^[A-Za-z0-9_-]{1,16}$")
+INN_RE = re.compile(r"^(\d{10}|\d{12})$")
+BARCODE_RE = re.compile(r"^\d{8}(\d{5})?$")
+
+
+def sku(value):
+    v = (value or "").strip().upper()
+    if not SKU_RE.match(v):
+        raise ValidationError("некорректный артикул: %r" % (value,))
+    return v
+
+
+def code(value, what="код"):
+    v = (value or "").strip()
+    if not CODE_RE.match(v):
+        raise ValidationError("некорректный %s: %r" % (what, value))
+    return v
+
+
+def name(value):
+    v = " ".join((value or "").split())
+    if not v:
+        raise ValidationError("пустое наименование")
+    if len(v) > 120:
+        raise ValidationError("слишком длинное наименование")
+    return v
+
+
+def positive_qty(value, what="количество"):
+    try:
+        d = D(value)
+    except ValueError:
+        raise ValidationError("%s не число: %r" % (what, value))
+    if d <= 0:
+        raise ValidationError("%s должно быть больше нуля" % what)
+    return d
+
+
+def non_negative(value, what="значение"):
+    try:
+        d = D(value)
+    except ValueError:
+        raise ValidationError("%s не число: %r" % (what, value))
+    if d < 0:
+        raise ValidationError("%s не может быть отрицательным" % what)
+    return d
+
+
+def percent(value, what="процент"):
+    d = non_negative(value, what)
+    if d > 100:
+        raise ValidationError("%s больше 100" % what)
+    return d
+
+
+def date(value, what="дата"):
+    try:
+        return iso(value)
+    except (ValueError, TypeError):
+        raise ValidationError("некорректная %s: %r" % (what, value))
+
+
+def unit(value):
+    v = (value or config.DEFAULT_UNIT).strip()
+    if v not in config.UNITS:
+        raise ValidationError("неизвестная единица измерения: %r" % (value,))
+    return v
+
+
+def inn(value):
+    if value in (None, ""):
+        return None
+    v = str(value).strip()
+    if not INN_RE.match(v):
+        raise ValidationError("ИНН должен содержать 10 или 12 цифр")
+    return v
+
+
+def barcode(value):
+    if value in (None, ""):
+        return None
+    v = str(value).strip()
+    if not BARCODE_RE.match(v):
+        raise ValidationError("штрихкод должен быть EAN-8 или EAN-13")
+    return v

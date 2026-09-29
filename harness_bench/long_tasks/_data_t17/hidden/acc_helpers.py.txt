@@ -1,0 +1,71 @@
+# -*- coding: utf-8 -*-
+"""Helpers for the hidden acceptance tests (independent of the visible tests/helpers.py)."""
+
+import os
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
+
+from stockroom import catalog, partners, pricing, rates, receiving  # noqa: E402
+from stockroom.db import Database  # noqa: E402
+
+
+def base_db():
+    db = Database.memory("ООО «Ромашка»")
+    catalog.addItem(db, "MILK", "Молоко 1 л", "89.90", vat="10", min_qty=20, category="молочное", date="2024-01-10")
+    catalog.addItem(db, "BREAD", "Хлеб белый", "45.00", vat="10", min_qty=10, category="хлеб", date="2024-01-10")
+    catalog.addItem(db, "TEA", "Чай чёрный 100 пак.", "350.00", unit="упак", vat="20", category="бакалея",
+                    date="2024-01-10")
+    catalog.addItem(db, "SUGAR", "Сахар", "72.50", unit="кг", vat="10", category="бакалея", date="2024-01-10")
+    pricing.set_breaks(db, "TEA", ["10:5", "50:10"])
+    partners.add_supplier(db, "SUP1", "Молочный завод", inn="7701234567")
+    partners.add_supplier(db, "SUP2", "Оптовая база")
+    partners.add_customer(db, "C1", "Кафе «Уют»")
+    partners.add_customer(db, "C2", "Сеть «Дом»", discount=5, group="wholesale")
+    partners.add_customer(db, "C3", "Столовая № 5", discount=3)
+    receiving.receive(db, "SUP1", "2024-03-01", ["MILK:30@55.00", "BREAD:40@28.00"])
+    receiving.receive(db, "SUP2", "2024-03-05", ["MILK:20@58.00", "TEA:100@210.00", "SUGAR:25.5@48.00"])
+    return db
+
+
+def feature_db():
+    """base_db() + perishable YOG, EUR-priced WINE, USD-priced LAMP, rates, lots.
+
+    R-0003 (2024-03-02, SUP1): YOG 10@30 lot A exp 2024-03-20, YOG 10@31 lot B exp 2024-03-15,
+                               YOG 5@29 (default lot R-0003-3) exp 2024-03-25
+    R-0004 (2024-03-05, SUP2, EUR): WINE 12@7.10
+    EUR: 2024-03-01 98.1234, 2024-03-10 101.5;  USD: 2024-02-20 90, 2024-03-12 92.4
+    """
+    db = base_db()
+    catalog.addItem(db, "YOG", "Йогурт", "60", vat="10", track_expiry=True)
+    catalog.addItem(db, "WINE", "Вино", "12.50", vat="20", currency="EUR")
+    catalog.addItem(db, "LAMP", "Лампа", "15", vat="20", currency="usd")
+    pricing.set_breaks(db, "WINE", ["6:4"])
+    rates.set_rate(db, "EUR", "2024-03-01", "98.1234")
+    rates.set_rate(db, "EUR", "2024-03-10", "101.5")
+    rates.set_rate(db, "USD", "2024-02-20", "90")
+    rates.set_rate(db, "USD", "2024-03-12", "92.4")
+    receiving.receive(db, "SUP1", "2024-03-02",
+                      ["YOG:10@30#A!2024-03-20", "YOG:10@31#B!2024-03-15", "YOG:5@29!2024-03-25"])
+    receiving.receive(db, "SUP2", "2024-03-05", ["WINE:12@7.10"], currency="EUR")
+    return db
+
+
+def save(db, directory, name="stock.json"):
+    path = os.path.join(str(directory), name)
+    db.save(path)
+    db.path = path
+    return path
+
+
+def run_cli(db_path, *args):
+    env = dict(os.environ)
+    env["PYTHONIOENCODING"] = "utf-8"
+    env.pop("STOCKROOM_DB", None)
+    cmd = [sys.executable, "-m", "stockroom", "--db", str(db_path)] + [str(a) for a in args]
+    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", env=env,
+                          cwd=os.getcwd())
+    return proc.returncode, proc.stdout, proc.stderr

@@ -1,0 +1,795 @@
+# -*- coding: utf-8 -*-
+"""Командная строка.
+
+    python3 -m stockroom [--db ПУТЬ] [--format text|csv] КОМАНДА [ПАРАМЕТРЫ]
+
+Путь к базе: --db, иначе переменная окружения STOCKROOM_DB, иначе ./stockroom.json.
+--format влияет только на отчёты и списки (report ..., item list, order list).
+
+Коды возврата: 0 — успех, 2 — ошибка данных (сообщение в stderr начинается с
+"ошибка: "), 1 — непредвиденная ошибка.
+
+Каждая команда-обработчик получает (args, db) и возвращает текст для stdout.
+Если обработчик изменил базу, main() сохраняет её (обработчики помечают это
+через db.dirty = True).
+"""
+
+import argparse
+import sys
+
+from . import (adjustments, audit, backup, catalog, config, csvio, orders, partners, pricing, receiving,
+               returns, textable)
+from .db import Database
+from .documents.invoice import render_invoice
+from .documents.receipt_note import render_receipt_note
+from .documents.waybill import render_waybill
+from .errors import StockError
+from .money import fmt_money, fmt_qty
+from .reports import REPORTS
+
+
+# ---------------------------------------------------------------- справочники
+def cmd_init(args, db):
+    Database.create(args.db_path, args.company, base_currency=args.currency, vat_default=args.vat)
+    return "Создана база %s" % args.db_path
+
+
+def cmd_item_add(args, db):
+    catalog.addItem(db, args.sku, args.name, args.price, unit=args.unit, vat=args.vat, category=args.category,
+                    min_qty=args.min_qty or 0, barcode=args.barcode, date=args.date, currency=args.currency,
+                    track_expiry=args.track_expiry)
+    db.dirty = True
+    return "Добавлен товар %s" % args.sku.upper()
+
+
+ITEM_LIST_COLUMNS = [("sku", "Артикул"), ("name", "Наименование"), ("unit", "Ед."), ("price", "Цена", "r"),
+                     ("vat", "НДС"), ("category", "Категория"), ("active", "Активен")]
+
+
+def cmd_item_list(args, db):
+    rows = catalog.listItems(db, category=args.category, include_inactive=args.all)
+    if args.format != "csv":
+        rows = [dict(r, price=fmt_money(r["price"])) for r in rows]
+    return textable.render(ITEM_LIST_COLUMNS, rows, args.format).rstrip("\n")
+
+
+def cmd_item_show(args, db):
+    item = catalog.getItem(db, args.sku)
+    from .inventory import available, on_hand
+
+    lines = ["%s — %s" % (item["sku"], item["name"]),
+             "Единица: %s" % item.get("unit", "шт"),
+             "Цена без НДС: %s" % fmt_money(item["price"]),
+             "НДС: %s%%" % item["vat"],
+             "Категория: %s" % (item.get("category") or "-"),
+             "Штрихкод: %s" % (item.get("barcode") or "-"),
+             "Остаток: %s" % fmt_qty(on_hand(db, item["sku"])),
+             "Доступно: %s" % fmt_qty(available(db, item["sku"])),
+             "Неснижаемый остаток: %s" % fmt_qty(item.get("min_qty", "0")),
+             "Активен: %s" % ("да" if item.get("active", True) else "нет")]
+    breaks = pricing.get_breaks(db, item["sku"])
+    if breaks:
+        lines.append("Скидки за количество: " + ", ".join("от %s — %s%%" % (fmt_qty(b["min_qty"]), fmt_qty(b["discount"]))
+                                                      for b in breaks))
+    lines.append("Валюта цены: %s" % (item.get("currency") or db.base_currency()))
+    lines.append("Учёт сроков годности: %s" % ("да" if item.get("track_expiry") else "нет"))
+    return "\n".join(lines)
+
+
+def cmd_item_update(args, db):
+    catalog.updateItem(db, args.sku, name=args.name, price=args.price, unit=args.unit, vat=args.vat,
+                       category=args.category, min_qty=args.min_qty, barcode=args.barcode, currency=args.currency,
+                       track_expiry=args.track_expiry)
+    db.dirty = True
+    return "Товар %s изменён" % args.sku.upper()
+
+
+def cmd_item_deactivate(args, db):
+    catalog.deactivateItem(db, args.sku)
+    db.dirty = True
+    return "Товар %s выведен из ассортимента" % args.sku.upper()
+
+
+def cmd_item_activate(args, db):
+    catalog.activateItem(db, args.sku)
+    db.dirty = True
+    return "Товар %s снова в ассортименте" % args.sku.upper()
+
+
+def cmd_item_search(args, db):
+    found = catalog.findItems(db, args.text)
+    if not found:
+        return "ничего не найдено"
+    return "\n".join("%s  %s" % (i["sku"], i["name"]) for i in found)
+
+
+def cmd_supplier_add(args, db):
+    partners.add_supplier(db, args.code, args.name, inn=args.inn, phone=args.phone)
+    db.dirty = True
+    return "Добавлен поставщик %s" % args.code
+
+
+def cmd_supplier_list(args, db):
+    cols = [("code", "Код"), ("name", "Наименование"), ("inn", "ИНН"), ("phone", "Телефон")]
+    return textable.render(cols, partners.list_suppliers(db), args.format).rstrip("\n")
+
+
+def cmd_customer_add(args, db):
+    partners.add_customer(db, args.code, args.name, discount=args.discount or 0, group=args.group, inn=args.inn)
+    db.dirty = True
+    return "Добавлен покупатель %s" % args.code
+
+
+def cmd_customer_list(args, db):
+    cols = [("code", "Код"), ("name", "Наименование"), ("group", "Группа"), ("discount", "Скидка, %", "r"),
+            ("blocked", "Блок.")]
+    return textable.render(cols, partners.list_customers(db, group=args.group), args.format).rstrip("\n")
+
+
+def cmd_customer_update(args, db):
+    blocked = None
+    if args.block:
+        blocked = True
+    elif args.unblock:
+        blocked = False
+    partners.update_customer(db, args.code, discount=args.discount, group=args.group, blocked=blocked)
+    db.dirty = True
+    return "Покупатель %s изменён" % args.code
+
+
+def cmd_breaks_set(args, db):
+    rows = pricing.set_breaks(db, args.sku, args.breaks)
+    db.dirty = True
+    return "Скидки за количество для %s: %d" % (args.sku.upper(), len(rows))
+
+
+def cmd_pricelist(args, db):
+    cols = [("sku", "Артикул"), ("name", "Наименование"), ("price", "Цена", "r")]
+    return textable.render(cols, pricing.price_list(db, args.customer, qty=args.qty), args.format).rstrip("\n")
+
+
+# ------------------------------------------------------------------ документы
+def cmd_receive(args, db):
+    doc = receiving.receive(db, args.supplier, args.date, args.lines, note=args.note, currency=args.currency)
+    db.dirty = True
+    text = "Приход %s проведён: строк %d, сумма %s" % (doc["id"], len(doc["lines"]), fmt_money(doc["total"]))
+    if doc.get("currency"):
+        text += " (%s %s)" % (fmt_money(doc["total_cur"]), doc["currency"])
+    return text
+
+
+def cmd_receipt_show(args, db):
+    return render_receipt_note(db, args.id).rstrip("\n")
+
+
+def cmd_receipt_reverse(args, db):
+    receiving.reverse_receipt(db, args.id, args.date)
+    db.dirty = True
+    return "Приход %s сторнирован" % args.id
+
+
+def cmd_receipt_list(args, db):
+    cols = [("id", "№"), ("date", "Дата"), ("supplier", "Поставщик"), ("total", "Сумма", "r")]
+    rows = receiving.receipts_between(db, args.date_from, args.date_to, supplier=args.supplier)
+    if args.format != "csv":
+        rows = [dict(r, total=fmt_money(r["total"])) for r in rows]
+    return textable.render(cols, rows, args.format).rstrip("\n")
+
+
+def cmd_order_create(args, db):
+    doc = orders.create_order(db, args.customer, args.date, args.lines, note=args.note)
+    db.dirty = True
+    return "Заказ %s создан" % doc["id"]
+
+
+def cmd_order_ship(args, db):
+    orders.ship_order(db, args.id, args.date)
+    db.dirty = True
+    return "Заказ %s отгружен" % args.id
+
+
+def cmd_order_cancel(args, db):
+    orders.cancel_order(db, args.id, args.date)
+    db.dirty = True
+    return "Заказ %s отменён" % args.id
+
+
+STATUS_TEXT = {"new": "новый", "shipped": "отгружен", "cancelled": "отменён", "returned": "возвращён",
+               "partially_returned": "частично возвращён"}
+
+
+def cmd_order_show(args, db):
+    doc = orders.get_order(db, args.id)
+    cust = partners.get_customer(db, doc["customer"])
+    out = ["Заказ %s от %s" % (doc["id"], doc["date"]),
+           "Покупатель: %s %s" % (cust["code"], cust["name"]),
+           "Статус: %s" % STATUS_TEXT.get(doc["status"], doc["status"])]
+    if doc.get("shipped_date"):
+        out.append("Отгружен: %s" % doc["shipped_date"])
+    for line in doc["lines"]:
+        item = db.data["items"][line["sku"]]
+        out.append("  %s  %s  %s %s" % (line["sku"], item["name"], fmt_qty(line["qty"]), item.get("unit", "шт")))
+    if doc["status"] != "cancelled":
+        out.append("Сумма с НДС: %s" % fmt_money(pricing.order_total(db, doc["id"])))
+    return "\n".join(out)
+
+
+def cmd_order_list(args, db):
+    cols = [("id", "№"), ("date", "Дата"), ("customer", "Покупатель"), ("status", "Статус")]
+    rows = orders.list_orders(db, status=args.status, customer=args.customer, date_from=args.date_from,
+                              date_to=args.date_to)
+    return textable.render(cols, rows, args.format).rstrip("\n")
+
+
+def cmd_invoice(args, db):
+    return render_invoice(db, args.id).rstrip("\n")
+
+
+def cmd_waybill(args, db):
+    return render_waybill(db, args.id).rstrip("\n")
+
+
+def cmd_return(args, db):
+    doc = returns.return_order(db, args.order, args.date, reason=args.reason, lines=args.lines or None)
+    db.dirty = True
+    return "Возврат %s по заказу %s оформлен, к возврату %s" % (doc["id"], args.order, fmt_money(doc["amount"]))
+
+
+def cmd_adjust(args, db):
+    doc = adjustments.adjust_count(db, args.sku, args.count, args.date, reason=args.reason)
+    db.dirty = True
+    return "Инвентаризация %s: %s было %s, стало %s" % (doc["id"], doc["sku"], fmt_qty(doc["before"]),
+                                                       fmt_qty(doc["after"]))
+
+
+def cmd_writeoff(args, db):
+    doc = adjustments.writeoff(db, args.sku, args.qty, args.date, args.reason, lot=args.lot)
+    db.dirty = True
+    return "Списание %s: %s %s, себестоимость %s" % (doc["id"], doc["sku"], fmt_qty(doc["qty"]),
+                                                    fmt_money(doc["cost"]))
+
+
+# ---------------------------------------------------------- отчёты и сервис
+REPORT_OPTIONS = {
+    "stock": ("category", "include_inactive"),
+    "low": (),
+    "movements": ("date_from", "date_to", "sku", "mtype"),
+    "valuation": ("category", "revalue"),
+    "sales": ("date_from", "date_to", "group"),
+    "abc": ("date_from", "date_to"),
+    "turnover": ("date_from", "date_to"),
+    "purchases": ("date_from", "date_to"),
+    "debts": ("date_to",),
+    "history": ("sku", "date_from", "date_to"),
+    "dead": ("on_date", "days"),
+    "margin": ("date_from", "date_to"),
+    "supplier-prices": ("date_from", "date_to", "sku"),
+    "sheet": ("category", "include_inactive"),
+    "reorder": ("on_date", "days"),
+    "writeoffs": ("date_from", "date_to"),
+    "open-orders": (),
+    "categories": (),
+    "expiry": ("on_date", "days"),
+}
+
+
+def cmd_report(args, db):
+    module = REPORTS[args.name]
+    opts = {}
+    for key in REPORT_OPTIONS[args.name]:
+        value = getattr(args, key, None)
+        if value not in (None, False):
+            opts[key] = value
+    if args.name == "turnover" and not (args.date_from and args.date_to):
+        raise StockError("для оборачиваемости нужны --from и --to")
+    if args.name == "history" and not args.sku:
+        raise StockError("для карточки товара нужен --sku")
+    if args.name == "dead" and not args.on_date:
+        raise StockError("для отчёта о неликвидах нужна --on")
+    if args.name == "reorder" and not args.on_date:
+        raise StockError("для плана закупок нужна --on")
+    if args.name == "expiry" and not args.on_date:
+        raise StockError("для отчёта о сроках годности нужна --on")
+    return module.render(db, args.format, **opts).rstrip("\n")
+
+
+def cmd_export(args, db):
+    if args.what == "items":
+        n = csvio.export_items(db, args.file)
+    elif args.what == "stock":
+        n = csvio.export_stock(db, args.file)
+    elif args.what == "lots":
+        n = csvio.export_lots(db, args.file)
+    else:
+        n = csvio.export_movements(db, args.file, args.date_from, args.date_to)
+    return "Выгружено строк: %d" % n
+
+
+def cmd_import(args, db):
+    if args.what == "items":
+        rep = csvio.import_items(db, args.file, update=args.update)
+        db.dirty = True
+        out = ["Добавлено: %d, обновлено: %d, ошибок: %d" % (rep["added"], rep["updated"], len(rep["errors"]))]
+        out.extend("  строка %d: %s" % e for e in rep["errors"])
+        return "\n".join(out)
+    if not args.date:
+        raise StockError("для импорта остатков нужна --date")
+    doc = csvio.import_stock(db, args.file, args.date)
+    db.dirty = True
+    return "Остатки загружены: приход %s, сумма %s" % (doc["id"], fmt_money(doc["total"]))
+
+
+def cmd_audit(args, db):
+    rows = audit.recent(db, limit=args.limit, action=args.action)
+    return "\n".join(audit.format_entry(r) for r in rows) or "журнал пуст"
+
+
+def cmd_backup(args, db):
+    backup.backup(db, args.file)
+    return "Копия сохранена: %s" % args.file
+
+
+def cmd_check(args, db):
+    problems = db.check_integrity()
+    if not problems:
+        return "Нарушений нет"
+    return "\n".join(["Нарушения:"] + ["  " + p for p in problems])
+
+
+# ------------------------------------------------ закупки, оплаты, прочее
+def cmd_po_create(args, db):
+    from . import purchasing
+
+    doc = purchasing.create_po(db, args.supplier, args.date, args.lines, note=args.note)
+    db.dirty = True
+    return "Заказ поставщику %s создан на сумму %s" % (doc["id"], fmt_money(purchasing.po_amount(doc)))
+
+
+def cmd_po_receive(args, db):
+    from . import purchasing
+
+    quantities = None
+    if args.lines:
+        quantities = {}
+        for raw in args.lines:
+            line = orders.parse_line(raw)
+            quantities[line["sku"]] = quantities.get(line["sku"], 0) + line["qty"]
+    doc = purchasing.receive_po(db, args.id, args.date, quantities)
+    db.dirty = True
+    po = purchasing.get_po(db, args.id)
+    return "По заказу %s оприходовано: приход %s; статус заказа: %s" % (args.id, doc["id"], po["status"])
+
+
+def cmd_po_close(args, db):
+    from . import purchasing
+
+    purchasing.close_po(db, args.id, args.date)
+    db.dirty = True
+    return "Заказ поставщику %s закрыт" % args.id
+
+
+def cmd_po_list(args, db):
+    from . import purchasing
+
+    cols = [("id", "№"), ("date", "Дата"), ("supplier", "Поставщик"), ("status", "Статус")]
+    return textable.render(cols, purchasing.open_pos(db, supplier=args.supplier), args.format).rstrip("\n")
+
+
+def cmd_payment(args, db):
+    from . import payments
+
+    pay = payments.register_payment(db, args.customer, args.date, args.amount, order=args.order, note=args.note)
+    db.dirty = True
+    return "Оплата %s от %s: %s" % (pay["id"], args.customer, fmt_money(pay["amount"]))
+
+
+def cmd_balance(args, db):
+    from . import payments
+
+    return "Долг %s на %s: %s" % (args.customer, args.date or "сегодня",
+                                  fmt_money(payments.balance(db, args.customer, args.date)))
+
+
+def cmd_act(args, db):
+    from .documents.act import render_act
+
+    return render_act(db, args.customer, args.date_from, args.date_to).rstrip("\n")
+
+
+def cmd_label(args, db):
+    from . import labels
+
+    return labels.render_labels(db, args.skus).rstrip("\n")
+
+
+def cmd_stocktake(args, db):
+    from . import stocktake
+
+    if args.action == "start":
+        session = stocktake.start(db, args.date, skus=args.skus or None, category=args.category)
+        db.dirty = True
+        return "Инвентаризация %s начата: позиций %d" % (session["id"], len(session["snapshot"]))
+    if args.action == "count":
+        if len(args.skus) != 2:
+            raise StockError("использование: stocktake count SKU КОЛ-ВО")
+        stocktake.record_count(db, args.skus[0], args.skus[1])
+        db.dirty = True
+        return "Учтено: %s = %s" % (args.skus[0].upper(), args.skus[1])
+    if args.action == "diff":
+        rows = stocktake.differences(db)
+        return "\n".join("%s: учёт %s, факт %s, разница %s" % (r["sku"], fmt_qty(r["book"]), fmt_qty(r["counted"]),
+                                                              fmt_qty(r["diff"])) for r in rows) or "пересчётов нет"
+    if args.action == "post":
+        docs = stocktake.post(db, args.date)
+        db.dirty = True
+        return "Инвентаризация проведена, документов: %d" % len(docs)
+    stocktake.cancel(db)
+    db.dirty = True
+    return "Инвентаризация отменена"
+
+
+def cmd_import_onec(args, db):
+    from .importers import onec
+
+    res = onec.load(db, args.file)
+    db.dirty = True
+    return "1С: товаров %d, приходов %d, пропущено %d" % (res["items"], res["receipts"], res["skipped"])
+
+
+# ------------------------------------------------------ комплекты, цены, выгрузки
+def cmd_kit(args, db):
+    from . import kits
+
+    if args.action == "set":
+        rows = kits.set_spec(db, args.sku, args.parts)
+        db.dirty = True
+        return "Спецификация %s: компонентов %d" % (args.sku.upper(), len(rows))
+    if args.action == "show":
+        spec = kits.get_spec(db, args.sku)
+        lines = ["%s × %s" % (c["sku"], fmt_qty(c["qty"])) for c in spec]
+        lines.append("Можно собрать: %d" % kits.can_assemble(db, args.sku))
+        return "\n".join(lines)
+    if not args.parts or len(args.parts) != 1:
+        raise StockError("укажите количество комплектов")
+    if args.action == "build":
+        doc = kits.assemble(db, args.sku, args.parts[0], args.date)
+        db.dirty = True
+        return "Сборка %s: %s × %s, себестоимость единицы %s" % (doc["id"], doc["sku"], doc["qty"],
+                                                                 fmt_money(doc["unit_cost"]))
+    doc = kits.disassemble(db, args.sku, args.parts[0], args.date)
+    db.dirty = True
+    return "Разборка %s: %s × %s" % (doc["id"], doc["sku"], args.parts[0])
+
+
+def cmd_price(args, db):
+    from . import price_history
+
+    if args.action == "change":
+        if args.price is None or not args.date:
+            raise StockError("нужны --price и --date")
+        price_history.change_price(db, args.sku, args.date, args.price, note=args.note)
+        db.dirty = True
+        return "Цена %s изменена на %s с %s" % (args.sku.upper(), fmt_money(args.price), args.date)
+    rows = price_history.history(db, args.sku)
+    return "\n".join("%s  %s%s" % (r["date"], fmt_money(r["price"]), ("  " + r["note"]) if r.get("note") else "")
+                     for r in rows) or "история пуста"
+
+
+def cmd_feed(args, db):
+    from .integrations import marketplace
+
+    n = marketplace.write_feed(db, args.file, args.date)
+    return "Фид сохранён: предложений %d" % n
+
+
+def cmd_export_accounting(args, db):
+    from .integrations import accounting
+
+    n = accounting.write_export(db, args.file, args.date_from, args.date_to)
+    return "Выгружено документов: %d" % n
+
+
+
+# ------------------------------------------------------------ валюты, партии
+def _fmt_rate(value):
+    return str(value).replace(".", ",")
+
+
+def cmd_rate_set(args, db):
+    from . import rates
+
+    value = rates.set_rate(db, args.currency, args.date, args.rate)
+    db.dirty = True
+    return "Курс %s на %s: %s" % (args.currency.upper(), args.date, _fmt_rate(value))
+
+
+def cmd_rate_show(args, db):
+    from . import rates
+
+    when, value = rates.get_rate_entry(db, args.currency, args.date)
+    return "Курс %s на %s: %s (от %s)" % (args.currency.upper(), args.date or "последнюю дату", _fmt_rate(value), when)
+
+
+def cmd_rate_list(args, db):
+    from . import rates
+
+    cols = [("currency", "Валюта"), ("date", "Дата"), ("rate", "Курс", "r")]
+    rows = rates.list_rates(db, args.currency)
+    if args.format != "csv":
+        rows = [dict(r, rate=_fmt_rate(r["rate"])) for r in rows]
+    return textable.render(cols, rows, args.format).rstrip("\n")
+
+
+def cmd_lots(args, db):
+    from . import lots
+
+    cols = [("lot", "Партия"), ("expiry", "Годен до"), ("qty", "Остаток", "r"), ("cost", "Цена", "r")]
+    rows = lots.lots_of(db, args.sku)
+    if args.format != "csv":
+        rows = [dict(r, qty=fmt_qty(r["qty"]), cost=fmt_money(r["cost"]), expiry=r["expiry"] or "-") for r in rows]
+    return textable.render(cols, rows, args.format).rstrip("\n")
+
+
+# ------------------------------------------------------------------- парсер
+def _sub(parent, name, func, help_text):
+    p = parent.add_parser(name, help=help_text)
+    p.set_defaults(func=func)
+    return p
+
+
+def build_parser():
+    ap = argparse.ArgumentParser(prog="stockroom", description="Складской учёт")
+    ap.add_argument("--db", dest="db_path", default=None, help="путь к файлу базы")
+    ap.add_argument("--format", choices=("text", "csv"), default="text", help="формат отчётов и списков")
+    sub = ap.add_subparsers(dest="command")
+
+    p = _sub(sub, "init", cmd_init, "создать новую базу")
+    p.add_argument("--company", required=True)
+    p.add_argument("--currency", default=config.BASE_CURRENCY)
+    p.add_argument("--vat", default=config.DEFAULT_VAT)
+
+    item = sub.add_parser("item", help="товары").add_subparsers(dest="item_cmd")
+    p = _sub(item, "add", cmd_item_add, "добавить товар")
+    p.add_argument("sku")
+    p.add_argument("name")
+    p.add_argument("--price", required=True)
+    p.add_argument("--unit")
+    p.add_argument("--vat")
+    p.add_argument("--category")
+    p.add_argument("--min-qty", dest="min_qty")
+    p.add_argument("--barcode")
+    p.add_argument("--date")
+    p.add_argument("--currency")
+    p.add_argument("--track-expiry", dest="track_expiry", action="store_true")
+    p = _sub(item, "list", cmd_item_list, "список товаров")
+    p.add_argument("--category")
+    p.add_argument("--all", action="store_true", help="включая выведенные")
+    p = _sub(item, "show", cmd_item_show, "карточка товара")
+    p.add_argument("sku")
+    p = _sub(item, "update", cmd_item_update, "изменить товар")
+    p.add_argument("sku")
+    for opt in ("--name", "--price", "--unit", "--vat", "--category", "--barcode", "--currency"):
+        p.add_argument(opt)
+    p.add_argument("--min-qty", dest="min_qty")
+    p.add_argument("--track-expiry", dest="track_expiry", choices=("yes", "no"))
+    p = _sub(item, "deactivate", cmd_item_deactivate, "вывести из ассортимента")
+    p.add_argument("sku")
+    p = _sub(item, "activate", cmd_item_activate, "вернуть в ассортимент")
+    p.add_argument("sku")
+    p = _sub(item, "search", cmd_item_search, "поиск")
+    p.add_argument("text")
+
+    sup = sub.add_parser("supplier", help="поставщики").add_subparsers(dest="sup_cmd")
+    p = _sub(sup, "add", cmd_supplier_add, "добавить поставщика")
+    p.add_argument("code")
+    p.add_argument("name")
+    p.add_argument("--inn")
+    p.add_argument("--phone")
+    _sub(sup, "list", cmd_supplier_list, "список поставщиков")
+
+    cus = sub.add_parser("customer", help="покупатели").add_subparsers(dest="cus_cmd")
+    p = _sub(cus, "add", cmd_customer_add, "добавить покупателя")
+    p.add_argument("code")
+    p.add_argument("name")
+    p.add_argument("--discount")
+    p.add_argument("--group", default="retail", choices=partners.GROUPS)
+    p.add_argument("--inn")
+    p = _sub(cus, "list", cmd_customer_list, "список покупателей")
+    p.add_argument("--group", choices=partners.GROUPS)
+    p = _sub(cus, "update", cmd_customer_update, "изменить покупателя")
+    p.add_argument("code")
+    p.add_argument("--discount")
+    p.add_argument("--group", choices=partners.GROUPS)
+    p.add_argument("--block", action="store_true")
+    p.add_argument("--unblock", action="store_true")
+
+    br = sub.add_parser("breaks", help="скидки за количество").add_subparsers(dest="br_cmd")
+    p = _sub(br, "set", cmd_breaks_set, "задать скидки: MIN:ПРОЦЕНТ ...")
+    p.add_argument("sku")
+    p.add_argument("breaks", nargs="*")
+
+    p = _sub(sub, "pricelist", cmd_pricelist, "прайс для покупателя")
+    p.add_argument("customer")
+    p.add_argument("--qty", default="1")
+
+    p = _sub(sub, "receive", cmd_receive, "приход: SKU:КОЛ-ВО@ЦЕНА[#ПАРТИЯ][!СРОК] ...")
+    p.add_argument("--supplier", required=True)
+    p.add_argument("--date", required=True)
+    p.add_argument("--note")
+    p.add_argument("--currency")
+    p.add_argument("lines", nargs="+")
+
+    rc = sub.add_parser("receipt", help="приходы").add_subparsers(dest="rc_cmd")
+    p = _sub(rc, "show", cmd_receipt_show, "приходный ордер")
+    p.add_argument("id")
+    p = _sub(rc, "reverse", cmd_receipt_reverse, "сторно прихода")
+    p.add_argument("id")
+    p.add_argument("--date", required=True)
+    p = _sub(rc, "list", cmd_receipt_list, "список приходов")
+    p.add_argument("--from", dest="date_from")
+    p.add_argument("--to", dest="date_to")
+    p.add_argument("--supplier")
+
+    od = sub.add_parser("order", help="заказы").add_subparsers(dest="od_cmd")
+    p = _sub(od, "create", cmd_order_create, "создать заказ: SKU:КОЛ-ВО ...")
+    p.add_argument("--customer", required=True)
+    p.add_argument("--date", required=True)
+    p.add_argument("--note")
+    p.add_argument("lines", nargs="+")
+    p = _sub(od, "ship", cmd_order_ship, "отгрузить")
+    p.add_argument("id")
+    p.add_argument("--date", required=True)
+    p = _sub(od, "cancel", cmd_order_cancel, "отменить")
+    p.add_argument("id")
+    p.add_argument("--date")
+    p = _sub(od, "show", cmd_order_show, "показать заказ")
+    p.add_argument("id")
+    p = _sub(od, "list", cmd_order_list, "список заказов")
+    p.add_argument("--status")
+    p.add_argument("--customer")
+    p.add_argument("--from", dest="date_from")
+    p.add_argument("--to", dest="date_to")
+
+    p = _sub(sub, "invoice", cmd_invoice, "счёт по заказу")
+    p.add_argument("id")
+    p = _sub(sub, "waybill", cmd_waybill, "накладная по заказу")
+    p.add_argument("id")
+    p = _sub(sub, "return", cmd_return, "возврат заказа (целиком или SKU:КОЛ-ВО ...)")
+    p.add_argument("order")
+    p.add_argument("lines", nargs="*")
+    p.add_argument("--date", required=True)
+    p.add_argument("--reason")
+    p = _sub(sub, "adjust", cmd_adjust, "инвентаризация")
+    p.add_argument("sku")
+    p.add_argument("--count", required=True)
+    p.add_argument("--date", required=True)
+    p.add_argument("--reason")
+    p = _sub(sub, "writeoff", cmd_writeoff, "списание")
+    p.add_argument("sku")
+    p.add_argument("qty")
+    p.add_argument("--date", required=True)
+    p.add_argument("--reason", required=True)
+    p.add_argument("--lot")
+
+    p = _sub(sub, "report", cmd_report, "отчёты")
+    p.add_argument("name", choices=sorted(REPORTS))
+    p.add_argument("--from", dest="date_from")
+    p.add_argument("--to", dest="date_to")
+    p.add_argument("--sku")
+    p.add_argument("--type", dest="mtype")
+    p.add_argument("--category")
+    p.add_argument("--group", default=None, choices=("sku", "customer"))
+    p.add_argument("--inactive", dest="include_inactive", action="store_true")
+    p.add_argument("--on", dest="on_date")
+    p.add_argument("--days", type=int)
+    p.add_argument("--revalue")
+
+    p = _sub(sub, "export", cmd_export, "выгрузка CSV")
+    p.add_argument("what", choices=("items", "stock", "movements", "lots"))
+    p.add_argument("file")
+    p.add_argument("--from", dest="date_from")
+    p.add_argument("--to", dest="date_to")
+    p = _sub(sub, "import", cmd_import, "загрузка CSV")
+    p.add_argument("what", choices=("items", "stock"))
+    p.add_argument("file")
+    p.add_argument("--update", action="store_true")
+    p.add_argument("--date")
+
+    po = sub.add_parser("po", help="заказы поставщикам").add_subparsers(dest="po_cmd")
+    p = _sub(po, "create", cmd_po_create, "создать: SKU:КОЛ-ВО@ЦЕНА ...")
+    p.add_argument("--supplier", required=True)
+    p.add_argument("--date", required=True)
+    p.add_argument("--note")
+    p.add_argument("lines", nargs="+")
+    p = _sub(po, "receive", cmd_po_receive, "оприходовать (всё или SKU:КОЛ-ВО ...)")
+    p.add_argument("id")
+    p.add_argument("--date", required=True)
+    p.add_argument("lines", nargs="*")
+    p = _sub(po, "close", cmd_po_close, "закрыть")
+    p.add_argument("id")
+    p.add_argument("--date")
+    p = _sub(po, "list", cmd_po_list, "открытые заказы")
+    p.add_argument("--supplier")
+
+    p = _sub(sub, "payment", cmd_payment, "оплата покупателя")
+    p.add_argument("customer")
+    p.add_argument("amount")
+    p.add_argument("--date", required=True)
+    p.add_argument("--order")
+    p.add_argument("--note")
+    p = _sub(sub, "balance", cmd_balance, "долг покупателя")
+    p.add_argument("customer")
+    p.add_argument("--date")
+    p = _sub(sub, "act", cmd_act, "акт сверки")
+    p.add_argument("customer")
+    p.add_argument("--from", dest="date_from", required=True)
+    p.add_argument("--to", dest="date_to", required=True)
+    p = _sub(sub, "label", cmd_label, "ценники")
+    p.add_argument("skus", nargs="+")
+    p = _sub(sub, "stocktake", cmd_stocktake, "инвентаризация по описи")
+    p.add_argument("action", choices=("start", "count", "diff", "post", "cancel"))
+    p.add_argument("skus", nargs="*")
+    p.add_argument("--date")
+    p.add_argument("--category")
+    p = _sub(sub, "import-onec", cmd_import_onec, "загрузка файла обмена 1С")
+    p.add_argument("file")
+
+    p = _sub(sub, "kit", cmd_kit, "комплекты: set SKU ЧАСТИ... | show SKU | build SKU N | unbuild SKU N")
+    p.add_argument("action", choices=("set", "show", "build", "unbuild"))
+    p.add_argument("sku")
+    p.add_argument("parts", nargs="*")
+    p.add_argument("--date")
+    p = _sub(sub, "price", cmd_price, "история цен: change SKU --price P --date D | history SKU")
+    p.add_argument("action", choices=("change", "history"))
+    p.add_argument("sku")
+    p.add_argument("--price")
+    p.add_argument("--date")
+    p.add_argument("--note")
+    p = _sub(sub, "feed", cmd_feed, "фид для маркетплейса")
+    p.add_argument("file")
+    p.add_argument("--date", required=True)
+    p = _sub(sub, "export-accounting", cmd_export_accounting, "выгрузка для бухгалтерии")
+    p.add_argument("file")
+    p.add_argument("--from", dest="date_from", required=True)
+    p.add_argument("--to", dest="date_to", required=True)
+
+    rt = sub.add_parser("rate", help="курсы валют").add_subparsers(dest="rate_cmd")
+    p = _sub(rt, "set", cmd_rate_set, "задать курс: ВАЛЮТА ДАТА КУРС")
+    p.add_argument("currency")
+    p.add_argument("date")
+    p.add_argument("rate")
+    p = _sub(rt, "show", cmd_rate_show, "курс на дату")
+    p.add_argument("currency")
+    p.add_argument("--date")
+    p = _sub(rt, "list", cmd_rate_list, "список курсов")
+    p.add_argument("currency", nargs="?")
+    p = _sub(sub, "lots", cmd_lots, "партии товара")
+    p.add_argument("sku")
+
+    p = _sub(sub, "audit", cmd_audit, "журнал действий")
+    p.add_argument("--limit", type=int, default=config.AUDIT_LIMIT)
+    p.add_argument("--action")
+    p = _sub(sub, "backup", cmd_backup, "резервная копия")
+    p.add_argument("file")
+    _sub(sub, "check", cmd_check, "проверка целостности")
+    return ap
+
+
+def main(argv=None):
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    if not getattr(args, "func", None):
+        parser.print_help()
+        return 1
+    args.db_path = config.db_path(args.db_path)
+    try:
+        db = None if args.func is cmd_init else Database.open(args.db_path)
+        out = args.func(args, db)
+        if db is not None and db.dirty:
+            db.save()
+    except StockError as exc:
+        sys.stderr.write("ошибка: %s\n" % exc)
+        return 2
+    if out:
+        sys.stdout.write(out + "\n")
+    return 0

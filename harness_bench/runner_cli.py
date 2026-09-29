@@ -19,10 +19,12 @@ defaults to operating on its own cwd.
 from __future__ import annotations
 
 import gc
+import hashlib
 import json
 import os
 import re
 import shlex
+import shutil
 import signal
 import subprocess
 import sys
@@ -30,10 +32,13 @@ import threading
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory, mkdtemp
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 
+from harness_bench.cli_artifacts import new_execution, record_execution
+from harness_bench.cli_isolation import bind_fds, sandbox_argv
 from harness_bench.core import Task
 from harness_bench.runner import (
     TaskRun,
@@ -48,6 +53,7 @@ from harness_bench.runner import (
     _task_sort_key,
     _write_interrupted_results_json,
     _write_partial_results_json,
+    load_results_json,
     normalize_json_output_path,
     summarize,
 )
@@ -64,7 +70,7 @@ DEFAULT_TIMEOUT_SECONDS = 600
 _TRANSIENT_ERROR_PATTERN = re.compile(
     r"(?:"
     # HTTP 4xx / 5xx
-    r"status\s+[45]\d\d"
+    r"(?:status|HTTP(?:/\d(?:\.\d)?)?)\s*[:=]?\s*(?:429|5\d\d)"
     # Node.js / libuv socket errors
     r"|ECONN(?:RESET|REFUSED|ABORTED)"
     r"|ETIMEDOUT|EAI_AGAIN|ENETUNREACH|EHOSTUNREACH|EPIPE"
@@ -1017,7 +1023,10 @@ def _task_run_with_cli_stats(
     workspace: Path | None = None,
     stats_workspace: Path | None = None,
 ) -> TaskRun:
-    stats = _codex_json_event_stats(result.stdout or "") if result is not None else None
+    native = _deepagents_worker_result(result.stdout or "") if result is not None else None
+    stats = {key: value for key, value in native.get("stats", {}).items() if key.startswith("agent_") and key in TaskRun.__dataclass_fields__} if native else None
+    if stats is None:
+        stats = _codex_json_event_stats(result.stdout or "") if result is not None else None
     if stats is None and result is not None:
         stats = _claude_json_event_stats(result.stdout or "")
     if stats is None and result is not None:
@@ -1149,29 +1158,32 @@ def _run_cli_subprocess(
     else:
         start_new_session = True
 
-    proc = subprocess.Popen(  # noqa: S603 — trusted local benchmark command
-        argv,
-        cwd=cwd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        stdin=subprocess.DEVNULL,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        env=env,
-        creationflags=creationflags,
-        start_new_session=start_new_session,
-    )
+    with bind_fds(argv) as (command, descriptors):
+        proc = subprocess.Popen(  # noqa: S603 — trusted local benchmark command
+            command,
+            cwd=cwd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdin=subprocess.DEVNULL,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            env=env,
+            creationflags=creationflags,
+            start_new_session=start_new_session,
+        **({"pass_fds": descriptors} if descriptors else {}),
+        )
     _register_active_process(proc)
     try:
         stdout, stderr = proc.communicate(timeout=timeout)
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as exc:
         _terminate_process_tree(proc)
         try:
-            proc.communicate(timeout=_PROCESS_TREE_SHUTDOWN_TIMEOUT)
+            stdout, stderr = proc.communicate(timeout=_PROCESS_TREE_SHUTDOWN_TIMEOUT)
         except subprocess.TimeoutExpired:
             _kill_process_tree(proc)
-            proc.communicate()
+            stdout, stderr = proc.communicate()
+        exc.output, exc.stderr = stdout, stderr
         raise
     except BaseException:
         _terminate_process_tree(proc)
@@ -1363,6 +1375,51 @@ def _swap_model_in_cli_command(cli_command: str, new_model: str) -> str:
     return shlex.join(parts)
 
 
+def _deepagents_worker_result(stdout: str) -> dict | None:
+    for line in reversed(stdout.splitlines()):
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if isinstance(event, dict) and event.get("type") == "hbf_deepagents_result":
+            return event
+    return None
+
+
+def _infrastructure_error(result: subprocess.CompletedProcess[str]) -> str | None:
+    """Only explicit launcher/provider errors; tool/pytest failures remain scored.
+
+    JSON agent transcripts may quote arbitrary task file contents. Never scan
+    them for generic words such as FileNotFoundError or HTTP status strings.
+    """
+    if result.returncode == 0:
+        return None
+    stderr = result.stderr or ""
+    startup = re.search(
+        r"(?:^|\n)(?:head: cannot open '[^'\n]*/mini' for reading: No such file or directory"
+        r"|Error: Unknown provider [^\n]+|[^\n]*: /dev/null: No such file or directory"
+        r"|bwrap: [^\n]+|[^\n]*: (?:mini|hermes|node): command not found)", stderr)
+    if startup:
+        return startup.group(0).strip()
+    if re.search(r"(?:ENOSPC|No space left on device|errno: -28)", stderr):
+        return "CLI environment ran out of disk space"
+    transient = _TRANSIENT_ERROR_PATTERN.search(stderr)
+    if transient:
+        return transient.group(0)
+    # A structured top-level API failure (pi emits these on stdout) is safe to
+    # inspect; nested tool results and ordinary assistant text are not.
+    for line in (result.stdout or "").splitlines():
+        try:
+            event = json.loads(line)
+        except (ValueError, TypeError):
+            continue
+        if isinstance(event, dict) and event.get("type") in {"error", "api_error"}:
+            detail = str(event.get("error", event.get("message", "")))
+            if _TRANSIENT_ERROR_PATTERN.search(detail) or "Unknown provider" in detail:
+                return detail
+    return None
+
+
 def run_task_cli(
     task: Task,
     *,
@@ -1370,211 +1427,165 @@ def run_task_cli(
     timeout: int = DEFAULT_TIMEOUT_SECONDS,
     keep_workspace: bool = False,
     transient_retries: int = DEFAULT_TRANSIENT_RETRIES,
+    isolation: str = "none",
+    runtime_paths: tuple[str, ...] = (),
+    artifacts_root: Path | None = None,
+    extra_env: dict[str, str] | None = None,
 ) -> TaskRun:
-    """Run a single task via the CLI agent and return its `TaskRun` result.
+    """Run one scored attempt, retaining all physical infrastructure retries.
 
-    Transient HTTP errors (4xx/5xx status codes printed by the CLI itself —
-    typically rate-limit 403 / 429 or 5xx server blips from the upstream
-    provider) are retried up to `transient_retries` times with exponential
-    backoff before the task is counted as a real failure. Each retry runs in
-    a fresh per-task temp workspace so the agent starts from clean fixtures.
+    ``none`` is available to Python callers for compatibility and diagnostics;
+    the public CLI defaults to the isolated Linux runner.
     """
+    timeout = max(timeout, int(getattr(task, "min_timeout_seconds", None) or 0))
     _load_env_from_dotenv()
-    workspace_keepalive: TemporaryDirectory | None = None
     base_argv = _ensure_cli_json_events(shlex.split(cli_command))
-    last_result: subprocess.CompletedProcess[str] | None = None
-    last_transient_excerpt: str | None = None
+    if not base_argv:
+        raise ValueError("cli_command is empty")
+    if isolation not in {"none", "bwrap"}:
+        raise ValueError(f"unknown isolation mode: {isolation}")
+    artifacts_root = artifacts_root or Path("jobs/cli_artifacts").resolve()
+    identity = {"isolation": isolation, "cli_command_sha256": hashlib.sha256(cli_command.encode()).hexdigest(),
+                "runtime_paths": list(runtime_paths), "timeout": timeout}
+    history = []
     started = time.monotonic()
-
-    # AGENTS.md is the runtime-tool / memory-discipline convention used by
-    # `deepagents` (and Codex CLI / Cursor): the file lives in the workspace
-    # and is auto-read into the system prompt. Claude Code (`free-code`)
-    # uses its own host-side memory at ~/.claude/projects/... and does NOT
-    # auto-discover AGENTS.md, so tasks that depend on it (e.g.
-    # `tasks_memory.py`) fail by design. When we detect a Claude-Code-like
-    # CLI, inject the workspace AGENTS.md via `--append-system-prompt` so
-    # the agent sees the same ambient instructions an AGENTS.md-native
-    # runtime would.
-    inject_agents_md = any(
-        "free-code" in arg or arg.endswith("/claude") or arg == "claude"
-        for arg in base_argv[:2]
-    )
-
-    try:
-        for attempt in range(transient_retries + 1):
-            if keep_workspace:
-                workspace_path = Path(mkdtemp(prefix=f"hb_cli_{task.id}_"))
-                workspace_keepalive = None
-            else:
-                workspace_keepalive = TemporaryDirectory(prefix=f"hb_cli_{task.id}_")
-                workspace_path = Path(workspace_keepalive.name)
-
-            task.setup(workspace_path)
-
+    inject_agents_md = any("free-code" in arg or arg.endswith("/claude") or arg == "claude" for arg in base_argv[:2])
+    for retry in range(transient_retries + 1):
+        try:
+            execution = new_execution(artifacts_root, task.id, task.prompt)
+        except OSError as exc:
+            error = f"Cannot create persistent CLI evidence: {exc}"
+            history.append({**identity, "retry": retry, "failure_kind": "infrastructure", "phase": "artifacts", "error": error})
+            return TaskRun(task.id, False, "", time.monotonic()-started, error=error,
+                           failure_kind="infrastructure", execution_history=history)
+        workspace_keepalive = None
+        workspace = private = None
+        try:
+            workspace_keepalive = None if keep_workspace else TemporaryDirectory(prefix=f"hb_cli_{task.id}_")
+            workspace = Path(mkdtemp(prefix=f"hb_cli_{task.id}_")) if keep_workspace else Path(workspace_keepalive.name)
+            private = Path(mkdtemp(prefix="hb_cli_private_"))
+            scratch, home = private / "tmp", private / "home"
+            scratch.mkdir()
+            home.mkdir()
+        except OSError as exc:
+            entry = {**identity, "execution": str(execution), "retry": retry, "phase": "allocation", "failure_kind": "infrastructure", "error": str(exc)}
+            history.append(entry)
+            try:
+                record_execution(execution, stdout="", stderr="", metadata=entry, trace_roots=())
+            except OSError as artifact_exc:
+                entry["artifact_error"] = str(artifact_exc)
+            if workspace_keepalive is not None:
+                _cleanup_workspace_keepalive(workspace_keepalive, task_id=task.id)
+            for allocated in (private, workspace if keep_workspace else None):
+                if allocated is not None:
+                    try:
+                        shutil.rmtree(allocated)
+                    except OSError as cleanup_exc:
+                        entry["cleanup_warning"] = str(cleanup_exc)
+            return TaskRun(task.id, False, "", time.monotonic()-started, error=f"Workspace allocation failed: {exc}",
+                           failure_kind="infrastructure", execution_history=history)
+        result = subprocess.CompletedProcess(base_argv, -1, "", "")
+        kind = None
+        error = None
+        run = None
+        retryable = False
+        phase = "setup"
+        wire_session = None
+        try:
+            task.setup(workspace)
             if _STOP_REQUESTED.is_set():
                 raise KeyboardInterrupt
-
-            argv = _argv_for_workspace(base_argv, workspace_path)
-            agents_md = workspace_path / "AGENTS.md"
+            argv = _argv_for_workspace(base_argv, workspace)
+            agents_md = workspace / "AGENTS.md"
             if inject_agents_md and agents_md.exists():
-                argv += [
-                    "--append-system-prompt",
-                    agents_md.read_text(encoding="utf-8"),
-                ]
+                argv += ["--append-system-prompt", agents_md.read_text(encoding="utf-8")]
             argv += [task.prompt]
-
+            env = {**(os.environ if extra_env and "HBF_WORKER_API_KEY" in extra_env else (_subprocess_env_with_token() or os.environ)), **(extra_env or {}),
+                   "HBF_TASK_MIN_RECURSION_LIMIT": str(getattr(task, "min_recursion_limit", None) or 0)}
+            if wire_base := env.get("HBF_WIRE_BASE_URL"):
+                wire_url = urlsplit(wire_base)
+                if (wire_url.scheme != "http" or wire_url.hostname not in {"127.0.0.1", "::1"}
+                    or wire_url.username or wire_url.password or wire_url.query or wire_url.fragment
+                    or not re.fullmatch(r"/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?", wire_url.path)):
+                    raise ValueError("HBF_WIRE_BASE_URL must be loopback http://HOST:PORT/run/harness")
+                wire_session = execution.name
+                endpoint = f"{wire_base.rstrip('/')}/{wire_session}/v1"
+                env.update(HBF_API_BASE=endpoint, OPENROUTER_BASE_URL=endpoint)
+            if isolation == "bwrap":
+                argv = sandbox_argv(argv, workspace=workspace, scratch=scratch, home=home, runtime_paths=runtime_paths)
+            else:
+                env = {**(env or os.environ), "TMPDIR": str(scratch), "TMP": str(scratch), "TEMP": str(scratch)}
+            phase = "cli"
+            result = _run_cli_subprocess(argv, cwd=workspace, timeout=timeout, env=env)
+            native = _deepagents_worker_result(result.stdout or "")
+            error = _infrastructure_error(result)
+            if extra_env and "HBF_WORKER_API_KEY" in extra_env:
+                terminal_count = sum(1 for line in (result.stdout or "").splitlines() if _deepagents_worker_result(line))
+                if terminal_count != 1 or not native or not isinstance(native.get("stats"), dict) or (result.returncode and not native.get("failure_kind")):
+                    native = {"failure_kind": "infrastructure", "message": "Deepagents worker did not produce exactly one valid terminal event", "retryable": False, "stats": {}}
+            if native and native.get("failure_kind"):
+                kind, error = native["failure_kind"], native.get("message", "worker failed")
+                retryable = bool(native.get("retryable")) and kind == "infrastructure"
+                run = _task_run_with_cli_stats(task_id=task.id, passed=False, message=error,
+                    elapsed_seconds=time.monotonic()-started, result=result,
+                    error=error if kind == "infrastructure" else None,
+                    workspace=workspace if keep_workspace else None, stats_workspace=workspace)
+            elif error:
+                kind = "infrastructure"
+                retryable = bool(_TRANSIENT_ERROR_PATTERN.search(error))
+            else:
+                phase = "verify"
+                outcome = task.verify(workspace)
+                message = outcome.message
+                if result.returncode:
+                    message += f" | CLI exit={result.returncode}: {(result.stderr or result.stdout).strip()[-300:]!r}"
+                run = _task_run_with_cli_stats(task_id=task.id, passed=outcome.passed, message=message,
+                    elapsed_seconds=time.monotonic()-started, result=result,
+                    workspace=workspace if keep_workspace else None, stats_workspace=workspace)
+        except subprocess.TimeoutExpired as exc:
+            kind, error = "timeout", f"CLI timed out after {timeout}s"
+            result = subprocess.CompletedProcess(base_argv, -1, exc.stdout, exc.stderr)
+        except Exception:  # noqa: BLE001 — preserve setup/launcher/verifier evidence
+            kind, error = "infrastructure", traceback.format_exc()
+        except KeyboardInterrupt:
+            kind, error = "interrupted", f"Interrupted during {phase}"
+            raise
+        finally:
+            entry = {"execution": str(execution), "retry": retry, "failure_kind": kind,
+                     "phase": phase, "returncode": result.returncode, "error": error,
+                     "passed": bool(run and run.passed), "isolation": isolation,
+                     "cli_command_sha256": hashlib.sha256(cli_command.encode()).hexdigest(),
+                     "timeout": timeout, "runtime_paths": list(runtime_paths), "wire_session": wire_session}
+            history.append(entry)
             try:
-                last_result = _run_cli_subprocess(
-                    argv,
-                    cwd=workspace_path,
-                    timeout=timeout,
-                    env=_subprocess_env_with_token(),
-                )
-            except subprocess.TimeoutExpired:
-                return TaskRun(
-                    task_id=task.id,
-                    passed=False,
-                    message="",
-                    elapsed_seconds=time.monotonic() - started,
-                    error=f"CLI timed out after {timeout}s",
-                    workspace=workspace_path if keep_workspace else None,
-                )
-            except FileNotFoundError as exc:
-                return TaskRun(
-                    task_id=task.id,
-                    passed=False,
-                    message="",
-                    elapsed_seconds=time.monotonic() - started,
-                    error=f"CLI executable not found: {exc}",
-                    workspace=workspace_path if keep_workspace else None,
-                )
-            except Exception:  # noqa: BLE001 — surface as failure
-                return TaskRun(
-                    task_id=task.id,
-                    passed=False,
-                    message="",
-                    elapsed_seconds=time.monotonic() - started,
-                    error=traceback.format_exc(),
-                    workspace=workspace_path if keep_workspace else None,
-                )
-
-            outcome = task.verify(workspace_path)
-            if outcome.passed:
-                return _task_run_with_cli_stats(
-                    task_id=task.id,
-                    passed=True,
-                    message=outcome.message,
-                    elapsed_seconds=time.monotonic() - started,
-                    result=last_result,
-                    workspace=workspace_path if keep_workspace else None,
-                    stats_workspace=workspace_path,
-                )
-
-            # Decide whether to retry. We retry on any transient network error
-            # (HTTP 4xx/5xx or transport-level disconnect). Other failures
-            # (verifier mismatch, model wrote the wrong content) get surfaced
-            # immediately — retrying wouldn't change the outcome.
-            combined = ((last_result.stderr or "") + "\n" + (last_result.stdout or ""))
-            m = _TRANSIENT_ERROR_PATTERN.search(combined)
-            if m and attempt < transient_retries:
-                last_transient_excerpt = m.group(0)
-                # Clean up the failed-attempt workspace before retrying, then
-                # sleep with a progressive backoff (30s, 60s, 120s, 240s, 300s)
-                # — long enough to outlive multi-minute IP throttles on the
-                # IFT endpoint.
-                if workspace_keepalive is not None:
-                    _cleanup_workspace_keepalive(workspace_keepalive, task_id=task.id)
-                    workspace_keepalive = None
-                delay = _BACKOFF_SCHEDULE[min(attempt, len(_BACKOFF_SCHEDULE) - 1)]
-                _sleep_interruptibly(delay)
-                continue
-
-            # Verifier failed and the error isn't transient (or budget exhausted).
-            # If we tried to retry at all, prefer the "gave up" wording so the
-            # log surfaces retry exhaustion clearly even when the CLI also
-            # exited non-zero.
-            message = outcome.message
-            if last_transient_excerpt:
-                message = (
-                    f"{outcome.message} | gave up after {transient_retries} transient retries "
-                    f"({last_transient_excerpt!r})"
-                )
-            elif last_result.returncode != 0:
-                tail = (last_result.stderr or last_result.stdout).strip()[-300:]
-                message = f"{outcome.message} | CLI exit={last_result.returncode}: {tail!r}"
-
-            # PROM fallback: when the primary path (typically IFT) exhausted
-            # its retry budget on transient errors AND PROM credentials are
-            # configured in the environment, retry the task once on PROM with
-            # the closest available model (default GigaChat-2-Max). This isn't
-            # "apples-to-apples" — the model is different — but it answers
-            # "would this task have passed if our infra weren't throttling?".
-            if last_transient_excerpt:
-                prom_env = _subprocess_env_with_prom_token()
-                if prom_env is not None:
-                    prom_model = os.getenv("GIGACHAT_PROM_MODEL", "GigaChat-2-Max")
-                    prom_base_argv = _ensure_codex_json_events(
-                        shlex.split(_swap_model_in_cli_command(cli_command, prom_model))
-                    )
-                    # Clean prior workspace and re-set up for PROM attempt.
-                    if workspace_keepalive is not None:
-                        _cleanup_workspace_keepalive(workspace_keepalive, task_id=task.id)
-                        workspace_keepalive = None
-                    if keep_workspace:
-                        workspace_path = Path(mkdtemp(prefix=f"hb_cli_prom_{task.id}_"))
-                    else:
-                        workspace_keepalive = TemporaryDirectory(
-                            prefix=f"hb_cli_prom_{task.id}_"
-                        )
-                        workspace_path = Path(workspace_keepalive.name)
-                    task.setup(workspace_path)
-                    prom_argv = [
-                        *_argv_for_workspace(prom_base_argv, workspace_path),
-                        task.prompt,
-                    ]
-                    try:
-                        prom_result = _run_cli_subprocess(
-                            prom_argv,
-                            cwd=workspace_path,
-                            timeout=timeout,
-                            env=prom_env,
-                        )
-                    except subprocess.TimeoutExpired:
-                        prom_result = None
-                    except Exception:  # noqa: BLE001
-                        prom_result = None
-                    if prom_result is not None:
-                        prom_outcome = task.verify(workspace_path)
-                        prom_tag = f" [PROM-fallback model={prom_model}]"
-                        if prom_outcome.passed:
-                            return _task_run_with_cli_stats(
-                                task_id=task.id,
-                                passed=True,
-                                message=prom_outcome.message + prom_tag,
-                                elapsed_seconds=time.monotonic() - started,
-                                result=prom_result,
-                                workspace=workspace_path if keep_workspace else None,
-                                stats_workspace=workspace_path,
-                            )
-                        # PROM-fallback also failed — surface its message for visibility.
-                        message = f"{message} | PROM-fallback({prom_model}): {prom_outcome.message}"
-
-            return _task_run_with_cli_stats(
-                task_id=task.id,
-                passed=False,
-                message=message,
-                elapsed_seconds=time.monotonic() - started,
-                result=last_result,
-                workspace=workspace_path if keep_workspace else None,
-                stats_workspace=workspace_path,
-            )
-
-        # Unreachable — the loop above always returns. Keep a deterministic
-        # fallback so static analysis doesn't complain.
-        raise RuntimeError("run_task_cli retry loop fell through")
-    finally:
-        if workspace_keepalive is not None:
-            _cleanup_workspace_keepalive(workspace_keepalive, task_id=task.id)
+                record_execution(execution, stdout=result.stdout, stderr=result.stderr,
+                    metadata={**entry, "task_id": task.id, "timeout": timeout, "runtime_paths": list(runtime_paths)},
+                    trace_roots=(workspace,), state_roots=(scratch, home))
+            except OSError as exc:
+                entry["artifact_error"] = str(exc)
+                entry["primary_failure_kind"] = kind
+                error = f"{error + ' | ' if error else ''}Cannot save complete CLI evidence: {exc}"
+                kind, run, retryable = "infrastructure", None, False
+                entry.update(failure_kind=kind, error=error, passed=False)
+            if workspace_keepalive is not None:
+                leftover = _cleanup_workspace_keepalive(workspace_keepalive, task_id=task.id)
+                if leftover:
+                    entry["workspace_cleanup_warning"] = str(leftover)
+            # Only the directory allocated by this execution is removed. Failed
+            # cleanup cannot replace a timeout/provider/evidence error.
+            try:
+                shutil.rmtree(private)
+            except OSError as exc:
+                entry["scratch_cleanup_warning"] = str(exc)
+                print(f"[WARN] {task.id}: private scratch retained at {private}: {exc}", file=sys.stderr)
+        if kind == "infrastructure" and retryable and retry < transient_retries:
+            _sleep_interruptibly(_BACKOFF_SCHEDULE[min(retry, len(_BACKOFF_SCHEDULE)-1)])
+            continue
+        if run is None:
+            run = TaskRun(task.id, False, "", time.monotonic()-started, error=error,
+                          workspace=workspace if keep_workspace else None, failure_kind=kind)
+        return replace(run, failure_kind=kind, execution_history=history)
+    raise RuntimeError("run_task_cli retry loop fell through")
 
 
 def run_all_cli(
@@ -1587,6 +1598,12 @@ def run_all_cli(
     attempts: int = 1,
     json_output: str | Path | None = None,
     rerun_on_fail: bool = False,
+    isolation: str = "none",
+    runtime_paths: tuple[str, ...] = (),
+    artifacts_root: Path | None = None,
+    transient_retries: int = DEFAULT_TRANSIENT_RETRIES,
+    extra_env_factory=None,
+    fail_on_runtime_error: bool = False,
 ) -> list[TaskRun]:
     """Run a subset (or all) of the benchmark via the CLI agent."""
     _load_env_from_dotenv()
@@ -1595,6 +1612,27 @@ def run_all_cli(
     if attempts < 1:
         raise ValueError("attempts must be positive")
 
+    if artifacts_root is None:
+        artifacts_root = Path(str(json_output) + ".artifacts").resolve() if json_output else Path("jobs/cli_artifacts").resolve()
+    previous = {(r.task_id, r.attempt): r for r in load_results_json(json_output)} if json_output and json_output.exists() else {}
+
+    if isolation == "bwrap":
+        expected_command = hashlib.sha256(cli_command.encode()).hexdigest()
+        for prior in previous.values():
+            actual = [item for item in (prior.execution_history or []) if item.get("cli_command_sha256")]
+            if (not actual or actual[-1].get("isolation") != isolation
+                    or actual[-1].get("cli_command_sha256") != expected_command
+                    or actual[-1].get("runtime_paths") != list(runtime_paths)):
+                raise ValueError("Cannot mix legacy/different CLI settings with isolated results; use a new --json-output file")
+
+    def retain_history(run: TaskRun, attempt: int) -> TaskRun:
+        prior = previous.get((run.task_id, attempt))
+        if prior is not None:
+            old = prior.execution_history or [{"legacy_result": True, "passed": prior.passed, "error": prior.error,
+                                               "failure_kind": prior.failure_kind, "elapsed_seconds": prior.elapsed_seconds}]
+            return replace(run, execution_history=[*old, {"resume": True, "rerun_on_fail": rerun_on_fail}, *(run.execution_history or [])])
+        return run
+
     targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
     results = _resume_results(
         json_output,
@@ -1602,6 +1640,8 @@ def run_all_cli(
         attempts,
         rerun_on_fail=rerun_on_fail,
     )
+    if fail_on_runtime_error and any(run.error for run in results):
+        return results
     pending_attempts = _pending_task_attempts(targets, attempts, results)
     if not pending_attempts:
         _write_partial_results_json(results, json_output)
@@ -1617,14 +1657,19 @@ def run_all_cli(
                     cli_command=cli_command,
                     timeout=timeout,
                     keep_workspace=keep_workspace,
+                    isolation=isolation, runtime_paths=runtime_paths, artifacts_root=artifacts_root,
+                    transient_retries=transient_retries,
+                    extra_env=extra_env_factory() if extra_env_factory else None,
                 )
-                run = _mark_attempt(run, attempt, attempts)
+                run = _mark_attempt(retain_history(run, attempt), attempt, attempts)
                 results.append(run)
                 _write_partial_results_json(results, json_output)
                 status = "PASS" if run.passed else "FAIL"
                 print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
                 if keep_workspace and run.workspace:
                     print(f"  workspace: {run.workspace}")
+                if fail_on_runtime_error and run.error:
+                    break
         except KeyboardInterrupt:
             _STOP_REQUESTED.set()
             _terminate_all_active_processes()
@@ -1648,13 +1693,21 @@ def run_all_cli(
                 cli_command=cli_command,
                 timeout=timeout,
                 keep_workspace=keep_workspace,
+                isolation=isolation, runtime_paths=runtime_paths, artifacts_root=artifacts_root,
+                transient_retries=transient_retries,
+                extra_env=extra_env_factory() if extra_env_factory else None,
             ): (task, attempt)
             for task, attempt in pending_attempts
         }
         for future in as_completed(future_to_task):
+            if future.cancelled():
+                continue
             _task, attempt = future_to_task[future]
-            run = _mark_attempt(future.result(), attempt, attempts)
+            run = _mark_attempt(retain_history(future.result(), attempt), attempt, attempts)
             results.append(run)
+            if fail_on_runtime_error and run.error:
+                for pending in future_to_task:
+                    pending.cancel()
             _write_partial_results_json(results, json_output)
             with print_lock:
                 completed += 1

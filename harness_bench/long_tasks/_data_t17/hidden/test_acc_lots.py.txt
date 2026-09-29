@@ -1,0 +1,254 @@
+# -*- coding: utf-8 -*-
+import csv
+import io
+import os
+
+import pytest
+from acc_helpers import base_db, feature_db, run_cli, save
+
+from stockroom import adjustments, catalog, csvio, inventory, lots, orders, receiving
+from stockroom.errors import InsufficientStock, ValidationError
+from stockroom.money import D
+
+
+def test_track_expiry_flag_values():
+    db = base_db()
+    assert catalog.addItem(db, "K1", "Кефир", "70", track_expiry=True)["track_expiry"] is True
+    assert catalog.addItem(db, "K2", "Кефир 2", "70")["track_expiry"] is False
+    for value, expected in (("да", True), ("NO", False), ("1", True), ("false", False), (True, True)):
+        catalog.updateItem(db, "K2", track_expiry=value)
+        assert catalog.getItem(db, "K2")["track_expiry"] is expected
+    with pytest.raises(ValidationError):
+        catalog.updateItem(db, "K2", track_expiry="может быть")
+
+
+def test_parse_line_with_lot_and_expiry():
+    assert receiving.parse_line("yog:10@31.5#L-0314!2024-04-01") == {
+        "sku": "YOG", "qty": D("10"), "cost": D("31.5"), "lot": "L-0314", "expiry": "2024-04-01"}
+    assert receiving.parse_line("YOG:2@3!2024-04-01") == {"sku": "YOG", "qty": D(2), "cost": D(3),
+                                                          "expiry": "2024-04-01"}
+    assert receiving.parse_line("YOG:2@3#x.1") == {"sku": "YOG", "qty": D(2), "cost": D(3), "lot": "x.1"}
+    assert receiving.parse_line("YOG:2@3") == {"sku": "YOG", "qty": D(2), "cost": D(3)}
+
+
+def test_lots_of_is_fefo_with_default_codes():
+    db = feature_db()
+    rows = lots.lots_of(db, "yog")
+    assert [(r["lot"], r["expiry"], r["qty"], r["cost"]) for r in rows] == [
+        ("B", "2024-03-15", D(10), D("31.00")), ("A", "2024-03-20", D(10), D("30.00")),
+        ("R-0003-3", "2024-03-25", D(5), D("29.00"))]
+    assert rows[0]["doc"] == "R-0003" and rows[0]["date"] == "2024-03-02"
+    milk = lots.lots_of(db, "MILK")
+    assert [(r["lot"], r["expiry"]) for r in milk] == [("R-0001-1", None), ("R-0002-1", None)]
+
+
+def test_receipt_document_lines_keep_old_shape():
+    db = feature_db()
+    doc = db.data["documents"]["R-0003"]
+    assert doc["lines"][0] == {"sku": "YOG", "qty": "10", "cost": "30.00", "lot": "A", "expiry": "2024-03-20"}
+    assert doc["lines"][2] == {"sku": "YOG", "qty": "5", "cost": "29.00", "expiry": "2024-03-25"}
+    assert db.data["documents"]["R-0001"]["lines"][0] == {"sku": "MILK", "qty": "30", "cost": "55.00"}
+
+
+@pytest.mark.parametrize("line", [
+    "YOG:1@30",                      # срок обязателен
+    "MILK:1@30!2024-05-01",          # у молока нет учёта сроков
+    "YOG:1@30#A!2024-05-01",         # партия A уже есть
+    "YOG:1@30#bad/lot!2024-05-01",   # недопустимый символ
+    "YOG:1@30#TOO-LONG-LOT-CODE-12345!2024-05-01",
+    "YOG:1@30#Z!2024-03-09",         # срок раньше даты прихода
+    "YOG:1@30#Z!2024-02-30",         # не дата
+])
+def test_receipt_line_validation(line):
+    db = feature_db()
+    before = len(db.data["documents"])
+    with pytest.raises(ValidationError):
+        receiving.receive(db, "SUP1", "2024-03-10", ["BREAD:1@20", line])
+    assert len(db.data["documents"]) == before
+    assert inventory.on_hand(db, "BREAD") == D(40)
+
+
+def test_lot_codes_unique_even_after_consumption_and_within_receipt():
+    db = feature_db()
+    with pytest.raises(ValidationError):
+        receiving.receive(db, "SUP1", "2024-03-10", ["YOG:1@30#N1!2024-05-01", "YOG:2@30#N1!2024-05-02"])
+    with pytest.raises(ValidationError):
+        receiving.receive(db, "SUP1", "2024-03-10", ["MILK:1@50#R-0001-1"])
+    order = orders.create_order(db, "C1", "2024-03-10", ["MILK:30"])
+    orders.ship_order(db, order["id"], "2024-03-10")
+    assert "R-0001-1" not in [r["lot"] for r in lots.lots_of(db, "MILK")]
+    with pytest.raises(ValidationError):
+        receiving.receive(db, "SUP1", "2024-03-11", ["MILK:1@50#R-0001-1"])
+    doc = receiving.receive(db, "SUP1", "2024-03-11", ["MILK:1@50#R-0001-1X", "YOG:1@30!2024-03-11"])
+    assert doc["lines"][1]["expiry"] == "2024-03-11"
+
+
+def test_shipment_skips_expired_lots():
+    db = feature_db()
+    order = orders.create_order(db, "C1", "2024-03-16", ["YOG:12"])
+    orders.ship_order(db, order["id"], "2024-03-16")
+    alloc = order["lines"][0]["allocations"]
+    assert [(a["lot"], a["qty"], a["expiry"]) for a in alloc] == [("A", "10", "2024-03-20"),
+                                                                  ("R-0003-3", "2", "2024-03-25")]
+    assert [(r["lot"], r["qty"]) for r in lots.lots_of(db, "YOG")] == [("B", D(10)), ("R-0003-3", D(3))]
+    assert db.check_integrity() == []
+
+
+def test_lot_expiring_on_shipment_date_is_shipped():
+    db = feature_db()
+    order = orders.create_order(db, "C1", "2024-03-15", ["YOG:4"])
+    orders.ship_order(db, order["id"], "2024-03-15")
+    assert [a["lot"] for a in order["lines"][0]["allocations"]] == ["B"]
+
+
+def test_insufficient_counts_only_fresh_lots():
+    db = feature_db()
+    order = orders.create_order(db, "C1", "2024-03-21", ["YOG:6", "BREAD:1"])
+    with pytest.raises(InsufficientStock) as ctx:
+        orders.ship_order(db, order["id"], "2024-03-21")
+    assert (ctx.value.sku, ctx.value.need, ctx.value.have) == ("YOG", "6", "5")
+    assert order["status"] == "new"
+    assert inventory.on_hand(db, "YOG") == D(25)
+    assert inventory.on_hand(db, "BREAD") == D(40)
+
+
+def test_fefo_puts_lots_without_expiry_last_and_ties_by_receipt():
+    db = feature_db()
+    catalog.updateItem(db, "MILK", track_expiry=True)
+    receiving.receive(db, "SUP1", "2024-03-06", ["MILK:5@60#M1!2024-04-10", "MILK:5@61#M2!2024-04-01"])
+    receiving.receive(db, "SUP1", "2024-03-07", ["MILK:5@62#M3!2024-04-01"])
+    order = orders.create_order(db, "C1", "2024-03-08", ["MILK:17"])
+    orders.ship_order(db, order["id"], "2024-03-08")
+    got = [(a["lot"], a["qty"]) for a in order["lines"][0]["allocations"]]
+    assert got == [("M2", "5"), ("M3", "5"), ("M1", "5"), ("R-0001-1", "2")]
+
+
+def test_writeoff_fefo_includes_expired_and_by_lot():
+    db = feature_db()
+    doc = adjustments.writeoff(db, "YOG", 12, "2024-03-21", "просрочка")
+    assert [(a["lot"], a["qty"]) for a in doc["allocations"]] == [("B", "10"), ("A", "2")]
+    doc = adjustments.writeoff(db, "YOG", 3, "2024-03-21", "бой", lot="R-0003-3")
+    assert doc["cost"] == "87.00"
+    assert [(r["lot"], r["qty"]) for r in lots.lots_of(db, "YOG")] == [("A", D(8)), ("R-0003-3", D(2))]
+    with pytest.raises(ValidationError):
+        adjustments.writeoff(db, "YOG", 1, "2024-03-21", "бой", lot="B")
+    with pytest.raises(InsufficientStock):
+        adjustments.writeoff(db, "YOG", 3, "2024-03-21", "бой", lot="R-0003-3")
+
+
+def test_adjust_shortage_fefo_and_surplus_lot():
+    db = feature_db()
+    adjustments.adjust_count(db, "YOG", 22, "2024-03-21")
+    assert [(r["lot"], r["qty"]) for r in lots.lots_of(db, "YOG")] == [("B", D(7)), ("A", D(10)),
+                                                                       ("R-0003-3", D(5))]
+    doc = adjustments.adjust_count(db, "YOG", 24, "2024-03-22")
+    rows = lots.lots_of(db, "YOG")
+    assert (rows[-1]["lot"], rows[-1]["expiry"], rows[-1]["qty"]) == (doc["id"], None, D(2))
+
+
+def test_expiring_report_rows():
+    db = feature_db()
+    rows = lots.expiring(db, "2024-03-16", days=5)
+    assert [(r["sku"], r["lot"], r["expiry"], r["qty"], r["days_left"]) for r in rows] == [
+        ("YOG", "B", "2024-03-15", D(10), -1), ("YOG", "A", "2024-03-20", D(10), 4)]
+    assert rows[0]["name"] == "Йогурт"
+    assert [r["lot"] for r in lots.expiring(db, "2024-03-01")] == ["B", "A", "R-0003-3"]
+
+
+def test_cli_lots_and_expiry_report(tmp_path):
+    path = save(feature_db(), tmp_path)
+    rc, out, err = run_cli(path, "--format", "csv", "lots", "YOG")
+    assert rc == 0, err
+    assert out.splitlines() == ["lot,expiry,qty,cost", "B,2024-03-15,10,31.00", "A,2024-03-20,10,30.00",
+                                "R-0003-3,2024-03-25,5,29.00"]
+    rc, out, err = run_cli(path, "--format", "csv", "report", "expiry", "--on", "2024-03-16", "--days", "5")
+    assert rc == 0, err
+    rows = list(csv.DictReader(io.StringIO(out)))
+    assert [(r["lot"], r["days_left"], r["qty"]) for r in rows] == [("B", "-1", "10"), ("A", "4", "10")]
+    assert list(rows[0].keys()) == ["sku", "name", "lot", "expiry", "qty", "days_left"]
+    rc, _, _ = run_cli(path, "report", "expiry")
+    assert rc == 2
+
+
+def test_cli_receive_with_lots_and_writeoff_lot(tmp_path):
+    path = save(feature_db(), tmp_path)
+    rc, out, err = run_cli(path, "receive", "--supplier", "SUP1", "--date", "2024-03-12",
+                           "YOG:4@33#Q7!2024-04-02", "MILK:1@50")
+    assert rc == 0, err
+    assert out.strip() == "Приход R-0005 проведён: строк 2, сумма 182,00"
+    rc, out, err = run_cli(path, "writeoff", "YOG", "1", "--date", "2024-03-12", "--reason", "бой", "--lot", "Q7")
+    assert rc == 0, err
+    rc, out, _ = run_cli(path, "--format", "csv", "lots", "YOG")
+    assert "Q7,2024-04-02,3,33.00" in out.splitlines()
+    rc, _, err = run_cli(path, "receive", "--supplier", "SUP1", "--date", "2024-03-12", "YOG:4@33")
+    assert rc == 2 and err.startswith("ошибка: ")
+
+
+def test_item_show_new_lines(tmp_path):
+    path = save(feature_db(), tmp_path)
+    rc, out, err = run_cli(path, "item", "show", "WINE")
+    assert rc == 0, err
+    lines = out.strip().splitlines()
+    assert lines[-2:] == ["Валюта цены: EUR", "Учёт сроков годности: нет"]
+    assert lines[-3].startswith("Скидки за количество")
+    rc, out, _ = run_cli(path, "item", "show", "YOG")
+    assert out.strip().splitlines()[-2:] == ["Валюта цены: RUB", "Учёт сроков годности: да"]
+    rc, out, err = run_cli(path, "item", "add", "KEFIR", "Кефир", "--price", "70", "--track-expiry")
+    assert rc == 0, err
+    rc, out, err = run_cli(path, "item", "update", "KEFIR", "--track-expiry", "no", "--currency", "cny")
+    assert rc == 0, err
+    rc, out, _ = run_cli(path, "item", "show", "KEFIR")
+    assert out.strip().splitlines()[-2:] == ["Валюта цены: CNY", "Учёт сроков годности: нет"]
+
+
+def test_export_and_import_lots(tmp_path):
+    db = feature_db()
+    target = os.path.join(str(tmp_path), "lots.csv")
+    n = csvio.export_lots(db, target)
+    with open(target, encoding="utf-8") as fh:
+        rows = list(csv.reader(fh))
+    assert rows[0] == ["sku", "lot", "expiry", "qty", "cost", "currency", "cost_cur"]
+    assert n == len(rows) - 1
+    assert rows[1][:2] == ["BREAD", "R-0001-2"]
+    assert ["WINE", "R-0004-1", "", "12", "696.68", "EUR", "7.10"] in rows
+    yog = [r for r in rows if r[0] == "YOG"]
+    assert [r[1] for r in yog] == ["B", "A", "R-0003-3"]
+    stock_csv = os.path.join(str(tmp_path), "stock.csv")
+    with open(stock_csv, "w", encoding="utf-8") as fh:
+        fh.write("sku,qty,cost,lot,expiry\nYOG,3,28,OPEN-1,2024-04-30\nMILK,2,50,,\n")
+    doc = csvio.import_stock(db, stock_csv, "2024-03-12")
+    assert doc["lines"][0]["lot"] == "OPEN-1"
+    assert [r["lot"] for r in lots.lots_of(db, "MILK")][-1] == doc["id"] + "-2"
+    bad = os.path.join(str(tmp_path), "bad.csv")
+    with open(bad, "w", encoding="utf-8") as fh:
+        fh.write("sku,qty,cost,lot,expiry\nBREAD,3,28,,\nYOG,3,28,OPEN-2,\n")
+    with pytest.raises(ValidationError):
+        csvio.import_stock(db, bad, "2024-03-12")
+    assert inventory.on_hand(db, "BREAD") == D(40)
+
+
+def test_shipment_takes_all_fresh_lots_leaving_expired():
+    db = feature_db()
+    order = orders.create_order(db, "C2", "2024-03-16", ["YOG:15"])
+    orders.ship_order(db, order["id"], "2024-03-16")
+    assert [(a["lot"], a["qty"]) for a in order["lines"][0]["allocations"]] == [("A", "10"), ("R-0003-3", "5")]
+    assert [(r["lot"], r["qty"]) for r in lots.lots_of(db, "YOG")] == [("B", D(10))]
+
+
+def test_cli_ship_fails_when_only_expired_left(tmp_path):
+    path = save(feature_db(), tmp_path)
+    rc, out, err = run_cli(path, "order", "create", "--customer", "C1", "--date", "2024-03-16", "YOG:16")
+    assert rc == 0, err
+    rc, _, err = run_cli(path, "order", "ship", "S-0001", "--date", "2024-03-16")
+    assert rc == 2
+    assert err.strip() == "ошибка: недостаточно остатка YOG: нужно 16, есть 15"
+
+
+def test_expired_lot_written_off_after_failed_shipment():
+    db = feature_db()
+    order = orders.create_order(db, "C1", "2024-03-26", ["YOG:1"])
+    with pytest.raises(InsufficientStock):
+        orders.ship_order(db, order["id"], "2024-03-26")
+    doc = adjustments.writeoff(db, "YOG", 25, "2024-03-26", "просрочка")
+    assert [a["lot"] for a in doc["allocations"]] == ["B", "A", "R-0003-3"]
+    assert inventory.on_hand(db, "YOG") == D(0)

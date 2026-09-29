@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+"""Остатки и их стоимость по категориям: число позиций с остатком, количество
+(только для штучного товара, весовой не суммируется), стоимость по себестоимости."""
+
+from ..costing import value_of
+from ..inventory import on_hand
+from ..money import D, fmt_money, fmt_qty, q2
+from ..textable import render as _render
+
+COLUMNS = [("category", "Категория"), ("positions", "Позиций", "r"), ("units", "Штук", "r"),
+           ("value", "Стоимость", "r")]
+
+
+def build(db):
+    acc = {}
+    for sku, item in db.data["items"].items():
+        qty = on_hand(db, sku)
+        if qty == 0:
+            continue
+        cat = item.get("category") or "(без категории)"
+        a = acc.setdefault(cat, {"positions": 0, "units": D(0), "value": D(0)})
+        a["positions"] += 1
+        if item.get("unit", "шт") != "кг":
+            a["units"] += qty
+        a["value"] += q2(value_of(db, sku))
+    return [dict(category=c, **acc[c]) for c in sorted(acc)]
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db)
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, units=fmt_qty(r["units"]), value=fmt_money(r["value"])) for r in rows]
+    return _render(COLUMNS, view, "text", title="Остатки по категориям")

@@ -1,0 +1,91 @@
+# Командная строка stockroom
+
+Общий вид: `python3 -m stockroom [--db ПУТЬ] [--format text|csv] КОМАНДА ...`
+
+База: `--db`, иначе переменная `STOCKROOM_DB`, иначе `./stockroom.json`. При ошибке
+данных команда печатает `ошибка: ...` в stderr и завершается с кодом 2.
+
+## Справочники
+
+| команда | что делает |
+|---------|------------|
+| `init --company НАЗВАНИЕ [--currency RUB] [--vat 20]` | создать базу |
+| `item add SKU НАЗВАНИЕ --price P [--unit шт] [--vat 20] [--category К] [--min-qty N] [--barcode EAN] [--date D]` | новый товар |
+| `item list [--category К] [--all]` | список товаров (CSV: `sku,name,unit,price,vat,category,active`) |
+| `item show SKU` | карточка с остатком и скидками за количество |
+| `item update SKU [--name] [--price] [--unit] [--vat] [--category] [--barcode] [--min-qty]` | изменить |
+| `item deactivate SKU` / `item activate SKU` | вывести из ассортимента / вернуть |
+| `item search ТЕКСТ` | поиск по артикулу, названию, категории, штрихкоду |
+| `supplier add КОД НАЗВАНИЕ [--inn] [--phone]`, `supplier list` | поставщики |
+| `customer add КОД НАЗВАНИЕ [--discount %] [--group retail|wholesale] [--inn]` | покупатели |
+| `customer update КОД [--discount] [--group] [--block|--unblock]`, `customer list [--group]` | |
+| `breaks set SKU MIN:ПРОЦЕНТ ...` | скидки за количество |
+| `pricelist ПОКУПАТЕЛЬ [--qty N]` | цены для покупателя |
+
+## Документы
+
+| команда | что делает |
+|---------|------------|
+| `receive --supplier S --date D [--note] SKU:КОЛ@ЦЕНА ...` | приход (цена — за единицу без НДС) |
+| `receipt show ID`, `receipt reverse ID --date D`, `receipt list [--from] [--to] [--supplier]` | приходы |
+| `order create --customer C --date D SKU:КОЛ ...` | заказ покупателя |
+| `order ship ID --date D` | отгрузка (всё или ничего, FIFO) |
+| `order cancel ID`, `order show ID`, `order list [--status] [--customer] [--from] [--to]` | |
+| `invoice ID` | счёт |
+| `waybill ID` | накладная (с указанием приходов, из которых отгружено) |
+| `return ЗАКАЗ --date D [--reason R]` | возврат всего заказа |
+| `adjust SKU --count N --date D [--reason]` | результат пересчёта товара |
+| `writeoff SKU QTY --date D --reason R` | списание |
+| `po create --supplier S --date D SKU:КОЛ@ЦЕНА ...` | заказ поставщику |
+| `po receive ID [SKU:КОЛ ...] --date D` | приход по заказу поставщику (без строк — всё недополученное) |
+| `po close ID`, `po list [--supplier]` | |
+| `payment ПОКУПАТЕЛЬ СУММА --date D [--order ID]` | оплата |
+| `balance ПОКУПАТЕЛЬ [--date D]`, `act ПОКУПАТЕЛЬ --from D --to D` | долг, акт сверки |
+| `stocktake start [SKU ...] --date D [--category К]` | начать инвентаризацию по описи |
+| `stocktake count SKU КОЛ`, `stocktake diff`, `stocktake post --date D`, `stocktake cancel` | |
+| `kit set SKU ЧАСТЬ:КОЛ ...`, `kit show SKU`, `kit build SKU N --date D`, `kit unbuild SKU N --date D` | комплекты |
+| `price change SKU --price P --date D [--note]`, `price history SKU` | история цен |
+| `label SKU ...` | ценники |
+
+Внимание: у команд с необязательным списком строк (`po receive`) строки нужно писать
+**до** опций (`po receive PO-0001 TEA:5 --date 2024-03-11`) — особенность argparse.
+
+## Отчёты
+
+`report ИМЯ [опции]`, где ИМЯ и опции:
+
+| отчёт | опции | колонки CSV |
+|-------|-------|-------------|
+| `stock` | `--category`, `--inactive` | `sku,name,unit,qty,min_qty,status` |
+| `low` | | `sku,name,qty,min_qty,reorder` |
+| `movements` | `--from`, `--to`, `--sku`, `--type` | `id,date,type,sku,qty,cost,doc` |
+| `valuation` | `--category` | `sku,name,qty,avg_cost,value` |
+| `sales` | `--from`, `--to`, `--group sku|customer` | `sku,name,qty,revenue,cost,margin` |
+| `abc` | `--from`, `--to` | `rank,sku,name,revenue,share,cum,cls` |
+| `turnover` | `--from`, `--to` (обязательны) | `sku,start,incoming,outgoing,end,days` |
+| `purchases` | `--from`, `--to` | `supplier,name,docs,total` |
+| `debts` | `--to` | `customer,name,shipped,paid,returned,debt` |
+| `history` | `--sku` (обязательно), `--from`, `--to` | `date,doc,type,incoming,outgoing,balance,cost` |
+| `dead` | `--on` (обязательно), `--days` | `sku,name,qty,value,last_out` |
+| `margin` | `--from`, `--to` | `category,revenue,cost,margin,margin_pct` |
+| `supplier-prices` | `--from`, `--to`, `--sku` | `sku,supplier,last_date,last_cost,min_cost,max_cost,count` |
+| `sheet` | `--category`, `--inactive` | `n,sku,name,unit,book,fact,sign` |
+| `reorder` | `--on` (обязательно), `--days` (дней покрытия, 14) | `sku,name,usage,have,need,order` |
+| `writeoffs` | `--from`, `--to` | `id,date,sku,qty,cost,reason` |
+| `open-orders` | | `id,date,customer,total,ready` |
+| `categories` | | `category,positions,units,value` |
+
+## Обмен
+
+| команда | что делает |
+|---------|------------|
+| `export items|stock|movements ФАЙЛ [--from] [--to]` | выгрузка CSV |
+| `import items ФАЙЛ [--update]` | загрузка товаров (ошибочные строки пропускаются) |
+| `import stock ФАЙЛ --date D` | начальные остатки (всё или ничего) |
+| `import-onec ФАЙЛ` | файл обмена 1С (номенклатура, поступления) |
+| `feed ФАЙЛ --date D` | фид для маркетплейса |
+| `export-accounting ФАЙЛ --from D --to D` | выгрузка документов для бухгалтерии (cp1251) |
+
+## Сервис
+
+`audit [--limit N] [--action A]`, `backup ФАЙЛ`, `check` (проверка инварианта остатков).

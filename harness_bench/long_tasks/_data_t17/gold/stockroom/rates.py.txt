@@ -1,0 +1,75 @@
+# -*- coding: utf-8 -*-
+"""Курсы валют к базовой валюте (рубль).
+
+db.data["rates"] = {"USD": [{"date": "2024-03-01", "rate": "91.2500"}, ...]} — по каждой
+валюте список, отсортированный по дате; курс — рублей за 1 единицу валюты, хранится
+с 4 знаками после запятой.
+
+get_rate(db, currency, date) — курс на дату: последний курс с датой не позже date.
+Для базовой валюты — 1. Если такого курса нет — RateMissing. date=None — последний
+известный курс.
+"""
+
+import re
+from decimal import ROUND_HALF_UP, Decimal
+
+from . import audit, validators
+from .errors import RateMissing, ValidationError
+from .money import D, q2
+
+CURRENCY_RE = re.compile(r"^[A-Z]{3}$")
+RATE_Q = Decimal("0.0001")
+
+
+def currency_code(db, value):
+    code = (value or "").strip().upper()
+    if not CURRENCY_RE.match(code):
+        raise ValidationError("код валюты — три латинские буквы: %r" % (value,))
+    return code
+
+
+def set_rate(db, currency, date, rate):
+    currency = currency_code(db, currency)
+    if currency == db.base_currency():
+        raise ValidationError("курс базовой валюты всегда 1")
+    date = validators.date(date)
+    value = validators.positive_qty(rate, "курс").quantize(RATE_Q, rounding=ROUND_HALF_UP)
+    rows = db.data.setdefault("rates", {}).setdefault(currency, [])
+    rows[:] = [r for r in rows if r["date"] != date]
+    rows.append({"date": date, "rate": str(value)})
+    rows.sort(key=lambda r: r["date"])
+    audit.log(db, date, "rate", currency=currency, rate=str(value))
+    return value
+
+
+def get_rate_entry(db, currency, date=None):
+    """(дата курса, курс) для валюты на дату."""
+    currency = currency_code(db, currency)
+    if currency == db.base_currency():
+        return None, D(1)
+    rows = db.data.get("rates", {}).get(currency, [])
+    if date is not None:
+        date = validators.date(date)
+        rows = [r for r in rows if r["date"] <= date]
+    if not rows:
+        raise RateMissing("нет курса %s на %s" % (currency, date or "последнюю дату"))
+    return rows[-1]["date"], D(rows[-1]["rate"])
+
+
+def get_rate(db, currency, date=None):
+    return get_rate_entry(db, currency, date)[1]
+
+
+def convert(db, amount, currency, date=None):
+    """Сумма в валюте → рубли по курсу на дату, с округлением до копеек."""
+    return q2(D(amount) * get_rate(db, currency, date))
+
+
+def list_rates(db, currency=None):
+    rows = []
+    for cur in sorted(db.data.get("rates", {})):
+        if currency and cur != currency.upper():
+            continue
+        for r in db.data["rates"][cur]:
+            rows.append({"currency": cur, "date": r["date"], "rate": D(r["rate"])})
+    return rows

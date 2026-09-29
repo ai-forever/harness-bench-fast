@@ -1,0 +1,83 @@
+# -*- coding: utf-8 -*-
+"""Инвентаризация по описи.
+
+Сеанс инвентаризации фиксирует учётные остатки на момент начала (снимок), затем в
+него вносятся фактические количества по мере пересчёта. При проведении для каждого
+пересчитанного товара вызывается adjustments.adjust_count с фактическим количеством,
+скорректированным на движения, прошедшие после снимка:
+
+    факт_к_проведению = факт + (текущий_учёт - учёт_в_снимке)
+
+Непересчитанные товары не трогаются. Сеансы хранятся в db.data["stocktakes"].
+"""
+
+from . import adjustments, audit, validators
+from .errors import DocumentStateError, NotFound, ValidationError
+from .inventory import on_hand
+from .money import D, qty_str
+
+
+def start(db, date, skus=None, category=None):
+    date = validators.date(date)
+    sessions = db.data.setdefault("stocktakes", [])
+    if any(s["status"] == "open" for s in sessions):
+        raise DocumentStateError("уже есть незавершённая инвентаризация")
+    if skus is None:
+        skus = [s for s in sorted(db.data["items"])
+                if db.data["items"][s].get("active", True)
+                and (category is None or db.data["items"][s].get("category") == category)]
+    snapshot = {}
+    for sku in skus:
+        sku = validators.sku(sku)
+        if sku not in db.data["items"]:
+            raise NotFound("нет товара %s" % sku)
+        snapshot[sku] = qty_str(on_hand(db, sku))
+    session = {"id": "INV-%03d" % (len(sessions) + 1), "date": date, "status": "open",
+               "snapshot": snapshot, "counted": {}}
+    sessions.append(session)
+    audit.log(db, date, "stocktake", id=session["id"], items=len(snapshot))
+    return session
+
+
+def current(db):
+    for s in db.data.get("stocktakes", []):
+        if s["status"] == "open":
+            return s
+    raise NotFound("нет открытой инвентаризации")
+
+
+def record_count(db, sku, qty):
+    session = current(db)
+    sku = validators.sku(sku)
+    if sku not in session["snapshot"]:
+        raise ValidationError("товар %s не входит в инвентаризацию %s" % (sku, session["id"]))
+    session["counted"][sku] = qty_str(validators.non_negative(qty, "количество"))
+    return session
+
+
+def differences(db):
+    session = current(db)
+    rows = []
+    for sku, counted in sorted(session["counted"].items()):
+        book = D(session["snapshot"][sku])
+        rows.append({"sku": sku, "book": book, "counted": D(counted), "diff": D(counted) - book})
+    return rows
+
+
+def post(db, date, reason="инвентаризация"):
+    session = current(db)
+    date = validators.date(date)
+    docs = []
+    for sku, counted in sorted(session["counted"].items()):
+        moved = on_hand(db, sku) - D(session["snapshot"][sku])
+        docs.append(adjustments.adjust_count(db, sku, D(counted) + moved, date,
+                                             reason="%s %s" % (reason, session["id"])))
+    session["status"] = "posted"
+    session["posted"] = date
+    return docs
+
+
+def cancel(db):
+    session = current(db)
+    session["status"] = "cancelled"
+    return session

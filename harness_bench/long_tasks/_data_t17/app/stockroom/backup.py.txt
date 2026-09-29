@@ -1,0 +1,20 @@
+# -*- coding: utf-8 -*-
+"""Резервные копии базы: копия файла с проверкой, что копия читается."""
+
+import shutil
+
+from .db import Database
+
+
+def backup(db, target):
+    if db.dirty:
+        db.save()
+    shutil.copyfile(db.path, target)
+    Database.open(target)  # проверка читаемости
+    return target
+
+
+def restore(source, target):
+    Database.open(source)
+    shutil.copyfile(source, target)
+    return target

@@ -1,0 +1,58 @@
+# -*- coding: utf-8 -*-
+"""Отрисовка текстовых таблиц и CSV для отчётов.
+
+Отчёт — это список колонок [(ключ, заголовок, выравнивание)] и список строк-словарей.
+render_text рисует таблицу моноширинным шрифтом, render_csv — CSV с заголовками-ключами
+(не русскими заголовками: так договорились с аналитиками, чтобы не ломать их выгрузки).
+"""
+
+import csv
+import io
+
+
+def _cell(value):
+    if value is None:
+        return ""
+    if isinstance(value, bool):
+        return "да" if value else "нет"
+    return str(value)
+
+
+def render_text(columns, rows, title=None, footer=None):
+    headers = [c[1] for c in columns]
+    cells = [[_cell(r.get(c[0])) for c in columns] for r in rows]
+    widths = [len(h) for h in headers]
+    for line in cells:
+        for i, v in enumerate(line):
+            widths[i] = max(widths[i], len(v))
+    out = []
+    if title:
+        out.append(title)
+        out.append("=" * len(title))
+    out.append("  ".join(h.ljust(widths[i]) for i, h in enumerate(headers)).rstrip())
+    out.append("  ".join("-" * w for w in widths))
+    for line in cells:
+        parts = []
+        for i, v in enumerate(line):
+            align = columns[i][2] if len(columns[i]) > 2 else "l"
+            parts.append(v.rjust(widths[i]) if align == "r" else v.ljust(widths[i]))
+        out.append("  ".join(parts).rstrip())
+    if footer:
+        out.append("")
+        out.extend(footer if isinstance(footer, list) else [footer])
+    return "\n".join(out) + "\n"
+
+
+def render_csv(columns, rows):
+    buf = io.StringIO()
+    w = csv.writer(buf, lineterminator="\n")
+    w.writerow([c[0] for c in columns])
+    for r in rows:
+        w.writerow([_cell(r.get(c[0])) for c in columns])
+    return buf.getvalue()
+
+
+def render(columns, rows, fmt="text", title=None, footer=None):
+    if fmt == "csv":
+        return render_csv(columns, rows)
+    return render_text(columns, rows, title=title, footer=footer)

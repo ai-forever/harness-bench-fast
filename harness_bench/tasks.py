@@ -20,6 +20,7 @@ import json
 from pathlib import Path
 
 from harness_bench.core import Task, VerifyResult
+from harness_bench.long_tasks import LONG_TASKS
 from harness_bench.tasks_adversarial import ADVERSARIAL_TASKS
 from harness_bench.tasks_agentic import AGENTIC_TASKS
 from harness_bench.tasks_cli import CLI_TASKS
@@ -831,9 +832,13 @@ ALL_TASKS: list[Task] = [
     *ADVERSARIAL_TASKS,
     *TBENCH_LITE_TASKS,
     *CLI_TASKS,
+    *LONG_TASKS,
 ]
 
 _TASK_INDEX: dict[str, Task] = {t.id: t for t in ALL_TASKS}
+
+# `long` selects the long-context wave (tasks 392-411) without the rest of the set.
+SUITES: dict[str, list[Task]] = {"default": ALL_TASKS, "long": LONG_TASKS}
 
 
 def get_task(task_id: str) -> Task:

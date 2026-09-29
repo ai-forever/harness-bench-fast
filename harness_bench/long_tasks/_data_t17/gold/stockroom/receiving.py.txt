@@ -1,0 +1,187 @@
+# -*- coding: utf-8 -*-
+"""Приход товара от поставщика.
+
+Документ прихода (documents["R-0001"]):
+
+    {"id": "R-0001", "type": "receipt", "date": "2024-03-01", "supplier": "SUP1",
+     "lines": [{"sku": "MILK", "qty": "10", "cost": "55.00"[, "lot": "A-17"][, "expiry": "2024-04-01"]}],
+     "total": "550.00", "status": "posted" | "reversed", "note": ...,
+     "currency": "USD", "rate": "91.2500", "total_cur": "6.00"}     # только для валютных
+
+Строка прихода в CLI: SKU:QTY@COST[#LOT][!YYYY-MM-DD], например ``MILK:10@55.5``,
+``MILK:10@55.5#A-17!2024-04-01`` (цена — за единицу, без НДС, в валюте документа;
+#LOT — код партии, !ДАТА — срок годности).
+
+Ключи lot и expiry в строке документа есть, только если они заданы; партия без явного
+кода получает код "<номер документа>-<номер строки>" (например, R-0001-1).
+
+Валютный приход (currency не равна базовой): цена единицы партии в рублях =
+round2(cost * курс на дату прихода); total — в рублях, total_cur — в валюте.
+"""
+
+import re
+
+from . import audit, catalog, costing, ids, inventory, validators
+from .errors import DocumentStateError, NotFound, ValidationError
+from .models import record_movement
+from .money import D, money_str, q2, qty_str
+
+LINE_RE = re.compile(r"^\s*([^:@\s]+)\s*:\s*([0-9]+(?:[.,][0-9]+)?)\s*@\s*([0-9]+(?:[.,][0-9]+)?)"
+                     r"\s*(?:#([^!\s]+))?\s*(?:!(\S+))?\s*$")
+LOT_RE = re.compile(r"^[A-Za-z0-9_.-]{1,20}$")
+
+
+def parse_line(text):
+    """'MILK:10@55.5#A1!2024-04-01' → {"sku", "qty", "cost"[, "lot"][, "expiry"]}."""
+    m = LINE_RE.match(text or "")
+    if not m:
+        raise ValidationError("строка прихода должна иметь вид SKU:КОЛ-ВО@ЦЕНА[#ПАРТИЯ][!СРОК], получено %r"
+                              % (text,))
+    line = {"sku": validators.sku(m.group(1)), "qty": D(m.group(2)), "cost": D(m.group(3))}
+    if m.group(4) is not None:
+        line["lot"] = m.group(4)
+    if m.group(5) is not None:
+        line["expiry"] = m.group(5)
+    return line
+
+
+def existing_lots(db, sku):
+    """Коды партий товара: из слоёв и из строк проведённых приходов."""
+    lots = {l.get("lot") for l in db.data["layers"].get(sku, [])}
+    for doc in db.documents_of("receipt"):
+        if doc.get("status") != "posted":
+            continue
+        for n, line in enumerate(doc["lines"], 1):
+            if line["sku"] == sku:
+                lots.add(line.get("lot") or "%s-%s" % (doc["id"], n))
+    lots.discard(None)
+    return lots
+
+
+def receive(db, supplier, date, lines, note=None, currency=None):
+    """Оприходовать товар. lines — список словарей {sku, qty, cost[, lot][, expiry]} или строк
+    SKU:QTY@COST[#LOT][!ДАТА]. currency — валюта цен документа (по умолчанию базовая).
+    Возвращает документ прихода."""
+    from .partners import get_supplier
+    from .rates import currency_code, get_rate
+
+    get_supplier(db, supplier)
+    date = validators.date(date)
+    base = db.base_currency()
+    currency = base if currency in (None, "") else currency_code(db, currency)
+    rate = get_rate(db, currency, date) if currency != base else D(1)
+    parsed = []
+    new_lots = {}
+    for raw in lines:
+        line = parse_line(raw) if isinstance(raw, str) else dict(raw)
+        item = catalog.getItem(db, line["sku"])
+        if not item.get("active", True):
+            raise ValidationError("товар %s выведен из ассортимента" % item["sku"])
+        qty = validators.positive_qty(line["qty"])
+        cost = validators.non_negative(line["cost"], "цена")
+        lot = line.get("lot")
+        if lot is not None:
+            lot = str(lot).strip()
+            if not LOT_RE.match(lot):
+                raise ValidationError("некорректный код партии: %r" % (line.get("lot"),))
+            if lot in existing_lots(db, item["sku"]) or lot in new_lots.get(item["sku"], set()):
+                raise ValidationError("партия %s товара %s уже существует" % (lot, item["sku"]))
+            new_lots.setdefault(item["sku"], set()).add(lot)
+        expiry = line.get("expiry")
+        if expiry in ("", None):
+            expiry = None
+        else:
+            expiry = validators.date(expiry, "дата срока годности")
+        if item.get("track_expiry") and expiry is None:
+            raise ValidationError("для товара %s обязателен срок годности партии" % item["sku"])
+        if not item.get("track_expiry") and expiry is not None:
+            raise ValidationError("товар %s без учёта сроков годности" % item["sku"])
+        if expiry is not None and expiry < date:
+            raise ValidationError("срок годности партии раньше даты прихода")
+        parsed.append({"sku": item["sku"], "qty": qty, "cost": cost, "lot": lot, "expiry": expiry})
+    if not parsed:
+        raise ValidationError("пустой приход")
+    doc_id = ids.next_id(db, "receipt")
+    total = D(0)
+    total_cur = D(0)
+    doc_lines = []
+    for n, line in enumerate(parsed, 1):
+        lot = line["lot"] or "%s-%s" % (doc_id, n)
+        unit_rub = q2(line["cost"] * rate) if currency != base else line["cost"]
+        costing.add_layer(db, line["sku"], doc_id, n, date, line["qty"], unit_rub, lot=lot, expiry=line["expiry"],
+                          currency=currency if currency != base else None,
+                          cost_cur=line["cost"] if currency != base else None)
+        inventory.change_stock(db, line["sku"], line["qty"])
+        amount = q2(line["qty"] * unit_rub)
+        record_movement(db, date, "in", line["sku"], line["qty"], amount, doc_id)
+        total += amount
+        total_cur += q2(line["qty"] * line["cost"])
+        doc_line = {"sku": line["sku"], "qty": qty_str(line["qty"]), "cost": money_str(line["cost"])}
+        if line["lot"]:
+            doc_line["lot"] = line["lot"]
+        if line["expiry"]:
+            doc_line["expiry"] = line["expiry"]
+        doc_lines.append(doc_line)
+    doc = {"id": doc_id, "type": "receipt", "date": date, "supplier": supplier,
+           "lines": doc_lines, "total": money_str(total), "status": "posted"}
+    if currency != base:
+        doc["currency"] = currency
+        doc["rate"] = str(rate)
+        doc["total_cur"] = money_str(total_cur)
+    if note:
+        doc["note"] = note
+    db.data["documents"][doc_id] = doc
+    audit.log(db, date, "receive", doc=doc_id, supplier=supplier, total=doc["total"])
+    return doc
+
+
+def get_receipt(db, doc_id):
+    doc = db.data["documents"].get(doc_id)
+    if doc is None or doc.get("type") != "receipt":
+        raise NotFound("нет прихода %s" % doc_id)
+    return doc
+
+
+def reverse_receipt(db, doc_id, date):
+    """Сторно прихода. Возможно, только если товар из этого прихода ещё не расходовался
+    (все его слои целы)."""
+    doc = get_receipt(db, doc_id)
+    if doc["status"] != "posted":
+        raise DocumentStateError("приход %s уже сторнирован" % doc_id)
+    date = validators.date(date)
+    for n, line in enumerate(doc["lines"], 1):
+        layer = _find_layer(db, line["sku"], doc_id, n)
+        if layer is None or D(layer["qty"]) != D(line["qty"]):
+            raise DocumentStateError("товар из прихода %s уже расходовался (%s)" % (doc_id, line["sku"]))
+    for n, line in enumerate(doc["lines"], 1):
+        layers = db.data["layers"][line["sku"]]
+        layer = _find_layer(db, line["sku"], doc_id, n)
+        layers.remove(layer)
+        inventory.change_stock(db, line["sku"], -D(line["qty"]))
+        record_movement(db, date, "in", line["sku"], -D(line["qty"]), -q2(D(line["qty"]) * D(layer["cost"])),
+                        doc_id, note="сторно")
+    doc["status"] = "reversed"
+    doc["reversed_date"] = date
+    audit.log(db, date, "receive.rev", doc=doc_id)
+    return doc
+
+
+def _find_layer(db, sku, doc_id, line_no):
+    for layer in db.data["layers"].get(sku, []):
+        if layer["doc"] == doc_id and int(layer["line"]) == line_no:
+            return layer
+    return None
+
+
+def receipts_between(db, date_from=None, date_to=None, supplier=None):
+    from .dates import in_range
+
+    rows = []
+    for doc in sorted(db.documents_of("receipt"), key=lambda d: (d["date"], d["id"])):
+        if doc.get("status") != "posted":
+            continue
+        if supplier and doc["supplier"] != supplier:
+            continue
+        if in_range(doc["date"], date_from, date_to):
+            rows.append(doc)
+    return rows

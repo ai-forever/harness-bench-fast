@@ -1,0 +1,66 @@
+# -*- coding: utf-8 -*-
+"""Оборачиваемость за период [date_from, date_to].
+
+Для каждого товара: остаток на начало (до date_from), приход (in + return + adjust>0),
+расход (out + writeoff + adjust<0), остаток на конец, средний остаток ((нач+кон)/2) и
+оборачиваемость в днях = средний остаток / (расход / дней в периоде), округление до
+0.1 дня; при нулевом расходе — пусто. Остатки восстанавливаются по журналу движений.
+"""
+
+from decimal import ROUND_HALF_UP, Decimal
+
+from ..dates import days_between, iso
+from ..money import D, fmt_qty
+from ..textable import render as _render
+
+COLUMNS = [("sku", "Артикул"), ("start", "Нач.", "r"), ("incoming", "Приход", "r"), ("outgoing", "Расход", "r"),
+           ("end", "Кон.", "r"), ("days", "Дней", "r")]
+
+
+def _sign(mv):
+    q = D(mv["qty"])
+    if mv["type"] in ("in", "return"):
+        return q
+    if mv["type"] in ("out", "writeoff"):
+        return -q
+    return q  # adjust: со знаком
+
+
+def build(db, date_from, date_to):
+    date_from, date_to = iso(date_from), iso(date_to)
+    period_days = days_between(date_from, date_to) + 1
+    rows = []
+    for sku in sorted(db.data["items"]):
+        start = incoming = outgoing = D(0)
+        seen = False
+        for mv in db.data["movements"]:
+            if mv["sku"] != sku:
+                continue
+            seen = True
+            delta = _sign(mv)
+            if mv["date"] < date_from:
+                start += delta
+            elif mv["date"] <= date_to:
+                if delta >= 0:
+                    incoming += delta
+                else:
+                    outgoing += -delta
+        if not seen:
+            continue
+        end = start + incoming - outgoing
+        days = None
+        if outgoing > 0:
+            avg = (start + end) / 2
+            days = (avg / (outgoing / period_days)).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
+        rows.append({"sku": sku, "start": start, "incoming": incoming, "outgoing": outgoing, "end": end, "days": days})
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, opts.get("date_from"), opts.get("date_to"))
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, start=fmt_qty(r["start"]), incoming=fmt_qty(r["incoming"]), outgoing=fmt_qty(r["outgoing"]),
+                 end=fmt_qty(r["end"]), days=("" if r["days"] is None else str(r["days"]).replace(".", ",")))
+            for r in rows]
+    return _render(COLUMNS, view, "text", title="Оборачиваемость")

@@ -1,0 +1,7 @@
+# -*- coding: utf-8 -*-
+"""stockroom — складской учёт небольшой оптово-розничной компании.
+
+Запуск: python3 -m stockroom --db ПУТЬ <команда> ... (см. cli.py и docs/USAGE.md).
+"""
+
+__version__ = "2.7.3"

@@ -1,0 +1,26 @@
+# -*- coding: utf-8 -*-
+"""Журнал действий пользователя.
+
+Записи добавляются бизнес-операциями (приход, отгрузка, возврат, ...). В качестве
+метки времени пишется дата документа, а не системное время: так журнал
+воспроизводим и не зависит от часового пояса сервера.
+"""
+
+
+def log(db, date, action, **details):
+    entry = {"date": date, "action": action}
+    entry.update(details)
+    db.data.setdefault("audit", []).append(entry)
+    return entry
+
+
+def recent(db, limit=20, action=None):
+    rows = db.data.get("audit", [])
+    if action:
+        rows = [r for r in rows if r.get("action") == action]
+    return rows[-limit:] if limit else list(rows)
+
+
+def format_entry(entry):
+    extra = ", ".join("%s=%s" % (k, entry[k]) for k in sorted(entry) if k not in ("date", "action"))
+    return "%s  %-10s %s" % (entry.get("date", ""), entry.get("action", ""), extra)

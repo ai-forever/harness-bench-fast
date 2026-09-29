@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*-
+"""Возврат товара поставщику (брак, пересорт, истёк договор реализации).
+
+Возврат поставщику уменьшает остаток. Товар списывается **из партий прихода этого
+поставщика** (слои, у которых документ-приход от него), начиная с самых старых; если в
+таких слоях не хватает — InsufficientStock (чужой товар поставщику не возвращают).
+Движение — writeoff с примечанием «возврат поставщику», документ SR-0001, сумма
+возврата — по ценам слоёв (то есть по цене закупки).
+"""
+
+from . import audit, catalog, ids, inventory, validators
+from .errors import InsufficientStock, ValidationError
+from .models import record_movement
+from .money import D, money_str, q2, qty_str
+from .partners import get_supplier
+
+ids.PREFIXES.setdefault("supplier_return", "SR")
+
+
+def _supplier_layers(db, sku, supplier):
+    docs = db.data["documents"]
+    return [l for l in db.data["layers"].get(sku, [])
+            if docs.get(l["doc"], {}).get("type") == "receipt" and docs[l["doc"]].get("supplier") == supplier]
+
+
+def available_from(db, sku, supplier):
+    return sum((D(l["qty"]) for l in _supplier_layers(db, sku, supplier)), D(0))
+
+
+def return_to_supplier(db, supplier, date, lines, reason):
+    get_supplier(db, supplier)
+    date = validators.date(date)
+    if not reason or not reason.strip():
+        raise ValidationError("укажите причину возврата поставщику")
+    parsed = []
+    for raw in lines:
+        if isinstance(raw, str):
+            if ":" not in raw:
+                raise ValidationError("строка возврата: SKU:КОЛ-ВО")
+            sku, qty = raw.split(":", 1)
+        else:
+            sku, qty = raw["sku"], raw["qty"]
+        item = catalog.getItem(db, sku)
+        qty = validators.positive_qty(qty)
+        have = available_from(db, item["sku"], supplier)
+        if have < qty:
+            raise InsufficientStock(item["sku"], qty_str(qty), qty_str(have))
+        parsed.append((item["sku"], qty))
+    if not parsed:
+        raise ValidationError("пустой возврат поставщику")
+    doc_id = ids.next_id(db, "supplier_return")
+    doc_lines = []
+    total = D(0)
+    for sku, qty in parsed:
+        need = qty
+        cost = D(0)
+        layers = db.data["layers"][sku]
+        for layer in list(_supplier_layers(db, sku, supplier)):
+            if need <= 0:
+                break
+            take = min(need, D(layer["qty"]))
+            cost += take * D(layer["cost"])
+            rest = D(layer["qty"]) - take
+            need -= take
+            if rest == 0:
+                layers.remove(layer)
+            else:
+                layer["qty"] = qty_str(rest)
+        inventory.change_stock(db, sku, -qty)
+        cost = q2(cost)
+        record_movement(db, date, "writeoff", sku, qty, cost, doc_id, note="возврат поставщику")
+        doc_lines.append({"sku": sku, "qty": qty_str(qty), "cost": money_str(cost)})
+        total += cost
+    doc = {"id": doc_id, "type": "supplier_return", "date": date, "supplier": supplier, "lines": doc_lines,
+           "total": money_str(total), "reason": reason.strip()}
+    db.data["documents"][doc_id] = doc
+    audit.log(db, date, "sup.return", doc=doc_id, supplier=supplier, total=doc["total"])
+    return doc

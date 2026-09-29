@@ -1,0 +1,118 @@
+# -*- coding: utf-8 -*-
+"""Заказы поставщикам (PO).
+
+Заказ поставщику не влияет на остатки — это план. Приход по заказу оформляется
+через receive_po(): он создаёт обычный документ прихода (receiving.receive) и отмечает
+полученное количество в строках заказа. Заказ можно получать частями; когда по всем
+строкам получено не меньше заказанного, статус становится "closed". Недопоставку
+закрывают вручную командой close_po().
+
+Документ (documents["PO-0001"]):
+
+    {"id": "PO-0001", "type": "po", "date": ..., "supplier": "SUP1", "status": "open" | "closed",
+     "lines": [{"sku", "qty", "cost", "received": "0"}], "receipts": ["R-0003", ...]}
+"""
+
+from . import audit, catalog, ids, validators
+from .errors import DocumentStateError, NotFound, ValidationError
+from .money import D, money_str, q2, qty_str
+from .partners import get_supplier
+from .receiving import parse_line, receive
+
+ids.PREFIXES.setdefault("po", "PO")
+
+
+def create_po(db, supplier, date, lines, note=None):
+    get_supplier(db, supplier)
+    date = validators.date(date)
+    doc_lines = []
+    for raw in lines:
+        line = parse_line(raw) if isinstance(raw, str) else dict(raw)
+        item = catalog.getItem(db, line["sku"])
+        qty = validators.positive_qty(line["qty"])
+        cost = validators.non_negative(line["cost"], "цена")
+        doc_lines.append({"sku": item["sku"], "qty": qty_str(qty), "cost": money_str(cost), "received": "0"})
+    if not doc_lines:
+        raise ValidationError("пустой заказ поставщику")
+    doc_id = ids.next_id(db, "po")
+    doc = {"id": doc_id, "type": "po", "date": date, "supplier": supplier, "status": "open",
+           "lines": doc_lines, "receipts": []}
+    if note:
+        doc["note"] = note
+    db.data["documents"][doc_id] = doc
+    audit.log(db, date, "po.new", doc=doc_id, supplier=supplier)
+    return doc
+
+
+def get_po(db, po_id):
+    doc = db.data["documents"].get(po_id)
+    if doc is None or doc.get("type") != "po":
+        raise NotFound("нет заказа поставщику %s" % po_id)
+    return doc
+
+
+def outstanding(doc):
+    """Недополученное количество по строкам: {sku: Decimal}."""
+    rest = {}
+    for line in doc["lines"]:
+        left = D(line["qty"]) - D(line["received"])
+        if left > 0:
+            rest[line["sku"]] = rest.get(line["sku"], D(0)) + left
+    return rest
+
+
+def receive_po(db, po_id, date, quantities=None):
+    """Оприходовать товар по заказу. quantities — {sku: qty}; по умолчанию всё недополученное.
+    Цена прихода — цена из строки заказа. Получить больше заказанного нельзя."""
+    doc = get_po(db, po_id)
+    if doc["status"] != "open":
+        raise DocumentStateError("заказ поставщику %s закрыт" % po_id)
+    rest = outstanding(doc)
+    if quantities is None:
+        quantities = rest
+    lines = []
+    for sku, qty in quantities.items():
+        sku = validators.sku(sku)
+        qty = validators.positive_qty(qty)
+        if qty > rest.get(sku, D(0)):
+            raise ValidationError("по заказу %s нельзя получить %s %s: осталось %s" % (po_id, qty_str(qty), sku,
+                                                                                   qty_str(rest.get(sku, D(0)))))
+        left = qty
+        for line in doc["lines"]:
+            if line["sku"] != sku or left <= 0:
+                continue
+            can = D(line["qty"]) - D(line["received"])
+            take = min(can, left)
+            if take <= 0:
+                continue
+            lines.append({"sku": sku, "qty": take, "cost": D(line["cost"])})
+            line["received"] = qty_str(D(line["received"]) + take)
+            left -= take
+    if not lines:
+        raise ValidationError("нечего получать по заказу %s" % po_id)
+    receipt = receive(db, doc["supplier"], date, lines, note="по заказу %s" % po_id)
+    doc["receipts"].append(receipt["id"])
+    if not outstanding(doc):
+        doc["status"] = "closed"
+    return receipt
+
+
+def close_po(db, po_id, date=None):
+    doc = get_po(db, po_id)
+    if doc["status"] != "open":
+        raise DocumentStateError("заказ поставщику %s уже закрыт" % po_id)
+    doc["status"] = "closed"
+    doc["closed_short"] = bool(outstanding(doc))
+    audit.log(db, date, "po.close", doc=po_id)
+    return doc
+
+
+def po_amount(doc):
+    return sum((q2(D(l["qty"]) * D(l["cost"])) for l in doc["lines"]), D(0))
+
+
+def open_pos(db, supplier=None):
+    rows = [d for d in db.documents_of("po") if d["status"] == "open"]
+    if supplier:
+        rows = [d for d in rows if d["supplier"] == supplier]
+    return sorted(rows, key=lambda d: d["id"])

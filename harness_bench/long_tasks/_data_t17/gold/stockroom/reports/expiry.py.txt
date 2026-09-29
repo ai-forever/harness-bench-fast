@@ -1,0 +1,22 @@
+# -*- coding: utf-8 -*-
+"""Сроки годности: партии, срок которых истекает не позже on_date + days (lots.expiring)."""
+
+from ..lots import expiring
+from ..money import fmt_qty
+from ..textable import render as _render
+
+COLUMNS = [("sku", "Артикул"), ("name", "Наименование"), ("lot", "Партия"), ("expiry", "Годен до"),
+           ("qty", "Остаток", "r"), ("days_left", "Дней", "r")]
+
+
+def build(db, on_date, days=30):
+    return expiring(db, on_date, days)
+
+
+def render(db, fmt="text", **opts):
+    days = opts.get("days")
+    rows = build(db, opts["on_date"], 30 if days is None else days)
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, qty=fmt_qty(r["qty"])) for r in rows]
+    return _render(COLUMNS, view, "text", title="Сроки годности")

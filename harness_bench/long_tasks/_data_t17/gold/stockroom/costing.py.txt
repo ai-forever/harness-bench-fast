@@ -1,0 +1,149 @@
+# -*- coding: utf-8 -*-
+"""Партии и себестоимость.
+
+Каждая строка прихода создаёт «слой» — партию:
+
+    {"doc", "line", "date", "qty", "cost",       # cost — цена единицы в рублях
+     "lot", "expiry",                            # код партии и срок годности (или null)
+     "currency", "cost_cur"}                     # только для валютных приходов
+
+Слои хранятся в порядке (дата, документ, строка). Расход (отгрузка, списание,
+недостача) забирает количество по FEFO: сначала партии со сроком годности по
+возрастанию срока, затем партии без срока; при равенстве — по дате прихода,
+документу и строке (для товаров без сроков это прежний FIFO). Отгрузка не берёт
+партии, срок которых истёк до даты отгрузки (skip_expired_before).
+
+Слой с нулевым остатком удаляется. Себестоимость расхода = сумма qty * cost по
+затронутым партиям, без округления внутри.
+"""
+
+from .errors import InsufficientStock, ValidationError
+from .money import D, money_str, qty_str
+
+LAYER_EXTRA = ("lot", "expiry", "currency", "cost_cur")
+
+
+def _key(layer):
+    return (layer["date"], layer["doc"], int(layer.get("line", 0)))
+
+
+def fefo_key(layer):
+    expiry = layer.get("expiry")
+    return (0 if expiry else 1, expiry or "", layer["date"], layer["doc"], int(layer.get("line", 0)))
+
+
+def layers_for(db, sku):
+    """Слои товара (список словарей в порядке прихода). Возвращает копии."""
+    return [dict(l) for l in db.data["layers"].get(sku, [])]
+
+
+def fefo_layers(db, sku):
+    """Слои товара в порядке расхода (FEFO). Возвращает копии."""
+    return sorted(layers_for(db, sku), key=fefo_key)
+
+
+def add_layer(db, sku, doc, line, date, qty, cost, lot=None, expiry=None, currency=None, cost_cur=None):
+    layers = db.data["layers"].setdefault(sku, [])
+    layer = {"doc": doc, "line": line, "date": date, "qty": qty_str(qty), "cost": money_str(cost),
+             "lot": lot or "%s-%s" % (doc, line), "expiry": expiry}
+    if currency:
+        layer["currency"] = currency
+        layer["cost_cur"] = money_str(cost_cur)
+    layers.append(layer)
+    layers.sort(key=_key)
+    return layer
+
+
+def usable_qty(db, sku, on_date=None):
+    """Количество в партиях, не просроченных на дату on_date (None — все партии)."""
+    total = D(0)
+    for layer in db.data["layers"].get(sku, []):
+        if on_date and layer.get("expiry") and layer["expiry"] < on_date:
+            continue
+        total += D(layer["qty"])
+    return total
+
+
+def consume(db, sku, qty, skip_expired_before=None, lot=None):
+    """Списать qty по FEFO. skip_expired_before — дата: партии со сроком раньше неё не
+    используются; lot — брать только из этой партии. Возвращает распределения
+    [{"doc", "line", "date", "qty", "cost", "lot", "expiry"}]."""
+    need = D(qty)
+    layers = db.data["layers"].get(sku, [])
+    candidates = []
+    for layer in sorted(layers, key=fefo_key):
+        if lot is not None and layer.get("lot") != lot:
+            continue
+        if skip_expired_before and layer.get("expiry") and layer["expiry"] < skip_expired_before:
+            continue
+        candidates.append(layer)
+    if lot is not None and not any(l.get("lot") == lot for l in layers):
+        raise ValidationError("у товара %s нет партии %s" % (sku, lot))
+    have = sum((D(l["qty"]) for l in candidates), D(0))
+    if have < need:
+        raise InsufficientStock(sku, qty_str(need), qty_str(have))
+    allocations = []
+    for layer in candidates:
+        if need <= 0:
+            break
+        take = min(need, D(layer["qty"]))
+        if take <= 0:
+            continue
+        allocations.append({"doc": layer["doc"], "line": layer["line"], "date": layer["date"],
+                            "qty": qty_str(take), "cost": layer["cost"], "lot": layer.get("lot"),
+                            "expiry": layer.get("expiry")})
+        for extra in ("currency", "cost_cur"):
+            if extra in layer:
+                allocations[-1][extra] = layer[extra]
+        rest = D(layer["qty"]) - take
+        need -= take
+        if rest == 0:
+            layers.remove(layer)
+        else:
+            layer["qty"] = qty_str(rest)
+    return allocations
+
+
+def consume_fifo(db, sku, qty):
+    """Старое имя: списание в порядке расхода (теперь FEFO, для товаров без сроков = FIFO)."""
+    return consume(db, sku, qty)
+
+
+def restore(db, sku, allocations):
+    """Вернуть количество в слои (для возвратов и отмен). Если слоя уже нет — он
+    создаётся заново с исходными документом, строкой, датой, ценой и партией."""
+    layers = db.data["layers"].setdefault(sku, [])
+    for a in allocations:
+        for layer in layers:
+            if layer["doc"] == a["doc"] and int(layer["line"]) == int(a["line"]):
+                layer["qty"] = qty_str(D(layer["qty"]) + D(a["qty"]))
+                break
+        else:
+            layer = {"doc": a["doc"], "line": a["line"], "date": a["date"], "qty": qty_str(a["qty"]),
+                     "cost": a["cost"], "lot": a.get("lot") or "%s-%s" % (a["doc"], a["line"]),
+                     "expiry": a.get("expiry")}
+            for extra in ("currency", "cost_cur"):
+                if extra in a:
+                    layer[extra] = a[extra]
+            layers.append(layer)
+    layers.sort(key=_key)
+
+
+def allocations_cost(allocations):
+    return sum((D(a["qty"]) * D(a["cost"]) for a in allocations), D(0))
+
+
+def value_of(db, sku):
+    """Себестоимость остатка товара в рублях (сумма по слоям), не округлена."""
+    return sum((D(l["qty"]) * D(l["cost"]) for l in db.data["layers"].get(sku, [])), D(0))
+
+
+def last_cost(db, sku):
+    """Цена последнего по дате слоя; если слоёв нет — цена последнего прихода из журнала; иначе 0."""
+    layers = db.data["layers"].get(sku, [])
+    if layers:
+        return D(layers[-1]["cost"])
+    for mv in reversed(db.data["movements"]):
+        if mv["sku"] == sku and mv["type"] == "in" and D(mv["qty"]) > 0:
+            return D(mv["cost"]) / D(mv["qty"])
+    return D(0)

@@ -1,0 +1,3 @@
+sku,qty,cost
+MILK,10,54.00
+NOPE,5,27.50

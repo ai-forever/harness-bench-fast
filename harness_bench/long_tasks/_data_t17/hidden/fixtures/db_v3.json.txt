@@ -1,0 +1,420 @@
+{
+ "schema": 3,
+ "meta": {
+  "company": "ООО «Старая база»",
+  "base_currency": "RUB",
+  "vat_default": "20",
+  "seq": {
+   "R": 2,
+   "MV": 8,
+   "S": 1,
+   "ADJ": 1
+  }
+ },
+ "items": {
+  "MILK": {
+   "sku": "MILK",
+   "name": "Молоко 1 л",
+   "unit": "шт",
+   "category": "молочное",
+   "price": "89.90",
+   "vat": "10",
+   "min_qty": "20",
+   "barcode": null,
+   "active": true,
+   "created": "2024-01-10"
+  },
+  "BREAD": {
+   "sku": "BREAD",
+   "name": "Хлеб белый",
+   "unit": "шт",
+   "category": "хлеб",
+   "price": "45.00",
+   "vat": "10",
+   "min_qty": "10",
+   "barcode": null,
+   "active": true,
+   "created": "2024-01-10"
+  },
+  "TEA": {
+   "sku": "TEA",
+   "name": "Чай чёрный 100 пак.",
+   "unit": "упак",
+   "category": "бакалея",
+   "price": "350.00",
+   "vat": "20",
+   "min_qty": "0",
+   "barcode": null,
+   "active": true,
+   "created": "2024-01-10"
+  },
+  "SUGAR": {
+   "sku": "SUGAR",
+   "name": "Сахар",
+   "unit": "кг",
+   "category": "бакалея",
+   "price": "72.50",
+   "vat": "10",
+   "min_qty": "0",
+   "barcode": null,
+   "active": true,
+   "created": "2024-01-10"
+  }
+ },
+ "suppliers": {
+  "SUP1": {
+   "code": "SUP1",
+   "name": "Молочный завод",
+   "inn": "7701234567",
+   "phone": null
+  },
+  "SUP2": {
+   "code": "SUP2",
+   "name": "Оптовая база",
+   "inn": null,
+   "phone": null
+  }
+ },
+ "customers": {
+  "C1": {
+   "code": "C1",
+   "name": "Кафе «Уют»",
+   "inn": null,
+   "discount": "0",
+   "group": "retail",
+   "blocked": false
+  },
+  "C2": {
+   "code": "C2",
+   "name": "Сеть «Дом»",
+   "inn": null,
+   "discount": "5",
+   "group": "wholesale",
+   "blocked": false
+  },
+  "C3": {
+   "code": "C3",
+   "name": "Столовая № 5",
+   "inn": null,
+   "discount": "3",
+   "group": "retail",
+   "blocked": false
+  }
+ },
+ "stock": {
+  "MILK": "15",
+  "BREAD": "36",
+  "TEA": "100",
+  "SUGAR": "27"
+ },
+ "layers": {
+  "MILK": [
+   {
+    "doc": "R-0002",
+    "line": 1,
+    "date": "2024-03-05",
+    "qty": "15",
+    "cost": "58.00"
+   }
+  ],
+  "BREAD": [
+   {
+    "doc": "R-0001",
+    "line": 2,
+    "date": "2024-03-01",
+    "qty": "36",
+    "cost": "28.00"
+   }
+  ],
+  "TEA": [
+   {
+    "doc": "R-0002",
+    "line": 2,
+    "date": "2024-03-05",
+    "qty": "100",
+    "cost": "210.00"
+   }
+  ],
+  "SUGAR": [
+   {
+    "doc": "R-0002",
+    "line": 3,
+    "date": "2024-03-05",
+    "qty": "25.5",
+    "cost": "48.00"
+   },
+   {
+    "doc": "ADJ-0001",
+    "line": 1,
+    "date": "2024-03-08",
+    "qty": "1.5",
+    "cost": "48.00"
+   }
+  ]
+ },
+ "price_breaks": {
+  "TEA": [
+   {
+    "min_qty": "10",
+    "discount": "5"
+   },
+   {
+    "min_qty": "50",
+    "discount": "10"
+   }
+  ]
+ },
+ "documents": {
+  "R-0001": {
+   "id": "R-0001",
+   "type": "receipt",
+   "date": "2024-03-01",
+   "supplier": "SUP1",
+   "lines": [
+    {
+     "sku": "MILK",
+     "qty": "30",
+     "cost": "55.00"
+    },
+    {
+     "sku": "BREAD",
+     "qty": "40",
+     "cost": "28.00"
+    }
+   ],
+   "total": "2770.00",
+   "status": "posted"
+  },
+  "R-0002": {
+   "id": "R-0002",
+   "type": "receipt",
+   "date": "2024-03-05",
+   "supplier": "SUP2",
+   "lines": [
+    {
+     "sku": "MILK",
+     "qty": "20",
+     "cost": "58.00"
+    },
+    {
+     "sku": "TEA",
+     "qty": "100",
+     "cost": "210.00"
+    },
+    {
+     "sku": "SUGAR",
+     "qty": "25.5",
+     "cost": "48.00"
+    }
+   ],
+   "total": "23384.00",
+   "status": "posted"
+  },
+  "S-0001": {
+   "id": "S-0001",
+   "type": "order",
+   "date": "2024-03-06",
+   "customer": "C1",
+   "status": "shipped",
+   "lines": [
+    {
+     "sku": "MILK",
+     "qty": "35",
+     "allocations": [
+      {
+       "doc": "R-0001",
+       "line": 1,
+       "date": "2024-03-01",
+       "qty": "30",
+       "cost": "55.00"
+      },
+      {
+       "doc": "R-0002",
+       "line": 1,
+       "date": "2024-03-05",
+       "qty": "5",
+       "cost": "58.00"
+      }
+     ]
+    },
+    {
+     "sku": "BREAD",
+     "qty": "4",
+     "allocations": [
+      {
+       "doc": "R-0001",
+       "line": 2,
+       "date": "2024-03-01",
+       "qty": "4",
+       "cost": "28.00"
+      }
+     ]
+    }
+   ],
+   "shipped_date": "2024-03-07"
+  },
+  "ADJ-0001": {
+   "id": "ADJ-0001",
+   "type": "adjust",
+   "date": "2024-03-08",
+   "sku": "SUGAR",
+   "before": "25.5",
+   "after": "27",
+   "diff": "1.5",
+   "cost": "72.00"
+  }
+ },
+ "movements": [
+  {
+   "id": "MV-000001",
+   "date": "2024-03-01",
+   "type": "in",
+   "sku": "MILK",
+   "qty": "30",
+   "cost": "1650.00",
+   "doc": "R-0001"
+  },
+  {
+   "id": "MV-000002",
+   "date": "2024-03-01",
+   "type": "in",
+   "sku": "BREAD",
+   "qty": "40",
+   "cost": "1120.00",
+   "doc": "R-0001"
+  },
+  {
+   "id": "MV-000003",
+   "date": "2024-03-05",
+   "type": "in",
+   "sku": "MILK",
+   "qty": "20",
+   "cost": "1160.00",
+   "doc": "R-0002"
+  },
+  {
+   "id": "MV-000004",
+   "date": "2024-03-05",
+   "type": "in",
+   "sku": "TEA",
+   "qty": "100",
+   "cost": "21000.00",
+   "doc": "R-0002"
+  },
+  {
+   "id": "MV-000005",
+   "date": "2024-03-05",
+   "type": "in",
+   "sku": "SUGAR",
+   "qty": "25.5",
+   "cost": "1224.00",
+   "doc": "R-0002"
+  },
+  {
+   "id": "MV-000006",
+   "date": "2024-03-07",
+   "type": "out",
+   "sku": "MILK",
+   "qty": "35",
+   "cost": "1940.00",
+   "doc": "S-0001"
+  },
+  {
+   "id": "MV-000007",
+   "date": "2024-03-07",
+   "type": "out",
+   "sku": "BREAD",
+   "qty": "4",
+   "cost": "112.00",
+   "doc": "S-0001"
+  },
+  {
+   "id": "MV-000008",
+   "date": "2024-03-08",
+   "type": "adjust",
+   "sku": "SUGAR",
+   "qty": "1.5",
+   "cost": "72.00",
+   "doc": "ADJ-0001"
+  }
+ ],
+ "audit": [
+  {
+   "date": "2024-01-10",
+   "action": "item.add",
+   "sku": "MILK"
+  },
+  {
+   "date": "2024-01-10",
+   "action": "item.add",
+   "sku": "BREAD"
+  },
+  {
+   "date": "2024-01-10",
+   "action": "item.add",
+   "sku": "TEA"
+  },
+  {
+   "date": "2024-01-10",
+   "action": "item.add",
+   "sku": "SUGAR"
+  },
+  {
+   "date": null,
+   "action": "supplier.add",
+   "code": "SUP1"
+  },
+  {
+   "date": null,
+   "action": "supplier.add",
+   "code": "SUP2"
+  },
+  {
+   "date": null,
+   "action": "customer.add",
+   "code": "C1"
+  },
+  {
+   "date": null,
+   "action": "customer.add",
+   "code": "C2"
+  },
+  {
+   "date": null,
+   "action": "customer.add",
+   "code": "C3"
+  },
+  {
+   "date": "2024-03-01",
+   "action": "receive",
+   "doc": "R-0001",
+   "supplier": "SUP1",
+   "total": "2770.00"
+  },
+  {
+   "date": "2024-03-05",
+   "action": "receive",
+   "doc": "R-0002",
+   "supplier": "SUP2",
+   "total": "23384.00"
+  },
+  {
+   "date": "2024-03-06",
+   "action": "order.new",
+   "doc": "S-0001",
+   "customer": "C1"
+  },
+  {
+   "date": "2024-03-07",
+   "action": "order.ship",
+   "doc": "S-0001"
+  },
+  {
+   "date": "2024-03-08",
+   "action": "adjust",
+   "doc": "ADJ-0001",
+   "sku": "SUGAR",
+   "diff": "1.5"
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "schema": 2,
+ "meta": {"company": "ООО «Лампа»", "base_currency": "RUB", "vat_default": "20", "migrated_at": "2021-02-01",
+          "seq": {"R": 1, "S": 1, "MV": 2}},
+ "items": {
+  "LAMP": {"sku": "LAMP", "name": "Лампа настольная", "unit": "шт", "category": "свет", "price": "1200.00",
+           "vat": "20", "min_qty": "3", "barcode": null, "active": true, "created": "2020-11-01", "avg_cost": "705.50"},
+  "BULB": {"sku": "BULB", "name": "Лампочка E27", "unit": "шт", "category": "свет", "price": "95.00",
+           "vat": "20", "min_qty": "50", "barcode": "4601234567893", "active": true, "created": "2020-11-01",
+           "avg_cost": "41.20"}
+ },
+ "suppliers": {"SVET": {"code": "SVET", "name": "Светотехника", "inn": "7812345678", "phone": null}},
+ "customers": {"SHOP": {"code": "SHOP", "name": "Магазин «Свет»", "inn": null, "discount": "0", "group": "retail",
+                        "blocked": false}},
+ "stock": {"LAMP": "7", "BULB": "120"},
+ "documents": {
+  "R-0001": {"id": "R-0001", "type": "receipt", "date": "2020-11-05", "supplier": "SVET",
+             "lines": [{"sku": "LAMP", "qty": "8", "cost": "705.50"}, {"sku": "BULB", "qty": "120", "cost": "41.20"}],
+             "total": "10588.00", "status": "posted"},
+  "S-0001": {"id": "S-0001", "type": "order", "date": "2020-12-01", "customer": "SHOP", "status": "shipped",
+             "shipped_date": "2020-12-02", "lines": [{"sku": "LAMP", "qty": "1"}]}
+ },
+ "movements": [
+  {"id": "MV-000001", "date": "2020-11-05", "type": "in", "sku": "LAMP", "qty": "8", "cost": "5644.00", "doc": "R-0001"},
+  {"id": "MV-000002", "date": "2020-12-02", "type": "out", "sku": "LAMP", "qty": "1", "cost": "705.50", "doc": "S-0001"}
+ ]
+}

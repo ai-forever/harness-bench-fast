@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+"""Отчёты.
+
+Каждый модуль отчёта определяет COLUMNS (ключ, заголовок, выравнивание), функцию
+build(db, **параметры) → список строк-словарей и render(db, fmt="text", **параметры) → str.
+Значения в строках build() — «сырые» (Decimal, str), форматирование — в render().
+CSV-вывод использует ключи колонок в заголовке и значения без форматирования
+(точка как десятичный разделитель).
+"""
+
+from . import (abc, category_margin, dead_stock, debts, history, inventory_sheet, lowstock, movements,
+               open_orders, purchases, reorder, sales, stock, stock_by_category, supplier_prices, turnover,
+               valuation, writeoffs)
+
+REPORTS = {
+    "stock": stock,
+    "low": lowstock,
+    "movements": movements,
+    "valuation": valuation,
+    "sales": sales,
+    "abc": abc,
+    "turnover": turnover,
+    "purchases": purchases,
+    "debts": debts,
+    "history": history,
+    "dead": dead_stock,
+    "margin": category_margin,
+    "supplier-prices": supplier_prices,
+    "sheet": inventory_sheet,
+    "reorder": reorder,
+    "writeoffs": writeoffs,
+    "open-orders": open_orders,
+    "categories": stock_by_category,
+}
+
+
+def get(name):
+    return REPORTS[name]

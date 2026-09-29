@@ -1,0 +1,22 @@
+{
+ "schema": 1,
+ "meta": {"company": "ИП Петров", "seq": {"R": 2, "MV": 2}},
+ "items": {
+  "NAIL": {"sku": "NAIL", "name": "Гвозди 50 мм", "unit": "кг", "price": "150.00", "vat": "20", "min_qty": "5",
+           "active": true, "qty": "12.5", "cost": "96.40"},
+  "HAMMER": {"sku": "HAMMER", "name": "Молоток", "unit": "шт", "price": "620.00", "vat": "20", "min_qty": "0",
+             "active": true, "qty": "0", "cost": "400.00"}
+ },
+ "suppliers": {"MET": {"code": "MET", "name": "Метиз-Опт", "inn": null, "phone": null}},
+ "customers": {},
+ "documents": [
+  {"id": "R-0001", "type": "receipt", "date": "2019-05-10", "supplier": "MET",
+   "lines": [{"sku": "NAIL", "qty": "20", "cost": "96.40"}], "total": "1928.00", "status": "posted"},
+  {"id": "R-0002", "type": "receipt", "date": "2019-05-12", "supplier": "MET",
+   "lines": [{"sku": "HAMMER", "qty": "2", "cost": "400.00"}], "total": "800.00", "status": "posted"}
+ ],
+ "movements": [
+  {"id": "MV-000001", "date": "2019-05-10", "type": "in", "sku": "NAIL", "qty": "20", "cost": "1928.00", "doc": "R-0001"},
+  {"id": "MV-000002", "date": "2019-05-12", "type": "in", "sku": "HAMMER", "qty": "2", "cost": "800.00", "doc": "R-0002"}
+ ]
+}

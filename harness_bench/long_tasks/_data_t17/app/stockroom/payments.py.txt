@@ -1,0 +1,70 @@
+# -*- coding: utf-8 -*-
+"""Оплаты покупателей и взаиморасчёты.
+
+Долг покупателя = сумма счетов по отгруженным заказам (pricing.order_amounts, с НДС)
+минус оплаты минус суммы возвратов. Заказ считается выставленным в дату отгрузки.
+Оплаты хранятся в db.data["payments"] списком:
+
+    {"id": "PAY-0001", "date": ..., "customer": "C001", "amount": "1000.00",
+     "order": "S-0001" | null, "note": ...}
+
+Привязка оплаты к заказу (order) — справочная, на расчёт долга не влияет.
+"""
+
+from . import audit, ids, validators
+from .dates import in_range
+from .errors import NotFound, ValidationError
+from .money import D, money_str
+from .partners import get_customer
+from .pricing import order_amounts
+
+ids.PREFIXES.setdefault("payment", "PAY")
+
+
+def register_payment(db, customer, date, amount, order=None, note=None):
+    get_customer(db, customer)
+    date = validators.date(date)
+    amount = validators.positive_qty(amount, "сумма оплаты")
+    if order is not None:
+        doc = db.data["documents"].get(order)
+        if doc is None or doc.get("type") != "order":
+            raise NotFound("нет заказа %s" % order)
+        if doc["customer"] != customer:
+            raise ValidationError("заказ %s другого покупателя" % order)
+    pay = {"id": ids.next_id(db, "payment"), "date": date, "customer": customer,
+           "amount": money_str(amount), "order": order}
+    if note:
+        pay["note"] = note
+    db.data.setdefault("payments", []).append(pay)
+    audit.log(db, date, "payment", customer=customer, amount=pay["amount"])
+    return pay
+
+
+def payments_of(db, customer, date_from=None, date_to=None):
+    return [p for p in db.data.get("payments", [])
+            if p["customer"] == customer and in_range(p["date"], date_from, date_to)]
+
+
+def ledger(db, customer, date_to=None):
+    """Хронология взаиморасчётов: список {"date", "doc", "kind", "debit", "credit"}
+    (debit — отгрузка, credit — оплата или возврат), отсортированный по дате и номеру."""
+    get_customer(db, customer)
+    rows = []
+    for doc in db.data["documents"].values():
+        if doc.get("type") == "order" and doc.get("customer") == customer and doc.get("shipped_date"):
+            if in_range(doc["shipped_date"], None, date_to):
+                rows.append({"date": doc["shipped_date"], "doc": doc["id"], "kind": "shipment",
+                             "debit": order_amounts(db, doc)["total"], "credit": D(0)})
+        if doc.get("type") == "return" and doc.get("customer") == customer:
+            if in_range(doc["date"], None, date_to):
+                rows.append({"date": doc["date"], "doc": doc["id"], "kind": "return",
+                             "debit": D(0), "credit": D(doc["amount"])})
+    for p in payments_of(db, customer, None, date_to):
+        rows.append({"date": p["date"], "doc": p["id"], "kind": "payment", "debit": D(0), "credit": D(p["amount"])})
+    rows.sort(key=lambda r: (r["date"], r["doc"]))
+    return rows
+
+
+def balance(db, customer, date_to=None):
+    """Долг покупателя на дату (положительный — покупатель должен нам)."""
+    return sum((r["debit"] - r["credit"] for r in ledger(db, customer, date_to)), D(0))

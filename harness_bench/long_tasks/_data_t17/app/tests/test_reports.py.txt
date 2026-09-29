@@ -1,0 +1,169 @@
+# -*- coding: utf-8 -*-
+import unittest
+
+from helpers import make_db
+from stockroom import adjustments, catalog, orders, payments, pricing, receiving, returns
+from stockroom.money import D
+from stockroom.reports import REPORTS, abc, dead_stock, debts, history, lowstock, movements, purchases, sales, stock, \
+    turnover, valuation
+
+
+def scenario():
+    """make_db() + три заказа и возврат:
+    S-0001 C1 от 06.03: MILK 35, BREAD 10 — отгружен 07.03, полностью возвращён 20.03;
+    S-0002 C2 от 08.03: TEA 60, SUGAR 5.5 — отгружен 08.03;
+    S-0003 C3 от 10.03: MILK 5 — не отгружен."""
+    db = make_db()
+    s1 = orders.create_order(db, "C1", "2024-03-06", ["MILK:35", "BREAD:10"])
+    orders.ship_order(db, s1["id"], "2024-03-07")
+    s2 = orders.create_order(db, "C2", "2024-03-08", ["TEA:60", "SUGAR:5.5"])
+    orders.ship_order(db, s2["id"], "2024-03-08")
+    orders.create_order(db, "C3", "2024-03-10", ["MILK:5"])
+    returns.return_order(db, s1["id"], "2024-03-20")
+    return db
+
+
+class StockReportsTest(unittest.TestCase):
+    def test_stock_statuses(self):
+        db = make_db()
+        adjustments.writeoff(db, "BREAD", 35, "2024-03-10", "черствый")
+        rows = {r["sku"]: r for r in stock.build(db)}
+        self.assertEqual(rows["BREAD"]["status"], "low")
+        self.assertEqual(rows["MILK"]["status"], "ok")
+        self.assertEqual(rows["TEA"]["qty"], D(100))
+        catalog.addItem(db, "SALT", "Соль", "20")
+        self.assertEqual({r["sku"]: r for r in stock.build(db)}["SALT"]["status"], "out")
+        self.assertEqual([r["sku"] for r in stock.build(db, category="бакалея")], ["SUGAR", "TEA"])
+
+    def test_inactive_items_hidden_unless_asked(self):
+        db = make_db()
+        catalog.deactivateItem(db, "TEA")
+        self.assertNotIn("TEA", [r["sku"] for r in stock.build(db)])
+        self.assertIn("TEA", [r["sku"] for r in stock.build(db, include_inactive=True)])
+
+    def test_low_stock_reorder(self):
+        db = make_db()
+        adjustments.writeoff(db, "MILK", 38, "2024-03-10", "просрочка")
+        rows = lowstock.build(db)
+        self.assertEqual([(r["sku"], r["qty"], r["reorder"]) for r in rows], [("MILK", D(12), D(28))])
+
+    def test_valuation(self):
+        db = scenario()
+        rows = {r["sku"]: r for r in valuation.build(db)}
+        self.assertEqual(rows["TEA"]["value"], D("8400.00"))
+        self.assertEqual(rows["MILK"]["value"], D(30 * 55 + 20 * 58))
+        self.assertEqual(rows["MILK"]["avg_cost"], D("56.20"))
+        self.assertEqual(rows["SUGAR"]["qty"], D(20))
+        self.assertEqual(valuation.total(db), sum((r["value"] for r in rows.values()), D(0)))
+
+
+class MovementReportsTest(unittest.TestCase):
+    def test_filters(self):
+        db = scenario()
+        self.assertEqual(len(movements.build(db)), 11)
+        self.assertEqual([r["id"] for r in movements.build(db, mtype="return")], ["MV-000010", "MV-000011"])
+        self.assertEqual([r["type"] for r in movements.build(db, sku="MILK")], ["in", "in", "out", "return"])
+        self.assertEqual(len(movements.build(db, date_from="2024-03-06", date_to="2024-03-08")), 4)
+
+    def test_history_running_balance(self):
+        db = scenario()
+        rows = history.build(db, "MILK")
+        self.assertEqual([r["balance"] for r in rows], [D(30), D(50), D(15), D(50)])
+        self.assertEqual(rows[2]["outgoing"], D(35))
+
+    def test_turnover(self):
+        db = scenario()
+        rows = {r["sku"]: r for r in turnover.build(db, "2024-03-06", "2024-03-15")}
+        tea = rows["TEA"]
+        self.assertEqual((tea["start"], tea["incoming"], tea["outgoing"], tea["end"]), (D(100), D(0), D(60), D(40)))
+        self.assertEqual(tea["days"], D("11.7"))
+        self.assertIsNone(rows["BREAD"]["days"] if rows["BREAD"]["outgoing"] == 0 else None)
+
+    def test_dead_stock(self):
+        db = scenario()
+        rows = dead_stock.build(db, "2024-06-30", days=90)
+        self.assertEqual([r["sku"] for r in rows], ["TEA", "MILK", "BREAD", "SUGAR"])
+        self.assertEqual([r["sku"] for r in dead_stock.build(db, "2024-03-31", days=24)], ["MILK", "BREAD"])
+        self.assertEqual(dead_stock.build(db, "2024-03-31", days=90), [])
+
+
+class SalesReportTest(unittest.TestCase):
+    def test_sales_by_sku_in_period_before_return(self):
+        db = scenario()
+        rows = {r["sku"]: r for r in sales.build(db, "2024-03-01", "2024-03-15")}
+        self.assertEqual(rows["MILK"]["revenue"], D("3146.50"))
+        self.assertEqual(rows["MILK"]["cost"], D("1940.00"))
+        self.assertEqual(rows["TEA"]["revenue"], D("16159.80"))
+        self.assertEqual(rows["SUGAR"]["qty"], D("5.5"))
+        self.assertEqual(rows["SUGAR"]["revenue"], D("340.95"))
+
+    def test_return_reduces_its_own_period(self):
+        db = scenario()
+        rows = {r["sku"]: r for r in sales.build(db, "2024-03-16", "2024-03-31")}
+        self.assertEqual(rows["MILK"]["qty"], D(-35))
+        self.assertEqual(rows["MILK"]["revenue"], D("-3146.50"))
+        whole = {r["sku"]: r for r in sales.build(db)}
+        self.assertEqual(whole["MILK"]["revenue"], D(0))
+        self.assertEqual(whole["MILK"]["margin"], D(0))
+
+    def test_group_by_customer(self):
+        db = scenario()
+        rows = sales.build(db, "2024-03-01", "2024-03-15", group="customer")
+        self.assertEqual([r["customer"] for r in rows], ["C1", "C2"])
+        self.assertEqual(rows[0]["revenue"], D("3596.50"))
+
+    def test_abc(self):
+        db = scenario()
+        rows = abc.build(db, "2024-03-01", "2024-03-15")
+        self.assertEqual([(r["sku"], r["cls"]) for r in rows],
+                         [("TEA", "A"), ("MILK", "C"), ("BREAD", "C"), ("SUGAR", "C")])
+
+
+class SalesMatchesPricingTest(unittest.TestCase):
+    """Отчёт о продажах считает выручку сам — она обязана совпадать с pricing.py."""
+
+    def test_revenue_equals_order_net(self):
+        db = make_db()
+        receiving.receive(db, "SUP1", "2024-03-05", ["TEA:500@200", "MILK:500@50", "SUGAR:100@40"])
+        expected = D(0)
+        for customer in ("C1", "C2", "C3"):
+            for qty in ("1", "10", "49", "50", "3.5"):
+                order = orders.create_order(db, customer, "2024-03-06", ["TEA:%s" % qty, "MILK:%s" % qty,
+                                                                         "SUGAR:0.7"])
+                orders.ship_order(db, order["id"], "2024-03-06")
+                expected += pricing.order_amounts(db, order)["net"]
+        rows = sales.build(db, "2024-03-06", "2024-03-06")
+        self.assertEqual(sum((r["revenue"] for r in rows), D(0)), expected)
+
+
+class OtherReportsTest(unittest.TestCase):
+    def test_purchases(self):
+        db = make_db()
+        rows = purchases.build(db)
+        self.assertEqual([(r["supplier"], r["docs"], r["total"]) for r in rows],
+                         [("SUP1", 1, D("2770.00")), ("SUP2", 1, D("23384.00"))])
+
+    def test_debts(self):
+        db = scenario()
+        payments.register_payment(db, "C2", "2024-03-12", "10000")
+        rows = {r["customer"]: r for r in debts.build(db)}
+        self.assertEqual(rows["C1"]["debt"], D(0))
+        self.assertEqual(rows["C2"]["paid"], D(10000))
+        self.assertEqual(rows["C2"]["debt"], pricing.order_total(db, "S-0002") - 10000)
+        self.assertNotIn("C3", rows)
+
+    def test_csv_output_uses_keys_and_plain_numbers(self):
+        db = scenario()
+        text = REPORTS["valuation"].render(db, "csv")
+        self.assertEqual(text.splitlines()[0], "sku,name,qty,avg_cost,value")
+        self.assertIn("TEA,Чай чёрный 100 пак.,40,210.00,8400.00", text.splitlines())
+
+    def test_text_output_has_title(self):
+        db = scenario()
+        text = REPORTS["stock"].render(db)
+        self.assertTrue(text.startswith("Остатки на складе\n"))
+        self.assertIn("норма", text)
+
+
+if __name__ == "__main__":
+    unittest.main()

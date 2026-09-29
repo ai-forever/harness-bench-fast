@@ -1,0 +1,123 @@
+# -*- coding: utf-8 -*-
+"""Комплекты (наборы): подарочные корзины, «набор для завтрака» и т. п.
+
+Комплект — обычный товар справочника, для которого задана спецификация: из каких
+компонентов и в каком количестве он собирается (db.data["kits"][SKU_КОМПЛЕКТА] =
+[{"sku": компонент, "qty": на один комплект}]).
+
+Сборка (assemble) списывает компоненты (по тем же правилам расхода, что и отгрузка
+заказа — costing.consume_fifo) и приходует комплекты новым слоем с себестоимостью,
+равной сумме себестоимости компонентов на единицу (с округлением до копеек).
+Документ — KIT-0001, движения: writeoff по каждому компоненту (с примечанием
+«сборка KIT-0001») и in по комплекту.
+
+Разборка (disassemble) — обратная операция: комплекты списываются, компоненты
+приходуются по текущей себестоимости комплекта, распределённой пропорционально
+последним ценам компонентов (costing.last_cost). Используется редко (возврат
+поставщику некомплектных наборов).
+"""
+
+from . import audit, catalog, costing, ids, inventory, validators
+from .errors import NotFound, ValidationError
+from .models import record_movement
+from .money import D, money_str, q2, qty_str
+
+ids.PREFIXES.setdefault("kit", "KIT")
+
+
+def set_spec(db, kit_sku, components):
+    """components — список строк 'SKU:КОЛ-ВО' или пар (sku, qty)."""
+    kit = catalog.getItem(db, kit_sku)
+    rows = []
+    for c in components:
+        if isinstance(c, str):
+            if ":" not in c:
+                raise ValidationError("компонент задаётся как SKU:КОЛ-ВО")
+            c = c.split(":", 1)
+        comp = catalog.getItem(db, c[0])
+        if comp["sku"] == kit["sku"]:
+            raise ValidationError("комплект не может входить сам в себя")
+        if comp["sku"] in db.data.get("kits", {}):
+            raise ValidationError("вложенные комплекты не поддерживаются")
+        rows.append({"sku": comp["sku"], "qty": qty_str(validators.positive_qty(c[1]))})
+    if not rows:
+        raise ValidationError("пустая спецификация комплекта")
+    db.data.setdefault("kits", {})[kit["sku"]] = rows
+    return rows
+
+
+def get_spec(db, kit_sku):
+    spec = db.data.get("kits", {}).get(kit_sku.upper())
+    if spec is None:
+        raise NotFound("%s не является комплектом" % kit_sku)
+    return spec
+
+
+def can_assemble(db, kit_sku):
+    """Сколько комплектов можно собрать из текущих остатков (целое число)."""
+    best = None
+    for c in get_spec(db, kit_sku):
+        n = int(inventory.on_hand(db, c["sku"]) // D(c["qty"]))
+        best = n if best is None else min(best, n)
+    return best or 0
+
+
+def assemble(db, kit_sku, qty, date):
+    kit = catalog.getItem(db, kit_sku)
+    spec = get_spec(db, kit["sku"])
+    qty = validators.positive_qty(qty)
+    if qty != qty.to_integral_value():
+        raise ValidationError("комплекты собираются целыми штуками")
+    date = validators.date(date)
+    for c in spec:
+        need = D(c["qty"]) * qty
+        have = inventory.on_hand(db, c["sku"])
+        if have < need:
+            from .errors import InsufficientStock
+
+            raise InsufficientStock(c["sku"], qty_str(need), qty_str(have))
+    doc_id = ids.next_id(db, "kit")
+    total_cost = D(0)
+    used = []
+    for c in spec:
+        need = D(c["qty"]) * qty
+        allocations = costing.consume_fifo(db, c["sku"], need)
+        inventory.change_stock(db, c["sku"], -need)
+        cost = q2(costing.allocations_cost(allocations))
+        record_movement(db, date, "writeoff", c["sku"], need, cost, doc_id, note="сборка %s" % doc_id)
+        total_cost += cost
+        used.append({"sku": c["sku"], "qty": qty_str(need), "cost": money_str(cost)})
+    unit_cost = q2(total_cost / qty)
+    costing.add_layer(db, kit["sku"], doc_id, 1, date, qty, unit_cost)
+    inventory.change_stock(db, kit["sku"], qty)
+    record_movement(db, date, "in", kit["sku"], qty, q2(unit_cost * qty), doc_id, note="сборка")
+    doc = {"id": doc_id, "type": "kit", "date": date, "sku": kit["sku"], "qty": qty_str(qty),
+           "unit_cost": money_str(unit_cost), "components": used}
+    db.data["documents"][doc_id] = doc
+    audit.log(db, date, "kit.build", doc=doc_id, sku=kit["sku"], qty=doc["qty"])
+    return doc
+
+
+def disassemble(db, kit_sku, qty, date):
+    kit = catalog.getItem(db, kit_sku)
+    spec = get_spec(db, kit["sku"])
+    qty = validators.positive_qty(qty)
+    date = validators.date(date)
+    allocations = costing.consume_fifo(db, kit["sku"], qty)
+    inventory.change_stock(db, kit["sku"], -qty)
+    kit_cost = q2(costing.allocations_cost(allocations))
+    doc_id = ids.next_id(db, "kit")
+    record_movement(db, date, "writeoff", kit["sku"], qty, kit_cost, doc_id, note="разборка")
+    weights = [(c, D(c["qty"]) * qty * costing.last_cost(db, c["sku"])) for c in spec]
+    total_weight = sum((w for _, w in weights), D(0))
+    for n, (c, w) in enumerate(weights, 1):
+        comp_qty = D(c["qty"]) * qty
+        share = (kit_cost * w / total_weight) if total_weight else kit_cost / len(weights)
+        unit = q2(share / comp_qty)
+        costing.add_layer(db, c["sku"], doc_id, n, date, comp_qty, unit)
+        inventory.change_stock(db, c["sku"], comp_qty)
+        record_movement(db, date, "in", c["sku"], comp_qty, q2(unit * comp_qty), doc_id, note="разборка")
+    doc = {"id": doc_id, "type": "kit", "date": date, "sku": kit["sku"], "qty": qty_str(-qty),
+           "unit_cost": money_str(q2(kit_cost / qty)), "components": []}
+    db.data["documents"][doc_id] = doc
+    return doc

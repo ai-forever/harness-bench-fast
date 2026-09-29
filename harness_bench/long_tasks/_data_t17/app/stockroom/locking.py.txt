@@ -1,0 +1,51 @@
+# -*- coding: utf-8 -*-
+"""Блокировка файла базы от одновременной записи двумя процессами.
+
+Рядом с базой создаётся файл <база>.lock с PID процесса. Если файл уже есть и
+моложе STALE_SECONDS, второй процесс получает ошибку «база занята». Старые
+(«зависшие») блокировки снимаются автоматически. На Windows и в тестах в памяти
+блокировка не используется.
+"""
+
+import os
+import time
+
+from .errors import StockError
+
+STALE_SECONDS = 600
+
+
+class DatabaseLocked(StockError):
+    code = "locked"
+
+
+class FileLock(object):
+    def __init__(self, db_path):
+        self.path = (db_path or "") + ".lock"
+        self.enabled = bool(db_path) and os.name == "posix"
+        self.acquired = False
+
+    def acquire(self):
+        if not self.enabled:
+            return self
+        if os.path.exists(self.path):
+            age = time.time() - os.path.getmtime(self.path)
+            if age < STALE_SECONDS:
+                raise DatabaseLocked("база занята другим процессом (%s)" % self.path)
+            os.unlink(self.path)
+        with open(self.path, "w") as fh:
+            fh.write(str(os.getpid()))
+        self.acquired = True
+        return self
+
+    def release(self):
+        if self.acquired and os.path.exists(self.path):
+            os.unlink(self.path)
+        self.acquired = False
+
+    def __enter__(self):
+        return self.acquire()
+
+    def __exit__(self, *exc):
+        self.release()
+        return False

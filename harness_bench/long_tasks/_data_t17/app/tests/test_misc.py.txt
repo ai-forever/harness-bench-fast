@@ -1,0 +1,95 @@
+# -*- coding: utf-8 -*-
+import os
+import shutil
+import tempfile
+import unittest
+
+from helpers import FIXTURES, make_db, save_db
+from stockroom import adjustments, audit, backup, inventory, labels, notifications, orders, stocktake
+from stockroom.db import Database
+from stockroom.errors import DocumentStateError, ValidationError
+from stockroom.importers import onec
+from stockroom.money import D
+
+
+class LabelsTest(unittest.TestCase):
+    def test_label_shows_retail_price_with_vat_and_breaks(self):
+        db = make_db()
+        text = labels.render_label(db, "TEA")
+        lines = text.splitlines()
+        self.assertEqual(lines[1], "|Чай чёрный 100 пак.           |")
+        self.assertIn("420,00 руб.", lines[3])
+        self.assertEqual(lines[4], "|от 10 упак — 399,00 руб.      |")
+        self.assertEqual(lines[5], "|от 50 упак — 378,00 руб.      |")
+        self.assertEqual(len(lines), 7)
+
+
+class StocktakeTest(unittest.TestCase):
+    def test_counts_adjusted_for_later_movements(self):
+        db = make_db()
+        session = stocktake.start(db, "2024-03-10", skus=["MILK", "BREAD"])
+        self.assertEqual(session["snapshot"], {"MILK": "50", "BREAD": "40"})
+        with self.assertRaises(DocumentStateError):
+            stocktake.start(db, "2024-03-10")
+        stocktake.record_count(db, "MILK", 47)
+        order = orders.create_order(db, "C1", "2024-03-10", ["MILK:5"])
+        orders.ship_order(db, order["id"], "2024-03-10")
+        diffs = stocktake.differences(db)
+        self.assertEqual([(d["sku"], d["diff"]) for d in diffs], [("MILK", D(-3))])
+        docs = stocktake.post(db, "2024-03-11")
+        self.assertEqual(len(docs), 1)
+        self.assertEqual(inventory.on_hand(db, "MILK"), D(42))
+        self.assertEqual(inventory.on_hand(db, "BREAD"), D(40))
+        stocktake.start(db, "2024-03-12", skus=["TEA"])
+        with self.assertRaises(ValidationError):
+            stocktake.record_count(db, "SUGAR", 1)
+
+
+class OneCTest(unittest.TestCase):
+    def test_load_items_and_receipt_once(self):
+        db = make_db()
+        res = onec.load(db, str(FIXTURES / "onec.txt"))
+        self.assertEqual(res, {"items": 1, "receipts": 1, "skipped": 1})
+        self.assertEqual(db.data["items"]["KEFIR"]["vat"], "10")
+        self.assertEqual(inventory.on_hand(db, "KEFIR"), D(15))
+        again = onec.load(db, str(FIXTURES / "onec.txt"))
+        self.assertEqual(again, {"items": 0, "receipts": 0, "skipped": 3})
+
+    def test_parse_sections(self):
+        recs = onec.parse("[Поступление]\nНомер=1\nСтрока=A;1;2\nСтрока=B;3;4\n")
+        self.assertEqual(recs, [("Поступление", {"Номер": "1", "Строка": ["A;1;2", "B;3;4"]})])
+
+
+class NotificationsAndAuditTest(unittest.TestCase):
+    def test_low_stock_message(self):
+        db = make_db()
+        self.assertIsNone(notifications.low_stock_message(db))
+        adjustments.writeoff(db, "BREAD", 35, "2024-03-10", "бой")
+        msg = notifications.low_stock_message(db)
+        self.assertIn("Тема: Мало на складе (1 поз.)", msg)
+        self.assertIn("BREAD Хлеб белый: остаток 5, минимум 10, заказать 15", msg)
+
+    def test_audit_trail(self):
+        db = make_db()
+        rows = audit.recent(db, limit=2)
+        self.assertEqual([r["action"] for r in rows], ["receive", "receive"])
+        self.assertEqual(rows[-1]["doc"], "R-0002")
+        self.assertEqual(len(audit.recent(db, limit=0, action="item.add")), 4)
+        self.assertIn("doc=R-0002", audit.format_entry(rows[-1]))
+
+
+class BackupTest(unittest.TestCase):
+    def test_backup_copy_is_readable(self):
+        tmp = tempfile.mkdtemp()
+        try:
+            db = make_db()
+            save_db(db, tmp)
+            target = os.path.join(tmp, "copy.json")
+            backup.backup(db, target)
+            self.assertEqual(inventory.on_hand(Database.open(target), "TEA"), D(100))
+        finally:
+            shutil.rmtree(tmp)
+
+
+if __name__ == "__main__":
+    unittest.main()

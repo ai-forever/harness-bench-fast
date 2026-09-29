@@ -1,0 +1,61 @@
+# -*- coding: utf-8 -*-
+"""Фид остатков и цен для маркетплейса (JSON).
+
+Формат согласован с маркетплейсом в 2022 году (спецификация «Feed v2»):
+
+    {"shop": "<company>", "generated": "<дата>", "currency": "RUB",
+     "offers": [{"id": SKU, "name": ..., "price": "98.89", "stock": 12, "vat": 10,
+                 "barcode": ... | null, "available": true}]}
+
+* price — розничная цена с НДС для покупателя-розницы без скидок (как на ценнике);
+  цена берётся из прайс-листа служебного покупателя MARKET (если его нет — цена
+  карточки без скидок);
+* stock — доступный остаток (остаток минус резерв новых заказов), целое, не меньше 0,
+  с «запасом прочности»: минус SAFETY_STOCK единиц, чтобы не продать последнее;
+* выведенные из ассортимента и товары без цены в фид не попадают.
+"""
+
+import json
+
+from ..inventory import available
+from ..money import D, money_str, q2
+
+MARKET_CUSTOMER = "MARKET"
+SAFETY_STOCK = 2
+
+
+def _price_with_vat(db, item, date):
+    if MARKET_CUSTOMER in db.data["customers"]:
+        from ..pricing import unit_price
+
+        net = unit_price(db, item["sku"], 1, MARKET_CUSTOMER, date)
+    else:
+        net = D(item["price"])
+    return q2(net + net * D(item["vat"]) / 100)
+
+
+def build_feed(db, date):
+    offers = []
+    for sku in sorted(db.data["items"]):
+        item = db.data["items"][sku]
+        if not item.get("active", True) or D(item["price"]) <= 0:
+            continue
+        stock = available(db, sku) - SAFETY_STOCK
+        stock = max(int(stock), 0)
+        offers.append({
+            "id": sku,
+            "name": item["name"],
+            "price": money_str(_price_with_vat(db, item, date)),
+            "stock": stock,
+            "vat": int(D(item["vat"])),
+            "barcode": item.get("barcode"),
+            "available": stock > 0,
+        })
+    return {"shop": db.meta("company") or "", "generated": date, "currency": "RUB", "offers": offers}
+
+
+def write_feed(db, path, date):
+    feed = build_feed(db, date)
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(feed, fh, ensure_ascii=False, indent=1)
+    return len(feed["offers"])

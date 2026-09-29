@@ -1,0 +1,90 @@
+# -*- coding: utf-8 -*-
+import datetime
+import unittest
+from decimal import Decimal
+
+from stockroom import validators
+from stockroom.dates import add_days, days_between, in_range, iso, month_key, parse_date, ru
+from stockroom.errors import ValidationError
+from stockroom.money import D, apply_discount, fmt_money, fmt_qty, money_str, q2, qty_str, to_str
+
+
+class MoneyTest(unittest.TestCase):
+    def test_decimal_parsing_accepts_comma_and_spaces(self):
+        self.assertEqual(D("1 234,50"), Decimal("1234.50"))
+        self.assertEqual(D(""), Decimal("0"))
+        self.assertEqual(D(0.1), Decimal("0.1"))
+        with self.assertRaises(ValueError):
+            D("abc")
+
+    def test_q2_rounds_half_up(self):
+        self.assertEqual(q2("2.345"), Decimal("2.35"))
+        self.assertEqual(q2("2.344"), Decimal("2.34"))
+        self.assertEqual(q2("-2.345"), Decimal("-2.35"))
+
+    def test_format_money(self):
+        self.assertEqual(fmt_money("1234567.5"), "1 234 567,50")
+        self.assertEqual(fmt_money("-12.345"), "-12,35")
+        self.assertEqual(fmt_money(0), "0,00")
+
+    def test_quantities(self):
+        self.assertEqual(qty_str("12.000"), "12")
+        self.assertEqual(qty_str("1.2345"), "1.235")
+        self.assertEqual(fmt_qty("25.5"), "25,5")
+        self.assertEqual(money_str("7"), "7.00")
+        self.assertEqual(to_str("5.50"), "5.5")
+
+    def test_discount(self):
+        self.assertEqual(q2(apply_discount("89.90", 10)), Decimal("80.91"))
+
+
+class DatesTest(unittest.TestCase):
+    def test_parse_formats(self):
+        self.assertEqual(parse_date("2024-03-05"), datetime.date(2024, 3, 5))
+        self.assertEqual(iso("5.3.2024"), "2024-03-05")
+        self.assertEqual(ru("2024-03-05"), "05.03.2024")
+        with self.assertRaises(ValueError):
+            parse_date("2024/03/05")
+
+    def test_arithmetic(self):
+        self.assertEqual(add_days("2024-02-28", 2), "2024-03-01")
+        self.assertEqual(days_between("2024-03-01", "2024-03-31"), 30)
+        self.assertEqual(month_key("2024-03-31"), "2024-03")
+
+    def test_in_range(self):
+        self.assertTrue(in_range("2024-03-05", "2024-03-05", "2024-03-05"))
+        self.assertFalse(in_range("2024-03-05", "2024-03-06", None))
+        self.assertTrue(in_range("2024-03-05", None, None))
+
+
+class ValidatorsTest(unittest.TestCase):
+    def test_sku_is_normalised(self):
+        self.assertEqual(validators.sku(" milk-1l "), "MILK-1L")
+        with self.assertRaises(ValidationError):
+            validators.sku("молоко")
+
+    def test_quantities_and_percent(self):
+        self.assertEqual(validators.positive_qty("1,5"), Decimal("1.5"))
+        with self.assertRaises(ValidationError):
+            validators.positive_qty("0")
+        with self.assertRaises(ValidationError):
+            validators.percent("101")
+
+    def test_inn_and_barcode(self):
+        self.assertEqual(validators.inn("7701234567"), "7701234567")
+        self.assertIsNone(validators.inn(""))
+        with self.assertRaises(ValidationError):
+            validators.inn("123")
+        with self.assertRaises(ValidationError):
+            validators.barcode("12345")
+
+    def test_date_and_unit(self):
+        self.assertEqual(validators.date("01.02.2024"), "2024-02-01")
+        with self.assertRaises(ValidationError):
+            validators.date("вчера")
+        with self.assertRaises(ValidationError):
+            validators.unit("бочка")
+
+
+if __name__ == "__main__":
+    unittest.main()

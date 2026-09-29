@@ -1,0 +1,144 @@
+# -*- coding: utf-8 -*-
+import pytest
+from acc_helpers import base_db, feature_db, run_cli, save
+
+from stockroom import costing, inventory, lots, orders, payments, pricing, returns
+from stockroom.documents.waybill import render_waybill
+from stockroom.errors import DocumentStateError, ValidationError
+from stockroom.money import D
+from stockroom.reports import sales
+
+
+@pytest.fixture()
+def shipped():
+    db = base_db()
+    order = orders.create_order(db, "C2", "2024-03-06", ["MILK:35", "TEA:60", "SUGAR:2.5"])
+    orders.ship_order(db, order["id"], "2024-03-07")
+    return db, order
+
+
+def test_partial_return_updates_stock_status_and_document(shipped):
+    db, order = shipped
+    doc = returns.return_order(db, order["id"], "2024-03-09", lines=["MILK:7", "tea:10", "MILK:1"])
+    assert doc["lines"] == [{"sku": "MILK", "qty": "8", "cost": "455.00"}, {"sku": "TEA", "qty": "10",
+                                                                           "cost": "2100.00"}]
+    assert order["status"] == "partially_returned"
+    assert order["return_doc"] == doc["id"] and order["returns"] == [doc["id"]]
+    assert inventory.on_hand(db, "MILK") == D(23)
+    assert inventory.on_hand(db, "TEA") == D(50)
+    assert db.check_integrity() == []
+
+
+def test_refund_uses_order_line_price(shipped):
+    db, order = shipped
+    doc = returns.return_order(db, order["id"], "2024-03-09", lines=["TEA:10"])
+    unit = pricing.unit_price(db, "TEA", 60, "C2", "2024-03-06")
+    assert unit == D("269.33")
+    net = (unit * 10).quantize(D("0.01"))
+    assert D(doc["amount"]) == net + (net * D("0.2")).quantize(D("0.01"))
+    assert doc["amount"] == "3231.96"
+
+
+def test_returned_goods_go_back_to_last_allocations_first(shipped):
+    db, order = shipped
+    returns.return_order(db, order["id"], "2024-03-09", lines=["MILK:8"])
+    alloc = order["lines"][0]["allocations"]
+    assert [(a["doc"], a.get("returned", "0")) for a in alloc] == [("R-0001", "3"), ("R-0002", "5")]
+    layers = costing.layers_for(db, "MILK")
+    assert [(l["doc"], l["qty"]) for l in layers] == [("R-0001", "3"), ("R-0002", "20")]
+    mv = db.data["movements"][-1]
+    assert (mv["type"], mv["sku"], mv["qty"], mv["cost"]) == ("return", "MILK", "8", "455.00")
+
+
+def test_second_return_completes_order(shipped):
+    db, order = shipped
+    first = returns.return_order(db, order["id"], "2024-03-09", lines=["MILK:35", "SUGAR:1"])
+    second = returns.return_order(db, order["id"], "2024-03-10")
+    assert second["lines"] == [{"sku": "TEA", "qty": "60", "cost": "12600.00"},
+                               {"sku": "SUGAR", "qty": "1.5", "cost": "72.00"}]
+    assert order["status"] == "returned"
+    assert order["returns"] == [first["id"], second["id"]]
+    assert [d["id"] for d in returns.returns_for(db, order["id"])] == [first["id"], second["id"]]
+    with pytest.raises(DocumentStateError):
+        returns.return_order(db, order["id"], "2024-03-11", lines=["TEA:1"])
+    assert inventory.on_hand(db, "SUGAR") == D("25.5")
+
+
+def test_full_return_without_lines_unchanged(shipped):
+    db, order = shipped
+    doc = returns.return_order(db, order["id"], "2024-03-09")
+    assert order["status"] == "returned"
+    assert D(doc["amount"]) == pricing.order_total(db, order["id"])
+
+
+@pytest.mark.parametrize("lines", [["MILK:36"], ["BREAD:1"], ["MILK:0"], ["MILK:x"], ["MILK:20", "MILK:16"]])
+def test_invalid_return_lines_change_nothing(shipped, lines):
+    db, order = shipped
+    n_docs = len(db.data["documents"])
+    with pytest.raises(ValidationError):
+        returns.return_order(db, order["id"], "2024-03-09", lines=lines)
+    assert len(db.data["documents"]) == n_docs
+    assert order["status"] == "shipped"
+    assert inventory.on_hand(db, "MILK") == D(15)
+
+
+def test_over_return_after_partial(shipped):
+    db, order = shipped
+    returns.return_order(db, order["id"], "2024-03-09", lines=["MILK:30"])
+    with pytest.raises(ValidationError):
+        returns.return_order(db, order["id"], "2024-03-09", lines=["MILK:6"])
+    returns.return_order(db, order["id"], "2024-03-09", lines=[{"sku": "MILK", "qty": "5"}])
+    assert order["status"] == "partially_returned"
+
+
+def test_return_restores_consumed_lot_with_expiry():
+    db = feature_db()
+    order = orders.create_order(db, "C1", "2024-03-16", ["YOG:12"])
+    orders.ship_order(db, order["id"], "2024-03-16")
+    orders_after = [(r["lot"], r["qty"]) for r in lots.lots_of(db, "YOG")]
+    assert orders_after == [("B", D(10)), ("R-0003-3", D(3))]
+    returns.return_order(db, order["id"], "2024-03-17", lines=["YOG:4"])
+    assert [(r["lot"], r["expiry"], r["qty"]) for r in lots.lots_of(db, "YOG")] == [
+        ("B", "2024-03-15", D(10)), ("A", "2024-03-20", D(2)), ("R-0003-3", "2024-03-25", D(5))]
+    assert db.check_integrity() == []
+
+
+def test_sales_report_and_balance_after_partial_return(shipped):
+    db, order = shipped
+    returns.return_order(db, order["id"], "2024-03-20", lines=["TEA:10"])
+    march = {r["sku"]: r for r in sales.build(db, "2024-03-01", "2024-03-15")}
+    later = {r["sku"]: r for r in sales.build(db, "2024-03-16", "2024-03-31")}
+    assert march["TEA"]["revenue"] == D("16159.80")
+    assert later["TEA"]["qty"] == D(-10)
+    assert later["TEA"]["revenue"] == D("-2693.30")
+    assert later["TEA"]["cost"] == D("-2100.00")
+    total = {r["sku"]: r for r in sales.build(db)}
+    assert total["TEA"]["qty"] == D(50)
+    assert payments.balance(db, "C2") == pricing.order_total(db, order["id"]) - D("3231.96")
+
+
+def test_waybill_and_order_show_for_partially_returned(shipped, tmp_path):
+    db, order = shipped
+    returns.return_order(db, order["id"], "2024-03-09", lines=["SUGAR:0.5"])
+    assert "НАКЛАДНАЯ № S-0001" in render_waybill(db, order["id"])
+    path = save(db, tmp_path)
+    rc, out, err = run_cli(path, "order", "show", "S-0001")
+    assert rc == 0, err
+    assert "Статус: частично возвращён" in out
+
+
+def test_cli_partial_return(tmp_path):
+    db = base_db()
+    order = orders.create_order(db, "C2", "2024-03-06", ["MILK:35", "TEA:60"])
+    orders.ship_order(db, order["id"], "2024-03-07")
+    path = save(db, tmp_path)
+    rc, out, err = run_cli(path, "return", "S-0001", "TEA:10", "--date", "2024-03-09")
+    assert rc == 0, err
+    assert out.strip() == "Возврат RT-0001 по заказу S-0001 оформлен, к возврату 3 231,96"
+    rc, _, err = run_cli(path, "return", "S-0001", "TEA:51", "--date", "2024-03-09")
+    assert rc == 2 and err.startswith("ошибка: ")
+    rc, out, err = run_cli(path, "return", "S-0001", "--date", "2024-03-10")
+    assert rc == 0, err
+    assert out.startswith("Возврат RT-0002 по заказу S-0001 оформлен")
+    rc, out, _ = run_cli(path, "order", "show", "S-0001")
+    assert "Статус: возвращён" in out

@@ -1,0 +1,57 @@
+# -*- coding: utf-8 -*-
+"""История цен продажи (журнал изменений цены в карточке товара).
+
+ВНИМАНИЕ: история только хранится и показывается (команда `item history` в старом
+меню и отчёт для коммерческого отдела). В расчёте цен заказов она НЕ участвует —
+заказы считаются по текущей цене карточки (см. pricing.py). Так решили в 2021 году,
+чтобы не пересчитывать старые счета; вопрос «цены на дату заказа» отложен.
+
+db.data["price_history"][SKU] = [{"date": ..., "price": "89.90", "note": ...}], по дате.
+"""
+
+from . import catalog, validators
+from .money import D, money_str
+
+
+def record(db, sku, date, price, note=None):
+    item = catalog.getItem(db, sku)
+    rows = db.data.setdefault("price_history", {}).setdefault(item["sku"], [])
+    entry = {"date": validators.date(date), "price": money_str(validators.non_negative(price, "цена"))}
+    if note:
+        entry["note"] = note
+    rows.append(entry)
+    rows.sort(key=lambda r: r["date"])
+    return entry
+
+
+def change_price(db, sku, date, price, note=None):
+    """Изменить цену в карточке и записать изменение в историю."""
+    entry = record(db, sku, date, price, note)
+    catalog.updateItem(db, sku, price=price)
+    return entry
+
+
+def history(db, sku):
+    item = catalog.getItem(db, sku)
+    return list(db.data.get("price_history", {}).get(item["sku"], []))
+
+
+def price_on(db, sku, date):
+    """Цена по истории на дату (последняя запись не позже даты); если истории нет —
+    текущая цена карточки. Только для отчётов, не для счетов!"""
+    date = validators.date(date)
+    rows = [r for r in history(db, sku) if r["date"] <= date]
+    if rows:
+        return D(rows[-1]["price"])
+    return D(catalog.getItem(db, sku)["price"])
+
+
+def changes_between(db, date_from, date_to):
+    out = []
+    for sku, rows in sorted(db.data.get("price_history", {}).items()):
+        prev = None
+        for r in rows:
+            if date_from <= r["date"] <= date_to and prev is not None:
+                out.append({"sku": sku, "date": r["date"], "old": D(prev["price"]), "new": D(r["price"])})
+            prev = r
+    return out

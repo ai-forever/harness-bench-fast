@@ -1,0 +1,134 @@
+# -*- coding: utf-8 -*-
+"""Возвраты от покупателей: полные и частичные.
+
+return_order(db, order_id, date, reason=None, lines=None):
+
+* lines=None — вернуть всё, что ещё не возвращено по заказу;
+* lines — список строк "SKU:КОЛ-ВО" или словарей {sku, qty}; одинаковые артикулы
+  складываются. Вернуть можно только товар из заказа и не больше, чем отгружено минус
+  уже возвращённое.
+
+Товар возвращается в те партии, из которых был отгружен, начиная с последнего
+распределения строки заказа (обратный порядок отгрузки); в распределениях заказа
+копится ключ "returned".
+
+Сумма к возврату (amount, с НДС) — по строкам: цена единицы как в заказе (pricing на
+дату заказа, скидка за количество — по количеству строки заказа), сумма без НДС =
+round2(цена * количество), НДС = round2(сумма * ставка / 100).
+
+Статус заказа после возврата: "returned", если вернули всё, иначе "partially_returned".
+
+Документ возврата (documents["RT-0001"]):
+
+    {"id": "RT-0001", "type": "return", "date": ..., "order": "S-0001",
+     "customer": "C001", "lines": [{"sku": "MILK", "qty": "3", "cost": "165.00"}],
+     "amount": "396.00", "reason": ..., "allocations": {"MILK": [...]}}
+"""
+
+from . import audit, costing, ids, inventory, validators
+from .errors import DocumentStateError, NotFound, ValidationError
+from .models import record_movement
+from .money import D, money_str, q2, qty_str
+from .orders import get_order, parse_line
+from .pricing import unit_price
+
+
+def returned_qty(order, sku):
+    total = D(0)
+    for line in order["lines"]:
+        if line["sku"] == sku:
+            total += sum((D(a.get("returned", "0")) for a in line.get("allocations", [])), D(0))
+    return total
+
+
+def remaining(order):
+    """Сколько ещё можно вернуть: {sku: Decimal} в порядке строк заказа."""
+    rest = {}
+    for line in order["lines"]:
+        rest[line["sku"]] = rest.get(line["sku"], D(0)) + D(line["qty"])
+    for sku in rest:
+        rest[sku] -= returned_qty(order, sku)
+    return rest
+
+
+def _requested(order, lines):
+    rest = remaining(order)
+    if lines is None:
+        return [(sku, qty) for sku, qty in rest.items() if qty > 0]
+    wanted = {}
+    for raw in lines:
+        line = parse_line(raw) if isinstance(raw, str) else dict(raw)
+        sku = validators.sku(line["sku"])
+        if sku not in rest:
+            raise ValidationError("товара %s нет в заказе %s" % (sku, order["id"]))
+        wanted[sku] = wanted.get(sku, D(0)) + validators.positive_qty(line["qty"])
+    if not wanted:
+        raise ValidationError("пустой возврат")
+    for sku, qty in wanted.items():
+        if qty > rest[sku]:
+            raise ValidationError("по заказу %s можно вернуть не больше %s %s" % (order["id"], qty_str(rest[sku]), sku))
+    return [(sku, wanted[sku]) for sku in rest if sku in wanted]
+
+
+def return_order(db, order_id, date, reason=None, lines=None):
+    order = get_order(db, order_id)
+    if order["status"] == "returned":
+        raise DocumentStateError("заказ %s уже возвращён" % order_id)
+    if order["status"] not in ("shipped", "partially_returned"):
+        raise DocumentStateError("вернуть можно только отгруженный заказ, %s в статусе %s" % (order_id, order["status"]))
+    date = validators.date(date)
+    if date < order["shipped_date"]:
+        raise DocumentStateError("дата возврата раньше даты отгрузки")
+    request = _requested(order, lines)
+    doc_id = ids.next_id(db, "return")
+    doc_lines = []
+    restored_all = {}
+    amount = D(0)
+    for sku, qty in request:
+        line = [l for l in order["lines"] if l["sku"] == sku][0]
+        left = qty
+        restored = []
+        for a in reversed(line.get("allocations", [])):
+            if left <= 0:
+                break
+            can = D(a["qty"]) - D(a.get("returned", "0"))
+            take = min(can, left)
+            if take <= 0:
+                continue
+            piece = dict(a)
+            piece.pop("returned", None)
+            piece["qty"] = qty_str(take)
+            restored.append(piece)
+            a["returned"] = qty_str(D(a.get("returned", "0")) + take)
+            left -= take
+        costing.restore(db, sku, restored)
+        inventory.change_stock(db, sku, qty)
+        cost = q2(costing.allocations_cost(restored))
+        record_movement(db, date, "return", sku, qty, cost, doc_id)
+        doc_lines.append({"sku": sku, "qty": qty_str(qty), "cost": money_str(cost)})
+        restored_all[sku] = restored
+        unit = unit_price(db, sku, D(line["qty"]), order["customer"], order["date"])
+        net = q2(unit * qty)
+        vat = q2(net * D(db.data["items"][sku]["vat"]) / 100)
+        amount += net + vat
+    doc = {"id": doc_id, "type": "return", "date": date, "order": order_id, "customer": order["customer"],
+           "lines": doc_lines, "amount": money_str(amount), "allocations": restored_all}
+    if reason:
+        doc["reason"] = reason
+    db.data["documents"][doc_id] = doc
+    order["return_doc"] = doc_id
+    order.setdefault("returns", []).append(doc_id)
+    order["status"] = "returned" if all(q <= 0 for q in remaining(order).values()) else "partially_returned"
+    audit.log(db, date, "return", doc=doc_id, order=order_id, amount=doc["amount"])
+    return doc
+
+
+def get_return(db, doc_id):
+    doc = db.data["documents"].get(doc_id)
+    if doc is None or doc.get("type") != "return":
+        raise NotFound("нет возврата %s" % doc_id)
+    return doc
+
+
+def returns_for(db, order_id):
+    return sorted((d for d in db.documents_of("return") if d.get("order") == order_id), key=lambda d: d["id"])

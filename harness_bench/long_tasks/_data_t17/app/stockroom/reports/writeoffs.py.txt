@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+"""Списания за период: документ, товар, количество, себестоимость, причина."""
+
+from ..dates import in_range
+from ..money import D, fmt_money, fmt_qty
+from ..textable import render as _render
+
+COLUMNS = [("id", "Документ"), ("date", "Дата"), ("sku", "Артикул"), ("qty", "Кол-во", "r"),
+           ("cost", "Себестоимость", "r"), ("reason", "Причина")]
+
+
+def build(db, date_from=None, date_to=None):
+    rows = []
+    for doc in sorted(db.documents_of("writeoff"), key=lambda d: d["id"]):
+        if in_range(doc["date"], date_from, date_to):
+            rows.append({"id": doc["id"], "date": doc["date"], "sku": doc["sku"], "qty": D(doc["qty"]),
+                         "cost": D(doc["cost"]), "reason": doc.get("reason", "")})
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, opts.get("date_from"), opts.get("date_to"))
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, qty=fmt_qty(r["qty"]), cost=fmt_money(r["cost"])) for r in rows]
+    total = sum((r["cost"] for r in rows), D(0))
+    return _render(COLUMNS, view, "text", title="Списания", footer="Итого: %s" % fmt_money(total))

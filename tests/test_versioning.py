@@ -4,6 +4,7 @@ from harness_bench.tasks import ALL_TASKS
 from harness_bench.versioning import (
     CURRENT_TASK_SET_REVISION,
     EXPECTED_TASK_COUNT,
+    TASK_SET_REVISIONS,
     TASK_SET_VERSION,
     TASK_WAVES,
     revision_for_task_id,
@@ -87,8 +88,16 @@ def test_cli_tasks_belong_to_their_revision() -> None:
     assert revision_for_task_id("task_391_cli_sed_section_extract").version == "0.15.0"
 
 
-def test_current_revision_is_the_audit_pass() -> None:
+def test_audit_revision_adds_no_tasks() -> None:
     # 0.16.0 adds no tasks: it corrects defects across the existing 391.
-    assert TASK_SET_VERSION == "0.16.0"
-    assert CURRENT_TASK_SET_REVISION.total_tasks == 391
-    assert CURRENT_TASK_SET_REVISION.added_task_numbers == (0, 0)
+    audit = next(revision for revision in TASK_SET_REVISIONS if revision.version == "0.16.0")
+    assert audit.total_tasks == 391
+    assert audit.added_task_numbers == (0, 0)
+
+
+def test_long_wave_is_the_current_revision() -> None:
+    assert TASK_SET_VERSION == "0.17.0"
+    assert CURRENT_TASK_SET_REVISION.total_tasks == 411
+    assert CURRENT_TASK_SET_REVISION.added_task_numbers == (392, 411)
+    assert revision_for_task_id("task_392_manuscript_continuity").version == "0.17.0"
+    assert revision_for_task_id("task_411_math_solutions_check").version == "0.17.0"

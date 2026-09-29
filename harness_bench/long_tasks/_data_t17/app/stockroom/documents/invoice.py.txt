@@ -1,0 +1,109 @@
+# -*- coding: utf-8 -*-
+"""Счёт покупателю.
+
+Модуль написан до появления pricing.py (2020) и считает цены сам. Логика должна
+совпадать с pricing.py один в один — это проверяет тест test_invoice.InvoiceMatchesPricingTest.
+Переписать на pricing.py так и не дошли руки: форма счёта согласована с бухгалтерией,
+и любые изменения в ней нужно согласовывать заново.
+
+Формат счёта (текст, ширина 100 символов):
+
+    ООО «Ромашка»
+    СЧЁТ № S-0001 от 05.03.2024
+    Покупатель: C001 Магазин у дома
+    <пустая строка>
+    таблица строк: №, Артикул, Наименование, Кол-во, Ед., Цена, Сумма, НДС%, НДС, Всего
+    <пустая строка>
+    Итого без НДС: 1 234,50
+    НДС: 246,90
+    Всего к оплате: 1 481,40
+"""
+
+from decimal import ROUND_HALF_UP, Decimal
+
+from .. import config
+from ..dates import ru
+from ..errors import DocumentStateError
+from ..money import fmt_money, fmt_qty
+from ..orders import get_order
+from ..partners import get_customer
+from ..textable import render_text
+
+CENT = Decimal("0.01")
+
+COLUMNS = [
+    ("n", "№", "r"),
+    ("sku", "Артикул"),
+    ("name", "Наименование"),
+    ("qty", "Кол-во", "r"),
+    ("unit", "Ед."),
+    ("price", "Цена", "r"),
+    ("net", "Сумма", "r"),
+    ("vat_rate", "НДС%", "r"),
+    ("vat", "НДС", "r"),
+    ("total", "Всего", "r"),
+]
+
+
+def _breaks(db, sku):
+    rows = db.data.get("price_breaks", {}).get(sku, [])
+    return sorted(rows, key=lambda r: Decimal(r["min_qty"]))
+
+
+def _line(db, order, line, customer):
+    """Рассчитать строку счёта (копия логики pricing.line_amounts)."""
+    item = db.data["items"][line["sku"]]
+    qty = Decimal(line["qty"])
+    price = Decimal(item["price"])
+    if customer.get("group") == "wholesale":
+        price = (price * (100 - Decimal(config.WHOLESALE_DISCOUNT)) / 100).quantize(CENT, rounding=ROUND_HALF_UP)
+    disc = Decimal(0)
+    for br in _breaks(db, item["sku"]):
+        if qty >= Decimal(br["min_qty"]):
+            disc = Decimal(br["discount"])
+    price = (price * (100 - disc) / 100).quantize(CENT, rounding=ROUND_HALF_UP)
+    price = (price * (100 - Decimal(customer.get("discount") or "0")) / 100).quantize(CENT, rounding=ROUND_HALF_UP)
+    net = (price * qty).quantize(CENT, rounding=ROUND_HALF_UP)
+    vat = (net * Decimal(item["vat"]) / 100).quantize(CENT, rounding=ROUND_HALF_UP)
+    return {
+        "sku": item["sku"],
+        "name": item["name"],
+        "unit": item.get("unit") or "шт",
+        "qty": qty,
+        "price": price,
+        "net": net,
+        "vat_rate": item["vat"],
+        "vat": vat,
+        "total": net + vat,
+    }
+
+
+def invoice_data(db, order_id):
+    """Данные счёта: {"order", "date", "customer", "lines": [...], "net", "vat", "total"} (суммы Decimal)."""
+    order = get_order(db, order_id)
+    if order["status"] == "cancelled":
+        raise DocumentStateError("заказ %s отменён, счёт не выставляется" % order_id)
+    customer = get_customer(db, order["customer"])
+    lines = [_line(db, order, l, customer) for l in order["lines"]]
+    net = sum((l["net"] for l in lines), Decimal(0))
+    vat = sum((l["vat"] for l in lines), Decimal(0))
+    return {"order": order_id, "date": order["date"], "customer": customer, "lines": lines,
+            "net": net, "vat": vat, "total": net + vat}
+
+
+def render_invoice(db, order_id):
+    data = invoice_data(db, order_id)
+    company = db.meta("company") or ""
+    out = [company, "СЧЁТ № %s от %s" % (data["order"], ru(data["date"])),
+           "Покупатель: %s %s" % (data["customer"]["code"], data["customer"]["name"]), ""]
+    rows = []
+    for n, l in enumerate(data["lines"], 1):
+        rows.append({"n": n, "sku": l["sku"], "name": l["name"], "qty": fmt_qty(l["qty"]), "unit": l["unit"],
+                     "price": fmt_money(l["price"]), "net": fmt_money(l["net"]), "vat_rate": l["vat_rate"],
+                     "vat": fmt_money(l["vat"]), "total": fmt_money(l["total"])})
+    out.append(render_text(COLUMNS, rows).rstrip("\n"))
+    out.append("")
+    out.append("Итого без НДС: %s" % fmt_money(data["net"]))
+    out.append("НДС: %s" % fmt_money(data["vat"]))
+    out.append("Всего к оплате: %s" % fmt_money(data["total"]))
+    return "\n".join(out) + "\n"

@@ -1,0 +1,21 @@
+# -*- coding: utf-8 -*-
+"""План закупок (forecast.reorder_plan): что и сколько заказать поставщикам."""
+
+from ..forecast import reorder_plan
+from ..money import fmt_qty
+from ..textable import render as _render
+
+COLUMNS = [("sku", "Артикул"), ("name", "Наименование"), ("usage", "Расход/день", "r"), ("have", "Есть+ждём", "r"),
+           ("need", "Нужно", "r"), ("order", "Заказать", "r")]
+
+
+def build(db, on_date, cover_days=14):
+    return reorder_plan(db, on_date, cover_days)
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, opts["on_date"], opts.get("days") or 14)
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, usage=fmt_qty(r["usage"]), have=fmt_qty(r["have"]), need=fmt_qty(r["need"])) for r in rows]
+    return _render(COLUMNS, view, "text", title="План закупок")

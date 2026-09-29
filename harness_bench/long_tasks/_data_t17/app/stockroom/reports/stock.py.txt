@@ -1,0 +1,46 @@
+# -*- coding: utf-8 -*-
+"""Остатки на складе.
+
+Колонки: sku, name, unit, qty, min_qty, status. status: "out" — остатка нет,
+"low" — меньше неснижаемого, "ok" — иначе. Неактивные товары показываются только
+с include_inactive=True (и только если остаток не нулевой).
+"""
+
+from ..inventory import on_hand
+from ..money import D, fmt_qty
+from ..textable import render as _render
+
+COLUMNS = [("sku", "Артикул"), ("name", "Наименование"), ("unit", "Ед."), ("qty", "Остаток", "r"),
+           ("min_qty", "Мин.", "r"), ("status", "Статус")]
+STATUS_TEXT = {"ok": "норма", "low": "мало", "out": "нет"}
+
+
+def status_of(qty, min_qty):
+    if qty <= 0:
+        return "out"
+    if qty < min_qty:
+        return "low"
+    return "ok"
+
+
+def build(db, category=None, include_inactive=False):
+    rows = []
+    for sku in sorted(db.data["items"]):
+        item = db.data["items"][sku]
+        qty = on_hand(db, sku)
+        if not item.get("active", True) and (not include_inactive or qty == 0):
+            continue
+        if category and item.get("category") != category:
+            continue
+        min_qty = D(item.get("min_qty", "0"))
+        rows.append({"sku": sku, "name": item["name"], "unit": item.get("unit", "шт"), "qty": qty,
+                     "min_qty": min_qty, "status": status_of(qty, min_qty)})
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, **opts)
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, qty=fmt_qty(r["qty"]), min_qty=fmt_qty(r["min_qty"]), status=STATUS_TEXT[r["status"]]) for r in rows]
+    return _render(COLUMNS, view, "text", title="Остатки на складе")

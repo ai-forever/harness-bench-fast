@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+"""Роли и права (заготовка, 2023).
+
+Планировалось, что CLI будет принимать --user и проверять права по ролям. Проверка
+пока нигде не вызывается: склад работает с одного компьютера. Таблица прав оставлена
+как документация согласованной с безопасниками модели.
+"""
+
+from .errors import StockError
+
+ROLES = {
+    "storekeeper": {"receive", "order.ship", "adjust", "writeoff", "stocktake", "report.stock", "report.low",
+                    "lots"},
+    "manager": {"order.create", "order.cancel", "invoice", "return", "customer", "pricelist", "report.sales",
+                "report.abc", "breaks", "payment", "act"},
+    "accountant": {"report.valuation", "report.movements", "report.turnover", "report.purchases", "report.debts",
+                   "export", "import", "act", "rate"},
+    "admin": {"*"},
+}
+
+
+class PermissionDenied(StockError):
+    code = "denied"
+
+
+def allowed(role, action):
+    perms = ROLES.get(role, set())
+    if "*" in perms:
+        return True
+    if action in perms:
+        return True
+    prefix = action.split(".", 1)[0]
+    return prefix in perms
+
+
+def check(role, action):
+    if not allowed(role, action):
+        raise PermissionDenied("роль %s не может выполнять %s" % (role, action))

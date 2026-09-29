@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+"""Товары с остатком ниже неснижаемого (только активные, только с min_qty > 0).
+
+reorder — рекомендуемое количество к заказу: min_qty * config.REORDER_FACTOR - qty.
+"""
+
+from .. import config
+from ..inventory import on_hand
+from ..money import D, fmt_qty
+from ..textable import render as _render
+
+COLUMNS = [("sku", "Артикул"), ("name", "Наименование"), ("qty", "Остаток", "r"), ("min_qty", "Мин.", "r"),
+           ("reorder", "Заказать", "r")]
+
+
+def build(db):
+    rows = []
+    for sku in sorted(db.data["items"]):
+        item = db.data["items"][sku]
+        if not item.get("active", True):
+            continue
+        min_qty = D(item.get("min_qty", "0"))
+        qty = on_hand(db, sku)
+        if min_qty > 0 and qty < min_qty:
+            rows.append({"sku": sku, "name": item["name"], "qty": qty, "min_qty": min_qty,
+                         "reorder": min_qty * config.REORDER_FACTOR - qty})
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db)
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [{k: (fmt_qty(v) if k in ("qty", "min_qty", "reorder") else v) for k, v in r.items()} for r in rows]
+    return _render(COLUMNS, view, "text", title="Мало на складе")

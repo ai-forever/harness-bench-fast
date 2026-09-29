@@ -1,0 +1,138 @@
+# -*- coding: utf-8 -*-
+import os
+import shutil
+import tempfile
+import unittest
+
+from helpers import make_db
+from stockroom import adjustments, barcodes, catalog, forecast, orders, purchasing, returns
+from stockroom.errors import ValidationError
+from stockroom.importers import supplier_invoice
+from stockroom.money import D
+from stockroom.reports import open_orders, reorder, writeoffs
+
+
+class BarcodesTest(unittest.TestCase):
+    def test_check_digit_and_internal_codes(self):
+        self.assertTrue(barcodes.is_valid_ean("4601234567893"))
+        self.assertFalse(barcodes.is_valid_ean("4601234567890"))
+        self.assertTrue(barcodes.is_valid_ean("96385074"))
+        code = barcodes.internal_code(42, 1250)
+        self.assertEqual(code[:12], "200042001250")
+        self.assertEqual(barcodes.parse_internal(code), (42, 1250))
+        self.assertIsNone(barcodes.parse_internal("4601234567893"))
+
+    def test_find_item_by_weight_code(self):
+        db = make_db()
+        catalog.updateItem(db, "SUGAR", barcode=barcodes.internal_code(7))
+        item, qty = barcodes.find_item(db, barcodes.internal_code(7, 1500))
+        self.assertEqual((item["sku"], qty), ("SUGAR", D("1.5")))
+        self.assertEqual(barcodes.find_item(db, "0000000"), (None, None))
+
+
+class ForecastTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+        for day, qty in (("2024-03-06", 6), ("2024-03-12", 9), ("2024-03-20", 15)):
+            order = orders.create_order(self.db, "C1", day, ["MILK:%d" % qty])
+            orders.ship_order(self.db, order["id"], day)
+
+    def test_daily_usage_and_cover(self):
+        self.assertEqual(forecast.daily_usage(self.db, "MILK", "2024-03-31", window=30), D(1))
+        returns.return_order(self.db, "S-0003", "2024-03-21")
+        self.assertEqual(forecast.daily_usage(self.db, "MILK", "2024-03-31", window=30), D("0.5"))
+        adjustments.adjust_count(self.db, "MILK", 30, "2024-03-22")
+        self.assertEqual(forecast.daily_usage(self.db, "MILK", "2024-03-31", window=30), D("0.5"))
+        self.assertEqual(forecast.days_of_cover(self.db, "MILK", "2024-03-31"), 60)
+        self.assertIsNone(forecast.days_of_cover(self.db, "TEA", "2024-03-31"))
+
+    def test_reorder_plan_counts_open_purchase_orders(self):
+        rows = {r["sku"]: r for r in reorder.build(self.db, "2024-03-31", cover_days=14)}
+        self.assertEqual(rows["MILK"]["order"], 14)
+        purchasing.create_po(self.db, "SUP1", "2024-03-31", ["MILK:10@55"])
+        rows = {r["sku"]: r for r in reorder.build(self.db, "2024-03-31", cover_days=14)}
+        self.assertEqual(rows["MILK"]["order"], 4)
+        self.assertNotIn("TEA", rows)
+
+
+class SupplierInvoiceTest(unittest.TestCase):
+    def test_load_with_mapping(self):
+        db = make_db()
+        tmp = tempfile.mkdtemp()
+        try:
+            path = os.path.join(tmp, "upd.csv")
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write("Артикул поставщика;Наименование;Количество;Цена без НДС;Ставка НДС\n"
+                         "M-001;Молоко;12;56,10;10\nX-999;Неизвестно;1;10;20\n")
+            supplier_invoice.map_sku(db, "SUP1", "M-001", "MILK")
+            res = supplier_invoice.load(db, "SUP1", path, "2024-03-15", dry_run=True)
+            self.assertEqual((res["receipt"], res["lines"], [u[1] for u in res["unknown"]]), (None, 1, ["X-999"]))
+            res = supplier_invoice.load(db, "SUP1", path, "2024-03-15")
+            self.assertEqual(res["receipt"]["total"], "673.20")
+            with open(path, "a", encoding="utf-8") as fh:
+                fh.write("M-001;Молоко;;1;10\n")
+            with self.assertRaises(ValidationError):
+                supplier_invoice.load(db, "SUP1", path, "2024-03-15")
+        finally:
+            shutil.rmtree(tmp)
+
+
+class OrderReportsTest(unittest.TestCase):
+    def test_open_orders_readiness(self):
+        db = make_db()
+        orders.create_order(db, "C1", "2024-03-06", ["TEA:70"])
+        orders.create_order(db, "C2", "2024-03-07", ["TEA:40"])
+        orders.create_order(db, "C3", "2024-03-08", ["TEA:30", "BREAD:1"])
+        rows = open_orders.build(db)
+        self.assertEqual([(r["id"], r["ready"]) for r in rows], [("S-0001", True), ("S-0002", False),
+                                                                ("S-0003", True)])
+        self.assertEqual(rows[0]["total"], D("26460.00"))
+
+    def test_writeoffs_report(self):
+        db = make_db()
+        adjustments.writeoff(db, "MILK", 2, "2024-03-10", "скисло")
+        adjustments.writeoff(db, "BREAD", 3, "2024-04-02", "черствый")
+        rows = writeoffs.build(db, "2024-03-01", "2024-03-31")
+        self.assertEqual([(r["sku"], r["cost"], r["reason"]) for r in rows], [("MILK", D("110.00"), "скисло")])
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+class SupplierReturnsAndReservationsTest(unittest.TestCase):
+    def test_return_to_supplier_takes_only_his_layers(self):
+        from stockroom import supplier_returns
+        from stockroom.errors import InsufficientStock as Short
+        db = make_db()
+        self.assertEqual(supplier_returns.available_from(db, "MILK", "SUP2"), D(20))
+        doc = supplier_returns.return_to_supplier(db, "SUP2", "2024-03-10", ["MILK:5"], "брак")
+        self.assertEqual(doc["total"], "290.00")
+        self.assertEqual(db.check_integrity(), [])
+        with self.assertRaises(Short):
+            supplier_returns.return_to_supplier(db, "SUP2", "2024-03-10", ["BREAD:1"], "брак")
+
+    def test_reservations(self):
+        from stockroom import reservations
+        db = make_db()
+        r1 = reservations.reserve(db, "C1", "TEA", 10, "2024-03-15")
+        reservations.reserve(db, "C2", "TEA", 5, "2024-03-20")
+        self.assertEqual(reservations.reserved_total(db, "TEA"), D(15))
+        self.assertEqual(reservations.expire(db, "2024-03-16"), [r1["id"]])
+        self.assertEqual(len(reservations.open_reservations(db)), 1)
+
+
+class PrintFormsTest(unittest.TestCase):
+    def test_pick_list_and_confirmation(self):
+        from stockroom.documents.order_confirmation import next_working_day, render_confirmation
+        from stockroom.documents.pick_list import plan, render_pick_list
+        db = make_db()
+        order = orders.create_order(db, "C1", "2024-03-08", ["MILK:35", "SUGAR:30"])
+        rows = plan(db, order["id"])
+        self.assertEqual(rows[0]["parts"], [("R-0001", D(30)), ("R-0002", D(5))])
+        self.assertEqual(rows[1]["short"], D("4.5"))
+        self.assertIn("НЕ ХВАТАЕТ 4,5", render_pick_list(db, order["id"]))
+        self.assertEqual(next_working_day("2024-03-08"), "2024-03-11")
+        text = render_confirmation(db, order["id"])
+        self.assertIn("Ожидаемая дата отгрузки: 11.03.2024", text)
+        self.assertIn("Итого: 5 853,65", text)

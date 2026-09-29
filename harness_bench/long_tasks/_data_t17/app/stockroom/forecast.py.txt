@@ -1,0 +1,65 @@
+# -*- coding: utf-8 -*-
+"""Прогноз расхода и план закупок.
+
+Средний дневной расход товара = (отгрузки + списания за window дней до даты) / window.
+Возвраты покупателей уменьшают расход. Недостачи инвентаризации в расход не входят
+(это не продажи).
+
+План закупок (reorder_plan): для активных товаров — рекомендуемое количество к заказу
+так, чтобы остаток + ожидаемое по открытым заказам поставщикам покрыл расход на
+cover_days дней плюс неснижаемый остаток; округляется вверх до целого.
+"""
+
+import math
+
+from .dates import add_days, iso
+from .inventory import on_hand
+from .money import D, q3
+
+
+def daily_usage(db, sku, on_date, window=30):
+    on_date = iso(on_date)
+    since = add_days(on_date, -int(window))
+    used = D(0)
+    for mv in db.data["movements"]:
+        if mv["sku"] != sku or not (since < mv["date"] <= on_date):
+            continue
+        if mv["type"] in ("out", "writeoff"):
+            used += D(mv["qty"])
+        elif mv["type"] == "return":
+            used -= D(mv["qty"])
+    return q3(max(used, D(0)) / int(window))
+
+
+def expected_receipts(db, sku):
+    from .purchasing import open_pos
+
+    total = D(0)
+    for po in open_pos(db):
+        for line in po["lines"]:
+            if line["sku"] == sku:
+                total += D(line["qty"]) - D(line["received"])
+    return total
+
+
+def reorder_plan(db, on_date, cover_days=14, window=30):
+    rows = []
+    for sku in sorted(db.data["items"]):
+        item = db.data["items"][sku]
+        if not item.get("active", True):
+            continue
+        usage = daily_usage(db, sku, on_date, window)
+        need = usage * cover_days + D(item.get("min_qty", "0"))
+        have = on_hand(db, sku) + expected_receipts(db, sku)
+        if have >= need:
+            continue
+        qty = int(math.ceil(need - have))
+        rows.append({"sku": sku, "name": item["name"], "usage": usage, "have": have, "need": need, "order": qty})
+    return rows
+
+
+def days_of_cover(db, sku, on_date, window=30):
+    usage = daily_usage(db, sku, on_date, window)
+    if usage == 0:
+        return None
+    return int(on_hand(db, sku) / usage)

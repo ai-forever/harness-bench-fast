@@ -1,0 +1,150 @@
+# -*- coding: utf-8 -*-
+import io
+import json
+import os
+import shutil
+import tempfile
+import unittest
+
+from helpers import make_db
+from stockroom import catalog, inventory, kits, menu, orders, partners, permissions, price_history, pricing, \
+    receiving, returns, scheduler
+from stockroom.errors import InsufficientStock, NotFound, ValidationError
+from stockroom.integrations import accounting, marketplace
+from stockroom.money import D
+from stockroom.reports import category_margin, inventory_sheet, supplier_prices
+
+
+class KitsTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+        catalog.addItem(self.db, "BOX", "Набор «Завтрак»", "600", vat="10")
+        kits.set_spec(self.db, "BOX", ["MILK:2", "BREAD:1", "TEA:1"])
+
+    def test_assemble(self):
+        self.assertEqual(kits.can_assemble(self.db, "BOX"), 25)
+        doc = kits.assemble(self.db, "BOX", 3, "2024-03-10")
+        self.assertEqual(doc["unit_cost"], "348.00")
+        self.assertEqual(inventory.on_hand(self.db, "BOX"), D(3))
+        self.assertEqual(inventory.on_hand(self.db, "MILK"), D(44))
+        self.assertEqual(self.db.check_integrity(), [])
+        with self.assertRaises(ValidationError):
+            kits.assemble(self.db, "BOX", "1.5", "2024-03-10")
+        with self.assertRaises(InsufficientStock):
+            kits.assemble(self.db, "BOX", 30, "2024-03-10")
+
+    def test_disassemble_and_spec_rules(self):
+        kits.assemble(self.db, "BOX", 2, "2024-03-10")
+        kits.disassemble(self.db, "BOX", 1, "2024-03-11")
+        self.assertEqual(inventory.on_hand(self.db, "BOX"), D(1))
+        self.assertEqual(inventory.on_hand(self.db, "MILK"), D(48))
+        self.assertEqual(self.db.check_integrity(), [])
+        with self.assertRaises(ValidationError):
+            kits.set_spec(self.db, "BOX", ["BOX:1"])
+        with self.assertRaises(NotFound):
+            kits.get_spec(self.db, "MILK")
+
+
+class PriceHistoryTest(unittest.TestCase):
+    def test_history_does_not_affect_orders(self):
+        db = make_db()
+        price_history.record(db, "MILK", "2024-01-10", "85.00")
+        price_history.change_price(db, "MILK", "2024-03-10", "92.00", note="подорожание")
+        self.assertEqual(price_history.price_on(db, "MILK", "2024-02-01"), D("85.00"))
+        self.assertEqual(price_history.price_on(db, "MILK", "2024-03-10"), D("92.00"))
+        order = orders.create_order(db, "C1", "2024-02-01", ["MILK:1"])
+        self.assertEqual(pricing.order_amounts(db, order)["net"], D("92.00"))
+        self.assertEqual(len(price_history.changes_between(db, "2024-03-01", "2024-03-31")), 1)
+
+
+class IntegrationsTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+        self.tmp = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def test_marketplace_feed(self):
+        orders.create_order(self.db, "C1", "2024-03-10", ["BREAD:39"])
+        feed = marketplace.build_feed(self.db, "2024-03-10")
+        offers = {o["id"]: o for o in feed["offers"]}
+        self.assertEqual(offers["MILK"]["price"], "98.89")
+        self.assertEqual(offers["MILK"]["stock"], 48)
+        self.assertEqual(offers["BREAD"]["stock"], 0)
+        self.assertFalse(offers["BREAD"]["available"])
+        partners.add_customer(self.db, "MARKET", "Маркетплейс", discount=10)
+        self.assertEqual({o["id"]: o for o in marketplace.build_feed(self.db, "2024-03-10")["offers"]}["MILK"]["price"],
+                         "89.00")
+        path = os.path.join(self.tmp, "feed.json")
+        self.assertEqual(marketplace.write_feed(self.db, path, "2024-03-10"), 4)
+        with open(path, encoding="utf-8") as fh:
+            self.assertEqual(json.load(fh)["shop"], "ООО «Ромашка»")
+
+    def test_accounting_export(self):
+        order = orders.create_order(self.db, "C2", "2024-03-06", ["TEA:10"])
+        orders.ship_order(self.db, order["id"], "2024-03-07")
+        returns.return_order(self.db, order["id"], "2024-03-08")
+        text = accounting.export_documents(self.db, "2024-03-02", "2024-03-31")
+        blocks = text.strip().split("\n\n")
+        self.assertEqual([b.splitlines()[0] for b in blocks], ["[Приход]", "[Возврат]", "[Реализация]"])
+        self.assertIn("Строка=TEA;10;284,29;2842,90;20;568,58", blocks[2])
+        path = os.path.join(self.tmp, "acc.txt")
+        self.assertEqual(accounting.write_export(self.db, path, "2024-03-01", "2024-03-31"), 4)
+        with open(path, "rb") as fh:
+            self.assertIn("Приход".encode("cp1251"), fh.read())
+
+
+class MoreReportsTest(unittest.TestCase):
+    def test_category_margin_and_supplier_prices(self):
+        db = make_db()
+        receiving.receive(db, "SUP1", "2024-03-09", ["MILK:10@57"])
+        order = orders.create_order(db, "C1", "2024-03-10", ["MILK:10", "TEA:2"])
+        orders.ship_order(db, order["id"], "2024-03-10")
+        rows = {r["category"]: r for r in category_margin.build(db)}
+        self.assertEqual(rows["молочное"]["revenue"], D("899.00"))
+        self.assertEqual(rows["молочное"]["margin_pct"], D("38.82"))
+        prices = supplier_prices.build(db, sku="MILK")
+        self.assertEqual([(r["supplier"], r["count"], r["last_cost"], r["min_cost"]) for r in prices],
+                         [("SUP1", 2, D("57.00"), D("55.00")), ("SUP2", 1, D("58.00"), D("58.00"))])
+
+    def test_inventory_sheet(self):
+        db = make_db()
+        catalog.addItem(db, "SALT", "Соль", "20", category="бакалея")
+        rows = inventory_sheet.build(db)
+        self.assertEqual([r["sku"] for r in rows], ["SUGAR", "TEA", "MILK", "BREAD"])
+        self.assertEqual(len(inventory_sheet.build(db, include_zero=True)), 5)
+
+
+class MiscLegacyTest(unittest.TestCase):
+    def test_permissions_table(self):
+        self.assertTrue(permissions.allowed("storekeeper", "report.stock"))
+        self.assertFalse(permissions.allowed("storekeeper", "report.sales"))
+        self.assertTrue(permissions.allowed("manager", "customer.update"))
+        self.assertTrue(permissions.allowed("admin", "anything"))
+        with self.assertRaises(permissions.PermissionDenied):
+            permissions.check("manager", "import")
+
+    def test_overdue_customers(self):
+        db = make_db()
+        order = orders.create_order(db, "C3", "2024-01-05", ["BREAD:2"])
+        orders.ship_order(db, order["id"], "2024-03-06")
+        self.assertEqual(scheduler.overdue_customers(db, "2024-03-20"), [])
+        self.assertEqual(scheduler.overdue_customers(db, "2024-04-10"), ["C3"])
+        result = scheduler.run_nightly(db, "2024-04-10")
+        self.assertIn("C3", result["reminders"])
+        self.assertEqual(result["errors"], [])
+
+    def test_legacy_menu_script(self):
+        db = make_db()
+        answers = iter(["3", "C1", "2024-03-10", "MILK:2", "", "4", "S-0001", "2024-03-10", "9", "0"])
+        out = io.StringIO()
+        menu.run(db, read=lambda prompt: next(answers), write=out.write)
+        self.assertIn("Создан заказ S-0001", out.getvalue())
+        self.assertIn("Отгружен заказ S-0001", out.getvalue())
+        self.assertIn("Нет такого пункта", out.getvalue())
+        self.assertEqual(inventory.on_hand(db, "MILK"), D(48))
+
+
+if __name__ == "__main__":
+    unittest.main()

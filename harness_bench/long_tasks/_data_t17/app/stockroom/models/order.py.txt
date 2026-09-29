@@ -1,0 +1,39 @@
+# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from decimal import Decimal
+from typing import List
+
+from ..money import D
+
+ORDER_STATUSES = ("new", "shipped", "cancelled", "returned")
+
+
+@dataclass
+class OrderLine:
+    sku: str
+    qty: Decimal
+    allocations: List[dict] = field(default_factory=list)
+
+    @property
+    def shipped_cost(self) -> Decimal:
+        return sum((D(a["qty"]) * D(a["cost"]) for a in self.allocations), D(0))
+
+
+@dataclass
+class OrderView:
+    id: str
+    date: str
+    customer: str
+    status: str
+    lines: List[OrderLine]
+    shipped_date: str = None
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "OrderView":
+        lines = [OrderLine(l["sku"], D(l["qty"]), list(l.get("allocations", []))) for l in d.get("lines", [])]
+        return cls(d["id"], d["date"], d["customer"], d.get("status", "new"), lines, d.get("shipped_date"))
+
+    def qty_of(self, sku: str) -> Decimal:
+        return sum((l.qty for l in self.lines if l.sku == sku), D(0))

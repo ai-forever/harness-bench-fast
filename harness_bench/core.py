@@ -40,6 +40,11 @@ class Task:
         gold_callback: Optional hook called after `gold_files` are applied.
             Use this when the gold state includes binary files (xlsx, sqlite).
         tags: Free-form labels (e.g. `("create", "easy")`).
+        min_timeout_seconds: Per-task wall-clock floor. Runners use
+            `max(configured timeout, this)`, so long tasks are not cut off by
+            the short default meant for the regular set.
+        min_recursion_limit: Same kind of floor for the deepagents graph
+            recursion limit.
     """
 
     id: str
@@ -51,6 +56,8 @@ class Task:
     setup_callback: Callable[[Path], None] | None = None
     gold_callback: Callable[[Path], None] | None = None
     tags: tuple[str, ...] = ()
+    min_timeout_seconds: float | None = None
+    min_recursion_limit: int | None = None
 
     def setup(self, workspace: Path) -> None:
         """Write the task's setup files into `workspace`.

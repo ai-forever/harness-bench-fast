@@ -1,0 +1,64 @@
+# -*- coding: utf-8 -*-
+"""Работа с датами документов.
+
+Даты документов — строки ISO (YYYY-MM-DD). На входе CLI принимает ещё
+русский формат ДД.ММ.ГГГГ. Время суток не хранится.
+"""
+
+import datetime
+import re
+
+_RU = re.compile(r"^(\d{1,2})\.(\d{1,2})\.(\d{4})$")
+_ISO = re.compile(r"^(\d{4})-(\d{2})-(\d{2})$")
+
+
+def parse_date(text):
+    """Строка → datetime.date. Бросает ValueError на мусоре."""
+    if isinstance(text, datetime.date):
+        return text
+    text = (text or "").strip()
+    m = _ISO.match(text)
+    if m:
+        return datetime.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    m = _RU.match(text)
+    if m:
+        return datetime.date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+    raise ValueError("не дата: %r" % (text,))
+
+
+def iso(value):
+    """date или строка → 'YYYY-MM-DD'."""
+    return parse_date(value).isoformat()
+
+
+def ru(value):
+    """'YYYY-MM-DD' → 'ДД.ММ.ГГГГ' для печатных форм."""
+    d = parse_date(value)
+    return "%02d.%02d.%04d" % (d.day, d.month, d.year)
+
+
+def today():
+    return datetime.date.today().isoformat()
+
+
+def days_between(a, b):
+    return (parse_date(b) - parse_date(a)).days
+
+
+def add_days(value, n):
+    return (parse_date(value) + datetime.timedelta(days=n)).isoformat()
+
+
+def in_range(value, date_from=None, date_to=None):
+    """Проверка попадания даты в [date_from, date_to] (границы включительно, None — без границы)."""
+    v = iso(value)
+    if date_from and v < iso(date_from):
+        return False
+    if date_to and v > iso(date_to):
+        return False
+    return True
+
+
+def month_key(value):
+    d = parse_date(value)
+    return "%04d-%02d" % (d.year, d.month)

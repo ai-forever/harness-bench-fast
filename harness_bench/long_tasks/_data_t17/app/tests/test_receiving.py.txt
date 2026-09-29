@@ -1,0 +1,99 @@
+# -*- coding: utf-8 -*-
+import unittest
+from decimal import Decimal
+
+from helpers import make_db
+from stockroom import catalog, costing, inventory, orders, receiving
+from stockroom.errors import DocumentStateError, InsufficientStock, NotFound, ValidationError
+from stockroom.money import D
+
+
+class ReceiveTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+
+    def test_receipt_document(self):
+        doc = self.db.data["documents"]["R-0002"]
+        self.assertEqual(doc["supplier"], "SUP2")
+        self.assertEqual(doc["total"], "23384.00")
+        self.assertEqual([l["sku"] for l in doc["lines"]], ["MILK", "TEA", "SUGAR"])
+        self.assertEqual(doc["lines"][2]["qty"], "25.5")
+
+    def test_stock_layers_and_movements(self):
+        self.assertEqual(inventory.on_hand(self.db, "MILK"), D(50))
+        layers = costing.layers_for(self.db, "MILK")
+        self.assertEqual([(l["doc"], l["qty"], l["cost"]) for l in layers],
+                         [("R-0001", "30", "55.00"), ("R-0002", "20", "58.00")])
+        ins = [m for m in self.db.data["movements"] if m["type"] == "in"]
+        self.assertEqual(len(ins), 5)
+        self.assertEqual(ins[-1]["cost"], "1224.00")
+
+    def test_parse_line(self):
+        self.assertEqual(receiving.parse_line(" milk : 2,5 @ 10 "), {"sku": "MILK", "qty": Decimal("2.5"),
+                                                                     "cost": Decimal("10")})
+        for bad in ("MILK:2", "MILK@10", "MILK:x@1", ""):
+            with self.assertRaises(ValidationError):
+                receiving.parse_line(bad)
+
+    def test_rejections(self):
+        with self.assertRaises(NotFound):
+            receiving.receive(self.db, "SUP9", "2024-03-10", ["MILK:1@1"])
+        with self.assertRaises(NotFound):
+            receiving.receive(self.db, "SUP1", "2024-03-10", ["NOPE:1@1"])
+        with self.assertRaises(ValidationError):
+            receiving.receive(self.db, "SUP1", "2024-03-10", ["MILK:0@1"])
+        with self.assertRaises(ValidationError):
+            receiving.receive(self.db, "SUP1", "2024-03-10", [])
+        catalog.deactivateItem(self.db, "BREAD")
+        with self.assertRaises(ValidationError):
+            receiving.receive(self.db, "SUP1", "2024-03-10", ["BREAD:1@1"])
+
+    def test_reverse_untouched_receipt(self):
+        doc = receiving.receive(self.db, "SUP1", "2024-03-10", ["BREAD:5@30"])
+        receiving.reverse_receipt(self.db, doc["id"], "2024-03-11")
+        self.assertEqual(inventory.on_hand(self.db, "BREAD"), D(40))
+        self.assertEqual(doc["status"], "reversed")
+        self.assertEqual(self.db.check_integrity(), [])
+        with self.assertRaises(DocumentStateError):
+            receiving.reverse_receipt(self.db, doc["id"], "2024-03-12")
+
+    def test_reverse_consumed_receipt_fails(self):
+        order = orders.create_order(self.db, "C1", "2024-03-06", ["BREAD:3"])
+        orders.ship_order(self.db, order["id"], "2024-03-06")
+        with self.assertRaises(DocumentStateError):
+            receiving.reverse_receipt(self.db, "R-0001", "2024-03-07")
+
+    def test_receipts_between(self):
+        self.assertEqual([d["id"] for d in receiving.receipts_between(self.db, "2024-03-02")], ["R-0002"])
+        self.assertEqual([d["id"] for d in receiving.receipts_between(self.db, supplier="SUP1")], ["R-0001"])
+
+
+class CostingTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+
+    def test_fifo_consumption_spans_layers(self):
+        allocations = costing.consume_fifo(self.db, "MILK", 35)
+        self.assertEqual([(a["doc"], a["qty"]) for a in allocations], [("R-0001", "30"), ("R-0002", "5")])
+        self.assertEqual(costing.allocations_cost(allocations), D(30 * 55 + 5 * 58))
+        self.assertEqual([l["doc"] for l in costing.layers_for(self.db, "MILK")], ["R-0002"])
+
+    def test_insufficient_layers(self):
+        with self.assertRaises(InsufficientStock):
+            costing.consume_fifo(self.db, "MILK", 51)
+        self.assertEqual(len(costing.layers_for(self.db, "MILK")), 2)
+
+    def test_restore_recreates_layer_in_order(self):
+        allocations = costing.consume_fifo(self.db, "MILK", 35)
+        costing.restore(self.db, "MILK", allocations)
+        layers = costing.layers_for(self.db, "MILK")
+        self.assertEqual([(l["doc"], l["qty"]) for l in layers], [("R-0001", "30"), ("R-0002", "20")])
+
+    def test_value_and_last_cost(self):
+        self.assertEqual(costing.value_of(self.db, "SUGAR"), D("25.5") * 48)
+        self.assertEqual(costing.last_cost(self.db, "MILK"), D("58.00"))
+        self.assertEqual(costing.last_cost(self.db, "NONE"), D(0))
+
+
+if __name__ == "__main__":
+    unittest.main()

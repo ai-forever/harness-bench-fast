@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+"""Журнал движений.
+
+Движение — одна строка изменения остатка:
+
+    id      MV-000001
+    date    дата документа
+    type    in (приход), out (отгрузка), return (возврат покупателя),
+            adjust (инвентаризация, qty со знаком), writeoff (списание)
+    sku     товар
+    qty     количество (положительное, кроме adjust)
+    cost    себестоимость движения в рублях (сумма, не цена за единицу)
+    doc     номер документа-основания
+    note    комментарий (необязательно)
+"""
+
+from .. import ids
+from ..money import money_str, qty_str
+
+MOVEMENT_TYPES = ("in", "out", "return", "adjust", "writeoff")
+
+
+def record_movement(db, date, mtype, sku, qty, cost, doc, note=None):
+    if mtype not in MOVEMENT_TYPES:
+        raise ValueError("unknown movement type %s" % mtype)
+    mv = {
+        "id": ids.next_id(db, "movement"),
+        "date": date,
+        "type": mtype,
+        "sku": sku,
+        "qty": qty_str(qty),
+        "cost": money_str(cost),
+        "doc": doc,
+    }
+    if note:
+        mv["note"] = note
+    db.data["movements"].append(mv)
+    return mv

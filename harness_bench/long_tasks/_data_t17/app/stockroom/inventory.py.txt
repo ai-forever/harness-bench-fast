@@ -1,0 +1,55 @@
+# -*- coding: utf-8 -*-
+"""Остатки товаров.
+
+Остаток хранится в db.data["stock"][SKU] строкой. Менять его напрямую нельзя —
+только через change_stock(), который заодно проверяет, что остаток не уходит в минус.
+Себестоимость остатка — в costing.py (FIFO-слои).
+"""
+
+from .errors import InsufficientStock
+from .money import D, qty_str
+
+
+def on_hand(db, sku):
+    """Текущий остаток товара (Decimal). Для неизвестного артикула — 0."""
+    return D(db.data["stock"].get(sku, "0"))
+
+
+def change_stock(db, sku, delta):
+    """Изменить остаток на delta (может быть отрицательным). Возвращает новый остаток."""
+    current = on_hand(db, sku)
+    new = current + D(delta)
+    if new < 0:
+        raise InsufficientStock(sku, qty_str(-D(delta)), qty_str(current))
+    db.data["stock"][sku] = qty_str(new)
+    return new
+
+
+def reserved(db, sku):
+    """Сколько товара зарезервировано новыми (неотгруженными) заказами."""
+    total = D(0)
+    for doc in db.data["documents"].values():
+        if doc.get("type") == "order" and doc.get("status") == "new":
+            for line in doc.get("lines", []):
+                if line["sku"] == sku:
+                    total += D(line["qty"])
+    return total
+
+
+def available(db, sku):
+    """Остаток минус резерв новых заказов (может быть отрицательным)."""
+    return on_hand(db, sku) - reserved(db, sku)
+
+
+def stock_rows(db, include_zero=True):
+    rows = []
+    for sku in sorted(db.data["items"]):
+        qty = on_hand(db, sku)
+        if not include_zero and qty == 0:
+            continue
+        rows.append({"sku": sku, "qty": qty})
+    return rows
+
+
+def total_units(db):
+    return sum((on_hand(db, s) for s in db.data["stock"]), D(0))

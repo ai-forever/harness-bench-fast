@@ -1,0 +1,102 @@
+# -*- coding: utf-8 -*-
+import json
+import os
+import shutil
+import tempfile
+import unittest
+
+from helpers import FIXTURES, make_db, save_db
+from stockroom import costing, inventory
+from stockroom.db import SCHEMA_VERSION, Database
+from stockroom.errors import SchemaError
+from stockroom.money import D
+
+
+class StorageTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def test_create_and_reopen(self):
+        path = os.path.join(self.tmp, "a.json")
+        Database.create(path, "ООО «Тест»")
+        db = Database.open(path)
+        self.assertEqual(db.meta("company"), "ООО «Тест»")
+        self.assertEqual(db.schema, SCHEMA_VERSION)
+        with self.assertRaises(SchemaError):
+            Database.create(path, "ещё раз")
+
+    def test_roundtrip_keeps_data(self):
+        db = make_db()
+        path = save_db(db, self.tmp)
+        again = Database.open(path)
+        self.assertEqual(inventory.on_hand(again, "MILK"), D(50))
+        self.assertEqual(again.data["documents"]["R-0002"]["total"], db.data["documents"]["R-0002"]["total"])
+        self.assertEqual(again.check_integrity(), [])
+
+    def test_missing_and_broken_files(self):
+        with self.assertRaises(SchemaError):
+            Database.open(os.path.join(self.tmp, "nope.json"))
+        broken = os.path.join(self.tmp, "broken.json")
+        with open(broken, "w") as fh:
+            fh.write("{not json")
+        with self.assertRaises(SchemaError):
+            Database.open(broken)
+        future = os.path.join(self.tmp, "future.json")
+        with open(future, "w") as fh:
+            json.dump({"schema": 99}, fh)
+        with self.assertRaises(SchemaError):
+            Database.open(future)
+
+
+class MigrationTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def _open(self, name):
+        path = os.path.join(self.tmp, name)
+        shutil.copy(str(FIXTURES / name), path)
+        return path, Database.open(path)
+
+    def test_v1_is_upgraded(self):
+        path, db = self._open("db_v1.json")
+        self.assertEqual(db.schema, SCHEMA_VERSION)
+        self.assertTrue(db.dirty)
+        self.assertEqual(inventory.on_hand(db, "NAIL"), D("12.5"))
+        self.assertEqual(costing.value_of(db, "NAIL"), D("12.5") * D("96.40"))
+        self.assertEqual(inventory.on_hand(db, "HAMMER"), D(0))
+        self.assertIn("R-0001", db.data["documents"])
+        self.assertEqual(db.check_integrity(), [])
+        with open(path, encoding="utf-8") as fh:
+            self.assertEqual(json.load(fh)["schema"], 1, "файл не переписывается до save()")
+
+    def test_v2_is_upgraded(self):
+        path, db = self._open("db_v2.json")
+        self.assertEqual(db.schema, SCHEMA_VERSION)
+        self.assertEqual(costing.value_of(db, "BULB"), D(120) * D("41.20"))
+        layers = costing.layers_for(db, "LAMP")
+        self.assertEqual(len(layers), 1)
+        self.assertEqual(layers[0]["date"], "2021-02-01")
+        self.assertEqual(D(layers[0]["qty"]), D(7))
+        self.assertNotIn("avg_cost", db.data["items"]["LAMP"])
+        db.save()
+        self.assertEqual(Database.open(path).schema, SCHEMA_VERSION)
+
+
+class IntegrityTest(unittest.TestCase):
+    def test_detects_mismatch(self):
+        db = make_db()
+        self.assertEqual(db.check_integrity(), [])
+        db.data["stock"]["MILK"] = "51"
+        problems = db.check_integrity()
+        self.assertEqual(len(problems), 1)
+        self.assertIn("MILK", problems[0])
+
+
+if __name__ == "__main__":
+    unittest.main()

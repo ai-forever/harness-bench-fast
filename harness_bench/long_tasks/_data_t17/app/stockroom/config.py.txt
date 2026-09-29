@@ -1,0 +1,45 @@
+# -*- coding: utf-8 -*-
+"""Настройки по умолчанию.
+
+Исторически часть настроек лежит здесь, часть — в meta базы (company, base_currency,
+vat_default). Значения из meta важнее: см. get_setting().
+"""
+
+import os
+
+DEFAULT_DB_PATH = "stockroom.json"
+DB_ENV_VAR = "STOCKROOM_DB"
+
+BASE_CURRENCY = "RUB"
+DEFAULT_VAT = "20"
+DEFAULT_UNIT = "шт"
+UNITS = ("шт", "кг", "л", "м", "упак", "компл")
+
+# Скидка оптовой ценовой группы, процентов.
+WHOLESALE_DISCOUNT = "10"
+
+# Сколько записей журнала аудита показывать по умолчанию.
+AUDIT_LIMIT = 20
+
+# Коэффициент для рекомендуемого заказа в отчёте «мало на складе»:
+# рекомендуем довести остаток до min_qty * REORDER_FACTOR.
+REORDER_FACTOR = 2
+
+# Границы ABC-анализа (накопленная доля выручки, проценты).
+ABC_A = 80
+ABC_B = 95
+
+
+def db_path(cli_value=None):
+    """Путь к базе: аргумент CLI > переменная окружения > значение по умолчанию."""
+    if cli_value:
+        return cli_value
+    return os.environ.get(DB_ENV_VAR) or DEFAULT_DB_PATH
+
+
+def get_setting(db, name, default=None):
+    """Настройка из meta базы, иначе из модуля, иначе default."""
+    meta = db.data.get("meta", {})
+    if name in meta and meta[name] not in (None, ""):
+        return meta[name]
+    return globals().get(name.upper(), default)

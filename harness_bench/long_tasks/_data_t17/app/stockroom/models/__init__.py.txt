@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+"""Типизированные представления записей базы (новый код, 2022+).
+
+Старые модули работают со словарями напрямую; новые (pricing, reports) — через
+эти лёгкие обёртки. Обёртки не копируют данные: изменения нужно делать в словарях.
+"""
+
+from .item import ItemView
+from .movement import MOVEMENT_TYPES, record_movement
+from .order import OrderLine, OrderView
+from .partner import CustomerView
+
+__all__ = ["ItemView", "CustomerView", "OrderView", "OrderLine", "MOVEMENT_TYPES", "record_movement"]

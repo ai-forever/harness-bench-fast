@@ -1,0 +1,62 @@
+# -*- coding: utf-8 -*-
+"""Резервы под покупателя без заказа («отложите мне 10 коробок до пятницы»).
+
+Резерв не меняет остаток и не создаёт движений; он только уменьшает доступное
+количество в отчётах и в inventory.available() — нет, не уменьшает: интеграция с
+available() так и не была сделана (см. SKL-188), резервы учитываются только в
+reserved_total() и в отчёте open_reservations(). Просроченные резервы (дата until
+прошла) снимаются командой expire().
+
+db.data["reservations"] = [{"id": "RS-0001", "customer", "sku", "qty", "until", "status": "active|released|expired"}]
+"""
+
+from . import catalog, ids, validators
+from .errors import DocumentStateError, NotFound
+from .money import D, qty_str
+from .partners import get_customer
+
+ids.PREFIXES.setdefault("reservation", "RS")
+
+
+def reserve(db, customer, sku, qty, until):
+    get_customer(db, customer)
+    item = catalog.getItem(db, sku)
+    rec = {"id": ids.next_id(db, "reservation"), "customer": customer, "sku": item["sku"],
+           "qty": qty_str(validators.positive_qty(qty)), "until": validators.date(until), "status": "active"}
+    db.data.setdefault("reservations", []).append(rec)
+    return rec
+
+
+def _get(db, rid):
+    for r in db.data.get("reservations", []):
+        if r["id"] == rid:
+            return r
+    raise NotFound("нет резерва %s" % rid)
+
+
+def release(db, rid):
+    rec = _get(db, rid)
+    if rec["status"] != "active":
+        raise DocumentStateError("резерв %s уже не активен" % rid)
+    rec["status"] = "released"
+    return rec
+
+
+def expire(db, on_date):
+    on_date = validators.date(on_date)
+    expired = []
+    for r in db.data.get("reservations", []):
+        if r["status"] == "active" and r["until"] < on_date:
+            r["status"] = "expired"
+            expired.append(r["id"])
+    return expired
+
+
+def reserved_total(db, sku):
+    return sum((D(r["qty"]) for r in db.data.get("reservations", []) if r["sku"] == sku and r["status"] == "active"),
+               D(0))
+
+
+def open_reservations(db, customer=None):
+    return [r for r in db.data.get("reservations", [])
+            if r["status"] == "active" and (customer is None or r["customer"] == customer)]

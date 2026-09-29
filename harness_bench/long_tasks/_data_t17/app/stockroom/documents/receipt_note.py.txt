@@ -1,0 +1,28 @@
+# -*- coding: utf-8 -*-
+"""Приходный ордер по документу прихода."""
+
+from ..dates import ru
+from ..money import D, fmt_money, fmt_qty, q2
+from ..partners import get_supplier
+from ..receiving import get_receipt
+from ..textable import render_text
+
+COLUMNS = [("n", "№", "r"), ("sku", "Артикул"), ("name", "Наименование"), ("qty", "Кол-во", "r"),
+           ("cost", "Цена", "r"), ("amount", "Сумма", "r")]
+
+
+def render_receipt_note(db, doc_id):
+    doc = get_receipt(db, doc_id)
+    sup = get_supplier(db, doc["supplier"])
+    rows = []
+    for n, line in enumerate(doc["lines"], 1):
+        item = db.data["items"][line["sku"]]
+        rows.append({"n": n, "sku": line["sku"], "name": item["name"], "qty": fmt_qty(line["qty"]),
+                     "cost": fmt_money(line["cost"]), "amount": fmt_money(q2(D(line["qty"]) * D(line["cost"])))})
+    head = ["ПРИХОДНЫЙ ОРДЕР № %s от %s" % (doc["id"], ru(doc["date"])),
+            "Поставщик: %s %s" % (sup["code"], sup["name"])]
+    if doc.get("status") == "reversed":
+        head.append("СТОРНИРОВАН %s" % ru(doc["reversed_date"]))
+    head.append("")
+    foot = ["Итого: %s" % fmt_money(doc["total"])]
+    return "\n".join(head) + "\n" + render_text(COLUMNS, rows, footer=foot)

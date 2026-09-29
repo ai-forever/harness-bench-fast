@@ -1,0 +1,111 @@
+# -*- coding: utf-8 -*-
+"""Загрузка номенклатуры и приходов из текстового файла обмена 1С
+(«ОбменСкладом», формат 2018 года, кодировка UTF-8 или cp1251).
+
+Файл состоит из секций, каждая начинается строкой в квадратных скобках:
+
+    [Номенклатура]
+    Артикул=MILK
+    Наименование=Молоко 1 л
+    ЕдИзм=шт
+    Цена=89,90
+    СтавкаНДС=10%
+    ---
+    Артикул=BREAD
+    ...
+
+    [Поступление]
+    Номер=00017
+    Дата=01.03.2024
+    Поставщик=SUP1
+    Строка=MILK;10;55,50
+    Строка=BREAD;20;30
+
+Записи внутри секции разделяются строкой '---'. Номенклатура добавляется, если её нет
+(существующие карточки не меняются). Поступление проводится через receiving.receive с
+примечанием «1С №<Номер>»; повторная загрузка того же номера пропускается.
+"""
+
+from .. import catalog, receiving
+from ..errors import StockError
+
+SECTION_ITEMS = "Номенклатура"
+SECTION_RECEIPT = "Поступление"
+
+
+def _decode(raw):
+    for enc in ("utf-8-sig", "cp1251"):
+        try:
+            return raw.decode(enc)
+        except UnicodeDecodeError:
+            continue
+    raise StockError("не удалось определить кодировку файла 1С")
+
+
+def parse(text):
+    """Разобрать текст обмена в список (секция, запись), запись — словарь;
+    повторяющийся ключ 'Строка' собирается в список."""
+    records = []
+    section = None
+    current = None
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("[") and line.endswith("]"):
+            if current:
+                records.append((section, current))
+            section, current = line[1:-1].strip(), {}
+            continue
+        if line == "---":
+            if current:
+                records.append((section, current))
+            current = {}
+            continue
+        if "=" not in line or section is None:
+            raise StockError("непонятная строка файла 1С: %r" % raw)
+        key, value = line.split("=", 1)
+        key, value = key.strip(), value.strip()
+        if key == "Строка":
+            current.setdefault(key, []).append(value)
+        else:
+            current[key] = value
+    if current:
+        records.append((section, current))
+    return records
+
+
+def _already_loaded(db, number):
+    note = "1С №%s" % number
+    return any(d.get("note") == note for d in db.documents_of("receipt"))
+
+
+def load(db, path):
+    with open(path, "rb") as fh:
+        text = _decode(fh.read())
+    result = {"items": 0, "receipts": 0, "skipped": 0}
+    for section, rec in parse(text):
+        if section == SECTION_ITEMS:
+            sku = rec.get("Артикул", "").upper()
+            if sku in db.data["items"]:
+                result["skipped"] += 1
+                continue
+            catalog.addItem(db, sku, rec.get("Наименование", sku), rec.get("Цена", "0"),
+                            unit=rec.get("ЕдИзм") or None, vat=(rec.get("СтавкаНДС") or "").rstrip("%") or None)
+            result["items"] += 1
+        elif section == SECTION_RECEIPT:
+            number = rec.get("Номер", "")
+            if _already_loaded(db, number):
+                result["skipped"] += 1
+                continue
+            lines = []
+            for row in rec.get("Строка", []):
+                parts = [p.strip() for p in row.split(";")]
+                if len(parts) != 3:
+                    raise StockError("строка поступления 1С должна иметь 3 поля: %r" % row)
+                lines.append({"sku": parts[0].upper(), "qty": parts[1], "cost": parts[2]})
+            receiving.receive(db, rec.get("Поставщик", ""), rec.get("Дата", ""), lines, note="1С №%s" % number)
+            result["receipts"] += 1
+        else:
+            raise StockError("неизвестная секция файла 1С: %s" % section)
+    return result

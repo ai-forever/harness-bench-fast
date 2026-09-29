@@ -1,0 +1,39 @@
+# -*- coding: utf-8 -*-
+"""Акт сверки взаиморасчётов с покупателем за период.
+
+Сальдо на начало — долг на день, предшествующий date_from. Строки — отгрузки,
+возвраты и оплаты периода (payments.ledger). Сальдо на конец = начало + дебет - кредит.
+"""
+
+from ..dates import add_days, iso, ru
+from ..money import D, fmt_money
+from ..partners import get_customer
+from ..payments import balance, ledger
+from ..textable import render_text
+
+KIND_TEXT = {"shipment": "Отгрузка", "payment": "Оплата", "return": "Возврат"}
+COLUMNS = [("date", "Дата"), ("doc", "Документ"), ("what", "Операция"), ("debit", "Дебет", "r"),
+           ("credit", "Кредит", "r")]
+
+
+def act_data(db, customer, date_from, date_to):
+    date_from, date_to = iso(date_from), iso(date_to)
+    opening = balance(db, customer, add_days(date_from, -1))
+    rows = [r for r in ledger(db, customer, date_to) if r["date"] >= date_from]
+    debit = sum((r["debit"] for r in rows), D(0))
+    credit = sum((r["credit"] for r in rows), D(0))
+    return {"customer": get_customer(db, customer), "from": date_from, "to": date_to, "opening": opening,
+            "rows": rows, "debit": debit, "credit": credit, "closing": opening + debit - credit}
+
+
+def render_act(db, customer, date_from, date_to):
+    data = act_data(db, customer, date_from, date_to)
+    head = ["АКТ СВЕРКИ с %s по %s" % (ru(data["from"]), ru(data["to"])),
+            "%s — %s %s" % (db.meta("company") or "", data["customer"]["code"], data["customer"]["name"]),
+            "Сальдо на начало: %s" % fmt_money(data["opening"]), ""]
+    rows = [{"date": ru(r["date"]), "doc": r["doc"], "what": KIND_TEXT[r["kind"]],
+             "debit": fmt_money(r["debit"]) if r["debit"] else "",
+             "credit": fmt_money(r["credit"]) if r["credit"] else ""} for r in data["rows"]]
+    foot = ["Обороты: дебет %s, кредит %s" % (fmt_money(data["debit"]), fmt_money(data["credit"])),
+            "Сальдо на конец: %s" % fmt_money(data["closing"])]
+    return "\n".join(head) + "\n" + render_text(COLUMNS, rows, footer=foot)

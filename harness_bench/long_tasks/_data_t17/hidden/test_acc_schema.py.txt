@@ -1,0 +1,118 @@
+# -*- coding: utf-8 -*-
+import csv
+import json
+import os
+import shutil
+
+from acc_helpers import FIXTURES, base_db, feature_db, run_cli, save
+
+from stockroom import catalog, csvio, lots, orders, returns
+from stockroom.db import SCHEMA_VERSION, Database
+from stockroom.money import D
+
+
+def copy_fixture(tmp_path, name):
+    target = os.path.join(str(tmp_path), name)
+    shutil.copy(str(FIXTURES / name), target)
+    return target
+
+
+def test_schema_version_and_new_database(tmp_path):
+    assert SCHEMA_VERSION == 4
+    path = os.path.join(str(tmp_path), "new.json")
+    Database.create(path, "ООО «Новая»")
+    with open(path, encoding="utf-8") as fh:
+        data = json.load(fh)
+    assert data["schema"] == 4
+    assert data["rates"] == {}
+
+
+def test_migration_3_to_4(tmp_path):
+    path = copy_fixture(tmp_path, "db_v3.json")
+    db = Database.open(path)
+    assert db.schema == 4 and db.dirty
+    assert db.data["rates"] == {}
+    assert all(i["currency"] == "RUB" and i["track_expiry"] is False for i in db.data["items"].values())
+    assert [(r["lot"], r["expiry"], r["qty"]) for r in lots.lots_of(db, "SUGAR")] == [
+        ("R-0002-3", None, D("25.5")), ("ADJ-0001-1", None, D("1.5"))]
+    alloc = db.data["documents"]["S-0001"]["lines"][0]["allocations"]
+    assert [(a["lot"], a["expiry"]) for a in alloc] == [("R-0001-1", None), ("R-0002-1", None)]
+    assert db.data["documents"]["R-0001"]["lines"][0] == {"sku": "MILK", "qty": "30", "cost": "55.00"}
+    with open(path, encoding="utf-8") as fh:
+        assert json.load(fh)["schema"] == 3
+    db.save()
+    assert Database.open(path).schema == 4
+
+
+def test_migrated_database_keeps_working(tmp_path):
+    path = copy_fixture(tmp_path, "db_v3.json")
+    db = Database.open(path)
+    doc = returns.return_order(db, "S-0001", "2024-03-10", lines=["MILK:31"])
+    assert doc["lines"][0]["cost"] == "1720.00"
+    assert [(r["lot"], r["qty"]) for r in lots.lots_of(db, "MILK")] == [("R-0001-1", D(26)), ("R-0002-1", D(20))]
+    assert db.data["documents"]["S-0001"]["status"] == "partially_returned"
+    order = orders.create_order(db, "C1", "2024-03-11", ["MILK:27"])
+    orders.ship_order(db, order["id"], "2024-03-11")
+    assert [(a["lot"], a["qty"]) for a in order["lines"][0]["allocations"]] == [("R-0001-1", "26"),
+                                                                               ("R-0002-1", "1")]
+    assert db.check_integrity() == []
+
+
+def test_v1_chain_reaches_schema_4(tmp_path):
+    path = copy_fixture(tmp_path, "db_v1.json")
+    db = Database.open(path)
+    assert db.schema == 4
+    assert [(r["lot"], r["qty"]) for r in lots.lots_of(db, "NAIL")] == [("MIGR-1", D("12.5"))]
+    assert catalog.getItem(db, "NAIL")["currency"] == "RUB"
+
+
+def test_cli_opens_old_database(tmp_path):
+    path = copy_fixture(tmp_path, "db_v3.json")
+    rc, out, err = run_cli(path, "--format", "csv", "lots", "SUGAR")
+    assert rc == 0, err
+    assert out.splitlines() == ["lot,expiry,qty,cost", "R-0002-3,,25.5,48.00", "ADJ-0001-1,,1.5,48.00"]
+
+
+def test_export_items_new_columns_and_roundtrip(tmp_path):
+    db = feature_db()
+    path = os.path.join(str(tmp_path), "items.csv")
+    csvio.export_items(db, path)
+    with open(path, encoding="utf-8") as fh:
+        rows = list(csv.DictReader(fh))
+    assert list(rows[0].keys()) == ["sku", "name", "unit", "category", "price", "vat", "min_qty", "barcode",
+                                    "currency", "track_expiry"]
+    by_sku = {r["sku"]: r for r in rows}
+    assert (by_sku["WINE"]["currency"], by_sku["WINE"]["track_expiry"]) == ("EUR", "0")
+    assert (by_sku["YOG"]["currency"], by_sku["YOG"]["track_expiry"]) == ("RUB", "1")
+    other = base_db()
+    for sku in list(other.data["items"]):
+        del other.data["items"][sku]
+    report = csvio.import_items(other, path)
+    assert report["errors"] == [] and report["added"] == 7
+    assert other.data["items"]["YOG"]["track_expiry"] is True
+    assert other.data["items"]["LAMP"]["currency"] == "USD"
+
+
+def test_import_items_currency_and_flags(tmp_path):
+    db = base_db()
+    path = os.path.join(str(tmp_path), "in.csv")
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write("sku;name;price;currency;track_expiry\nK1;Кефир;70;;да\nW1;Виски;30;usd;\nX1;Плохо;1;RUBLES;\n"
+                 "X2;Плохо2;1;;может\n")
+    report = csvio.import_items(db, path)
+    assert report["added"] == 2
+    assert [n for n, _ in report["errors"]] == [4, 5]
+    assert db.data["items"]["K1"]["track_expiry"] is True and db.data["items"]["K1"]["currency"] == "RUB"
+    assert db.data["items"]["W1"]["currency"] == "USD" and db.data["items"]["W1"]["track_expiry"] is False
+
+
+def test_cli_export_lots(tmp_path):
+    path = save(feature_db(), tmp_path)
+    target = os.path.join(str(tmp_path), "lots.csv")
+    rc, out, err = run_cli(path, "export", "lots", target)
+    assert rc == 0, err
+    with open(target, encoding="utf-8") as fh:
+        lines = fh.read().splitlines()
+    assert lines[0] == "sku,lot,expiry,qty,cost,currency,cost_cur"
+    assert "YOG,B,2024-03-15,10,31.00,," in lines
+    assert out.strip() == "Выгружено строк: %d" % (len(lines) - 1)

@@ -692,7 +692,7 @@ def test_run_all_continues_from_existing_json(monkeypatch, tmp_path: Path, capsy
     assert [task["message"] for task in payload["tasks"]] == ["already done", "newly done"]
 
 
-def test_cli_timeout_results_are_tagged_for_continue(tmp_path: Path) -> None:
+def test_cli_timeout_is_scored_and_not_retried_on_continue(tmp_path: Path) -> None:
     import json
 
     out = tmp_path / "results.json"
@@ -705,10 +705,10 @@ def test_cli_timeout_results_are_tagged_for_continue(tmp_path: Path) -> None:
     payload = json.loads(out.read_text(encoding="utf-8"))
     task = payload["tasks"][0]
     assert task["failure_kind"] == "timeout"
-    assert task["rerun_on_continue"] is True
+    assert "rerun_on_continue" not in task
 
 
-def test_run_all_cli_continues_from_existing_json_reruns_cli_timeout(
+def test_run_all_cli_continues_without_rerunning_cli_timeout(
     monkeypatch,
     tmp_path: Path,
     capsys,
@@ -761,11 +761,11 @@ def test_run_all_cli_continues_from_existing_json_reruns_cli_timeout(
         json_output=out,
     )
 
-    assert calls == ["task_01_fake"]
+    assert calls == []
     assert [result.task_id for result in results] == ["task_01_fake", "task_02_fake"]
-    assert "[CONTINUE] loaded 1/2 completed task attempt(s)" in capsys.readouterr().out
+    assert "[CONTINUE] loaded 2/2 completed task attempt(s)" in capsys.readouterr().out
     payload = json.loads(out.read_text(encoding="utf-8"))
-    assert [task["message"] for task in payload["tasks"]] == ["rerun ok", "already done"]
+    assert [task["message"] for task in payload["tasks"]] == ["", "already done"]
     assert "rerun_on_continue" not in payload["tasks"][0]
 
 

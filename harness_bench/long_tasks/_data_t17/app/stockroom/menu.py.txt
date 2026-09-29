@@ -1,0 +1,110 @@
+# -*- coding: utf-8 -*-
+"""УСТАРЕЛО: текстовое меню для кладовщика (2019–2021).
+
+Запускалось как `python -m stockroom.menu` на складском терминале. С переходом на
+командную строку не поддерживается: новые операции (партии, валюты, возвраты по
+строкам) сюда не добавляются, а некоторые пункты устарели (например, «Остатки»
+печатает только количество). Оставлено по просьбе склада «на всякий случай».
+"""
+
+import sys
+
+from . import adjustments, catalog, config, orders, receiving, returns
+from .db import Database
+from .errors import StockError
+from .money import fmt_money, fmt_qty
+
+MENU = """
+==== СКЛАД ====
+1. Остатки
+2. Приход
+3. Новый заказ
+4. Отгрузить заказ
+5. Возврат заказа
+6. Инвентаризация товара
+7. Списание
+0. Выход
+"""
+
+
+def _ask(prompt, read=input):
+    return read(prompt).strip()
+
+
+def show_stock(db, write):
+    for item in catalog.listItems(db):
+        write("%-12s %-40s %10s\n" % (item["sku"], item["name"][:40], fmt_qty(db.data["stock"].get(item["sku"], "0"))))
+
+
+def do_receive(db, read, write):
+    supplier = _ask("Поставщик: ", read)
+    date = _ask("Дата: ", read)
+    lines = []
+    while True:
+        line = _ask("Строка SKU:КОЛ@ЦЕНА (пусто — конец): ", read)
+        if not line:
+            break
+        lines.append(line)
+    doc = receiving.receive(db, supplier, date, lines)
+    write("Проведён приход %s на %s\n" % (doc["id"], fmt_money(doc["total"])))
+
+
+def do_order(db, read, write):
+    customer = _ask("Покупатель: ", read)
+    date = _ask("Дата: ", read)
+    lines = []
+    while True:
+        line = _ask("Строка SKU:КОЛ (пусто — конец): ", read)
+        if not line:
+            break
+        lines.append(line)
+    doc = orders.create_order(db, customer, date, lines)
+    write("Создан заказ %s\n" % doc["id"])
+
+
+def do_ship(db, read, write):
+    doc = orders.ship_order(db, _ask("Номер заказа: ", read), _ask("Дата: ", read))
+    write("Отгружен заказ %s\n" % doc["id"])
+
+
+def do_return(db, read, write):
+    doc = returns.return_order(db, _ask("Номер заказа: ", read), _ask("Дата: ", read))
+    write("Возврат %s на %s\n" % (doc["id"], fmt_money(doc["amount"])))
+
+
+def do_adjust(db, read, write):
+    doc = adjustments.adjust_count(db, _ask("Артикул: ", read), _ask("Факт: ", read), _ask("Дата: ", read))
+    write("Документ %s, разница %s\n" % (doc["id"], fmt_qty(doc["diff"])))
+
+
+def do_writeoff(db, read, write):
+    doc = adjustments.writeoff(db, _ask("Артикул: ", read), _ask("Количество: ", read), _ask("Дата: ", read),
+                               _ask("Причина: ", read))
+    write("Списание %s на %s\n" % (doc["id"], fmt_money(doc["cost"])))
+
+
+ACTIONS = {"2": do_receive, "3": do_order, "4": do_ship, "5": do_return, "6": do_adjust, "7": do_writeoff}
+
+
+def run(db, read=input, write=sys.stdout.write):
+    while True:
+        write(MENU)
+        choice = _ask("> ", read)
+        if choice == "0":
+            return
+        if choice == "1":
+            show_stock(db, write)
+            continue
+        action = ACTIONS.get(choice)
+        if action is None:
+            write("Нет такого пункта\n")
+            continue
+        try:
+            action(db, read, write)
+            db.save()
+        except StockError as exc:
+            write("ОШИБКА: %s\n" % exc)
+
+
+if __name__ == "__main__":
+    run(Database.open(config.db_path(None)))

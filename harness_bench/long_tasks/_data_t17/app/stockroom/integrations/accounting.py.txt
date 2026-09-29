@@ -1,0 +1,84 @@
+# -*- coding: utf-8 -*-
+"""Выгрузка документов для бухгалтерии (текстовый формат обмена «Склад → 1С», 2019).
+
+Каждый документ — блок строк «ключ=значение», блоки разделены пустой строкой:
+
+    [Приход]
+    Номер=R-0001
+    Дата=01.03.2024
+    Контрагент=SUP1
+    Сумма=2770,00
+    Строка=MILK;30;55,00;1650,00
+
+    [Реализация]
+    Номер=S-0001
+    Дата=07.03.2024           (дата отгрузки)
+    Контрагент=C1
+    СуммаБезНДС=...
+    НДС=...
+    Строка=MILK;35;89,90;3146,50;10;314,65
+
+    [Возврат]
+    Номер=RT-0001
+    Дата=...
+    Основание=S-0001
+    Сумма=...
+
+Суммы реализации берутся из pricing.order_amounts (как в счёте). В выгрузку попадают
+только проведённые приходы, отгруженные заказы (в т. ч. потом возвращённые) и
+возвраты с датой в периоде.
+"""
+
+from ..dates import in_range, ru
+from ..money import D, fmt_money, fmt_qty, q2
+from ..pricing import order_amounts
+
+
+def _money(v):
+    return fmt_money(v, sep="")
+
+
+def _receipt_block(doc):
+    lines = ["[Приход]", "Номер=%s" % doc["id"], "Дата=%s" % ru(doc["date"]), "Контрагент=%s" % doc["supplier"],
+             "Сумма=%s" % _money(doc["total"])]
+    for l in doc["lines"]:
+        lines.append("Строка=%s;%s;%s;%s" % (l["sku"], fmt_qty(l["qty"]), _money(l["cost"]),
+                                             _money(q2(D(l["qty"]) * D(l["cost"])))))
+    return lines
+
+
+def _sale_block(db, doc):
+    amounts = order_amounts(db, doc)
+    lines = ["[Реализация]", "Номер=%s" % doc["id"], "Дата=%s" % ru(doc["shipped_date"]),
+             "Контрагент=%s" % doc["customer"], "СуммаБезНДС=%s" % _money(amounts["net"]),
+             "НДС=%s" % _money(amounts["vat"])]
+    for l in amounts["lines"]:
+        lines.append("Строка=%s;%s;%s;%s;%s;%s" % (l["sku"], fmt_qty(l["qty"]), _money(l["unit"]), _money(l["net"]),
+                                                   fmt_qty(l["vat_rate"]), _money(l["vat"])))
+    return lines
+
+
+def _return_block(doc):
+    return ["[Возврат]", "Номер=%s" % doc["id"], "Дата=%s" % ru(doc["date"]), "Основание=%s" % doc["order"],
+            "Сумма=%s" % _money(doc["amount"])]
+
+
+def export_documents(db, date_from, date_to):
+    blocks = []
+    docs = sorted(db.data["documents"].values(), key=lambda d: d["id"])
+    for doc in docs:
+        t = doc.get("type")
+        if t == "receipt" and doc.get("status") == "posted" and in_range(doc["date"], date_from, date_to):
+            blocks.append(_receipt_block(doc))
+        elif t == "order" and doc.get("shipped_date") and in_range(doc["shipped_date"], date_from, date_to):
+            blocks.append(_sale_block(db, doc))
+        elif t == "return" and in_range(doc["date"], date_from, date_to):
+            blocks.append(_return_block(doc))
+    return "\n\n".join("\n".join(b) for b in blocks) + ("\n" if blocks else "")
+
+
+def write_export(db, path, date_from, date_to):
+    text = export_documents(db, date_from, date_to)
+    with open(path, "w", encoding="cp1251", errors="replace", newline="\r\n") as fh:
+        fh.write(text)
+    return text.count("[")

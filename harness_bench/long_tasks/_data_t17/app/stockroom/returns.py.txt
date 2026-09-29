@@ -1,0 +1,64 @@
+# -*- coding: utf-8 -*-
+"""Возвраты от покупателей.
+
+Сейчас поддерживается только полный возврат отгруженного заказа: весь товар
+возвращается на склад в те же FIFO-слои (по той же себестоимости), заказ получает
+статус "returned". Частичные возвраты оформляли вручную через корректировку —
+это давно просят исправить (см. задачу SKL-212).
+
+Документ возврата (documents["RT-0001"]):
+
+    {"id": "RT-0001", "type": "return", "date": ..., "order": "S-0001",
+     "customer": "C001", "lines": [{"sku": "MILK", "qty": "3", "cost": "165.00"}],
+     "amount": "396.00", "reason": ...}
+
+amount — сумма к возврату покупателю с НДС, по правилам pricing.py на дату заказа.
+"""
+
+from . import audit, costing, ids, inventory, validators
+from .errors import DocumentStateError, NotFound
+from .models import record_movement
+from .money import D, money_str, q2, qty_str
+from .orders import get_order
+from .pricing import order_amounts
+
+
+def return_order(db, order_id, date, reason=None):
+    order = get_order(db, order_id)
+    if order["status"] == "returned":
+        raise DocumentStateError("заказ %s уже возвращён" % order_id)
+    if order["status"] != "shipped":
+        raise DocumentStateError("вернуть можно только отгруженный заказ, %s в статусе %s" % (order_id, order["status"]))
+    date = validators.date(date)
+    if date < order["shipped_date"]:
+        raise DocumentStateError("дата возврата раньше даты отгрузки")
+    doc_id = ids.next_id(db, "return")
+    lines = []
+    for line in order["lines"]:
+        allocations = line.get("allocations", [])
+        costing.restore(db, line["sku"], allocations)
+        inventory.change_stock(db, line["sku"], D(line["qty"]))
+        cost = q2(costing.allocations_cost(allocations))
+        record_movement(db, date, "return", line["sku"], line["qty"], cost, doc_id)
+        lines.append({"sku": line["sku"], "qty": qty_str(line["qty"]), "cost": money_str(cost)})
+    amount = order_amounts(db, order)["total"]
+    doc = {"id": doc_id, "type": "return", "date": date, "order": order_id, "customer": order["customer"],
+           "lines": lines, "amount": money_str(amount)}
+    if reason:
+        doc["reason"] = reason
+    db.data["documents"][doc_id] = doc
+    order["status"] = "returned"
+    order["return_doc"] = doc_id
+    audit.log(db, date, "return", doc=doc_id, order=order_id, amount=doc["amount"])
+    return doc
+
+
+def get_return(db, doc_id):
+    doc = db.data["documents"].get(doc_id)
+    if doc is None or doc.get("type") != "return":
+        raise NotFound("нет возврата %s" % doc_id)
+    return doc
+
+
+def returns_for(db, order_id):
+    return sorted((d for d in db.documents_of("return") if d.get("order") == order_id), key=lambda d: d["id"])

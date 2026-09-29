@@ -1,0 +1,22 @@
+# -*- coding: utf-8 -*-
+"""УСТАРЕЛО: выгрузка остатков в XML для старого сайта (сайт закрыт в 2022).
+
+Код не вызывается из CLI. Удалить после согласования с ИТ-отделом.
+"""
+
+from xml.sax.saxutils import escape
+
+from .money import D
+
+
+def stock_xml(db):
+    parts = ['<?xml version="1.0" encoding="utf-8"?>', "<stock>"]
+    for sku in sorted(db.data["items"]):
+        item = db.data["items"][sku]
+        if not item.get("active", True):
+            continue
+        qty = D(db.data["stock"].get(sku, "0"))
+        parts.append('  <item sku="%s" qty="%s" price="%s">%s</item>'
+                     % (escape(sku), qty, item["price"], escape(item["name"])))
+    parts.append("</stock>")
+    return "\n".join(parts) + "\n"

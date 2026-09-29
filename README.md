@@ -1,8 +1,10 @@
 # harness-bench
 
-## Current Results
+Current task set: **411 tasks, `task-set v0.17.0`**. Tasks 392–411 are the long-context wave. No full run of v0.17.0 is published yet.
 
-Published benchmark results below use the full 391-task set (`task-set v0.16.0`).
+## Published results (task-set v0.16.0, 391 tasks)
+
+These runs are the full 391-task set. v0.17.0 adds twenty tasks, so a score here is not a score on the current set.
 `Steps` and `Tokens` are shown when the runner exposes them; `—` means the metric
 is absent from the run artifact, not that nothing was spent. Each row is one full
 run per harness + model setup. The `Profile` column shows the deepagents harness
@@ -100,7 +102,7 @@ runs (317, 311, 308 passed), with Steps/Tokens as the mean of per-run sums.
 
 </details>
 
-A self-contained **391-task agent benchmark** (`task-set v0.16.0`) for evaluating LLM-backed
+A self-contained **411-task agent benchmark** (`task-set v0.17.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -137,7 +139,7 @@ uv venv && uv pip install -e ".[gigachat,openrouter]"
 # to the public profile.
 uv pip install -e ".[gigachat-profile]"
 
-# List all 391 tasks
+# List all 411 tasks
 uv run python -m harness_bench list
 
 # Show the benchmark task-set version and revision history
@@ -305,7 +307,7 @@ uv run python -m harness_bench apply-gold \
 
 ## What's inside
 
-### Tasks (391 total, task-set v0.16.0)
+### Tasks (411 total, task-set v0.17.0)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -322,6 +324,7 @@ uv run python -m harness_bench apply-gold \
 | `tasks_adversarial.py` | 331–351 | adversarial/robustness wave: the agent must diagnose and work around a hostile environment — broken Python versions and imports, unreadable/mis-encoded/permission-locked files, instructions that contradict the environment, broken build commands and skills, and a ~100 MB log that must be streamed rather than read whole. |
 | `tasks_tbench_lite.py` | 352–371 | calibrated Terminal-Bench-inspired workflows: multi-source joins, event reconstruction, parsers, config precedence, conflict resolution, package refactors, SQLite migration, deterministic manifests, and retry-aware aggregation. |
 | `tasks_cli.py` | 372–391 | CLI-composition wave. Thirteen tasks drive bespoke per-task tools (`logq`, `pktool`, `xtab`, `cfgctl`, `depwalk`, `slicer`) built so that reading `--help` is unavoidable: the surface is deliberately unconventional (a leading verb, `--src`/`--cap`/`--map`, mini-languages like `--span LO..HI` and `--pick level=ERROR,WARN`, `--shape` not `--format`), so a guessed invocation exits non-zero — and the semantics that decide the answer (exclusive bounds, nearest-rank percentiles, margins before normalisation, corrupt-record policy) appear only in the `--help` epilog. Two read binary or fixed-width payloads. Seven exercise POSIX tools (multi-key `sort`, `join -1/-2/-a/-e/-o`, `comm`, `grep -oE` with `uniq -c`, `find` predicates with `xargs -0`, `awk`, `sed` ranges): the agent writes `solve.sh` and the verifier deletes the artifact, runs the script, and rejects general-purpose interpreters. **Requires `bash` on `PATH`.** |
+| `long_tasks/` | 392–411 | Long-context wave. Twenty tasks that require reading a large body of material (a novel, an intranet, parish registers, mail, a codebase, git history, a text adventure, and so on) and that floor each run at 7200 s and 3000 steps, so a full-set run includes them. Select only this wave with `--suite long`. |
 
 Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
@@ -351,6 +354,7 @@ changes do not need a task-set bump.
 | `0.14.0` | 2026-07-23 | 352–371 | 371 | Calibrated Terminal-Bench-inspired wave with deterministic, offline, gold-verified multi-step tasks |
 | `0.15.0` | 2026-07-27 | 372–391 | 391 | CLI-composition wave: bespoke tools (`logq`, `pktool`, `xtab`, `cfgctl`, `depwalk`, `slicer`) with a deliberately unguessable surface, so `--help` must be read before anything runs, plus POSIX pipeline tasks (`sort`, `join`, `comm`, `grep`/`uniq -c`, `find`/`xargs -0`, `awk`, `sed`) whose `solve.sh` the verifier executes |
 | `0.16.0` | 2026-07-28 | — | 391 | Audit pass over all 391 tasks: no tasks added or removed, but defects gold-verification cannot see were corrected — tasks winnable without work, prompts whose verifier rejected the work they described, requirements the verifier never checked (notably “do not edit the tests”), and platform/self-pollution issues. **Not score-comparable with v0.15.0.** |
+| `0.17.0` | 2026-09-26 | 392–411 | 411 | Long-context wave, promoted from the separate `--suite long` into the scored set. Registry ids are `task_392_*` … `task_411_*`; generator seeds and paraphrase fixtures stay on `long_NN_*`, so the tasks themselves did not change. Each task floors the runner at 7200 s and 3000 steps. **Not score-comparable with v0.16.0.** |
 
 ### Infrastructure
 
@@ -374,6 +378,97 @@ security sandbox: `execute` still spawns a real shell on the host and
 the runners inherit environment variables. The benchmark is meant for a
 trusted local environment. After the agent stops, the per-task verifier
 inspects the workspace.
+
+## Long-context wave (tasks 392–411)
+
+Twenty tasks (`harness_bench/long_tasks/tNN_*.py`, registry ids
+`task_392_*` … `task_411_*`) built to push an agent harness through **context
+compaction**: each task needs tens to hundreds of agent steps and reading
+0.4–1.4M characters of material (novels, intranets, parish registers, e-mail
+threads, code bases, git history, binary logs, a text adventure…). They are
+part of `ALL_TASKS` as of task-set v0.17.0. `--suite long` (`list`, `run*`,
+`verify-gold`) selects only this wave. Every task has a minimum timeout
+(7200 s) and recursion limit (3000) that runners apply on top of their own
+settings, and is mechanically verified like the rest of the bench. Generator
+seeds and the paraphrase fixtures in `_texts/` keep the earlier `long_NN_*`
+names, so promoting the wave did not regenerate the workspaces.
+
+Strong models avoid reading whenever a shortcut exists, so the suite is designed
+against the shortcuts we observed with Claude Opus 5.5:
+
+- structured data is processed by scripts → the answer depends on natural
+  language that has to be read;
+- procedurally generated prose collapses to a few hundred templates → texts are
+  paraphrased by an LLM and every paraphrase is accepted only when an
+  independent LLM, given just the task's rules, recovers the generator's ground
+  truth from it (`scripts/rewrite_long_texts.py`, fixtures in
+  `harness_bench/long_tasks/_texts/`; a stored paraphrase is used only if its
+  draft hash matches, so ground truth always comes from the generator);
+- local data can be decoded → the text adventure encrypts each zone with a key
+  derived from answers found by reading the previous zone;
+- deepagents' general-purpose subagent spreads reading over parallel contexts →
+  measure with `--no-subagents`.
+
+```bash
+# self-check without a model: untouched fails, gold passes, near misses fail
+uv run python scripts/check_long_tasks.py
+# deepagents + Opus 5.5, compaction at 128K real tokens, one context
+uv run python -m harness_bench run-openrouter --suite long \
+    --model anthropic/claude-opus-5.5 --compact-at-tokens 128000 \
+    --no-subagents --prompt-cache --concurrency 6
+```
+
+Measured 2026-09-25 with deepagents 0.6.12 + Claude Opus 5.5 (`anthropic/claude-opus-5.5`
+via an OpenRouter-compatible gateway, reasoning `default`), `--compact-at-tokens 128000
+--no-subagents --prompt-cache`. One row per task version; "runs" is how many runs of that
+version were made, "compactions" lists the count per run. Every run of every task passed.
+
+The 2026-09-25 runs addressed these same tasks under the previous ids `long_01_*` … `long_20_*`.
+The current versions of tasks 398 and 405 were measured 2026-09-29 in the same
+configuration through another gateway, with `--isolation none` on macOS; their traces
+show no reads outside the task workspace.
+
+| Task | What has to be read | Runs | Compactions | Peak prompt |
+| --- | --- | ---: | --- | ---: |
+| task_392_manuscript_continuity | 18-chapter novel vs. a character bible | 2 | 6, 5 | 127K |
+| task_393_intranet_multihop | 340-page intranet, dated orders | 2 | 1, 7 | 127K |
+| task_394_review_annotation | 800 LLM-paraphrased reviews + guidelines | 2 | 3, 5 | 127K |
+| task_395_homework_grading | 90 students' code, e-mails, rubric | 1 | 1 | 125K |
+| task_396_parish_genealogy | 1,456 parish register records | 2 | 1, 1 | 128K |
+| task_397_conference_schedule | 327 paraphrased letters, rules | 1 | 8 | 127K |
+| task_398_card_game_engine | 250 cards, errata, partly paraphrased rulings | 1 | 3 | 128K |
+| task_399_port_js_library | 4,200-line JS library → Python | 2 | 1, 1 | 127K |
+| task_400_sql_dialect_port | 70 legacy queries + dialect manual | 2 | 1, 3 | 119K |
+| task_401_review_comments | 158 review threads over a 5K-line project | 2 | 3, 1 | 128K |
+| task_402_changelog_semver | 238 commits + 251 paraphrased issue threads | 2 | 1, 3 | 120K |
+| task_403_binary_format_reverse | 205 paraphrased developer e-mails, samples | 1 | 8 context drops | 128K |
+| task_404_text_adventure | encrypted 91-location quest | 3 | 0, 1, 1 | 128K |
+| task_405_paper_reproduce | methods, appendices, paraphrased query log, CSVs | 1 | 6 | 128K |
+| task_406_spreadsheet_audit | 17 formula sheets + model spec | 1 | 1 | 113K |
+| task_407_courier_routes | 280 paraphrased courier voice notes | 1 | 2 | 123K |
+| task_408_legacy_feature | 78-module legacy app + feature spec | 2 | 1, 1 | 125K |
+| task_409_procurement_datasheets | 183 datasheets, price lists, 45 requests | 2 | 1, 1 | 124K |
+| task_410_recipe_nutrition | 155 recipes, measures, nutrition table | 2 | 1, 1 | 124K |
+| task_411_math_solutions_check | 150 step-by-step student solutions | 2 | 3, 3 | 133K |
+
+A task with one compaction and a peak near 128K compacts in some runs and not in
+others (task 404 did not in one of three runs).
+
+`run-openrouter` options added for this suite:
+
+- `--compact-at-tokens N` — deepagents summarizes once a prompt reaches N
+  **provider tokens** (usage of the last model call plus an estimate of what was
+  appended since). deepagents' own counter assumes ~4 characters per token and
+  undercounts Russian tool output and tool schemas: on one trace its count was
+  55–69K while the real prompt was 125K.
+- `--no-subagents` — drop the auto-added general-purpose subagent (`task` tool).
+- `--prompt-cache` — ask the gateway to cache the prompt prefix (top-level
+  `cache_control`; cuts cost ~20× for Anthropic models, inputs unchanged).
+- `OPENROUTER_MAX_RETRIES` — per-request retries for 429/5xx (default 2).
+- `HARNESS_BENCH_TRACE_DIR` — dump the full message history of every task.
+
+Result JSON gains `agent_peak_input_tokens`, `agent_compactions` and
+`agent_cost_usd` when observable.
 
 ## Harbor export
 
@@ -401,17 +496,58 @@ The Docker image contains only task setup and runtime dependencies. The
 benchmark registry / gold data is copied into Harbor `solution/` and `tests/`
 payloads, so normal agents do not get the gold answers baked into the image.
 
-Local no-Docker execution remains the canonical development loop:
-`run`, `run-cli`, `run-pure`, `run-openrouter`, `verify-gold`,
-`verify-task`, and `apply-gold` all run directly on the host. Docker is only
+`run-cli` and `run-openrouter` default to a separate Linux bubblewrap sandbox
+for each task agent. Fixture setup and verification stay in the host parent;
+the worker sees its workspace, private scratch/home, and allowlisted runtime
+files. It cannot read the host benchmark registry, gold data or old workspaces.
+Bubblewrap (`bwrap`) must be installed on the runner. `--isolation none` retains
+host execution for diagnostics. The native GigaChat `run` / `run-pure` commands
+still execute on the host and are not isolated by this change. Docker is only
 needed when invoking Harbor's own local runner.
+
+For custom CLI dependencies, pass `--sandbox-manifest runtime.json` containing
+`{"runtime_paths": ["/absolute/trusted/runtime"]}`. Allowlist package directories
+or exact launcher/config files; do not mount benchmark/data roots. The native
+OpenRouter worker automatically mounts its Python environment and four runtime
+source files, with installed `harness_bench` task packages masked. Editable
+runtime dependencies outside the environment need an explicit manifest entry.
+Network access remains available for the configured model endpoint. Set
+`OPENROUTER_REASONING_EFFORT=medium` (or another model-supported level) to
+explicitly select reasoning effort for the native OpenRouter worker; retain
+`--forward-reasoning-history` when measuring reasoning models.
+
+Both isolated runners save each execution under `RESULT.json.artifacts/` (or
+`--artifacts-dir DIR`): the prompt, stdout/stderr, execution metadata, and native
+traces found before workspace cleanup, plus full regular-file snapshots of the
+private scratch/home (including native session databases/configs). Symlink escapes
+are skipped. Files of at least 1 MiB are copied into verified SHA256 objects
+outside the sandbox and then hardlinked into each archived task; live source
+files are never hardlinked. `content_objects.json` records every object reference.
+Artifact execution directories have mode 0700. The OpenRouter worker additionally emits
+model inputs/outputs, tool events, complete final history and usage. These are
+client-side records. For an external session-aware wire recorder, set
+`HBF_WIRE_BASE_URL=http://127.0.0.1:PORT/RUN/HARNESS`. Each physical execution
+gets its own `.../EXECUTION/v1` endpoint in `HBF_API_BASE` and
+`OPENROUTER_BASE_URL`; its metadata records the matching `wire_session`.
+The recorder must forward that route to the original model endpoint without
+changing request or response bodies. Wire recording is opt-in.
+
+Timeouts remain scored failures when a JSON run resumes. Infrastructure failures
+are separately marked and may be retried on the same model; every retry and
+explicit `--rerun-on-fail` keeps execution history. There is no automatic PROM
+model fallback. Any infrastructure failure makes `measurement_valid=false`,
+`pass_rate=null` and a nonzero exit even with `--allow-task-failures`. Token/step
+coverage fields distinguish missing telemetry from measured zero. Use a fresh
+JSON filename when migrating old unisolated runs; resume refuses to mix them
+with the isolated worker settings.
 
 ## Results
 
 The published results table (full 391-task set, `task-set v0.16.0`) is kept at
-the top of this README. Only one run per harness + model setup is listed;
-superseded and older-task-set runs are not carried over (the last v0.13.0
-table is kept in a collapsed section for reference only).
+the top of this README. The current task set is v0.17.0 (411 tasks); those
+published rows are not runs of it. Only one run per harness + model setup is
+listed; superseded and older-task-set runs are not carried over (the last
+v0.13.0 table is kept in a collapsed section for reference only).
 
 ### Scoring rules
 
@@ -430,7 +566,7 @@ table is kept in a collapsed section for reference only).
 1. In one of the task modules (`tasks.py`, `tasks_extra.py`,
    `tasks_more.py`, `tasks_hard.py`, `tasks_extreme.py`,
    `tasks_diagnostic.py`, `tasks_memory.py`, `tasks_skills.py`,
-   `tasks_tbench_lite.py`, `tasks_cli.py` — pick the one that fits
+   `tasks_tbench_lite.py`, `tasks_cli.py`, `long_tasks/` — pick the one that fits
    the wave / difficulty) describe a `Task(...)` — id, prompt,
    `setup_files`, `gold_files`, `verifier`.
 2. Wire it into the corresponding module's `*_TASKS` list — it gets

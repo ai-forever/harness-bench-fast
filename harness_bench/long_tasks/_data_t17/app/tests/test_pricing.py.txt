@@ -1,0 +1,64 @@
+# -*- coding: utf-8 -*-
+import unittest
+
+from helpers import make_db
+from stockroom import orders, pricing
+from stockroom.errors import ValidationError
+from stockroom.money import D
+
+
+class PricingTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+
+    def test_retail_price_without_discounts(self):
+        a = pricing.line_amounts(self.db, "MILK", 1, "C1")
+        self.assertEqual((a["unit"], a["net"], a["vat"], a["total"]), (D("89.90"), D("89.90"), D("8.99"), D("98.89")))
+
+    def test_wholesale_then_personal_discount(self):
+        self.assertEqual(pricing.unit_price(self.db, "MILK", 1, "C2"), D("76.86"))
+
+    def test_quantity_breaks(self):
+        self.assertEqual(pricing.qty_break(self.db, "TEA", 9), D(0))
+        self.assertEqual(pricing.unit_price(self.db, "TEA", 9, "C1"), D("350.00"))
+        self.assertEqual(pricing.unit_price(self.db, "TEA", 10, "C1"), D("332.50"))
+        self.assertEqual(pricing.unit_price(self.db, "TEA", 50, "C1"), D("315.00"))
+
+    def test_all_rules_together(self):
+        a = pricing.line_amounts(self.db, "TEA", 60, "C3")
+        self.assertEqual(a["unit"], D("305.55"))
+        self.assertEqual(a["net"], D("18333.00"))
+        self.assertEqual(a["vat"], D("3666.60"))
+        self.assertEqual(a["vat_rate"], D("20"))
+
+    def test_weighted_goods_round_line_sum(self):
+        a = pricing.line_amounts(self.db, "SUGAR", "1.237", "C3")
+        self.assertEqual(a["unit"], D("70.33"))
+        self.assertEqual(a["net"], D("87.00"))
+
+    def test_order_amounts_are_sums_of_lines(self):
+        order = orders.create_order(self.db, "C2", "2024-03-06", ["MILK:12", "TEA:10", "BREAD:3"])
+        amounts = pricing.order_amounts(self.db, order)
+        self.assertEqual(len(amounts["lines"]), 3)
+        self.assertEqual(amounts["net"], sum((l["net"] for l in amounts["lines"]), D(0)))
+        self.assertEqual(amounts["total"], amounts["net"] + amounts["vat"])
+        self.assertEqual(pricing.order_total(self.db, order["id"]), amounts["total"])
+
+    def test_breaks_validation(self):
+        with self.assertRaises(ValidationError):
+            pricing.set_breaks(self.db, "MILK", ["10-5"])
+        with self.assertRaises(ValidationError):
+            pricing.set_breaks(self.db, "MILK", ["10:100"])
+        with self.assertRaises(ValidationError):
+            pricing.set_breaks(self.db, "MILK", ["10:5", "10:7"])
+        rows = pricing.set_breaks(self.db, "MILK", [("24", "3"), ("12", "2")])
+        self.assertEqual([r["min_qty"] for r in rows], ["12", "24"])
+
+    def test_price_list(self):
+        rows = pricing.price_list(self.db, "C2")
+        self.assertEqual([r["sku"] for r in rows], ["BREAD", "MILK", "SUGAR", "TEA"])
+        self.assertEqual(rows[1]["price"], "76.86")
+
+
+if __name__ == "__main__":
+    unittest.main()

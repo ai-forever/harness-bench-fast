@@ -1,0 +1,160 @@
+# -*- coding: utf-8 -*-
+"""Хранилище: один JSON-файл.
+
+Структура файла (схема 3):
+
+    {
+      "schema": 3,
+      "meta": {"company": ..., "base_currency": "RUB", "vat_default": "20",
+               "seq": {"R": 12, "S": 40, ...}},
+      "items": {SKU: {...}},                 # справочник товаров (catalog.py)
+      "suppliers": {CODE: {...}},            # поставщики (partners.py)
+      "customers": {CODE: {...}},            # покупатели (partners.py)
+      "stock": {SKU: "12.5"},                # остаток, строка-Decimal
+      "layers": {SKU: [{"doc", "line", "date", "qty", "cost"}]},   # FIFO-слои себестоимости
+      "price_breaks": {SKU: [{"min_qty", "discount"}]},
+      "documents": {ID: {...}},              # приходы, заказы, возвраты, корректировки
+      "movements": [{...}],                  # журнал движений
+      "audit": [{...}]                       # журнал действий
+    }
+
+Инвариант: для каждого товара сумма qty его слоёв равна stock[SKU]. Его проверяет
+check_integrity() и тест test_db.IntegrityTest — не нарушайте его в новых операциях.
+
+Файл пишется атомарно (временный файл + os.replace). Старые схемы 1 и 2
+автоматически поднимаются до текущей при загрузке (migrations.py), исходный файл
+при этом не перезаписывается до первого save().
+"""
+
+import json
+import os
+import tempfile
+
+from . import migrations
+from .errors import SchemaError
+from .money import D
+
+SCHEMA_VERSION = 3
+
+EMPTY = {
+    "schema": SCHEMA_VERSION,
+    "meta": {},
+    "items": {},
+    "suppliers": {},
+    "customers": {},
+    "stock": {},
+    "layers": {},
+    "price_breaks": {},
+    "documents": {},
+    "movements": [],
+    "audit": [],
+}
+
+
+class Database(object):
+    """Обёртка над словарём данных с загрузкой/сохранением.
+
+    Использование:
+
+        db = Database.open("stock.json")
+        ...изменения через модули бизнес-логики...
+        db.save()
+    """
+
+    def __init__(self, path, data=None):
+        self.path = path
+        self.data = data if data is not None else json.loads(json.dumps(EMPTY))
+        self.dirty = False
+
+    # ----------------------------------------------------------------- открытие
+    @classmethod
+    def open(cls, path):
+        if not os.path.exists(path):
+            raise SchemaError("файл базы не найден: %s (сначала выполните init)" % path)
+        with open(path, "r", encoding="utf-8") as fh:
+            try:
+                data = json.load(fh)
+            except ValueError as exc:
+                raise SchemaError("файл базы повреждён: %s" % exc)
+        if not isinstance(data, dict) or "schema" not in data:
+            raise SchemaError("это не файл базы stockroom")
+        version = data.get("schema")
+        if not isinstance(version, int) or version < 1 or version > SCHEMA_VERSION:
+            raise SchemaError("неизвестная версия схемы: %r" % (version,))
+        migrated = version < SCHEMA_VERSION
+        if migrated:
+            data = migrations.migrate(data, SCHEMA_VERSION)
+        for key, value in EMPTY.items():
+            if key not in data:
+                data[key] = json.loads(json.dumps(value))
+        db = cls(path, data)
+        db.dirty = migrated
+        return db
+
+    @classmethod
+    def create(cls, path, company, base_currency="RUB", vat_default="20"):
+        if os.path.exists(path):
+            raise SchemaError("файл уже существует: %s" % path)
+        db = cls(path)
+        db.data["meta"] = {
+            "company": company,
+            "base_currency": base_currency,
+            "vat_default": str(vat_default),
+            "seq": {},
+        }
+        db.save()
+        return db
+
+    @classmethod
+    def memory(cls, company="Тест"):
+        """База без файла — для тестов и пробных расчётов."""
+        db = cls(None)
+        db.data["meta"] = {"company": company, "base_currency": "RUB", "vat_default": "20", "seq": {}}
+        return db
+
+    # --------------------------------------------------------------- сохранение
+    def save(self, path=None):
+        path = path or self.path
+        if path is None:
+            return
+        directory = os.path.dirname(os.path.abspath(path))
+        fd, tmp = tempfile.mkstemp(prefix=".stockroom-", dir=directory)
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                json.dump(self.data, fh, ensure_ascii=False, indent=1)
+                fh.write("\n")
+            os.replace(tmp, path)
+        except Exception:
+            if os.path.exists(tmp):
+                os.unlink(tmp)
+            raise
+        self.dirty = False
+
+    # ------------------------------------------------------------------ доступ
+    @property
+    def schema(self):
+        return self.data.get("schema")
+
+    def meta(self, key, default=None):
+        return self.data.get("meta", {}).get(key, default)
+
+    def base_currency(self):
+        return self.meta("base_currency") or "RUB"
+
+    def documents_of(self, doc_type):
+        return [d for d in self.data["documents"].values() if d.get("type") == doc_type]
+
+    def check_integrity(self):
+        """Список нарушений инварианта остатков (пустой — всё в порядке)."""
+        problems = []
+        for sku, qty in self.data["stock"].items():
+            layers = self.data["layers"].get(sku, [])
+            total = sum((D(l["qty"]) for l in layers), D(0))
+            if total != D(qty):
+                problems.append("%s: остаток %s, в слоях %s" % (sku, qty, total))
+            if D(qty) < 0:
+                problems.append("%s: отрицательный остаток" % sku)
+        for sku in self.data["layers"]:
+            if sku not in self.data["stock"] and any(D(l["qty"]) for l in self.data["layers"][sku]):
+                problems.append("%s: слои без остатка" % sku)
+        return problems

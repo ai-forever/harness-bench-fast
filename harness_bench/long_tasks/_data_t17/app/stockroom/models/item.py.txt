@@ -1,0 +1,47 @@
+# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+from dataclasses import dataclass
+from decimal import Decimal
+from typing import Optional
+
+from ..money import D
+
+
+@dataclass(frozen=True)
+class ItemView:
+    """Только для чтения: карточка товара с Decimal-полями."""
+
+    sku: str
+    name: str
+    unit: str
+    category: str
+    price: Decimal
+    vat: Decimal
+    min_qty: Decimal
+    barcode: Optional[str]
+    active: bool
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "ItemView":
+        return cls(
+            sku=d["sku"],
+            name=d["name"],
+            unit=d.get("unit") or "шт",
+            category=d.get("category") or "",
+            price=D(d.get("price", "0")),
+            vat=D(d.get("vat", "20")),
+            min_qty=D(d.get("min_qty", "0")),
+            barcode=d.get("barcode"),
+            active=bool(d.get("active", True)),
+        )
+
+    @classmethod
+    def load(cls, db, sku: str) -> "ItemView":
+        from ..catalog import getItem
+
+        return cls.from_dict(getItem(db, sku))
+
+    @property
+    def label(self) -> str:
+        return "%s %s" % (self.sku, self.name)

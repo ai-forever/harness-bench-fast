@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+"""Тексты уведомлений (письма формирует и отправляет внешний скрипт по cron).
+
+low_stock_message — сводка по товарам ниже неснижаемого остатка для закупщика.
+debt_message — напоминание покупателю о задолженности.
+"""
+
+from .money import fmt_money, fmt_qty
+from .payments import balance
+from .partners import get_customer
+from .reports import lowstock
+
+
+def low_stock_message(db):
+    rows = lowstock.build(db)
+    if not rows:
+        return None
+    lines = ["Тема: Мало на складе (%d поз.)" % len(rows), "", "Добрый день!", "",
+             "Следующие товары ниже неснижаемого остатка:"]
+    for r in rows:
+        lines.append("  %s %s: остаток %s, минимум %s, заказать %s" % (r["sku"], r["name"], fmt_qty(r["qty"]),
+                                                                    fmt_qty(r["min_qty"]), fmt_qty(r["reorder"])))
+    lines += ["", "-- ", db.meta("company") or ""]
+    return "\n".join(lines) + "\n"
+
+
+def debt_message(db, customer, on_date):
+    cust = get_customer(db, customer)
+    debt = balance(db, customer, on_date)
+    if debt <= 0:
+        return None
+    return ("Тема: Напоминание об оплате\n\nУважаемый клиент %s!\n\nПо состоянию на %s за вами числится "
+            "задолженность %s руб. Просим погасить её в ближайшее время.\n\n-- \n%s\n"
+            % (cust["name"], on_date, fmt_money(debt), db.meta("company") or ""))

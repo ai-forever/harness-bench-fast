@@ -1,0 +1,67 @@
+# -*- coding: utf-8 -*-
+"""Штрихкоды EAN-8 / EAN-13.
+
+validators.barcode проверяет только длину и цифры (так исторически), контрольную
+цифру проверяет is_valid_ean(). Внутренние штрихкоды для весового и фасованного
+товара генерируются с префиксом 2 (диапазон «для внутреннего использования»):
+2 + 5 цифр номера + 6 цифр (вес в граммах или 000000) + контрольная цифра.
+"""
+
+import re
+
+_DIGITS = re.compile(r"^\d+$")
+INTERNAL_PREFIX = "2"
+
+
+def check_digit(body):
+    """Контрольная цифра EAN для строки цифр без неё (7 или 12 цифр)."""
+    if not _DIGITS.match(body or ""):
+        raise ValueError("штрихкод состоит из цифр")
+    total = 0
+    for i, ch in enumerate(reversed(body)):
+        total += int(ch) * (3 if i % 2 == 0 else 1)
+    return str((10 - total % 10) % 10)
+
+
+def is_valid_ean(code):
+    code = (code or "").strip()
+    if len(code) not in (8, 13) or not _DIGITS.match(code):
+        return False
+    return check_digit(code[:-1]) == code[-1]
+
+
+def internal_code(number, grams=0):
+    """Внутренний EAN-13 для товара с номером number (до 99999) и весом grams (до 999999 г)."""
+    if not 0 < int(number) < 100000:
+        raise ValueError("номер должен быть 1..99999")
+    if not 0 <= int(grams) < 1000000:
+        raise ValueError("вес вне диапазона")
+    body = "%s%05d%06d" % (INTERNAL_PREFIX, int(number), int(grams))
+    return body + check_digit(body)
+
+
+def parse_internal(code):
+    """Разобрать внутренний штрихкод: (номер, граммы) или None для чужих кодов."""
+    if not is_valid_ean(code) or len(code) != 13 or not code.startswith(INTERNAL_PREFIX):
+        return None
+    return int(code[1:6]), int(code[6:12])
+
+
+def find_item(db, code):
+    """Товар по штрихкоду: сначала точное совпадение, затем внутренний код весового
+    товара (по номеру из поля barcode карточки). Возвращает (item, qty) или (None, None);
+    qty — вес в кг для весовых, иначе 1."""
+    from .money import D
+
+    code = (code or "").strip()
+    for item in db.data["items"].values():
+        if item.get("barcode") == code:
+            return item, D(1)
+    parsed = parse_internal(code)
+    if parsed:
+        number, grams = parsed
+        for item in db.data["items"].values():
+            bc = item.get("barcode") or ""
+            if bc.startswith(INTERNAL_PREFIX) and len(bc) == 13 and int(bc[1:6]) == number:
+                return item, (D(grams) / 1000 if grams else D(1))
+    return None, None

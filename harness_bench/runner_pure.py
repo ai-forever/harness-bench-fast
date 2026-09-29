@@ -98,6 +98,7 @@ def run_task(
     keep_workspace: bool = False,
     recursion_limit: int = 80,
 ) -> TaskRun:
+    recursion_limit = max(recursion_limit, getattr(task, "min_recursion_limit", None) or 0)
     workspace_keepalive: TemporaryDirectory | None = None
     try:
         if keep_workspace:
@@ -117,6 +118,7 @@ def run_task(
                 agent,
                 {"messages": [{"role": "user", "content": task.prompt}]},
                 stats,
+                min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
             )
         except Exception as exc:  # noqa: BLE001 — log and surface as task failure
             run = _agent_exception_task_run(

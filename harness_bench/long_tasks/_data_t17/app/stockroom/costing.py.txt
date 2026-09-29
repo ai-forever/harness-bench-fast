@@ -1,0 +1,92 @@
+# -*- coding: utf-8 -*-
+"""Себестоимость по FIFO.
+
+Каждый приход создаёт «слой»: (документ, строка, дата, количество, цена за единицу).
+Отгрузки и списания забирают количество из самых старых слоёв; порядок слоёв —
+по дате, затем по номеру документа и строки (так, как они лежат в списке: новые
+слои дописываются в конец, restore() вставляет на своё место).
+
+Слой с нулевым остатком удаляется. Себестоимость отгрузки = сумма qty * cost по
+затронутым слоям, без округления до копеек внутри (округляется итог движения).
+"""
+
+from .errors import InsufficientStock
+from .money import D, money_str, qty_str
+
+
+def _key(layer):
+    return (layer["date"], layer["doc"], int(layer.get("line", 0)))
+
+
+def layers_for(db, sku):
+    """Слои товара (список словарей, самые старые первыми). Возвращает копии."""
+    return [dict(l) for l in db.data["layers"].get(sku, [])]
+
+
+def add_layer(db, sku, doc, line, date, qty, cost):
+    layers = db.data["layers"].setdefault(sku, [])
+    layer = {"doc": doc, "line": line, "date": date, "qty": qty_str(qty), "cost": money_str(cost)}
+    layers.append(layer)
+    layers.sort(key=_key)
+    return layer
+
+
+def consume_fifo(db, sku, qty):
+    """Списать qty из слоёв по FIFO. Возвращает список распределений
+    [{"doc", "line", "date", "qty", "cost"}] — сколько взято из какого слоя."""
+    need = D(qty)
+    layers = db.data["layers"].get(sku, [])
+    have = sum((D(l["qty"]) for l in layers), D(0))
+    if have < need:
+        raise InsufficientStock(sku, qty_str(need), qty_str(have))
+    allocations = []
+    for layer in list(layers):
+        if need <= 0:
+            break
+        take = min(need, D(layer["qty"]))
+        if take <= 0:
+            continue
+        allocations.append({"doc": layer["doc"], "line": layer["line"], "date": layer["date"],
+                            "qty": qty_str(take), "cost": layer["cost"]})
+        rest = D(layer["qty"]) - take
+        need -= take
+        if rest == 0:
+            layers.remove(layer)
+        else:
+            layer["qty"] = qty_str(rest)
+    return allocations
+
+
+def restore(db, sku, allocations):
+    """Вернуть количество в слои (для возвратов и отмен). Если слоя уже нет — он
+    создаётся заново с исходными документом, строкой, датой и ценой."""
+    layers = db.data["layers"].setdefault(sku, [])
+    for a in allocations:
+        for layer in layers:
+            if layer["doc"] == a["doc"] and int(layer["line"]) == int(a["line"]):
+                layer["qty"] = qty_str(D(layer["qty"]) + D(a["qty"]))
+                break
+        else:
+            layers.append({"doc": a["doc"], "line": a["line"], "date": a["date"],
+                           "qty": qty_str(a["qty"]), "cost": a["cost"]})
+    layers.sort(key=_key)
+
+
+def allocations_cost(allocations):
+    return sum((D(a["qty"]) * D(a["cost"]) for a in allocations), D(0))
+
+
+def value_of(db, sku):
+    """Себестоимость остатка товара (сумма по слоям), не округлена."""
+    return sum((D(l["qty"]) * D(l["cost"]) for l in db.data["layers"].get(sku, [])), D(0))
+
+
+def last_cost(db, sku):
+    """Цена последнего по дате слоя; если слоёв нет — цена последнего прихода из журнала; иначе 0."""
+    layers = db.data["layers"].get(sku, [])
+    if layers:
+        return D(layers[-1]["cost"])
+    for mv in reversed(db.data["movements"]):
+        if mv["sku"] == sku and mv["type"] == "in" and D(mv["qty"]) > 0:
+            return D(mv["cost"]) / D(mv["qty"])
+    return D(0)

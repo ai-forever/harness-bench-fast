@@ -1,0 +1,118 @@
+# -*- coding: utf-8 -*-
+"""Отчёт о продажах за период.
+
+Продажа попадает в период по дате отгрузки (shipped_date), возврат — по дате
+документа возврата. Выручка — без НДС, в рублях: цена товара в валюте пересчитывается по
+курсу на дату заказа. Возврат (в т. ч. частичный) уменьшает количество, выручку и
+себестоимость в периоде возврата; выручка возврата считается по цене строки заказа
+(скидка за количество — по количеству в заказе).
+
+Группировка: group="sku" (по товарам) или group="customer" (по покупателям).
+
+Цену строки отчёт считает сам (_net_amount) — так было быстрее на больших базах,
+чем дёргать pricing.line_amounts с его загрузкой карточек. Правила — те же, что в
+pricing.py; синхронность проверяет test_reports.SalesMatchesPricingTest.
+"""
+
+from .. import config
+from ..dates import in_range
+from ..money import D, apply_discount, fmt_money, fmt_qty, q2
+from ..textable import render as _render
+
+COLUMNS_SKU = [("sku", "Артикул"), ("name", "Наименование"), ("qty", "Кол-во", "r"), ("revenue", "Выручка", "r"),
+               ("cost", "Себестоимость", "r"), ("margin", "Маржа", "r")]
+COLUMNS_CUSTOMER = [("customer", "Покупатель"), ("name", "Наименование"), ("qty", "Кол-во", "r"),
+                    ("revenue", "Выручка", "r"), ("cost", "Себестоимость", "r"), ("margin", "Маржа", "r")]
+
+
+def _net_amount(db, sku, qty, customer, date=None, break_qty=None):
+    """Сумма без НДС для qty единиц; date — дата заказа (курс валюты), break_qty — количество
+    для скидки за количество (по умолчанию qty; для возвратов — количество строки заказа)."""
+    item = db.data["items"][sku]
+    price = D(item["price"])
+    currency = item.get("currency") or db.base_currency()
+    if currency != db.base_currency():
+        from ..rates import get_rate
+
+        price = q2(price * get_rate(db, currency, date))
+    if break_qty is None:
+        break_qty = qty
+    if customer.get("group") == "wholesale":
+        price = q2(apply_discount(price, config.WHOLESALE_DISCOUNT))
+    breaks = db.data.get("price_breaks", {}).get(sku, [])
+    best = None
+    for br in breaks:
+        if D(break_qty) >= D(br["min_qty"]) and (best is None or D(br["min_qty"]) > D(best["min_qty"])):
+            best = br
+    if best is not None:
+        price = q2(apply_discount(price, best["discount"]))
+    price = q2(apply_discount(price, customer.get("discount") or 0))
+    return q2(price * D(qty))
+
+
+def _alloc_cost(line):
+    return q2(sum((D(a["qty"]) * D(a["cost"]) for a in line.get("allocations", [])), D(0)))
+
+
+def _bucket(acc, key, name):
+    if key not in acc:
+        acc[key] = {"name": name, "qty": D(0), "revenue": D(0), "cost": D(0)}
+    return acc[key]
+
+
+def build(db, date_from=None, date_to=None, group="sku"):
+    if group not in ("sku", "customer"):
+        raise ValueError("group must be sku or customer")
+    acc = {}
+    docs = db.data["documents"]
+    for doc in docs.values():
+        if doc.get("type") != "order" or doc.get("status") not in ("shipped", "partially_returned", "returned"):
+            continue
+        if not in_range(doc["shipped_date"], date_from, date_to):
+            continue
+        customer = db.data["customers"][doc["customer"]]
+        for line in doc["lines"]:
+            key = line["sku"] if group == "sku" else doc["customer"]
+            name = db.data["items"][line["sku"]]["name"] if group == "sku" else customer["name"]
+            b = _bucket(acc, key, name)
+            b["qty"] += D(line["qty"])
+            b["revenue"] += _net_amount(db, line["sku"], line["qty"], customer, doc["date"])
+            b["cost"] += _alloc_cost(line)
+    for doc in docs.values():
+        if doc.get("type") != "return" or not in_range(doc["date"], date_from, date_to):
+            continue
+        order = docs[doc["order"]]
+        customer = db.data["customers"][order["customer"]]
+        for line in doc["lines"]:
+            key = line["sku"] if group == "sku" else order["customer"]
+            name = db.data["items"][line["sku"]]["name"] if group == "sku" else customer["name"]
+            b = _bucket(acc, key, name)
+            b["qty"] -= D(line["qty"])
+            order_qty = sum((D(l["qty"]) for l in order["lines"] if l["sku"] == line["sku"]), D(0))
+            b["revenue"] -= _net_amount(db, line["sku"], line["qty"], customer, order["date"], order_qty)
+            b["cost"] -= D(line["cost"])
+    rows = []
+    for key in sorted(acc):
+        b = acc[key]
+        row = {"name": b["name"], "qty": b["qty"], "revenue": b["revenue"], "cost": b["cost"],
+               "margin": b["revenue"] - b["cost"]}
+        row["sku" if group == "sku" else "customer"] = key
+        rows.append(row)
+    return rows
+
+
+def totals(rows):
+    return {k: sum((r[k] for r in rows), D(0)) for k in ("qty", "revenue", "cost", "margin")}
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, **opts)
+    columns = COLUMNS_SKU if opts.get("group", "sku") == "sku" else COLUMNS_CUSTOMER
+    if fmt == "csv":
+        return _render(columns, rows, "csv")
+    view = [dict(r, qty=fmt_qty(r["qty"]), revenue=fmt_money(r["revenue"]), cost=fmt_money(r["cost"]),
+                 margin=fmt_money(r["margin"])) for r in rows]
+    t = totals(rows)
+    foot = "Итого: выручка %s, себестоимость %s, маржа %s" % (fmt_money(t["revenue"]), fmt_money(t["cost"]),
+                                                            fmt_money(t["margin"]))
+    return _render(columns, view, "text", title="Продажи", footer=foot)

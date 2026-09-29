@@ -39,7 +39,7 @@ from harness_bench.runner_cli import DEFAULT_CLI_COMMAND, DEFAULT_TIMEOUT_SECOND
 from harness_bench.runner_openrouter import DEFAULT_OPENROUTER_MODEL
 from harness_bench.runner_openrouter import run_all as run_all_openrouter
 from harness_bench.runner_pure import run_all as run_all_pure
-from harness_bench.tasks import ALL_TASKS, get_task
+from harness_bench.tasks import ALL_TASKS, SUITES, get_task
 from harness_bench.versioning import (
     CURRENT_TASK_SET_REVISION,
     TASK_SET_REVISIONS,
@@ -59,6 +59,8 @@ def _exit_code(
     fail_on_runtime_error: bool = False,
 ) -> int:
     """Return the process exit code for a completed benchmark run."""
+    if any(getattr(r, "failure_kind", None) == "infrastructure" for r in results):
+        return 1
     if fail_on_runtime_error and _has_runtime_error(results):
         return 1
     if allow_task_failures:
@@ -66,12 +68,24 @@ def _exit_code(
     return 0 if all(getattr(r, "passed", False) for r in results) else 1
 
 
-def _cmd_list(_args: argparse.Namespace) -> int:
-    for task in ALL_TASKS:
+def _task_ids(args: argparse.Namespace) -> list[str] | None:
+    """Explicit `--task` ids win; otherwise `--suite long` selects that wave."""
+    if args.task:
+        return args.task
+    suite = getattr(args, "suite", "default")
+    if suite != "default":
+        return [task.id for task in SUITES[suite]]
+    return None
+
+
+def _cmd_list(args: argparse.Namespace) -> int:
+    tasks = SUITES[getattr(args, "suite", "default")]
+    for task in tasks:
         tags = f"  [{', '.join(task.tags)}]" if task.tags else ""
         print(f"  {task.id} — {task.name}{tags}")
-    print(f"\nTotal: {len(ALL_TASKS)} tasks")
-    print(f"Task-set version: {TASK_SET_VERSION}")
+    print(f"\nTotal: {len(tasks)} tasks")
+    if tasks is ALL_TASKS:
+        print(f"Task-set version: {TASK_SET_VERSION}")
     return 0
 
 
@@ -150,7 +164,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
     metric_ks = _metric_ks_for_args(args)
     _announce_json_output(args)
     results = run_all(
-        task_ids=args.task,
+        task_ids=_task_ids(args),
         keep_workspace=args.keep,
         recursion_limit=args.recursion_limit,
         concurrency=args.concurrency,
@@ -164,10 +178,12 @@ def _cmd_run(args: argparse.Namespace) -> int:
 
 
 def _cmd_run_openrouter(args: argparse.Namespace) -> int:
+    from harness_bench.cli_isolation import load_manifest
+
     metric_ks = _metric_ks_for_args(args)
     _announce_json_output(args)
     results = run_all_openrouter(
-        task_ids=args.task,
+        task_ids=_task_ids(args),
         model_name=args.model,
         keep_workspace=args.keep,
         recursion_limit=args.recursion_limit,
@@ -180,6 +196,12 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         fail_on_runtime_error=args.fail_on_runtime_error,
         rerun_on_fail=args.rerun_on_fail,
         forward_reasoning_history=args.forward_reasoning_history,
+        compact_at_tokens=args.compact_at_tokens,
+        prompt_cache=args.prompt_cache,
+        no_subagents=args.no_subagents,
+        isolation=args.isolation,
+        runtime_paths=load_manifest(args.sandbox_manifest),
+        artifacts_root=args.artifacts_dir,
     )
     _summarize_run(results, metric_ks)
     _maybe_report_json(args, results)
@@ -194,7 +216,7 @@ def _cmd_run_pure(args: argparse.Namespace) -> int:
     metric_ks = _metric_ks_for_args(args)
     _announce_json_output(args)
     results = run_all_pure(
-        task_ids=args.task,
+        task_ids=_task_ids(args),
         keep_workspace=args.keep,
         recursion_limit=args.recursion_limit,
         concurrency=args.concurrency,
@@ -208,10 +230,12 @@ def _cmd_run_pure(args: argparse.Namespace) -> int:
 
 
 def _cmd_run_cli(args: argparse.Namespace) -> int:
+    from harness_bench.cli_isolation import load_manifest
+
     metric_ks = _metric_ks_for_args(args)
     _announce_json_output(args)
     results = run_all_cli(
-        task_ids=args.task,
+        task_ids=_task_ids(args),
         cli_command=args.cli_command,
         timeout=args.timeout,
         keep_workspace=args.keep,
@@ -219,6 +243,9 @@ def _cmd_run_cli(args: argparse.Namespace) -> int:
         attempts=args.attempts,
         json_output=args.json_output,
         rerun_on_fail=args.rerun_on_fail,
+        isolation=args.isolation,
+        runtime_paths=load_manifest(args.sandbox_manifest),
+        artifacts_root=args.artifacts_dir,
     )
     _summarize_run(results, metric_ks)
     _maybe_report_json(args, results)
@@ -262,7 +289,7 @@ def _cmd_summarize_json(args: argparse.Namespace) -> int:
 
 
 def _cmd_verify_gold(args: argparse.Namespace) -> int:
-    results = verify_gold(task_ids=args.task)
+    results = verify_gold(task_ids=_task_ids(args))
     failed = [r for r in results if not r.passed]
     print()
     print("=" * 64)
@@ -312,7 +339,7 @@ def _cmd_verify_task(args: argparse.Namespace) -> int:
 def _cmd_export_harbor(args: argparse.Namespace) -> int:
     result = export_harbor_dataset(
         args.output,
-        task_ids=args.task,
+        task_ids=_task_ids(args),
         org=args.org,
         dataset=args.dataset,
         clean=args.clean,
@@ -534,6 +561,34 @@ def build_parser() -> argparse.ArgumentParser:
             "runs that differ in this flag are not comparable."
         ),
     )
+    p_or.add_argument(
+        "--compact-at-tokens",
+        type=int,
+        default=None,
+        help=(
+            "Make deepagents auto-compact (summarize) the conversation once a "
+            "prompt reaches this many tokens by deepagents' approximate count, "
+            "e.g. 128000. Default: deepagents' fallback of 170000 for models "
+            "without a profile. Changes agent behavior on long tasks."
+        ),
+    )
+    p_or.add_argument(
+        "--prompt-cache",
+        action="store_true",
+        help=(
+            "Ask the gateway to cache the prompt prefix (top-level "
+            "cache_control, honored for Anthropic models on OpenRouter-style "
+            "gateways). Cuts cost; does not change model inputs."
+        ),
+    )
+    p_or.add_argument(
+        "--no-subagents",
+        action="store_true",
+        help=(
+            "Disable deepagents' auto-added general-purpose subagent (no `task` "
+            "tool), so the whole trajectory stays in one context."
+        ),
+    )
     _add_metric_args(p_or)
     p_or.add_argument(
         "--harness-profile",
@@ -560,6 +615,10 @@ def build_parser() -> argparse.ArgumentParser:
             "an agent/runtime exception recorded in the JSON error field."
         ),
     )
+    p_or.add_argument("--isolation", choices=("bwrap", "none"), default="bwrap",
+                      help="Per-task Linux worker sandbox (default); none retains the diagnostic in-process runner")
+    p_or.add_argument("--sandbox-manifest", type=Path, help="Additional trusted runtime paths for editable dependencies")
+    p_or.add_argument("--artifacts-dir", type=Path, help="Persistent per-execution model/tool evidence")
     p_or.set_defaults(func=_cmd_run_openrouter)
 
     p_pure = sub.add_parser(
@@ -686,8 +745,23 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Exit 0 when the harness completes even if some benchmark tasks fail.",
     )
+    p_cli.add_argument("--isolation", choices=("bwrap", "none"), default="bwrap",
+                       help="Per-task allowlisted Linux sandbox (default: bwrap); none is diagnostic only.")
+    p_cli.add_argument("--sandbox-manifest", type=Path, help="JSON runtime_paths allowlist for custom CLI dependencies")
+    p_cli.add_argument("--artifacts-dir", type=Path, help="Persistent per-execution stdout, stderr, prompts and native traces")
     p_cli.set_defaults(func=_cmd_run_cli)
 
+    for command in ("list", "run", "run-openrouter", "run-pure", "run-cli", "verify-gold"):
+        sub.choices[command].add_argument(
+            "--suite",
+            choices=sorted(SUITES),
+            default="default",
+            help=(
+                "Task suite when no --task is given: 'default' is the scored "
+                "task set (411 tasks, v0.17.0), 'long' is only the long-context "
+                "wave inside it (tasks 392-411)."
+            ),
+        )
     return parser
 
 

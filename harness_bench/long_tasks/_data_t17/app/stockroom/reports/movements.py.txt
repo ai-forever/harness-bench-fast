@@ -1,0 +1,33 @@
+# -*- coding: utf-8 -*-
+"""Журнал движений с фильтрами по периоду, товару и типу."""
+
+from ..dates import in_range
+from ..money import D, fmt_money, fmt_qty
+from ..textable import render as _render
+
+COLUMNS = [("id", "№"), ("date", "Дата"), ("type", "Тип"), ("sku", "Артикул"), ("qty", "Кол-во", "r"),
+           ("cost", "Себестоимость", "r"), ("doc", "Документ")]
+TYPE_TEXT = {"in": "приход", "out": "расход", "return": "возврат", "adjust": "инвент.", "writeoff": "списание"}
+
+
+def build(db, date_from=None, date_to=None, sku=None, mtype=None):
+    rows = []
+    for mv in db.data["movements"]:
+        if sku and mv["sku"] != sku:
+            continue
+        if mtype and mv["type"] != mtype:
+            continue
+        if not in_range(mv["date"], date_from, date_to):
+            continue
+        rows.append({"id": mv["id"], "date": mv["date"], "type": mv["type"], "sku": mv["sku"],
+                     "qty": D(mv["qty"]), "cost": D(mv["cost"]), "doc": mv["doc"]})
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, **opts)
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, type=TYPE_TEXT.get(r["type"], r["type"]), qty=fmt_qty(r["qty"]), cost=fmt_money(r["cost"]))
+            for r in rows]
+    return _render(COLUMNS, view, "text", title="Движения товаров")

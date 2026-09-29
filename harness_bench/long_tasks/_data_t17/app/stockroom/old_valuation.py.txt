@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+"""УСТАРЕЛО. Оценка по средней себестоимости (схема 2).
+
+Не используется с перехода на FIFO (схема 3, 2021). Оставлено, потому что на него
+ссылается старый скрипт сверки бухгалтерии, который запускают раз в год руками.
+Не импортируйте в новом коде.
+"""
+
+from .money import D, q2
+
+
+def average_cost(movements, sku):
+    """Скользящая средняя по журналу движений (только приходы и расходы)."""
+    qty = D(0)
+    value = D(0)
+    for mv in movements:
+        if mv["sku"] != sku:
+            continue
+        if mv["type"] == "in":
+            qty += D(mv["qty"])
+            value += D(mv["cost"])
+        elif mv["type"] in ("out", "writeoff"):
+            if qty > 0:
+                avg = value / qty
+                value -= avg * D(mv["qty"])
+            qty -= D(mv["qty"])
+    if qty <= 0:
+        return D(0)
+    return q2(value / qty)
+
+
+def valuation_avg(db):
+    rows = []
+    for sku in sorted(db.data["items"]):
+        avg = average_cost(db.data["movements"], sku)
+        qty = D(db.data["stock"].get(sku, "0"))
+        rows.append((sku, qty, avg, q2(qty * avg)))
+    return rows

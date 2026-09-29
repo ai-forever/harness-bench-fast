@@ -1,0 +1,200 @@
+# -*- coding: utf-8 -*-
+"""Цены в валюте: пересчёт по курсу на дату заказа во всех местах расчёта цен."""
+
+import csv
+import io
+
+import pytest
+from acc_helpers import feature_db, run_cli, save
+
+from stockroom import labels, orders, payments, pricing, receiving, returns
+from stockroom.documents.invoice import invoice_data, render_invoice
+from stockroom.errors import RateMissing
+from stockroom.money import D
+from stockroom.reports import abc, sales
+
+
+def stocked():
+    db = feature_db()
+    receiving.receive(db, "SUP2", "2024-03-05", ["LAMP:40@11"], currency="USD")
+    receiving.receive(db, "SUP2", "2024-03-05", ["WINE:40@7"], currency="EUR")
+    return db
+
+
+def order(db, customer, date, lines, ship=True):
+    doc = orders.create_order(db, customer, date, lines)
+    if ship:
+        orders.ship_order(db, doc["id"], date)
+    return doc
+
+
+# --------------------------------------------------------------- pricing.py
+def test_unit_price_converts_at_order_date():
+    db = stocked()
+    assert pricing.unit_price(db, "WINE", 1, "C1", "2024-03-05") == D("1226.54")
+    assert pricing.unit_price(db, "WINE", 1, "C1", "2024-03-16") == D("1268.75")
+    assert pricing.unit_price(db, "WINE", 6, "C2", "2024-03-16") == D("1041.39")
+    assert pricing.unit_price(db, "LAMP", 1, "C3", "2024-03-11") == D("1309.50")
+    assert pricing.unit_price(db, "MILK", 1, "C1", "2024-03-16") == D("89.90")
+
+
+def test_order_amounts_use_order_date():
+    db = stocked()
+    doc = order(db, "C3", "2024-03-12", ["WINE:7", "LAMP:2", "MILK:1"], ship=False)
+    amounts = pricing.order_amounts(db, doc)
+    assert [l["unit"] for l in amounts["lines"]] == [D("1181.46"), D("1344.42"), D("87.20")]
+    assert amounts["net"] == D("11046.26")
+    assert amounts["total"] == D("13246.79")
+    assert pricing.order_total(db, doc["id"]) == D("13246.79")
+
+
+def test_missing_rate_on_order_date():
+    db = stocked()
+    doc = order(db, "C1", "2024-02-25", ["WINE:1"], ship=False)
+    with pytest.raises(RateMissing):
+        pricing.order_total(db, doc["id"])
+    doc2 = order(db, "C1", "2024-02-25", ["LAMP:1"], ship=False)
+    assert pricing.order_total(db, doc2["id"]) == D("1620.00")
+
+
+def test_price_list_and_labels_use_latest_rate():
+    db = stocked()
+    rows = {r["sku"]: r["price"] for r in pricing.price_list(db, "C1")}
+    assert rows["WINE"] == "1268.75" and rows["LAMP"] == "1386.00" and rows["MILK"] == "89.90"
+    rows = {r["sku"]: r["price"] for r in pricing.price_list(db, "C1", date="2024-03-05")}
+    assert rows["WINE"] == "1226.54" and rows["LAMP"] == "1350.00"
+    text = labels.render_label(db, "WINE")
+    assert "1 522,50 руб." in text
+    assert "от 6 шт — 1 461,60 руб." in text
+
+
+def test_balance_and_cli_order_show(tmp_path):
+    db = stocked()
+    doc = order(db, "C2", "2024-03-16", ["WINE:6", "LAMP:1"])
+    total = pricing.order_total(db, doc["id"])
+    assert total == D("8920.05")
+    assert payments.balance(db, "C2") == total
+    path = save(db, tmp_path)
+    rc, out, err = run_cli(path, "order", "show", doc["id"])
+    assert rc == 0, err
+    assert "Сумма с НДС: 8 920,05" in out
+
+
+def test_return_amount_for_foreign_item():
+    db = stocked()
+    doc = order(db, "C2", "2024-03-16", ["WINE:6"])
+    receiving.receive(db, "SUP2", "2024-03-20", ["WINE:1@1"], currency="EUR")
+    ret = returns.return_order(db, doc["id"], "2024-03-21", lines=["WINE:2"])
+    assert ret["amount"] == "2499.34"
+
+
+# ------------------------------------------------------ documents/invoice.py
+def test_invoice_prices_converted():
+    db = stocked()
+    doc = order(db, "C2", "2024-03-16", ["WINE:6", "LAMP:1", "MILK:2"], ship=False)
+    data = invoice_data(db, doc["id"])
+    assert [l["price"] for l in data["lines"]] == [D("1041.39"), D("1185.03"), D("76.86")]
+
+
+def test_invoice_matches_pricing_for_foreign_items():
+    db = stocked()
+    for customer in ("C1", "C2", "C3"):
+        for date in ("2024-03-05", "2024-03-11", "2024-03-16"):
+            for qty in ("1", "6", "13"):
+                doc = order(db, customer, date, ["WINE:%s" % qty, "LAMP:%s" % qty, "TEA:%s" % qty], ship=False)
+                data = invoice_data(db, doc["id"])
+                expected = pricing.order_amounts(db, doc)
+                assert (data["net"], data["vat"], data["total"]) == (expected["net"], expected["vat"],
+                                                                     expected["total"])
+
+
+def test_invoice_uses_order_date_not_latest_rate():
+    db = stocked()
+    doc = order(db, "C1", "2024-03-05", ["WINE:1"], ship=False)
+    data = invoice_data(db, doc["id"])
+    assert data["lines"][0]["price"] == D("1226.54")
+    assert data["total"] == D("1471.85")
+
+
+def test_render_invoice_totals():
+    db = stocked()
+    doc = order(db, "C3", "2024-03-12", ["WINE:7", "LAMP:2", "MILK:1"], ship=False)
+    text = render_invoice(db, doc["id"])
+    assert "Всего к оплате: 13 246,79" in text.splitlines()
+    assert "Итого без НДС: 11 046,26" in text.splitlines()
+
+
+def test_cli_invoice(tmp_path):
+    db = stocked()
+    doc = order(db, "C2", "2024-03-16", ["WINE:6", "LAMP:1"], ship=False)
+    path = save(db, tmp_path)
+    rc, out, err = run_cli(path, "invoice", doc["id"])
+    assert rc == 0, err
+    assert "Всего к оплате: 8 920,05" in out
+    row = [l for l in out.splitlines() if l.startswith("1 ")][0]
+    assert "1 041,39" in row
+
+
+def test_invoice_missing_rate_is_error(tmp_path):
+    db = stocked()
+    doc = order(db, "C1", "2024-02-25", ["WINE:1"], ship=False)
+    with pytest.raises(RateMissing):
+        invoice_data(db, doc["id"])
+    path = save(db, tmp_path)
+    rc, _, err = run_cli(path, "invoice", doc["id"])
+    assert rc == 2 and err.startswith("ошибка: ")
+
+
+# ------------------------------------------------------- reports/sales.py
+def test_sales_revenue_converted():
+    db = stocked()
+    order(db, "C2", "2024-03-16", ["WINE:6", "LAMP:1"])
+    rows = {r["sku"]: r for r in sales.build(db)}
+    assert rows["WINE"]["revenue"] == D("6248.34")
+    assert rows["LAMP"]["revenue"] == D("1185.03")
+    assert rows["WINE"]["cost"] == D(6 * 696.68).quantize(D("0.01"))
+
+
+def test_sales_by_customer_converted():
+    db = stocked()
+    a = order(db, "C2", "2024-03-16", ["WINE:6"])
+    b = order(db, "C3", "2024-03-11", ["LAMP:2"])
+    rows = {r["customer"]: r for r in sales.build(db, group="customer")}
+    assert rows["C2"]["revenue"] == pricing.order_amounts(db, a)["net"]
+    assert rows["C3"]["revenue"] == pricing.order_amounts(db, b)["net"] == D("2619.00")
+
+
+def test_sales_matches_pricing_many_orders():
+    db = stocked()
+    expected = D(0)
+    for customer in ("C1", "C2", "C3"):
+        for date in ("2024-03-05", "2024-03-12"):
+            doc = order(db, customer, date, ["WINE:2", "LAMP:3", "MILK:1"])
+            expected += pricing.order_amounts(db, doc)["net"]
+    assert sum((r["revenue"] for r in sales.build(db)), D(0)) == expected
+
+
+def test_sales_foreign_return():
+    db = stocked()
+    doc = order(db, "C2", "2024-03-16", ["WINE:6"])
+    returns.return_order(db, doc["id"], "2024-03-20", lines=["WINE:2"])
+    later = {r["sku"]: r for r in sales.build(db, "2024-03-18", "2024-03-31")}
+    assert later["WINE"]["revenue"] == D("-2082.78")
+
+
+def test_abc_uses_converted_revenue():
+    db = stocked()
+    order(db, "C1", "2024-03-16", ["WINE:3", "MILK:30", "BREAD:10"])
+    rows = abc.build(db)
+    assert [r["sku"] for r in rows] == ["WINE", "MILK", "BREAD"]
+    assert rows[0]["revenue"] == D("3806.25")
+
+
+def test_cli_sales_report(tmp_path):
+    db = stocked()
+    order(db, "C2", "2024-03-16", ["WINE:6", "LAMP:1"])
+    path = save(db, tmp_path)
+    rc, out, err = run_cli(path, "--format", "csv", "report", "sales")
+    assert rc == 0, err
+    rows = {r["sku"]: r for r in csv.DictReader(io.StringIO(out))}
+    assert rows["WINE"]["revenue"] == "6248.34"

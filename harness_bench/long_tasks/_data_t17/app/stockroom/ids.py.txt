@@ -1,0 +1,41 @@
+# -*- coding: utf-8 -*-
+"""Нумерация документов и движений.
+
+Номера сквозные по префиксу и хранятся в meta.seq. Формат: префикс, дефис,
+номер с ведущими нулями (4 знака для документов, 6 для движений).
+"""
+
+PREFIXES = {
+    "receipt": "R",
+    "order": "S",
+    "return": "RT",
+    "adjust": "ADJ",
+    "writeoff": "WO",
+    "movement": "MV",
+}
+WIDTH = {"MV": 6}
+
+
+def next_id(db, kind):
+    """Выдать следующий номер для вида документа kind (см. PREFIXES)."""
+    prefix = PREFIXES.get(kind, kind)
+    seq = db.data.setdefault("meta", {}).setdefault("seq", {})
+    n = int(seq.get(prefix, 0)) + 1
+    seq[prefix] = n
+    return "%s-%0*d" % (prefix, WIDTH.get(prefix, 4), n)
+
+
+def peek_id(db, kind):
+    """Какой номер будет выдан следующим (без изменения счётчика)."""
+    prefix = PREFIXES.get(kind, kind)
+    n = int(db.data.get("meta", {}).get("seq", {}).get(prefix, 0)) + 1
+    return "%s-%0*d" % (prefix, WIDTH.get(prefix, 4), n)
+
+
+def kind_of(doc_id):
+    """По номеру документа определить его вид: 'R-0001' → 'receipt'."""
+    prefix = doc_id.split("-", 1)[0]
+    for kind, p in PREFIXES.items():
+        if p == prefix:
+            return kind
+    return None

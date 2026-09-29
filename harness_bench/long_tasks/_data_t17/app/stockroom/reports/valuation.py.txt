@@ -1,0 +1,43 @@
+# -*- coding: utf-8 -*-
+"""Оценка остатков по себестоимости (FIFO).
+
+Для каждого товара с ненулевым остатком: qty, value — сумма qty*cost по слоям,
+округлённая до копеек, avg_cost — value / qty, округлённая до копеек. Итог — сумма
+value по строкам.
+"""
+
+from ..costing import value_of
+from ..inventory import on_hand
+from ..money import D, fmt_money, fmt_qty, q2
+from ..textable import render as _render
+
+COLUMNS = [("sku", "Артикул"), ("name", "Наименование"), ("qty", "Остаток", "r"), ("avg_cost", "Ср. цена", "r"),
+           ("value", "Стоимость", "r")]
+
+
+def build(db, category=None):
+    rows = []
+    for sku in sorted(db.data["items"]):
+        item = db.data["items"][sku]
+        if category and item.get("category") != category:
+            continue
+        qty = on_hand(db, sku)
+        if qty == 0:
+            continue
+        value = q2(value_of(db, sku))
+        rows.append({"sku": sku, "name": item["name"], "qty": qty, "avg_cost": q2(value / qty), "value": value})
+    return rows
+
+
+def total(db, category=None):
+    return sum((r["value"] for r in build(db, category=category)), D(0))
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, **opts)
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, qty=fmt_qty(r["qty"]), avg_cost=fmt_money(r["avg_cost"]), value=fmt_money(r["value"]))
+            for r in rows]
+    foot = "Итого: %s" % fmt_money(sum((r["value"] for r in rows), D(0)))
+    return _render(COLUMNS, view, "text", title="Оценка остатков", footer=foot)

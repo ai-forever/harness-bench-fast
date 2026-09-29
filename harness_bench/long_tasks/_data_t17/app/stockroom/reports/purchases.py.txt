@@ -1,0 +1,29 @@
+# -*- coding: utf-8 -*-
+"""Закупки по поставщикам за период: число приходов и сумма (сторнированные не учитываются)."""
+
+from ..money import D, fmt_money
+from ..receiving import receipts_between
+from ..textable import render as _render
+
+COLUMNS = [("supplier", "Поставщик"), ("name", "Наименование"), ("docs", "Приходов", "r"), ("total", "Сумма", "r")]
+
+
+def build(db, date_from=None, date_to=None):
+    acc = {}
+    for doc in receipts_between(db, date_from, date_to):
+        a = acc.setdefault(doc["supplier"], {"docs": 0, "total": D(0)})
+        a["docs"] += 1
+        a["total"] += D(doc["total"])
+    rows = []
+    for code in sorted(acc):
+        sup = db.data["suppliers"].get(code, {"name": "?"})
+        rows.append({"supplier": code, "name": sup["name"], "docs": acc[code]["docs"], "total": acc[code]["total"]})
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db, **opts)
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, total=fmt_money(r["total"])) for r in rows]
+    return _render(COLUMNS, view, "text", title="Закупки по поставщикам")

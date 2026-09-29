@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+"""Неотгруженные заказы: покупатель, дата, сумма с НДС, хватает ли остатка
+(с учётом того, что более ранние заказы отгружаются первыми)."""
+
+from ..inventory import on_hand
+from ..money import D, fmt_money
+from ..pricing import order_amounts
+from ..textable import render as _render
+
+COLUMNS = [("id", "Заказ"), ("date", "Дата"), ("customer", "Покупатель"), ("total", "Сумма", "r"),
+           ("ready", "Можно отгрузить")]
+
+
+def build(db):
+    left = {}
+    rows = []
+    for doc in sorted(db.documents_of("order"), key=lambda d: (d["date"], d["id"])):
+        if doc.get("status") != "new":
+            continue
+        ready = True
+        for line in doc["lines"]:
+            have = left.get(line["sku"], on_hand(db, line["sku"]))
+            if have < D(line["qty"]):
+                ready = False
+        if ready:
+            for line in doc["lines"]:
+                left[line["sku"]] = left.get(line["sku"], on_hand(db, line["sku"])) - D(line["qty"])
+        rows.append({"id": doc["id"], "date": doc["date"], "customer": doc["customer"],
+                     "total": order_amounts(db, doc)["total"], "ready": ready})
+    return rows
+
+
+def render(db, fmt="text", **opts):
+    rows = build(db)
+    if fmt == "csv":
+        return _render(COLUMNS, rows, "csv")
+    view = [dict(r, total=fmt_money(r["total"])) for r in rows]
+    return _render(COLUMNS, view, "text", title="Неотгруженные заказы")

@@ -1,0 +1,141 @@
+# -*- coding: utf-8 -*-
+import unittest
+
+from helpers import make_db
+from stockroom import adjustments, costing, inventory, orders, partners, pricing, returns
+from stockroom.errors import DocumentStateError, InsufficientStock, NotFound, ValidationError
+from stockroom.money import D
+
+
+class OrdersTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+
+    def test_create_merges_same_sku(self):
+        doc = orders.create_order(self.db, "C1", "2024-03-06", ["MILK:2", "BREAD:1", "milk:3"])
+        self.assertEqual(doc["id"], "S-0001")
+        self.assertEqual(doc["status"], "new")
+        self.assertEqual(doc["lines"], [{"sku": "MILK", "qty": "5"}, {"sku": "BREAD", "qty": "1"}])
+        self.assertEqual(inventory.reserved(self.db, "MILK"), D(5))
+        self.assertEqual(inventory.available(self.db, "MILK"), D(45))
+
+    def test_blocked_customer_and_bad_lines(self):
+        partners.update_customer(self.db, "C3", blocked=True)
+        with self.assertRaises(ValidationError):
+            orders.create_order(self.db, "C3", "2024-03-06", ["MILK:1"])
+        with self.assertRaises(ValidationError):
+            orders.create_order(self.db, "C1", "2024-03-06", ["MILK=1"])
+        with self.assertRaises(NotFound):
+            orders.create_order(self.db, "C1", "2024-03-06", ["NOPE:1"])
+
+    def test_ship_takes_oldest_layers(self):
+        doc = orders.create_order(self.db, "C1", "2024-03-06", ["MILK:35"])
+        orders.ship_order(self.db, doc["id"], "2024-03-07")
+        self.assertEqual(doc["status"], "shipped")
+        self.assertEqual(doc["shipped_date"], "2024-03-07")
+        alloc = doc["lines"][0]["allocations"]
+        self.assertEqual([(a["doc"], a["qty"], a["cost"]) for a in alloc], [("R-0001", "30", "55.00"),
+                                                                            ("R-0002", "5", "58.00")])
+        out = [m for m in self.db.data["movements"] if m["type"] == "out"]
+        self.assertEqual(out[0]["cost"], "1940.00")
+        self.assertEqual(inventory.on_hand(self.db, "MILK"), D(15))
+        self.assertEqual(orders.shipped_cost(doc), D("1940.00"))
+        self.assertEqual(self.db.check_integrity(), [])
+
+    def test_ship_is_all_or_nothing(self):
+        doc = orders.create_order(self.db, "C1", "2024-03-06", ["BREAD:5", "MILK:51"])
+        with self.assertRaises(InsufficientStock) as ctx:
+            orders.ship_order(self.db, doc["id"], "2024-03-07")
+        self.assertEqual(ctx.exception.sku, "MILK")
+        self.assertEqual(inventory.on_hand(self.db, "BREAD"), D(40))
+        self.assertEqual(doc["status"], "new")
+
+    def test_state_rules(self):
+        doc = orders.create_order(self.db, "C1", "2024-03-06", ["BREAD:1"])
+        with self.assertRaises(ValidationError):
+            orders.ship_order(self.db, doc["id"], "2024-03-05")
+        orders.cancel_order(self.db, doc["id"])
+        with self.assertRaises(DocumentStateError):
+            orders.ship_order(self.db, doc["id"], "2024-03-07")
+        with self.assertRaises(DocumentStateError):
+            orders.cancel_order(self.db, doc["id"])
+
+    def test_list_orders(self):
+        a = orders.create_order(self.db, "C1", "2024-03-06", ["BREAD:1"])
+        b = orders.create_order(self.db, "C2", "2024-03-08", ["BREAD:1"])
+        orders.ship_order(self.db, b["id"], "2024-03-08")
+        self.assertEqual([d["id"] for d in orders.list_orders(self.db)], [a["id"], b["id"]])
+        self.assertEqual([d["id"] for d in orders.list_orders(self.db, status="shipped")], [b["id"]])
+        self.assertEqual([d["id"] for d in orders.list_orders(self.db, date_to="2024-03-07")], [a["id"]])
+
+
+class ReturnsTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+        self.order = orders.create_order(self.db, "C2", "2024-03-06", ["MILK:35", "TEA:12"])
+        orders.ship_order(self.db, self.order["id"], "2024-03-07")
+
+    def test_full_return_restores_stock_and_layers(self):
+        doc = returns.return_order(self.db, self.order["id"], "2024-03-09", reason="брак упаковки")
+        self.assertEqual(doc["id"], "RT-0001")
+        self.assertEqual(self.order["status"], "returned")
+        self.assertEqual(self.order["return_doc"], "RT-0001")
+        self.assertEqual(inventory.on_hand(self.db, "MILK"), D(50))
+        self.assertEqual([(l["doc"], l["qty"]) for l in costing.layers_for(self.db, "MILK")],
+                         [("R-0001", "30"), ("R-0002", "20")])
+        self.assertEqual(doc["lines"][0], {"sku": "MILK", "qty": "35", "cost": "1940.00"})
+        self.assertEqual(self.db.check_integrity(), [])
+
+    def test_refund_equals_order_total(self):
+        doc = returns.return_order(self.db, self.order["id"], "2024-03-09")
+        self.assertEqual(D(doc["amount"]), pricing.order_total(self.db, self.order["id"]))
+        self.assertEqual(returns.returns_for(self.db, self.order["id"]), [doc])
+
+    def test_return_rules(self):
+        with self.assertRaises(DocumentStateError):
+            returns.return_order(self.db, self.order["id"], "2024-03-06")
+        returns.return_order(self.db, self.order["id"], "2024-03-09")
+        with self.assertRaises(DocumentStateError):
+            returns.return_order(self.db, self.order["id"], "2024-03-10")
+        fresh = orders.create_order(self.db, "C1", "2024-03-10", ["BREAD:1"])
+        with self.assertRaises(DocumentStateError):
+            returns.return_order(self.db, fresh["id"], "2024-03-11")
+
+
+class AdjustmentsTest(unittest.TestCase):
+    def setUp(self):
+        self.db = make_db()
+
+    def test_shortage_is_written_off_fifo(self):
+        doc = adjustments.adjust_count(self.db, "MILK", 45, "2024-03-10", reason="пересчёт")
+        self.assertEqual((doc["before"], doc["after"], doc["diff"]), ("50", "45", "-5"))
+        self.assertEqual(doc["cost"], "-275.00")
+        self.assertEqual(costing.layers_for(self.db, "MILK")[0]["qty"], "25")
+        mv = self.db.data["movements"][-1]
+        self.assertEqual((mv["type"], mv["qty"], mv["doc"]), ("adjust", "-5", "ADJ-0001"))
+
+    def test_surplus_uses_last_cost(self):
+        doc = adjustments.adjust_count(self.db, "MILK", 52, "2024-03-10")
+        self.assertEqual(doc["cost"], "116.00")
+        last = costing.layers_for(self.db, "MILK")[-1]
+        self.assertEqual((last["doc"], last["qty"], last["cost"]), ("ADJ-0001", "2", "58.00"))
+        self.assertEqual(self.db.check_integrity(), [])
+
+    def test_no_difference_creates_document_without_movement(self):
+        before = len(self.db.data["movements"])
+        doc = adjustments.adjust_count(self.db, "BREAD", 40, "2024-03-10")
+        self.assertEqual(doc["diff"], "0")
+        self.assertEqual(len(self.db.data["movements"]), before)
+
+    def test_writeoff(self):
+        doc = adjustments.writeoff(self.db, "SUGAR", "0.5", "2024-03-10", "порван мешок")
+        self.assertEqual(doc["cost"], "24.00")
+        self.assertEqual(inventory.on_hand(self.db, "SUGAR"), D(25))
+        with self.assertRaises(ValidationError):
+            adjustments.writeoff(self.db, "SUGAR", "1", "2024-03-10", " ")
+        with self.assertRaises(InsufficientStock):
+            adjustments.writeoff(self.db, "SUGAR", "26", "2024-03-10", "бой")
+
+
+if __name__ == "__main__":
+    unittest.main()

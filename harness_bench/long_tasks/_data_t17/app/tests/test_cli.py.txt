@@ -1,0 +1,130 @@
+# -*- coding: utf-8 -*-
+"""Сквозные проверки командной строки (запуск `python -m stockroom` в подпроцессе)."""
+
+import csv
+import io
+import os
+import shutil
+import tempfile
+import unittest
+
+from helpers import make_db, run_cli, save_db
+
+
+class CliBasicsTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.path = os.path.join(self.tmp, "cli.json")
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def test_init_and_items(self):
+        rc, out, err = run_cli(self.path, "init", "--company", "ООО «Тест»")
+        self.assertEqual(rc, 0, err)
+        rc, out, _ = run_cli(self.path, "item", "add", "cocoa", "Какао", "--price", "310", "--vat", "20")
+        self.assertEqual(out.strip(), "Добавлен товар COCOA")
+        rc, out, _ = run_cli(self.path, "--format", "csv", "item", "list")
+        self.assertEqual(out.splitlines()[0], "sku,name,unit,price,vat,category,active")
+        self.assertIn("COCOA,Какао,шт,310.00,20,,да", out.splitlines())
+
+    def test_errors_exit_with_code_2(self):
+        rc, out, err = run_cli(self.path, "item", "list")
+        self.assertEqual(rc, 2)
+        self.assertTrue(err.startswith("ошибка: файл базы не найден"))
+        run_cli(self.path, "init", "--company", "Т")
+        rc, _, err = run_cli(self.path, "item", "show", "NOPE")
+        self.assertEqual((rc, err.strip()), (2, "ошибка: нет товара NOPE"))
+
+    def test_db_from_environment(self):
+        env_path = os.path.join(self.tmp, "env.json")
+        save_db(make_db(), self.tmp)
+        os.replace(os.path.join(self.tmp, "stock.json"), env_path)
+        old = os.environ.get("STOCKROOM_DB")
+        try:
+            from stockroom import config
+
+            self.assertEqual(config.db_path(None), old or config.DEFAULT_DB_PATH)
+            os.environ["STOCKROOM_DB"] = env_path
+            self.assertEqual(config.db_path(None), env_path)
+            self.assertEqual(config.db_path("x.json"), "x.json")
+        finally:
+            if old is None:
+                os.environ.pop("STOCKROOM_DB", None)
+            else:
+                os.environ["STOCKROOM_DB"] = old
+
+
+class CliFlowTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.path = save_db(make_db(), self.tmp)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp)
+
+    def cli(self, *args):
+        rc, out, err = run_cli(self.path, *args)
+        self.assertEqual(rc, 0, err)
+        return out
+
+    def test_receive_order_ship_invoice_return(self):
+        out = self.cli("receive", "--supplier", "SUP1", "--date", "2024-03-10", "BREAD:10@29", "MILK:5@57,5")
+        self.assertEqual(out.strip(), "Приход R-0003 проведён: строк 2, сумма 577,50")
+        self.assertEqual(self.cli("order", "create", "--customer", "C2", "--date", "2024-03-11", "MILK:12",
+                                  "TEA:10").strip(), "Заказ S-0001 создан")
+        self.assertEqual(self.cli("order", "ship", "S-0001", "--date", "2024-03-12").strip(), "Заказ S-0001 отгружен")
+        invoice = self.cli("invoice", "S-0001")
+        self.assertIn("Всего к оплате: 4 426,03", invoice)
+        show = self.cli("order", "show", "S-0001")
+        self.assertIn("Статус: отгружен", show)
+        self.assertIn("Сумма с НДС: 4 426,03", show)
+        out = self.cli("return", "S-0001", "--date", "2024-03-15")
+        self.assertEqual(out.strip(), "Возврат RT-0001 по заказу S-0001 оформлен, к возврату 4 426,03")
+        rc, _, err = run_cli(self.path, "return", "S-0001", "--date", "2024-03-16")
+        self.assertEqual(rc, 2)
+        self.assertIn("уже возвращён", err)
+
+    def test_insufficient_stock_message(self):
+        self.cli("order", "create", "--customer", "C1", "--date", "2024-03-11", "SUGAR:30")
+        rc, _, err = run_cli(self.path, "order", "ship", "S-0001", "--date", "2024-03-11")
+        self.assertEqual(rc, 2)
+        self.assertEqual(err.strip(), "ошибка: недостаточно остатка SUGAR: нужно 30, есть 25.5")
+
+    def test_reports_csv(self):
+        out = self.cli("--format", "csv", "report", "stock")
+        rows = list(csv.DictReader(io.StringIO(out)))
+        self.assertEqual([r["sku"] for r in rows], ["BREAD", "MILK", "SUGAR", "TEA"])
+        self.assertEqual(rows[2]["qty"], "25.5")
+        out = self.cli("--format", "csv", "report", "movements", "--sku", "MILK")
+        self.assertEqual(len(out.strip().splitlines()), 3)
+        rc, _, err = run_cli(self.path, "report", "turnover")
+        self.assertEqual(rc, 2)
+
+    def test_adjust_writeoff_and_check(self):
+        out = self.cli("adjust", "MILK", "--count", "48", "--date", "2024-03-10", "--reason", "пересчёт")
+        self.assertEqual(out.strip(), "Инвентаризация ADJ-0001: MILK было 50, стало 48")
+        out = self.cli("writeoff", "SUGAR", "0,5", "--date", "2024-03-10", "--reason", "мешок")
+        self.assertEqual(out.strip(), "Списание WO-0001: SUGAR 0,5, себестоимость 24,00")
+        self.assertEqual(self.cli("check").strip(), "Нарушений нет")
+
+    def test_purchase_order_and_payments(self):
+        out = self.cli("po", "create", "--supplier", "SUP2", "--date", "2024-03-10", "TEA:20@205")
+        self.assertEqual(out.strip(), "Заказ поставщику PO-0001 создан на сумму 4 100,00")
+        out = self.cli("po", "receive", "PO-0001", "TEA:5", "--date", "2024-03-11")
+        self.assertIn("статус заказа: open", out)
+        self.cli("order", "create", "--customer", "C1", "--date", "2024-03-11", "BREAD:2")
+        self.cli("order", "ship", "S-0001", "--date", "2024-03-11")
+        self.assertEqual(self.cli("payment", "C1", "50", "--date", "2024-03-12").strip(), "Оплата PAY-0001 от C1: 50,00")
+        self.assertEqual(self.cli("balance", "C1").strip(), "Долг C1 на сегодня: 49,00")
+
+    def test_stocktake_flow(self):
+        self.assertIn("позиций 1", self.cli("stocktake", "start", "TEA", "--date", "2024-03-10"))
+        self.cli("stocktake", "count", "TEA", "98")
+        self.assertEqual(self.cli("stocktake", "diff").strip(), "TEA: учёт 100, факт 98, разница -2")
+        self.assertEqual(self.cli("stocktake", "post", "--date", "2024-03-10").strip(),
+                         "Инвентаризация проведена, документов: 1")
+
+
+if __name__ == "__main__":
+    unittest.main()

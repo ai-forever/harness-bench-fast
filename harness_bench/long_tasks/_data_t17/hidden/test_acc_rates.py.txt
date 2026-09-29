@@ -1,0 +1,133 @@
+# -*- coding: utf-8 -*-
+import csv
+import io
+
+import pytest
+from acc_helpers import base_db, feature_db, run_cli, save
+
+from stockroom import catalog, costing, inventory, rates, receiving
+from stockroom.errors import RateMissing, StockError, ValidationError
+from stockroom.money import D
+from stockroom.reports import purchases, valuation
+
+
+def test_set_rate_storage_and_replace():
+    db = base_db()
+    assert rates.set_rate(db, "usd", "01.03.2024", "91.25") == D("91.2500")
+    rates.set_rate(db, "USD", "2024-02-01", "89.123456")
+    rates.set_rate(db, "USD", "2024-03-01", "91.3")
+    assert db.data["rates"]["USD"] == [{"date": "2024-02-01", "rate": "89.1235"},
+                                       {"date": "2024-03-01", "rate": "91.3000"}]
+
+
+@pytest.mark.parametrize("args", [("RUB", "2024-03-01", "1"), ("US", "2024-03-01", "90"),
+                                  ("USD", "2024-03-01", "0"), ("USD", "вчера", "90"), ("U5D", "2024-03-01", "9")])
+def test_set_rate_validation(args):
+    db = base_db()
+    with pytest.raises(ValidationError):
+        rates.set_rate(db, *args)
+
+
+def test_get_rate_rules():
+    db = feature_db()
+    assert rates.get_rate(db, "EUR", "2024-03-09") == D("98.1234")
+    assert rates.get_rate(db, "EUR", "2024-03-10") == D("101.5")
+    assert rates.get_rate(db, "eur", "2030-01-01") == D("101.5")
+    assert rates.get_rate(db, "EUR") == D("101.5")
+    assert rates.get_rate(db, "RUB", "1990-01-01") == D(1)
+    with pytest.raises(RateMissing):
+        rates.get_rate(db, "EUR", "2024-02-29")
+    with pytest.raises(RateMissing):
+        rates.get_rate(db, "CNY", "2024-03-10")
+    assert issubclass(RateMissing, StockError)
+    assert rates.convert(db, "7.10", "EUR", "2024-03-05") == D("696.68")
+    assert [(r["currency"], r["date"]) for r in rates.list_rates(db)] == [
+        ("EUR", "2024-03-01"), ("EUR", "2024-03-10"), ("USD", "2024-02-20"), ("USD", "2024-03-12")]
+    assert len(rates.list_rates(db, "USD")) == 2
+
+
+def test_new_database_and_items_have_currency():
+    db = base_db()
+    assert db.data["rates"] == {}
+    assert catalog.getItem(db, "MILK")["currency"] == "RUB"
+    with pytest.raises(ValidationError):
+        catalog.addItem(db, "X1", "Икс", "1", currency="EURO")
+
+
+def test_foreign_receipt_layer_and_document():
+    db = feature_db()
+    doc = db.data["documents"]["R-0004"]
+    assert doc["lines"] == [{"sku": "WINE", "qty": "12", "cost": "7.10"}]
+    assert (doc["currency"], doc["rate"], doc["total"], doc["total_cur"]) == ("EUR", "98.1234", "8360.16", "85.20")
+    layer = costing.layers_for(db, "WINE")[0]
+    assert (layer["cost"], layer["currency"], layer["cost_cur"], layer["lot"]) == ("696.68", "EUR", "7.10", "R-0004-1")
+    mv = [m for m in db.data["movements"] if m["doc"] == "R-0004"][0]
+    assert mv["cost"] == "8360.16"
+    assert "currency" not in db.data["documents"]["R-0003"]
+
+
+def test_foreign_receipt_totals_round_per_line():
+    db = feature_db()
+    doc = receiving.receive(db, "SUP2", "2024-03-12", ["LAMP:3@10.555", "LAMP:1@0.01"], currency="USD")
+    assert doc["total"] == str((D(3) * (D("10.555") * D("92.4")).quantize(D("0.01"))
+                                + (D("0.01") * D("92.4")).quantize(D("0.01"))).quantize(D("0.01")))
+    assert doc["total_cur"] == "31.68"
+    assert [r["total"] for r in purchases.build(db) if r["supplier"] == "SUP2"] == [
+        D("23384.00") + D("8360.16") + D(doc["total"])]
+
+
+def test_foreign_receipt_without_rate_changes_nothing():
+    db = feature_db()
+    with pytest.raises(RateMissing):
+        receiving.receive(db, "SUP2", "2024-03-01", ["LAMP:1@10"], currency="CNY")
+    with pytest.raises(RateMissing):
+        receiving.receive(db, "SUP2", "2024-02-19", ["LAMP:1@10"], currency="USD")
+    assert inventory.on_hand(db, "LAMP") == D(0)
+    assert "R-0005" not in db.data["documents"]
+
+
+def test_valuation_historical_and_revalued():
+    db = feature_db()
+    receiving.receive(db, "SUP2", "2024-03-12", ["LAMP:2@11"], currency="USD")
+    rows = {r["sku"]: r for r in valuation.build(db)}
+    assert rows["WINE"]["value"] == D("8360.16")
+    assert rows["LAMP"]["value"] == D("2032.80")
+    re = {r["sku"]: r for r in valuation.build(db, revalue="2024-03-10")}
+    assert re["WINE"]["value"] == D(12) * D("720.65")
+    assert re["WINE"]["avg_cost"] == D("720.65")
+    assert re["LAMP"]["value"] == D("1980.00")
+    assert re["MILK"]["value"] == rows["MILK"]["value"]
+    assert valuation.total(db, revalue="2024-03-10") == sum((r["value"] for r in re.values()), D(0))
+    with pytest.raises(RateMissing):
+        valuation.build(db, revalue="2024-02-01")
+
+
+def test_cli_rates(tmp_path):
+    path = save(base_db(), tmp_path)
+    rc, out, err = run_cli(path, "rate", "set", "usd", "2024-03-01", "91.25")
+    assert rc == 0, err
+    assert out.strip() == "Курс USD на 2024-03-01: 91,2500"
+    run_cli(path, "rate", "set", "USD", "2024-03-10", "92")
+    rc, out, err = run_cli(path, "rate", "show", "USD", "--date", "2024-03-05")
+    assert out.strip() == "Курс USD на 2024-03-05: 91,2500 (от 2024-03-01)"
+    rc, out, err = run_cli(path, "rate", "show", "USD")
+    assert out.strip() == "Курс USD на последнюю дату: 92,0000 (от 2024-03-10)"
+    rc, _, err = run_cli(path, "rate", "show", "USD", "--date", "2024-02-01")
+    assert rc == 2 and err.startswith("ошибка: ")
+    rc, out, err = run_cli(path, "--format", "csv", "rate", "list")
+    rows = list(csv.DictReader(io.StringIO(out)))
+    assert [(r["currency"], r["date"], r["rate"]) for r in rows] == [("USD", "2024-03-01", "91.2500"),
+                                                                     ("USD", "2024-03-10", "92.0000")]
+
+
+def test_cli_foreign_receipt_and_revalue(tmp_path):
+    path = save(feature_db(), tmp_path)
+    rc, out, err = run_cli(path, "receive", "--supplier", "SUP2", "--date", "2024-03-13", "--currency", "USD",
+                           "LAMP:2@11")
+    assert rc == 0, err
+    assert out.strip() == "Приход R-0005 проведён: строк 1, сумма 2 032,80 (22,00 USD)"
+    rc, out, err = run_cli(path, "--format", "csv", "report", "valuation", "--revalue", "2024-03-10")
+    assert rc == 0, err
+    rows = {r["sku"]: r for r in csv.DictReader(io.StringIO(out))}
+    assert rows["LAMP"]["value"] == "1980.00"
+    assert list(rows["LAMP"].keys()) == ["sku", "name", "qty", "avg_cost", "value"]
