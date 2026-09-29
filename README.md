@@ -6,10 +6,14 @@ Current task set: **411 tasks, `task-set v0.17.0`**. Tasks 392–411 are the lon
 
 | Harness | Profile | Model | Result | % | Long wave (392–411) | Steps | Tokens |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| deepagents | Anthropic | Claude Haiku 4.5 | 361/411 | 87.8% | 1/20 | 7,326 | 600,214,572 |
 | deepagents | GigaChat | GigaChat 3.5 432B-A28B (IFT) | 348/411 | 84.7% | 0/20 | 5,207 | 61,842,876 |
 | deepagents | GigaChat | GigaChat 3.5 Ultra Reasoning (PROM)¹ | 222/411 | 54.0% | 0/20 | 3,879 | 38,611,899 |
 
-Each row is one full run, measured 2026-09-29 with `deepagents-gigachat` **0.0.4** through
+Each row is one full run, measured 2026-09-29. Claude Haiku 4.5 ran through
+`run-openrouter` with the built-in `anthropic:claude-haiku-4-5` profile
+(`--harness-profile`, `--prompt-cache`, `--isolation none`, reasoning `default`); it solves
+one long-wave task (399). The GigaChat rows used `deepagents-gigachat` **0.0.4** through
 the native `run` command (`--concurrency 3`, default timeout and step limit; the long-wave
 floors apply). Model builds from the API responses: `GigaChat-3.5-432B-A28B:32.9.16.9`
 and `GigaChat-3.5-Ultra-Reasoning:3.5.16.9`; reasoning level `default`.
