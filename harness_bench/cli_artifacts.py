@@ -9,7 +9,7 @@ import re
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
-from tempfile import NamedTemporaryFile, mkdtemp
+from tempfile import mkdtemp, mkstemp
 
 CAS_MIN_BYTES = 1024 * 1024
 
@@ -25,30 +25,40 @@ def _copy_evidence(source: Path, destination: Path, objects: Path) -> dict | Non
         shutil.copyfile(source, destination)
         return None
     objects.mkdir(parents=True, exist_ok=True, mode=0o700)
-    with NamedTemporaryFile(prefix=".pending_", dir=objects) as temporary:
+    # A closed mkstemp file, not NamedTemporaryFile: Windows cannot reopen an
+    # open temporary file or delete a read-only one, so the pending copy is
+    # unlinked before the published object is made read-only.
+    handle, name = mkstemp(prefix=".pending_", dir=objects)
+    candidate = Path(name)
+    try:
         digest = hashlib.sha256()
         size = 0
-        with source.open("rb") as incoming:
+        with os.fdopen(handle, "wb") as temporary, source.open("rb") as incoming:
             while block := incoming.read(1024 * 1024):
                 temporary.write(block)
                 digest.update(block)
                 size += len(block)
-        temporary.flush()
-        os.fsync(temporary.fileno())
+            temporary.flush()
+            os.fsync(temporary.fileno())
         sha256 = digest.hexdigest()
-        candidate = Path(temporary.name)
         with candidate.open("rb") as copied:
             if hashlib.file_digest(copied, "sha256").hexdigest() != sha256:
                 raise OSError("evidence copy failed SHA256 verification")
-        candidate.chmod(0o444)
         obj = objects / sha256
         try:
             os.link(candidate, obj)
+            created = True
         except FileExistsError:
+            created = False
             with obj.open("rb") as existing:
                 if hashlib.file_digest(existing, "sha256").hexdigest() != sha256:
                     raise OSError(f"evidence content object failed SHA256 verification: {sha256}") from None
+        candidate.unlink()
+        if created:
+            obj.chmod(0o444)
         os.link(obj, destination)
+    finally:
+        candidate.unlink(missing_ok=True)
     return {"sha256": sha256, "bytes": size, "object": str(obj.relative_to(objects.parent))}
 
 TRACE_PATTERNS = (

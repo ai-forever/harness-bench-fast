@@ -83,7 +83,7 @@ def sandbox_argv(
     ]
     # Root needs host mount permissions for runtime paths owned by another UID.
     # Bubblewrap drops child capabilities and sets no_new_privs in both modes.
-    if os.geteuid() != 0:
+    if getattr(os, "geteuid", lambda: -1)() != 0:
         command += ["--unshare-user"]
     private_home = os.path.expanduser("~")
     command += [

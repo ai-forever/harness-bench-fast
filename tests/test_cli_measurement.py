@@ -172,6 +172,7 @@ def test_real_subprocess_timeout_retains_complete_drain(tmp_path):
     assert "before timeout" in exc.value.stdout
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="bwrap argv uses POSIX paths; isolation is Linux-only")
 def test_allowlist_has_no_host_root_and_keeps_runtime_under_private_home(monkeypatch, tmp_path):
     from harness_bench import cli_isolation
 
@@ -243,7 +244,7 @@ def test_failed_private_scratch_cleanup_preserves_primary_error(monkeypatch, tmp
     retained = []
 
     def failed_cleanup(path, **kwargs):
-        if str(path).split("/")[-1].startswith("hb_cli_private_"):
+        if Path(path).name.startswith("hb_cli_private_"):
             retained.append(path)
             raise OSError("cleanup denied")
         return real_cleanup(path, **kwargs)
