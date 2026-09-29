@@ -258,13 +258,14 @@ def build_agent(
     compact_at_tokens: int | None = None,
     prompt_cache: bool = False,
     no_subagents: bool = False,
+    responses_api: bool = False,
 ) -> Any:
     """Build the same model used by the standalone isolated worker."""
     _apply_internal_tagme_defaults()
     return _runtime_build_agent(workspace, api_key=_openrouter_api_key(), model_name=model_name,
         recursion_limit=recursion_limit, max_tokens=max_tokens, harness_profile=harness_profile,
         forward_reasoning_history=forward_reasoning_history, compact_at_tokens=compact_at_tokens,
-        prompt_cache=prompt_cache, no_subagents=no_subagents)
+        prompt_cache=prompt_cache, no_subagents=no_subagents, responses_api=responses_api)
 
 
 def run_task(
@@ -280,6 +281,7 @@ def run_task(
     compact_at_tokens: int | None = None,
     prompt_cache: bool = False,
     no_subagents: bool = False,
+    responses_api: bool = False,
 ) -> TaskRun:
     if transient_attempts < 1:
         raise ValueError("transient_attempts must be positive")
@@ -311,6 +313,7 @@ def run_task(
                     compact_at_tokens=compact_at_tokens,
                     prompt_cache=prompt_cache,
                     no_subagents=no_subagents,
+                    responses_api=responses_api,
                 )
                 invocation_result = invoke_agent_with_stats(
                     agent,
@@ -382,6 +385,7 @@ def run_all(
     compact_at_tokens: int | None = None,
     prompt_cache: bool = False,
     no_subagents: bool = False,
+    responses_api: bool = False,
     isolation: str = "none",
     runtime_paths: tuple[str, ...] = (),
     artifacts_root: Path | None = None,
@@ -403,7 +407,8 @@ def run_all(
             if value is not None:
                 command += [flag, str(value)]
         for flag, enabled in (("--forward-reasoning-history", forward_reasoning_history),
-                              ("--prompt-cache", prompt_cache), ("--no-subagents", no_subagents)):
+                              ("--prompt-cache", prompt_cache), ("--no-subagents", no_subagents),
+                              ("--responses-api", responses_api)):
             if enabled:
                 command.append(flag)
         # Exact worker source files only, plus interpreter/site-packages. No
@@ -455,6 +460,7 @@ def run_all(
                     compact_at_tokens=compact_at_tokens,
                     prompt_cache=prompt_cache,
                     no_subagents=no_subagents,
+                    responses_api=responses_api,
                 )
                 run = _mark_attempt(run, attempt, attempts)
                 results.append(run)
@@ -495,6 +501,7 @@ def run_all(
                 compact_at_tokens=compact_at_tokens,
                 prompt_cache=prompt_cache,
                 no_subagents=no_subagents,
+                responses_api=responses_api,
             ): (task, attempt)
             for task, attempt in pending_attempts
         }

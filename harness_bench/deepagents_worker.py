@@ -27,6 +27,7 @@ def main() -> int:
     parser.add_argument("--compact-at-tokens", type=int)
     parser.add_argument("--prompt-cache", action="store_true")
     parser.add_argument("--no-subagents", action="store_true")
+    parser.add_argument("--responses-api", action="store_true")
     parser.add_argument("prompt")
     args = parser.parse_args()
     stats = None
@@ -75,6 +76,7 @@ def main() -> int:
             compact_at_tokens=args.compact_at_tokens,
             prompt_cache=args.prompt_cache,
             no_subagents=args.no_subagents,
+            responses_api=args.responses_api,
         )
         callbacks = [Evidence()]
         if callback := stats.as_callback():

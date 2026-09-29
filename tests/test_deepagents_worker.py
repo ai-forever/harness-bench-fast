@@ -34,6 +34,7 @@ def test_isolated_route_preserves_model_configuration_and_exposes_only_runtime(m
         compact_at_tokens=100000,
         prompt_cache=True,
         no_subagents=True,
+        responses_api=True,
         transient_attempts=5,
     )
     argv = shlex.split(captured["cli_command"])
@@ -41,7 +42,8 @@ def test_isolated_route_preserves_model_configuration_and_exposes_only_runtime(m
     assert argv[argv.index("--max-tokens") + 1] == "16384"
     assert argv[argv.index("--harness-profile") + 1] == "gigachat"
     assert all(
-        flag in argv for flag in ("--forward-reasoning-history", "--prompt-cache", "--no-subagents")
+        flag in argv
+        for flag in ("--forward-reasoning-history", "--prompt-cache", "--no-subagents", "--responses-api")
     )
     assert captured["transient_retries"] == 4
     paths = captured["runtime_paths"]
@@ -114,3 +116,31 @@ def test_explicit_reasoning_effort_reaches_native_model(monkeypatch, tmp_path):
     monkeypatch.setenv("OPENROUTER_REASONING_EFFORT", "misspelled")
     with pytest.raises(ValueError, match="Unsupported OPENROUTER_REASONING_EFFORT"):
         openrouter_agent.build_agent(tmp_path, api_key="offline")
+
+
+def test_responses_api_moves_effort_into_encrypted_reasoning(monkeypatch, tmp_path):
+    import deepagents
+
+    from harness_bench import openrouter_agent
+
+    captured = {}
+
+    class Agent:
+        def with_config(self, config):
+            return self
+
+    def create(model, **kwargs):
+        captured["model"] = model
+        return Agent()
+
+    monkeypatch.setattr(deepagents, "create_deep_agent", create)
+    monkeypatch.setenv("OPENROUTER_REASONING_EFFORT", "high")
+    openrouter_agent.build_agent(tmp_path, api_key="offline", model_name="openai/gpt-6-luna", responses_api=True)
+    model = captured["model"]
+    assert model.use_responses_api is True
+    assert model.reasoning == {"effort": "high"} and model.reasoning_effort is None
+    assert model.store is False and model.include == ["reasoning.encrypted_content"]
+
+    openrouter_agent.build_agent(tmp_path, api_key="offline", model_name="z-ai/glm-5.3")
+    model = captured["model"]
+    assert not model.use_responses_api and model.reasoning_effort == "high"

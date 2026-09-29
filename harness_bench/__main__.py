@@ -199,6 +199,7 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         compact_at_tokens=args.compact_at_tokens,
         prompt_cache=args.prompt_cache,
         no_subagents=args.no_subagents,
+        responses_api=args.responses_api,
         isolation=args.isolation,
         runtime_paths=load_manifest(args.sandbox_manifest),
         artifacts_root=args.artifacts_dir,
@@ -587,6 +588,16 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "Disable deepagents' auto-added general-purpose subagent (no `task` "
             "tool), so the whole trajectory stays in one context."
+        ),
+    )
+    p_or.add_argument(
+        "--responses-api",
+        action="store_true",
+        help=(
+            "Call the model through the OpenAI Responses API instead of Chat "
+            "Completions, with reasoning items kept encrypted and replayed each "
+            "turn. Needed for models that reject reasoning_effort together "
+            "with tools on Chat Completions (e.g. openai/gpt-6-luna)."
         ),
     )
     _add_metric_args(p_or)

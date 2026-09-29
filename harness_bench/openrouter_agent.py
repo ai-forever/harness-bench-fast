@@ -209,6 +209,7 @@ def build_agent(
     compact_at_tokens: int | None = None,
     prompt_cache: bool = False,
     no_subagents: bool = False,
+    responses_api: bool = False,
 ) -> Any:
     """Build a stock `deepagents` agent backed by an OpenRouter model.
 
@@ -243,6 +244,21 @@ def build_agent(
         # OpenRouter-style gateways cache the growing prefix for Anthropic
         # models only when asked; this does not change what the model sees.
         model_kwargs["extra_body"] = {"cache_control": {"type": "ephemeral"}}
+    if responses_api:
+        # Some reasoning models (gpt-6-luna on 2026-09-29) reject any
+        # reasoning_effort except "none" together with function tools on Chat
+        # Completions, even when the field is omitted; the Responses API takes
+        # both. Reasoning items come back encrypted (store=False) and are
+        # replayed on every turn, which is how that API carries them forward,
+        # so --forward-reasoning-history does not apply here.
+        model_kwargs.update(
+            use_responses_api=True,
+            output_version="responses/v1",
+            store=False,
+            include=["reasoning.encrypted_content"],
+        )
+        if effort := model_kwargs.pop("reasoning_effort", None):
+            model_kwargs["reasoning"] = {"effort": effort}
     model = ReasoningAwareChatOpenAI(
         model=model_name,
         base_url=os.getenv("OPENROUTER_BASE_URL", DEFAULT_BASE_URL),

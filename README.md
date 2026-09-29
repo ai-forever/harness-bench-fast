@@ -538,6 +538,10 @@ Network access remains available for the configured model endpoint. Set
 `OPENROUTER_REASONING_EFFORT=medium` (or another model-supported level) to
 explicitly select reasoning effort for the native OpenRouter worker; retain
 `--forward-reasoning-history` when measuring reasoning models.
+Some models accept `reasoning_effort` together with tools only on the Responses
+API (on 2026-09-29 `openai/gpt-6-luna` rejected every level except `none` on Chat
+Completions); `--responses-api` switches the worker to it, sends the effort as
+`reasoning.effort` and replays the encrypted reasoning items on every turn.
 
 Both isolated runners save each execution under `RESULT.json.artifacts/` (or
 `--artifacts-dir DIR`): the prompt, stdout/stderr, execution metadata, and native
