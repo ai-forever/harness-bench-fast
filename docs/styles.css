@@ -616,3 +616,38 @@ h3 {
     justify-content: center;
   }
 }
+
+.history details > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+  list-style: none;
+}
+
+.history details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.history details > summary::after {
+  content: "Show";
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.history details[open] > summary::after {
+  content: "Hide";
+}
+
+.history .history-title {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.history details[open] > summary {
+  margin-bottom: 20px;
+}
