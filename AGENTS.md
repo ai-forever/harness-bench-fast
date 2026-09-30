@@ -39,9 +39,9 @@ Rules:
 
 ## GigaChat Models
 
-- For any GigaChat model, always state the stand (gateway) explicitly: PROM (production, `gigachat.sberdevices.ru`) or IFT (`gigachat.ift.sberdevices.ru`). The two stands can serve different model weights, so a GigaChat score is only meaningful with the stand named.
-- Use a `(PROM)` or `(IFT)` suffix on the model name in result tables and prose (e.g. `GigaChat-3-Ultra (IFT)`, `GigaChat-3-Ultra PROM`). Never report a bare `GigaChat-...` score without the stand.
-- Always record the exact model version too. The API returns it in the `model` field of every chat-completion response as `Name:Version` (e.g. `GigaChat-3-Ultra:32.3.18.5`). Capture that string when running a benchmark and report the version alongside the stand, since weights change between releases.
+- Distinguish production `(PROM)` and `(internal version)` in GigaChat result tables and prose. They can serve different weights, so the label is part of the measurement configuration.
+- Public documentation, the landing page and other public materials must use `(internal version)` for internal models and `xxxB` if a size placeholder is needed. Never expose internal stand names, gateway URLs, exact parameter counts or model identifiers that reveal those counts. Keep exact gateway and model identifiers only in private run artifacts for reproducibility.
+- Always record the exact model version too. The API returns it in the `model` field of every chat-completion response as `Name:Version` (e.g. `GigaChat-3-Ultra:32.3.18.5`). Capture that string in private run artifacts. In public reports, use the approved model label and build version, since weights change between releases.
 - Observed versions (as of 2026-06-22; re-check, they change):
-  - `GigaChat-3-Ultra` — `32.3.18.5` (PROM and IFT)
-  - `GigaChat-3-Lightning` — `32.4.16.3` (PROM and IFT)
+  - `GigaChat-3-Ultra` — `32.3.18.5` (PROM and internal version)
+  - `GigaChat-3-Lightning` — `32.4.16.3` (PROM and internal version)

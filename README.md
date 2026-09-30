@@ -10,7 +10,7 @@ Current task set: **411 tasks, `task-set v0.17.0`**. Tasks 392–411 are the lon
 | deepagents | none | GPT-6 Luna (high) | 390/411 | 94.9% | 12/20 | 9,822 | 360,640,300 |
 | deepagents | none | GLM-5.3 (high) | 389/411 | 94.6% | 14/20 | 8,031 | 1,005,651,882 |
 | deepagents | Anthropic | Claude Haiku 4.5 | 361/411 | 87.8% | 1/20 | 7,326 | 600,214,572 |
-| deepagents | GigaChat | GigaChat 3.5 432B-A28B (IFT) | 348/411 | 84.7% | 0/20 | 5,207 | 61,842,876 |
+| deepagents | GigaChat | GigaChat 3.5 xxxB (internal version) | 348/411 | 84.7% | 0/20 | 5,207 | 61,842,876 |
 | deepagents | GigaChat | GigaChat 3.5 Ultra Reasoning (PROM)¹ | 222/411 | 54.0% | 0/20 | 3,879 | 38,611,899 |
 
 Each row is one full run, measured 2026-09-29/30. DeepSeek V4.1 Flash
@@ -23,9 +23,9 @@ accepts reasoning with tools only there. Claude Haiku 4.5 ran through
 (`--harness-profile`, `--prompt-cache`, `--isolation none`, reasoning `default`); it solves
 one long-wave task (399). The GigaChat rows used `deepagents-gigachat` **0.0.4** through
 the native `run` command (`--concurrency 3`, default timeout and step limit; the long-wave
-floors apply). Model builds from the API responses: `GigaChat-3.5-432B-A28B:32.9.16.9`
+floors apply). Model builds: GigaChat 3.5 xxxB (internal version), `32.9.16.9`,
 and `GigaChat-3.5-Ultra-Reasoning:3.5.16.9`; reasoning level `default`.
-On tasks 1–391 the 432B run scores 348/391, in line with the six profile-0.0.4 runs
+On tasks 1–391 the internal-version run scores 348/391, in line with the six profile-0.0.4 runs
 on v0.16.0 below (352.8 ± 2.8). Neither GigaChat model solves a long-wave task: both
 return an incomplete result within minutes instead of reading the material.
 
@@ -47,11 +47,11 @@ profile applied: `GigaChat` = the `deepagents-gigachat` tuning profile,
 `Anthropic` = the Anthropic harness profile built into deepagents, `OpenAI` =
 the OpenAI harness profile built into deepagents, `none` = stock deepagents
 defaults, `—` = not applicable (non-deepagents harnesses).
-GigaChat rows are the IFT stand, build `32.9.23.6`.
+GigaChat rows use the internal version, build `32.9.23.6`.
 
 **Every `GigaChat`-profile row above was produced with `deepagents-gigachat`
 0.0.3.** The pin now installs **0.0.4**, which is a result-affecting change, so a
-fresh install no longer reproduces those rows. Measured on GigaChat 3.5 (IFT),
+fresh install no longer reproduces those rows. Measured on GigaChat 3.5 (internal version),
 k=4 per version with versions interleaved on one stand: 0.0.3 342.0/391 (87.5%,
 sd 3.9) against 0.0.4 **352.8/391 (90.2%**, sd 2.8 over 6 runs, steps 3,262,
 tokens 6,049,158) — **+10.8 tasks**, with every 0.0.4 run above every 0.0.3 run.
