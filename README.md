@@ -1,5 +1,7 @@
 # harness-bench
 
+[Live leaderboard and benchmark results](https://ai-forever.github.io/harness-bench-fast/)
+
 Current task set: **411 tasks, `task-set v0.17.0`**. Tasks 392–411 are the long-context wave. New runs are measured on this version.
 
 ## Results (task-set v0.17.0, 411 tasks)
@@ -9,8 +11,12 @@ Current task set: **411 tasks, `task-set v0.17.0`**. Tasks 392–411 are the lon
 | deepagents | none | DeepSeek V4.1 Flash (high) | 406/411 | 98.8% | 18/20 | 10,457 | 1,693,784,997 |
 | deepagents | none | GPT-6 Luna (high) | 390/411 | 94.9% | 12/20 | 9,822 | 360,640,300 |
 | deepagents | none | GLM-5.3 (high) | 389/411 | 94.6% | 14/20 | 8,031 | 1,005,651,882 |
+| mini-SWE-agent | — | GigaChat 3.5 Ultra Reasoning (PROM)² | 366/411 | 89.1% | 0/20 | 5,898 | 60,635,573 |
 | deepagents | Anthropic | Claude Haiku 4.5 | 361/411 | 87.8% | 1/20 | 7,326 | 600,214,572 |
 | deepagents | GigaChat | GigaChat 3.5 xxxB (internal version) | 348/411 | 84.7% | 0/20 | 5,207 | 61,842,876 |
+| pi-mono | — | GigaChat 3.5 xxxB (internal version)² | 316/411 | 76.9% | 0/20 | 5,027 | 331,507,322 |
+| pi-mono | — | GigaChat 3.5 Ultra Reasoning (PROM)² | 299/411 | 72.7% | 0/20 | 3,291 | 139,229,464 |
+| mini-SWE-agent | — | GigaChat 3.5 xxxB (internal version)² | 237/411 | 57.7% | 0/20 | 5,044 | 44,772,995 |
 | deepagents | GigaChat | GigaChat 3.5 Ultra Reasoning (PROM)¹ | 222/411 | 54.0% | 0/20 | 3,879 | 38,611,899 |
 
 Each row is one full run, measured 2026-09-29/30. DeepSeek V4.1 Flash
@@ -21,13 +27,12 @@ GLM with `--forward-reasoning-history`, GPT-6 Luna through `--responses-api` bec
 accepts reasoning with tools only there. Claude Haiku 4.5 ran through
 `run-openrouter` with the built-in `anthropic:claude-haiku-4-5` profile
 (`--harness-profile`, `--prompt-cache`, `--isolation none`, reasoning `default`); it solves
-one long-wave task (399). The GigaChat rows used `deepagents-gigachat` **0.0.4** through
+one long-wave task (399). The deepagents GigaChat rows used `deepagents-gigachat` **0.0.4** through
 the native `run` command (`--concurrency 3`, default timeout and step limit; the long-wave
 floors apply). Model builds: GigaChat 3.5 xxxB (internal version), `32.9.16.9`,
 and `GigaChat-3.5-Ultra-Reasoning:3.5.16.9`; reasoning level `default`.
 On tasks 1–391 the internal-version run scores 348/391, in line with the six profile-0.0.4 runs
-on v0.16.0 below (352.8 ± 2.8). Neither GigaChat model solves a long-wave task: both
-return an incomplete result within minutes instead of reading the material.
+on v0.16.0 below (352.8 ± 2.8). Neither GigaChat model solves a long-wave task in any of the listed harnesses.
 
 ¹ On PROM this model plans several parallel function calls, returns only one of them,
 and keeps all of them under `functions_state_id`; the next request with a single
@@ -36,6 +41,26 @@ results count` (88 of the first 294 tasks as-is). This row was measured with a w
 that omits `functions_state_id` from outgoing messages, after which no 422 occurred and
 the model issues the remaining calls one at a time. It measures the model under that
 workaround, not the stock client.
+
+² The four CLI runs were measured on 2026-09-30 with mini-SWE-agent **2.4.6**
+and pi-mono **0.73.1**, without a deepagents profile, in a Linux bwrap sandbox.
+Each covers all 411 tasks: concurrency 3, timeout 900 s (7200 s for the long
+wave), max_tokens 16,384 per response, no artificial CLI step cap. Model builds
+match the deepagents rows: internal version `32.9.16.9` with reasoning `default`;
+Ultra Reasoning PROM `3.5.16.9` with reasoning `medium` and reasoning-history
+replay. PROM uses the same state-ID workaround described above. These compare
+complete configurations: tools, isolation and budgets differ, and PROM reasoning
+also differs from its deepagents run. One run per setup; variation across repeats
+has not been measured.
+
+CLI steps and tokens were audited against native traces, including usage saved
+on service turns after mini-SWE format errors and completed responses before
+timeouts. Token counts are lower bounds for interrupted responses. The mini-SWE
+PROM score includes one verifier correction (task 253): a service trace in the
+workspace root was mistaken for a model-produced secret leak. Replaying the saved
+deterministic commands without model calls reproduced the original failure;
+moving only telemetry into an excluded dot-directory changed it to a pass
+(365 → 366). Raw results remain unchanged in private artifacts.
 
 ## Earlier results (task-set v0.16.0, 391 tasks)
 

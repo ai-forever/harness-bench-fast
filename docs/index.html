@@ -54,7 +54,7 @@
               <span class="label">tasks</span>
             </div>
             <div>
-              <span class="metric">6</span>
+              <span class="metric">10</span>
               <span class="label">runs listed</span>
             </div>
             <div>
@@ -120,11 +120,20 @@
             measured 2026-09-29/30. DeepSeek V4.1 Flash, GPT-6 Luna and GLM-5.3
             run on stock deepagents with reasoning effort high (GPT-6 Luna
             through the Responses API); Claude Haiku 4.5 with the built-in
-            Anthropic harness profile. GigaChat rows use
+            Anthropic harness profile. The deepagents GigaChat rows use
             <code>deepagents-gigachat</code> 0.0.4 through the native runner,
             builds 32.9.16.9 (xxxB, internal version) and 3.5.16.9 (Ultra Reasoning,
-            PROM); the Ultra Reasoning row was measured with a client
+            PROM); all Ultra Reasoning runs use a client
             workaround for a PROM function-calling defect (see the README).
+            The four GigaChat CLI runs use mini-SWE-agent 2.4.6 or pi-mono 0.73.1
+            in bwrap: reasoning default for the internal version, medium with
+            reasoning-history replay for PROM. Tools, isolation and budgets differ
+            between configurations; these are single runs, not a controlled
+            comparison of harnesses alone. CLI token counts were audited from
+            native traces and can undercount interrupted responses. The mini-SWE
+            PROM score includes one correction for service telemetry mistaken for
+            a secret leak; see the
+            <a href="https://github.com/ai-forever/harness-bench-fast#results-task-set-v0170-411-tasks">README audit notes</a>.
           </p>
         </div>
 
@@ -165,8 +174,20 @@
             <div class="meta">Long wave 14/20 · Steps 8,031 · Tokens 1,005,651,882</div>
           </article>
 
-          <article class="result-row" data-harness="deepagents" data-group="other">
+          <article class="result-row" data-harness="mini-SWE-agent" data-group="gigachat">
             <div class="rank">4</div>
+            <div class="who">
+              <h3>mini-SWE-agent</h3>
+              <p>GigaChat 3.5 Ultra Reasoning (PROM)</p>
+            </div>
+            <div class="score">366/411</div>
+            <div class="percent">89.1%</div>
+            <div class="bar"><span style="width: 89.1%"></span></div>
+            <div class="meta">Long wave 0/20 · Steps 5,898 · Tokens 60,635,573</div>
+          </article>
+
+          <article class="result-row" data-harness="deepagents" data-group="other">
+            <div class="rank">5</div>
             <div class="who">
               <h3>deepagents + Anthropic profile</h3>
               <p>Claude Haiku 4.5</p>
@@ -178,7 +199,7 @@
           </article>
 
           <article class="result-row" data-harness="deepagents" data-group="gigachat">
-            <div class="rank">5</div>
+            <div class="rank">6</div>
             <div class="who">
               <h3>deepagents + GigaChat profile</h3>
               <p>GigaChat 3.5 xxxB (internal version)</p>
@@ -189,8 +210,44 @@
             <div class="meta">Long wave 0/20 · Steps 5,207 · Tokens 61,842,876</div>
           </article>
 
+          <article class="result-row" data-harness="pi-mono" data-group="gigachat">
+            <div class="rank">7</div>
+            <div class="who">
+              <h3>pi-mono</h3>
+              <p>GigaChat 3.5 xxxB (internal version)</p>
+            </div>
+            <div class="score">316/411</div>
+            <div class="percent">76.9%</div>
+            <div class="bar"><span style="width: 76.9%"></span></div>
+            <div class="meta">Long wave 0/20 · Steps 5,027 · Tokens 331,507,322</div>
+          </article>
+
+          <article class="result-row" data-harness="pi-mono" data-group="gigachat">
+            <div class="rank">8</div>
+            <div class="who">
+              <h3>pi-mono</h3>
+              <p>GigaChat 3.5 Ultra Reasoning (PROM)</p>
+            </div>
+            <div class="score">299/411</div>
+            <div class="percent">72.7%</div>
+            <div class="bar"><span style="width: 72.7%"></span></div>
+            <div class="meta">Long wave 0/20 · Steps 3,291 · Tokens 139,229,464</div>
+          </article>
+
+          <article class="result-row" data-harness="mini-SWE-agent" data-group="gigachat">
+            <div class="rank">9</div>
+            <div class="who">
+              <h3>mini-SWE-agent</h3>
+              <p>GigaChat 3.5 xxxB (internal version)</p>
+            </div>
+            <div class="score">237/411</div>
+            <div class="percent">57.7%</div>
+            <div class="bar"><span style="width: 57.7%"></span></div>
+            <div class="meta">Long wave 0/20 · Steps 5,044 · Tokens 44,772,995</div>
+          </article>
+
           <article class="result-row" data-harness="deepagents" data-group="gigachat">
-            <div class="rank">6</div>
+            <div class="rank">10</div>
             <div class="who">
               <h3>deepagents + GigaChat profile</h3>
               <p>GigaChat 3.5 Ultra Reasoning (PROM, workaround)</p>
