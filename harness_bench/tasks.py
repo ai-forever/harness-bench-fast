@@ -21,6 +21,7 @@ from pathlib import Path
 
 from harness_bench.core import Task, VerifyResult
 from harness_bench.long_tasks import LONG_TASKS
+from harness_bench.reflect_tasks import REFLECT_TASKS
 from harness_bench.tasks_adversarial import ADVERSARIAL_TASKS
 from harness_bench.tasks_agentic import AGENTIC_TASKS
 from harness_bench.tasks_cli import CLI_TASKS
@@ -835,10 +836,13 @@ ALL_TASKS: list[Task] = [
     *LONG_TASKS,
 ]
 
-_TASK_INDEX: dict[str, Task] = {t.id: t for t in ALL_TASKS}
+# The reflection suite is selectable by id and `--suite reflect` but is not part
+# of the scored set, so task-set v0.17.0 is unchanged.
+_TASK_INDEX: dict[str, Task] = {t.id: t for t in (*ALL_TASKS, *REFLECT_TASKS)}
 
-# `long` selects the long-context wave (tasks 392-411) without the rest of the set.
-SUITES: dict[str, list[Task]] = {"default": ALL_TASKS, "long": LONG_TASKS}
+# `long` selects the long-context wave (tasks 392-411) without the rest of the set;
+# `reflect` selects the tool-reflection suite, which is outside the scored set.
+SUITES: dict[str, list[Task]] = {"default": ALL_TASKS, "long": LONG_TASKS, "reflect": REFLECT_TASKS}
 
 
 def get_task(task_id: str) -> Task:

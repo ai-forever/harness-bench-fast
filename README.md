@@ -536,6 +536,60 @@ others (task 404 did not in one of three runs).
 Result JSON gains `agent_peak_input_tokens`, `agent_compactions` and
 `agent_cost_usd` when observable.
 
+## Tool-reflection suite (`--suite reflect`, outside the scored set)
+
+Twenty tasks (`harness_bench/reflect_tasks/tNN_*.py`, ids `reflect_01_*` …
+`reflect_20_*`) in which the agent works a small stateful service through a closed
+client in `tools/<name>`, documented in `docs/<name>.md`. The service deviates from its
+documentation in ways that show up only in its responses: an ambiguous refusal for
+correct arguments (an order below a supplier minimum, an over-limit charge), an `"ok"`
+that did less than asked (a partial batch, a capped booking, a backordered line), a
+gateway timeout that did apply the write, an undocumented field or hint (`next_cursor`,
+`quota_remaining`, `--consistent`). Each task also has a mid-course surprise that
+invalidates the plan after the agent has acted (stock recounted, a card replaced, a fee
+tier changing), and a tight success condition. Following the documentation literally
+fails; reading what the tool returned and re-planning passes.
+
+The client journals every call with an HMAC chain; the verifier replays the journal
+through the same service from its initial state and checks the result, so editing the
+service's state files gains nothing. The suite is selected with `--suite reflect` (or by
+id) and is **not** part of `ALL_TASKS`: task-set v0.17.0 is unchanged. Each task floors
+the run at 1800 s and 400 steps.
+
+```bash
+# self-check without a model: untouched fails, gold passes, near misses fail,
+# the verifier ignores the state file and rejects an altered journal
+uv run python scripts/check_reflect_tasks.py
+uv run python -m harness_bench run-openrouter --suite reflect --attempts 2 --model <model>
+```
+
+Calibration, 2026-09-30, two attempts per task, `run-openrouter` in the bwrap sandbox
+(GigaChat: native `run` with `deepagents-gigachat` 0.0.4); passed attempts out of two:
+
+| task | GigaChat 3.5 xxxB (internal version) | gpt-oss-120b | Qwen3.6-35B-A3B | Claude Haiku 4.5 | DeepSeek V4.1 Flash (high) | GPT-6 Luna (high) | Claude Opus 5.5 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| reflect_01_supplier_minimum | 0/2 | 0/2 | 1/2 | 1/2 | 2/2 | 2/2 | 1/2 |
+| reflect_02_crm_pagination | 0/2 | 0/2 | 2/2 | 1/2 | 2/2 | 1/2 | 2/2 |
+| reflect_03_batch_partial | 0/2 | 0/2 | 2/2 | 2/2 | 2/2 | 2/2 | 2/2 |
+| reflect_04_api_throttle | 0/2 | 0/2 | 0/2 | 1/2 | 0/2 | 2/2 | 0/2 |
+| reflect_05_pay_units | 0/2 | 0/2 | 2/2 | 2/2 | 2/2 | 2/2 | 2/2 |
+| reflect_06_transfer_fees | 1/2 | 0/2 | 1/2 | 2/2 | 0/2 | 2/2 | 0/2 |
+| reflect_07_ticket_timeout_dupes | 0/2 | 0/2 | 1/2 | 1/2 | 2/2 | 2/2 | 2/2 |
+| reflect_08_storage_async_delete | 0/2 | 0/2 | 0/2 | 1/2 | 2/2 | 2/2 | 2/2 |
+| reflect_09_wiki_optimistic_lock | 0/2 | 0/2 | 0/2 | 0/2 | 2/2 | 1/2 | 2/2 |
+| reflect_10_catalog_case_search | 0/2 | 0/2 | 2/2 | 0/2 | 2/2 | 2/2 | 2/2 |
+| reflect_11_calendar_timezone | 0/2 | 0/2 | 2/2 | 0/2 | 0/2 | 0/2 | 2/2 |
+| reflect_12_rooms_duration_cap | 0/2 | 0/2 | 2/2 | 1/2 | 2/2 | 2/2 | 1/2 |
+| reflect_13_payments_split_limits | 0/2 | 0/2 | 2/2 | 0/2 | 2/2 | 2/2 | 2/2 |
+| reflect_14_shipping_weight_codes | 0/2 | 0/2 | 2/2 | 1/2 | 2/2 | 2/2 | 2/2 |
+| reflect_15_kv_eventual | 0/2 | 0/2 | 0/2 | 0/2 | 1/2 | 0/2 | 2/2 |
+| reflect_16_report_deprecated_flag | 0/2 | 0/2 | 0/2 | 1/2 | 2/2 | 1/2 | 2/2 |
+| reflect_17_geocode_quota | 0/2 | 0/2 | 2/2 | 0/2 | 2/2 | 1/2 | 1/2 |
+| reflect_18_mail_bounce | 0/2 | 0/2 | 1/2 | 0/2 | 2/2 | 2/2 | 2/2 |
+| reflect_19_orders_backorder | 0/2 | 0/2 | 0/2 | 1/2 | 0/2 | 1/2 | 1/2 |
+| reflect_20_admin_elevation | 0/2 | 0/2 | 0/2 | 0/2 | 1/2 | 2/2 | 0/2 |
+| **total** | **1/40** | **0/40** | **22/40** | **15/40** | **30/40** | **31/40** | **30/40** |
+
 ## Harbor export
 
 The repo can generate a local Harbor dataset without changing the native

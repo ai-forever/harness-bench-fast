@@ -804,7 +804,8 @@ def build_parser() -> argparse.ArgumentParser:
             help=(
                 "Task suite when no --task is given: 'default' is the scored "
                 "task set (411 tasks, v0.17.0), 'long' is only the long-context "
-                "wave inside it (tasks 392-411)."
+                "wave inside it (tasks 392-411), 'reflect' is the tool-reflection "
+                "suite outside the scored set."
             ),
         )
     for command in ("list", "run", "run-openrouter", "run-pure", "run-cli", "verify-gold", "export-harbor"):
