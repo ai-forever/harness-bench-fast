@@ -6,11 +6,19 @@ Current task set: **411 tasks, `task-set v0.17.0`**. Tasks 392–411 are the lon
 
 | Harness | Profile | Model | Result | % | Long wave (392–411) | Steps | Tokens |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| deepagents | none | DeepSeek V4.1 Flash (high) | 406/411 | 98.8% | 18/20 | 10,457 | 1,693,784,997 |
+| deepagents | none | GPT-6 Luna (high) | 390/411 | 94.9% | 12/20 | 9,822 | 360,640,300 |
+| deepagents | none | GLM-5.3 (high) | 389/411 | 94.6% | 14/20 | 8,031 | 1,005,651,882 |
 | deepagents | Anthropic | Claude Haiku 4.5 | 361/411 | 87.8% | 1/20 | 7,326 | 600,214,572 |
 | deepagents | GigaChat | GigaChat 3.5 432B-A28B (IFT) | 348/411 | 84.7% | 0/20 | 5,207 | 61,842,876 |
 | deepagents | GigaChat | GigaChat 3.5 Ultra Reasoning (PROM)¹ | 222/411 | 54.0% | 0/20 | 3,879 | 38,611,899 |
 
-Each row is one full run, measured 2026-09-29. Claude Haiku 4.5 ran through
+Each row is one full run, measured 2026-09-29/30. DeepSeek V4.1 Flash
+(`deepseek/deepseek-v4.1-flash`), GPT-6 Luna (`openai/gpt-6-luna`) and GLM-5.3
+(`z-ai/glm-5.3`) ran through `run-openrouter` with stock deepagents (no built-in profile
+exists for them), `OPENROUTER_REASONING_EFFORT=high` and `--isolation none`; DeepSeek and
+GLM with `--forward-reasoning-history`, GPT-6 Luna through `--responses-api` because it
+accepts reasoning with tools only there. Claude Haiku 4.5 ran through
 `run-openrouter` with the built-in `anthropic:claude-haiku-4-5` profile
 (`--harness-profile`, `--prompt-cache`, `--isolation none`, reasoning `default`); it solves
 one long-wave task (399). The GigaChat rows used `deepagents-gigachat` **0.0.4** through
