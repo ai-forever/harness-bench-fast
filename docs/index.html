@@ -272,14 +272,19 @@
             Results below use the full 391-task set (task-set v0.16.0). The
             current task set is v0.17.0 (411 tasks); these rows are not runs of
             it, and the v0.16.0 audit already made earlier scores incomparable.
-            One full run per harness + model setup is listed.
+            One full run per harness + model setup is listed (k=1). The 13 archived
+            benchmark-server runs were verified against their JSON artifacts on
+            2026-10-01; the separately recorded Pi run is also retained. This is
+            a verification date, not a measurement date. Different harnesses and
+            profiles measure complete configurations, not model weights alone.
+            Reasoning is default unless explicitly labelled; historical
+            artifacts do not establish the provider default.
             Filter by model group or a single harness; steps and tokens are
             shown only when the harness exposes them. GigaChat rows are the
             internal version, build 32.9.23.6; GigaChat-profile rows were measured
             with <code>deepagents-gigachat</code> 0.0.3 (see the README for
-            the result-affecting 0.0.4 pin change). Rows within ~3 points of
-            each other are a tie: a single mid-scale run carries ±1-2 pp of
-            sampling noise.
+            the result-affecting 0.0.4 pin change). One run per configuration does not establish repeatability or
+            the significance of small score differences.
           </p>
         </div>
 

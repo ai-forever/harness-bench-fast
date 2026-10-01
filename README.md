@@ -67,14 +67,20 @@ moving only telemetry into an excluded dot-directory changed it to a pass
 These runs are the full 391-task set. v0.17.0 adds twenty tasks, so a score here is not a score on the current set.
 `Steps` and `Tokens` are shown when the runner exposes them; `—` means the metric
 is absent from the run artifact, not that nothing was spent. Each row is one full
-run per harness + model setup. The `Profile` column shows the deepagents harness
+run per harness + model setup (**k=1**). The 13 archived v0.16.0 runs on the
+benchmark server were checked against their JSON artifacts on **2026-10-01**;
+the table also retains the separately recorded Pi run. This is the date of
+verification, not the date the runs were measured. Different harnesses and
+profiles measure complete configurations, not a controlled comparison of model
+weights. Reasoning level is `default` unless a row explicitly records another
+level; for historical artifacts this does not establish the provider default. The `Profile` column shows the deepagents harness
 profile applied: `GigaChat` = the `deepagents-gigachat` tuning profile,
 `Anthropic` = the Anthropic harness profile built into deepagents, `OpenAI` =
 the OpenAI harness profile built into deepagents, `none` = stock deepagents
 defaults, `—` = not applicable (non-deepagents harnesses).
 GigaChat rows use the internal version, build `32.9.23.6`.
 
-**Every `GigaChat`-profile row above was produced with `deepagents-gigachat`
+**Every `GigaChat`-profile row in the v0.16.0 table below was produced with `deepagents-gigachat`
 0.0.3.** The pin now installs **0.0.4**, which is a result-affecting change, so a
 fresh install no longer reproduces those rows. Measured on GigaChat 3.5 (internal version),
 k=4 per version with versions interleaved on one stand: 0.0.3 342.0/391 (87.5%,
