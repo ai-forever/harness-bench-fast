@@ -315,7 +315,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_06_transfer_fees",
+    id="task_417_transfer_fees",
     name="Pay out exact net amounts through a bank with hidden fees and a per-transfer cap",
     prompt=PROMPT,
     service=SERVICE,

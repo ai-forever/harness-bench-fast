@@ -62,6 +62,7 @@ TASK_WAVES: tuple[TaskWave, ...] = (
     TaskWave("tbench-lite", 352, 371),
     TaskWave("cli", 372, 391),
     TaskWave("long", 392, 411),
+    TaskWave("reflect", 412, 431),
 )
 
 
@@ -346,6 +347,22 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "long_NN_* so setup and gold do not move. Each task floors the "
             "runner at 7200 s and 3000 graph steps. A full run of this "
             "revision is not comparable with 0.16.0."
+        ),
+    ),
+    TaskSetRevision(
+        version="0.18.0",
+        introduced="2026-10-02",
+        total_tasks=431,
+        added_task_numbers=(412, 431),
+        modules=("reflect_tasks",),
+        notes=(
+            "Added the tool-reflection wave, tasks 412-431, previously selected "
+            "only via --suite reflect. Registry ids are now task_412_* through "
+            "task_431_*; earlier reflect_NN_* ids remain lookup aliases. "
+            "Fixed the IAM user-show command and history-based policy checks, "
+            "and wiki append placement in the presence of concurrent bot edits. "
+            "Each task floors the runner at 1800 s and 400 graph steps. "
+            "A full run of this revision is not comparable with 0.17.0."
         ),
     ),
 )

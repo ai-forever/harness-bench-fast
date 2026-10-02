@@ -312,7 +312,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_01_supplier_minimum",
+    id="task_412_supplier_minimum",
     name="Restock through a portal with pack pricing, hidden minimums and lead times",
     prompt=PROMPT,
     service=SERVICE,

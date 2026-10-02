@@ -388,7 +388,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_02_crm_pagination",
+    id="task_413_crm_pagination",
     name="Export and tag VIP customers from a CRM with silent paging and merged duplicates",
     prompt=PROMPT,
     service=SERVICE,

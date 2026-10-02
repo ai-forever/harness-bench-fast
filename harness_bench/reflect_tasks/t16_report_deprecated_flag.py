@@ -357,7 +357,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_16_report_deprecated_flag",
+    id="task_427_report_deprecated_flag",
     name="Export monthly CSV reports past a deprecated flag, a row cap and a stale cache",
     prompt=PROMPT,
     service=SERVICE,

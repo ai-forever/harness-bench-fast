@@ -9,14 +9,16 @@ import pytest
 from harness_bench.reflect_tasks import REFLECT_TASKS
 from harness_bench.reflect_tasks.common import JOURNAL_FILE, STATE_FILE
 from harness_bench.tasks import ALL_TASKS, SUITES, get_task
-from harness_bench.versioning import CURRENT_TASK_SET_REVISION
+from harness_bench.versioning import CURRENT_TASK_SET_REVISION, task_number
 
 
-def test_suite_is_selectable_but_outside_the_scored_set() -> None:
+def test_reflect_wave_is_tasks_412_to_431() -> None:
     ids = {task.id for task in REFLECT_TASKS}
-    assert ids and all(i.startswith("reflect_") for i in ids)
+    assert len(ids) == 20
+    assert [task_number(t.id) for t in REFLECT_TASKS] == list(range(412, 432))
     assert SUITES["reflect"] == REFLECT_TASKS
-    assert not ids & {task.id for task in ALL_TASKS}
+    assert ids <= {task.id for task in ALL_TASKS}
+    assert ALL_TASKS[411:431] == REFLECT_TASKS
     assert len(ALL_TASKS) == CURRENT_TASK_SET_REVISION.total_tasks
     assert all(get_task(i).id == i for i in ids)
 
@@ -38,3 +40,10 @@ def test_untouched_fails_gold_passes_and_journal_is_authoritative(task, tmp_path
     journal.write_text("\n".join([*lines[:-1], json.dumps(entry)]) + "\n", encoding="utf-8")
     result = task.verify(tmp_path)
     assert not result.passed and "altered" in result.message
+
+
+def test_pre_publication_ids_resolve_to_the_scored_tasks() -> None:
+    for task in REFLECT_TASKS:
+        number, suffix = task.id.removeprefix("task_").split("_", 1)
+        alias = f"reflect_{int(number) - 411:02d}_{suffix}"
+        assert get_task(alias) is task

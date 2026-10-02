@@ -95,9 +95,14 @@ def test_audit_revision_adds_no_tasks() -> None:
     assert audit.added_task_numbers == (0, 0)
 
 
-def test_long_wave_is_the_current_revision() -> None:
-    assert TASK_SET_VERSION == "0.17.0"
-    assert CURRENT_TASK_SET_REVISION.total_tasks == 411
-    assert CURRENT_TASK_SET_REVISION.added_task_numbers == (392, 411)
+def test_long_wave_keeps_its_original_revision() -> None:
     assert revision_for_task_id("task_392_manuscript_continuity").version == "0.17.0"
     assert revision_for_task_id("task_411_math_solutions_check").version == "0.17.0"
+
+
+def test_reflect_wave_is_the_current_revision() -> None:
+    assert TASK_SET_VERSION == "0.18.0"
+    assert CURRENT_TASK_SET_REVISION.total_tasks == 431
+    assert CURRENT_TASK_SET_REVISION.added_task_numbers == (412, 431)
+    assert revision_for_task_id("task_412_supplier_minimum").version == "0.18.0"
+    assert revision_for_task_id("task_431_admin_elevation").version == "0.18.0"

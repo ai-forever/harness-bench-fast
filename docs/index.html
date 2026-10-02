@@ -6,7 +6,7 @@
     <title>harness-bench results</title>
     <meta
       name="description"
-      content="harness-bench task-set v0.17.0 (411 tasks) results; earlier v0.16.0 results are kept as history."
+      content="harness-bench task-set v0.18.0 (431 tasks), including the new tool-reflection wave; v0.17.0 and earlier results are history."
     >
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -28,8 +28,8 @@
     <main>
       <section class="hero" aria-labelledby="title">
         <div class="hero-copy">
-          <p class="eyebrow">Current task set: v0.17.0</p>
-          <h1 id="title">411 mechanically verified coding-agent tasks</h1>
+          <p class="eyebrow">Current task set: v0.18.0</p>
+          <h1 id="title">431 mechanically verified agent tasks</h1>
           <p class="lead">
             A compact benchmark for comparing agent harnesses on file edits,
             data transforms, pytest bug fixes, memory discipline, synthetic
@@ -37,7 +37,9 @@
             adversarial / hostile-environment handling, CLI composition
             with bespoke tools whose <code>--help</code> must actually be read,
             and a long-context wave (tasks 392–411) that pushes the harness
-            through context compaction.
+            through context compaction, plus a tool-reflection wave (tasks 412–431)
+            that requires adapting to partial results, changing constraints,
+            and stateful service responses.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="#current">View results</a>
@@ -47,43 +49,14 @@
           </div>
         </div>
 
-        <div class="score-panel" aria-label="Benchmark summary">
+        <div class="score-panel" aria-label="Current benchmark summary">
           <div class="summary-grid">
-            <div>
-              <span class="metric">411</span>
-              <span class="label">tasks</span>
-            </div>
-            <div>
-              <span class="metric">10</span>
-              <span class="label">runs listed</span>
-            </div>
-            <div>
-              <span class="metric">6</span>
-              <span class="label">models</span>
-            </div>
-            <div>
-              <span class="metric">98.8%</span>
-              <span class="label">top score</span>
-            </div>
+            <div><span class="metric">431</span><span class="label">tasks</span></div>
+            <div><span class="metric">20</span><span class="label">new tool-reflection tasks</span></div>
+            <div><span class="metric">0</span><span class="label">full v0.18.0 runs published</span></div>
+            <div><span class="metric">v0.18.0</span><span class="label">task-set version</span></div>
           </div>
-
-          <div class="mini-bars" aria-label="Top score bars">
-            <div class="bar-row">
-              <span>deepagents / DeepSeek V4.1 Flash</span>
-              <strong>98.8%</strong>
-              <i style="--score: 98.8%"></i>
-            </div>
-            <div class="bar-row">
-              <span>deepagents / GPT-6 Luna</span>
-              <strong>94.9%</strong>
-              <i style="--score: 94.9%"></i>
-            </div>
-            <div class="bar-row">
-              <span>deepagents / GLM-5.3</span>
-              <strong>94.6%</strong>
-              <i style="--score: 94.6%"></i>
-            </div>
-          </div>
+          <p>Previous scores use 411 or fewer tasks. They are listed below as history.</p>
         </div>
       </section>
 
@@ -108,12 +81,28 @@
           <span class="strip-number">392-411</span>
           <span>Long-context wave: large reading workloads (novels, registers, mail, codebases, git history) with a 7200&nbsp;s / 3000-step floor, meant to drive context compaction</span>
         </div>
+        <div>
+          <span class="strip-number">412-431</span>
+          <span>Tool-reflection wave: stateful services with partial results, pagination, throttling, concurrent edits, async actions, and changing constraints. Every client call is recorded in a signed journal and replayed for verification.</span>
+        </div>
       </section>
 
-            <section class="section" id="current" aria-labelledby="current-title">
+      <section class="section" id="current" aria-labelledby="current-title">
         <div class="section-heading">
-          <p class="eyebrow">Current results, task-set v0.17.0</p>
-          <h2 id="current-title">Leaderboard: 411 tasks</h2>
+          <p class="eyebrow">Current task set, v0.18.0</p>
+          <h2 id="current-title">431 tasks, including 20 tool-reflection tasks</h2>
+          <p>No completed full 431-task runs are published yet. New runs include tasks 412–431;
+            the corrected wave is also available through <code>--suite reflect</code>.</p>
+          <p>Results from earlier task-set versions are historical and cannot be compared
+            directly with v0.18.0. The pre-publication reflect calibration also predates
+            the IAM and wiki fixes; it is retained in the README with its original labels.</p>
+        </div>
+      </section>
+
+      <section class="section history" id="history" aria-labelledby="history-title">
+        <div class="section-heading">
+          <p class="eyebrow">Historical results, task-set v0.17.0</p>
+          <h2 id="history-title">Earlier leaderboard: 411 tasks</h2>
           <p>
             Every run covers the full 411-task set, including the long-context
             wave (tasks 392–411). One full run per harness + model setup,
@@ -130,10 +119,12 @@
             reasoning-history replay for PROM. Tools, isolation and budgets differ
             between configurations; these are single runs, not a controlled
             comparison of harnesses alone. CLI token counts were audited from
-            native traces and can undercount interrupted responses. The mini-SWE
+            native traces and can undercount interrupted responses. Historical deepagents
+            token totals are runner telemetry that can overcount duplicated usage fields;
+            they are not independently verified cost estimates. The mini-SWE
             PROM score includes one correction for service telemetry mistaken for
             a secret leak; see the
-            <a href="https://github.com/ai-forever/harness-bench-fast#results-task-set-v0170-411-tasks">README audit notes</a>.
+            <a href="https://github.com/ai-forever/harness-bench-fast#historical-results-task-set-v0170-411-tasks">README audit notes</a>.
           </p>
         </div>
 
@@ -260,17 +251,17 @@
         </div>
       </section>
 
-            <section class="section history" id="history" aria-labelledby="history-title">
+            <section class="section history" id="history-v016" aria-labelledby="history-v016-title">
         <details>
           <summary>
             <span class="eyebrow">History</span>
-            <span class="history-title" id="history-title">Earlier results: task-set v0.16.0, 391 tasks</span>
+            <span class="history-title" id="history-v016-title">Earlier results: task-set v0.16.0, 391 tasks</span>
           </summary>
           <div id="leaderboard">
         <div class="section-heading">
           <p>
             Results below use the full 391-task set (task-set v0.16.0). The
-            current task set is v0.17.0 (411 tasks); these rows are not runs of
+            current task set is v0.18.0 (431 tasks); these rows are not runs of
             it, and the v0.16.0 audit already made earlier scores incomparable.
             One full run per harness + model setup is listed (k=1). The 13 archived
             benchmark-server runs were verified against their JSON artifacts on
@@ -499,7 +490,7 @@
     </main>
 
     <footer class="footer">
-      <span>harness-bench · task set v0.17.0 · earlier results under History</span>
+      <span>harness-bench · task set v0.18.0 · earlier results under History</span>
       <a href="https://github.com/ai-forever/harness-bench-fast">Source on GitHub</a>
     </footer>
 

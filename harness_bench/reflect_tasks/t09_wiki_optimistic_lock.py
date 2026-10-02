@@ -22,7 +22,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from harness_bench.reflect_tasks.common import PROMPT_RULES, Replay, Service, call, reflect_task
+from harness_bench.reflect_tasks.common import (
+    JOURNAL_FILE,
+    PROMPT_RULES,
+    Replay,
+    Service,
+    call,
+    reflect_task,
+)
 
 EDITS = {
     "onboarding": [
@@ -257,6 +264,19 @@ def _text(lines: list[str]) -> list[str]:
 
 def check(result: Replay, ws: Path) -> str | None:
     ns = SERVICE.namespace()
+    history = SERVICE.initial_state()
+    append_after = {name: 0 for name in EDITS}
+    # The signed journal has already been authenticated by replay(). Remember how
+    # much foreign text existed when each new line was first stored; later bot
+    # appends may legitimately follow our block in the final page.
+    for entry in (ws / JOURNAL_FILE).read_text(encoding="utf-8").splitlines():
+        record = json.loads(entry)
+        before = {name: set(_text(history["pages"][name]["lines"])) for name in EDITS}
+        ns["_dispatch"](history, record["argv"], ns["_IO"](recorded=record.get("files", {})))
+        for name, mine in EDITS.items():
+            page = history["pages"][name]
+            if any(line in _text(page["lines"]) and line not in before[name] for line in mine):
+                append_after[name] = max(append_after[name], len(_text(page["shadow"])))
     for name, page in result.state["pages"].items():
         final, shadow = _text(page["lines"]), _text(page["shadow"])
         mine = EDITS.get(name, [])
@@ -278,7 +298,7 @@ def check(result: Replay, ws: Path) -> str | None:
             if any(line in original and line not in shadow for line in rest):
                 return f"page {name}: another participant's edits were overwritten"
             return f"page {name} does not keep its existing text intact"
-        if start < len(_text(ns["PAGES"][name])):
+        if start < max(len(_text(ns["PAGES"][name])), append_after[name]):
             return f"page {name}: the lines were not appended after the existing text"
     return None
 
@@ -396,7 +416,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_09_wiki_optimistic_lock",
+    id="task_420_wiki_optimistic_lock",
     name="Append to wiki pages under optimistic locking, truncated reads and a concurrent bot",
     prompt=PROMPT,
     service=SERVICE,

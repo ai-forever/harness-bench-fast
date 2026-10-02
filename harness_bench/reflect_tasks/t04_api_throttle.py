@@ -255,7 +255,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_04_api_throttle",
+    id="task_415_api_throttle",
     name="Collect article metadata from a feed that throttles and relocates articles",
     prompt=PROMPT,
     service=SERVICE,

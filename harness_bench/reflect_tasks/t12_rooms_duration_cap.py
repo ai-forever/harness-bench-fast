@@ -495,7 +495,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_12_rooms_duration_cap",
+    id="task_423_rooms_duration_cap",
     name="Book long workshops when every reservation is silently capped at an hour",
     prompt=PROMPT,
     service=SERVICE,

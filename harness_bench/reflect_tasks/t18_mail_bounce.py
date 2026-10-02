@@ -399,7 +399,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_18_mail_bounce",
+    id="task_429_mail_bounce",
     name="Deliver a notice exactly once through a relay with async bounces and greylisting",
     prompt=PROMPT,
     service=SERVICE,

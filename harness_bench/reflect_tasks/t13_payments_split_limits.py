@@ -384,7 +384,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_13_payments_split_limits",
+    id="task_424_payments_split_limits",
     name="Collect payments under hidden per-transaction and daily card limits",
     prompt=PROMPT,
     service=SERVICE,

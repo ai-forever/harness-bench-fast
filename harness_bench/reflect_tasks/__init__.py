@@ -1,7 +1,7 @@
 """Tool-reflection suite: services that do not behave as documented.
 
-Twenty tasks, selected with ``--suite reflect`` and kept out of the scored
-``ALL_TASKS``. In each one a small stateful service, reached only through a
+Twenty tasks (412-431) in the scored ``ALL_TASKS`` (task-set v0.18.0),
+also selected with ``--suite reflect``. In each one a small stateful service, reached only through a
 closed client in ``tools/``, deviates from its documentation in ways that show
 up only in its responses: ambiguous refusals for correct arguments, an ``ok``
 that did less than asked, fields the documentation never mentions. The agent

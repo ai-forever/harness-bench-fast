@@ -384,7 +384,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_10_catalog_case_search",
+    id="task_421_catalog_case_search",
     name="Map messy product names to SKUs through a case-sensitive, paged catalog",
     prompt=PROMPT,
     service=SERVICE,
