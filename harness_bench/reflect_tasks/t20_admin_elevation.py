@@ -174,7 +174,7 @@ def _run(state, cmd, opts):
 
 
 def handle(state, words, opts, io):
-    cmd = " ".join(words[:2]) if words[:1] == ["group"] and len(words) > 1 else (words[0] if words else "")
+    cmd = " ".join(words[:2]) if words and words[0] in ("group", "user") and len(words) > 1 else (words[0] if words else "")
     if cmd == "elevate":
         reason = opts.get("reason")
         if not isinstance(reason, str) or len(reason.strip()) < 3:
@@ -252,6 +252,33 @@ PROMPT = """
 
 
 def check(result: Replay, ws: Path) -> str | None:
+    ns = SERVICE.namespace()
+    history = SERVICE.initial_state()
+    expected = _effective(USERS, GROUPS)
+    index, active = 0, False
+    for argv, _, _ in result.calls:
+        words, opts = ns["_parse"](argv)
+        cmd = " ".join(words[:2]) if words and words[0] in ("group", "user") else (words[0] if words else "")
+        before = _effective(history["users"], history["groups"])
+        _, code = ns["_dispatch"](history, argv, ns["_IO"](recorded={}))
+        if any(set(history["groups"][g]) != set(perms) for g, perms in GROUPS.items()):
+            return "group permissions were changed during the session"
+        if code != 0 or cmd not in ns["PRIVILEGED"]:
+            continue
+        after = _effective(history["users"], history["groups"])
+        # Inherited revokes and preparatory direct grants can leave effective
+        # rights unchanged. Order concerns logical changes, not command spelling.
+        if after == before:
+            continue
+        if index >= len(CHANGES) or opts.get("user") != CHANGES[index][1]:
+            return "the changes were not applied in changes.csv order"
+        if not active:
+            action, user, perm = CHANGES[index]
+            (expected[user].add if action == "grant" else expected[user].discard)(perm)
+            active = True
+        if after == expected:
+            index += 1
+            active = False
     state = result.state
     for group, perms in GROUPS.items():
         if sorted(state["groups"][group]) != sorted(perms):
@@ -264,6 +291,8 @@ def check(result: Replay, ws: Path) -> str | None:
             if extra:
                 return f"{user} still has {len(extra)} permission(s) the change list removes or never grants"
             return f"{user} lacks {len(missing)} permission(s) they should have"
+    if active or index != len(CHANGES):
+        return "the ordered change list was not completed"
     return None
 
 
@@ -380,7 +409,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_20_admin_elevation",
+    id="task_431_admin_elevation",
     name="Apply IAM changes through short elevation windows and group-inherited rights",
     prompt=PROMPT,
     service=SERVICE,

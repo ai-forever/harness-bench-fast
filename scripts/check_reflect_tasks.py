@@ -24,6 +24,7 @@ from pathlib import Path
 
 from harness_bench.reflect_tasks import _MODULES, REFLECT_TASKS
 from harness_bench.reflect_tasks.common import JOURNAL_FILE, STATE_FILE, replay
+from harness_bench.tasks import get_task
 
 
 def _digest(ws: Path) -> str:
@@ -38,7 +39,8 @@ def main() -> int:
     parser.add_argument("--task", action="append", help="task id (repeatable)")
     args = parser.parse_args()
     modules = {importlib.import_module(f"harness_bench.reflect_tasks.{name}").TASK.id: name for name in _MODULES}
-    tasks = [t for t in REFLECT_TASKS if not args.task or t.id in args.task]
+    selected = {get_task(task_id).id for task_id in args.task or []}
+    tasks = [t for t in REFLECT_TASKS if not selected or t.id in selected]
     failures = 0
     for task in tasks:
         module = importlib.import_module(f"harness_bench.reflect_tasks.{modules[task.id]}")

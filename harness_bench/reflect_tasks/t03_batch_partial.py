@@ -383,7 +383,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_03_batch_partial",
+    id="task_414_batch_partial",
     name="Apply stock adjustments through a batch endpoint that stops at the first bad row",
     prompt=PROMPT,
     service=SERVICE,

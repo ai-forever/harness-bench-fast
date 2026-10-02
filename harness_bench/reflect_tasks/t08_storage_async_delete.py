@@ -343,7 +343,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_08_storage_async_delete",
+    id="task_419_storage_async_delete",
     name="Delete old temporary objects through asynchronous, lock-aware delete jobs",
     prompt=PROMPT,
     service=SERVICE,

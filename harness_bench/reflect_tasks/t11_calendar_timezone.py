@@ -361,7 +361,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_11_calendar_timezone",
+    id="task_422_calendar_timezone",
     name="Book local-time meetings across a DST switch through a UTC-only, write-limited calendar",
     prompt=PROMPT,
     service=SERVICE,

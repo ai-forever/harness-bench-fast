@@ -326,7 +326,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_15_kv_eventual",
+    id="task_426_kv_eventual",
     name="Read-modify-write counters on a lagging replica with a concurrent writer",
     prompt=PROMPT,
     service=SERVICE,

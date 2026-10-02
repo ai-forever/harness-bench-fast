@@ -834,14 +834,17 @@ ALL_TASKS: list[Task] = [
     *TBENCH_LITE_TASKS,
     *CLI_TASKS,
     *LONG_TASKS,
+    *REFLECT_TASKS,
 ]
 
-# The reflection suite is selectable by id and `--suite reflect` but is not part
-# of the scored set, so task-set v0.17.0 is unchanged.
-_TASK_INDEX: dict[str, Task] = {t.id: t for t in (*ALL_TASKS, *REFLECT_TASKS)}
+# Canonical scored ids; retain the pre-publication reflection names as aliases.
+_TASK_INDEX: dict[str, Task] = {t.id: t for t in ALL_TASKS}
+_TASK_INDEX.update({
+    f"reflect_{int(t.id.split('_')[1]) - 411:02d}_{t.id.split('_', 2)[2]}": t
+    for t in REFLECT_TASKS
+})
 
-# `long` selects the long-context wave (tasks 392-411) without the rest of the set;
-# `reflect` selects the tool-reflection suite, which is outside the scored set.
+# These suites select waves already included in the default scored set.
 SUITES: dict[str, list[Task]] = {"default": ALL_TASKS, "long": LONG_TASKS, "reflect": REFLECT_TASKS}
 
 

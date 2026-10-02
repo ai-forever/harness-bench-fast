@@ -462,7 +462,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_14_shipping_weight_codes",
+    id="task_425_shipping_weight_codes",
     name="Ship orders under a hidden gross weight limit and soft address validation",
     prompt=PROMPT,
     service=SERVICE,

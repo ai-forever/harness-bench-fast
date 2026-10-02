@@ -405,7 +405,7 @@ NEAR_MISSES = [
 ]
 
 TASK = reflect_task(
-    id="reflect_07_ticket_timeout_dupes",
+    id="task_418_ticket_timeout_dupes",
     name="File tickets exactly once through a timing-out helpdesk with an undocumented priority set",
     prompt=PROMPT,
     service=SERVICE,

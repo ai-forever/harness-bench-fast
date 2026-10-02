@@ -2,9 +2,16 @@
 
 [Live leaderboard and benchmark results](https://ai-forever.github.io/harness-bench-fast/)
 
-Current task set: **411 tasks, `task-set v0.17.0`**. Tasks 392–411 are the long-context wave. New runs are measured on this version.
+Current task set: **431 tasks, `task-set v0.18.0`**. Tasks 392–411 are the long-context wave; tasks 412–431 are the tool-reflection wave. New full runs use this version.
 
-## Results (task-set v0.17.0, 411 tasks)
+## Results (task-set v0.18.0, 431 tasks)
+
+No completed full 431-task runs are published yet. Use a fresh result JSON path
+for v0.18.0; do not resume an older-version report into the new task set. The new tool-reflection wave is
+included in the default suite and can also be selected with `--suite reflect`.
+Earlier 411-task and 391-task results below are historical and are not scores on v0.18.0.
+
+## Historical results (task-set v0.17.0, 411 tasks)
 
 | Harness | Profile | Model | Result | % | Long wave (392–411) | Steps | Tokens |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -18,6 +25,11 @@ Current task set: **411 tasks, `task-set v0.17.0`**. Tasks 392–411 are the lon
 | pi-mono | — | GigaChat 3.5 Ultra Reasoning (PROM)² | 299/411 | 72.7% | 0/20 | 3,291 | 139,229,464 |
 | mini-SWE-agent | — | GigaChat 3.5 xxxB (internal version)² | 237/411 | 57.7% | 0/20 | 5,044 | 44,772,995 |
 | deepagents | GigaChat | GigaChat 3.5 Ultra Reasoning (PROM)¹ | 222/411 | 54.0% | 0/20 | 3,879 | 38,611,899 |
+
+Historical deepagents token totals are preserved as recorded by the runner.
+The collector can count duplicated usage fields more than once; these totals
+have not been independently recalculated and should not be treated as verified
+cost estimates. Pass/fail scores are unaffected.
 
 Each row is one full run, measured 2026-09-29/30. DeepSeek V4.1 Flash
 (`deepseek/deepseek-v4.1-flash`), GPT-6 Luna (`openai/gpt-6-luna`) and GLM-5.3
@@ -64,7 +76,7 @@ moving only telemetry into an excluded dot-directory changed it to a pass
 
 ## Earlier results (task-set v0.16.0, 391 tasks)
 
-These runs are the full 391-task set. v0.17.0 adds twenty tasks, so a score here is not a score on the current set.
+These runs are the full 391-task set. Later revisions add tasks, so a score here is not a score on the current set.
 `Steps` and `Tokens` are shown when the runner exposes them; `—` means the metric
 is absent from the run artifact, not that nothing was spent. Each row is one full
 run per harness + model setup (**k=1**). The 13 archived v0.16.0 runs on the
@@ -168,7 +180,7 @@ runs (317, 311, 308 passed), with Steps/Tokens as the mean of per-run sums.
 
 </details>
 
-A self-contained **411-task agent benchmark** (`task-set v0.17.0`) for evaluating LLM-backed
+A self-contained **431-task agent benchmark** (`task-set v0.18.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -205,14 +217,14 @@ uv venv && uv pip install -e ".[gigachat,openrouter]"
 # to the public profile.
 uv pip install -e ".[gigachat-profile]"
 
-# List all 411 tasks
+# List all 431 tasks
 uv run python -m harness_bench list
 
 # Any contiguous block of task numbers (inclusive; list, run*, verify-gold,
 # export-harbor), e.g. everything except the long-context wave:
 uv run python -m harness_bench run-openrouter --model deepseek/deepseek-v4-flash \
     --from-task 1 --to-task 391
-# A run over a subset is a partial run: it does not go into the 411-task table.
+# A run over a subset is a partial run: it does not go into the 431-task table.
 
 # Show the benchmark task-set version and revision history
 uv run python -m harness_bench version --check
@@ -379,7 +391,7 @@ uv run python -m harness_bench apply-gold \
 
 ## What's inside
 
-### Tasks (411 total, task-set v0.17.0)
+### Tasks (431 total, task-set v0.18.0)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -397,6 +409,7 @@ uv run python -m harness_bench apply-gold \
 | `tasks_tbench_lite.py` | 352–371 | calibrated Terminal-Bench-inspired workflows: multi-source joins, event reconstruction, parsers, config precedence, conflict resolution, package refactors, SQLite migration, deterministic manifests, and retry-aware aggregation. |
 | `tasks_cli.py` | 372–391 | CLI-composition wave. Thirteen tasks drive bespoke per-task tools (`logq`, `pktool`, `xtab`, `cfgctl`, `depwalk`, `slicer`) built so that reading `--help` is unavoidable: the surface is deliberately unconventional (a leading verb, `--src`/`--cap`/`--map`, mini-languages like `--span LO..HI` and `--pick level=ERROR,WARN`, `--shape` not `--format`), so a guessed invocation exits non-zero — and the semantics that decide the answer (exclusive bounds, nearest-rank percentiles, margins before normalisation, corrupt-record policy) appear only in the `--help` epilog. Two read binary or fixed-width payloads. Seven exercise POSIX tools (multi-key `sort`, `join -1/-2/-a/-e/-o`, `comm`, `grep -oE` with `uniq -c`, `find` predicates with `xargs -0`, `awk`, `sed` ranges): the agent writes `solve.sh` and the verifier deletes the artifact, runs the script, and rejects general-purpose interpreters. **Requires `bash` on `PATH`.** |
 | `long_tasks/` | 392–411 | Long-context wave. Twenty tasks that require reading a large body of material (a novel, an intranet, parish registers, mail, a codebase, git history, a text adventure, and so on) and that floor each run at 7200 s and 3000 steps, so a full-set run includes them. Select only this wave with `--suite long`. |
+| `reflect_tasks/` | 412–431 | Stateful tool-reflection wave: partial results, pagination, throttling, stale revisions, async deletion, inherited permissions, and mid-course changes visible in tool responses. Signed client journals are replayed by the verifier. Each task floors the runner at 1800 s and 400 steps. Select only this wave with `--suite reflect`. |
 
 Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
@@ -427,6 +440,7 @@ changes do not need a task-set bump.
 | `0.15.0` | 2026-07-27 | 372–391 | 391 | CLI-composition wave: bespoke tools (`logq`, `pktool`, `xtab`, `cfgctl`, `depwalk`, `slicer`) with a deliberately unguessable surface, so `--help` must be read before anything runs, plus POSIX pipeline tasks (`sort`, `join`, `comm`, `grep`/`uniq -c`, `find`/`xargs -0`, `awk`, `sed`) whose `solve.sh` the verifier executes |
 | `0.16.0` | 2026-07-28 | — | 391 | Audit pass over all 391 tasks: no tasks added or removed, but defects gold-verification cannot see were corrected — tasks winnable without work, prompts whose verifier rejected the work they described, requirements the verifier never checked (notably “do not edit the tests”), and platform/self-pollution issues. **Not score-comparable with v0.15.0.** |
 | `0.17.0` | 2026-09-26 | 392–411 | 411 | Long-context wave, promoted from the separate `--suite long` into the scored set. Registry ids are `task_392_*` … `task_411_*`; generator seeds and paraphrase fixtures stay on `long_NN_*`, so the tasks themselves did not change. Each task floors the runner at 7200 s and 3000 steps. **Not score-comparable with v0.16.0.** |
+| `0.18.0` | 2026-10-02 | 412–431 | 431 | Tool-reflection wave promoted into the scored set, with IAM command/policy and wiki append-position fixes. New ids are `task_412_*` … `task_431_*`; `reflect_NN_*` remain lookup aliases. Each task floors the runner at 1800 s and 400 steps. **Not score-comparable with v0.17.0 or pre-fix reflect calibration.** |
 
 ### Infrastructure
 
@@ -542,10 +556,10 @@ others (task 404 did not in one of three runs).
 Result JSON gains `agent_peak_input_tokens`, `agent_compactions` and
 `agent_cost_usd` when observable.
 
-## Tool-reflection suite (`--suite reflect`, outside the scored set)
+## Tool-reflection wave (tasks 412–431)
 
-Twenty tasks (`harness_bench/reflect_tasks/tNN_*.py`, ids `reflect_01_*` …
-`reflect_20_*`) in which the agent works a small stateful service through a closed
+Twenty tasks (`harness_bench/reflect_tasks/tNN_*.py`, ids `task_412_*` …
+`task_431_*`) in which the agent works a small stateful service through a closed
 client in `tools/<name>`, documented in `docs/<name>.md`. The service deviates from its
 documentation in ways that show up only in its responses: an ambiguous refusal for
 correct arguments (an order below a supplier minimum, an over-limit charge), an `"ok"`
@@ -559,8 +573,10 @@ fails; reading what the tool returned and re-planning passes.
 The client journals every call with an HMAC chain; the verifier replays the journal
 through the same service from its initial state and checks the result, so editing the
 service's state files gains nothing. The suite is selected with `--suite reflect` (or by
-id) and is **not** part of `ALL_TASKS`: task-set v0.17.0 is unchanged. Each task floors
-the run at 1800 s and 400 steps.
+id) and is part of `ALL_TASKS` as of task-set v0.18.0. The earlier `reflect_NN_*`
+ids remain aliases that resolve to the new scored ids. Each task floors the run at
+1800 s and 400 steps. Use `--to-task 411` to select only the previous task range;
+that is a partial run under the current task-set version.
 
 ```bash
 # self-check without a model: untouched fails, gold passes, near misses fail,
@@ -568,6 +584,12 @@ the run at 1800 s and 400 steps.
 uv run python scripts/check_reflect_tasks.py
 uv run python -m harness_bench run-openrouter --suite reflect --attempts 2 --model <model>
 ```
+
+### Historical pre-publication calibration
+
+The table below was measured before the October 2026 IAM and wiki fixes and retains
+its original `reflect_NN_*` labels. It is not a measurement of the corrected v0.18.0
+wave, and the old results must not be relabelled as new-version scores.
 
 Calibration, 2026-09-30, two attempts per task, `run-openrouter` in the bwrap sandbox
 (GigaChat: native `run` with `deepagents-gigachat` 0.0.4); passed attempts out of two:
@@ -673,9 +695,9 @@ with the isolated worker settings.
 
 ## Results
 
-The results tables are kept at the top of this README: the current task set
-v0.17.0 (411 tasks) first, then the earlier v0.16.0 (391 tasks) table, which is not
-comparable with it. Only one run per harness + model setup is
+The results tables are kept at the top of this README. The current task set is
+v0.18.0 (431 tasks); no full results are published yet. The v0.17.0 (411 tasks) and
+v0.16.0 (391 tasks) tables are historical and are not comparable with the current set. Only one run per harness + model setup is
 listed; superseded and older-task-set runs are not carried over (the last
 v0.13.0 table is kept in a collapsed section for reference only).
 
