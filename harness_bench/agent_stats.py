@@ -139,6 +139,7 @@ class AgentRunStatsCollector:
         self.stats: dict[str, int] = {}
         self.peak_input_tokens = 0
         self.cost_usd: float | None = None
+        self._endpoint_errors: list[BaseException] = []
 
     def as_callback(self) -> Any:
         try:
@@ -149,6 +150,10 @@ class AgentRunStatsCollector:
         outer = self
 
         class _Handler(BaseCallbackHandler):
+            def on_llm_error(self, error: BaseException, **_kwargs: Any) -> None:
+                if _is_endpoint_unavailable(error):
+                    outer._endpoint_errors.append(error)
+
             def on_llm_end(self, response: Any, **_kwargs: Any) -> None:
                 outer.stats["agent_llm_calls"] = outer.stats.get("agent_llm_calls", 0) + 1
                 usages: list[Any] = []
@@ -167,6 +172,16 @@ class AgentRunStatsCollector:
                 outer._observe_call(usages)
 
         return _Handler()
+
+    def endpoint_unavailable(self, error: BaseException | None) -> bool:
+        """Only errors observed at the model boundary can invalidate a run."""
+        seen: set[int] = set()
+        while error is not None and id(error) not in seen:
+            if any(error is observed for observed in self._endpoint_errors):
+                return True
+            seen.add(id(error))
+            error = error.__cause__ or error.__context__
+        return False
 
     def _observe_call(self, usages: list[Any]) -> None:
         """Track the peak single-call prompt and the gateway cost of one call.
@@ -204,3 +219,33 @@ class AgentRunStatsCollector:
                 else:
                     stats[key] = value
         return stats
+
+
+def _is_endpoint_unavailable(error: BaseException) -> bool:
+    """Connection/access/overload failures, excluding invalid model requests."""
+    import httpx
+
+    if isinstance(error, httpx.TransportError):
+        return True
+    status_code = None
+    if isinstance(error, httpx.HTTPStatusError):
+        status_code = error.response.status_code
+    try:
+        import openai
+    except ImportError:
+        pass
+    else:
+        if isinstance(error, openai.APIConnectionError):
+            return True
+        if isinstance(error, openai.APIStatusError):
+            status_code = error.status_code
+    try:
+        from gigachat.exceptions import ResponseError
+    except ImportError:
+        pass
+    else:
+        if isinstance(error, ResponseError):
+            status_code = error.status_code
+    return status_code is not None and (
+        status_code in {401, 403, 404, 408, 409, 429} or 500 <= status_code < 600
+    )

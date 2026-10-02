@@ -705,13 +705,24 @@ v0.13.0 table is kept in a collapsed section for reference only).
 
 - A task that hits the per-task wall-clock timeout or hangs counts as a
   normal fail: it stays in the denominator and gets no partial credit.
-- Transient infrastructure errors are **not** model failures. If a task dies
-  on a network failure or an API infrastructure response (HTTP 5xx, 429,
-  `529 Overloaded`, connection reset, gateway timeout) rather than on the
-  model's own behavior, the task may be rerun and the retried result is
-  recorded. Runners may also auto-retry such errors in-flight
-  (`run-openrouter` already retries up to 5 attempts per task); a retried
-  task is scored the same as any other task.
+- In the native DeepAgents runners, all agent/tool and task-verification
+  exceptions are scored model failures. The attempt gets zero, stays in the
+  denominator, and the benchmark continues, including with
+  `--fail-on-runtime-error`. Full tracebacks are preserved in the task `message`
+  (and worker artifacts); the task `error` stays empty. This does not change
+  the agent's tools, prompts, exception handling, or recovery behavior.
+- The exception is model endpoint unavailability: connection/API timeouts,
+  HTTP 401/403/404, 408/409/429, and all 5xx (including `529 Overloaded`).
+  These are identified at the model-call boundary; a tool raising the same
+  exception is still a scored failure. Invalid model requests such as HTTP
+  400/413/422 are scored failures too.
+- After applicable transient retries are exhausted, endpoint failures stop
+  the run even without `--fail-on-runtime-error`, set
+  `failure_kind="infrastructure"`, `measurement_valid=false`, `pass_rate=null`,
+  and exit nonzero even with `--allow-task-failures`. Resuming retries these
+  attempts; scored model failures are retained. Existing setup, launcher, and
+  artifact-integrity checks still invalidate runs that cannot be executed or
+  recorded reliably.
 
 ## Adding a task
 

@@ -120,16 +120,17 @@ def run_task(
                 stats,
                 min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
             )
-        except Exception as exc:  # noqa: BLE001 — log and surface as task failure
+            result = task.verify(workspace_path)
+        except (Exception, SystemExit) as exc:  # noqa: BLE001 — log and surface as task failure
             run = _agent_exception_task_run(
                 exc,
                 task_id=task.id,
                 elapsed_seconds=time.monotonic() - started,
                 recursion_limit=recursion_limit,
                 workspace=workspace_path if keep_workspace else None,
+                endpoint_unavailable=stats.endpoint_unavailable(exc),
             )
             return replace(run, **stats.merged())
-        result = task.verify(workspace_path)
         return _task_run_with_agent_stats(
             task_id=task.id,
             passed=result.passed,
@@ -189,6 +190,8 @@ def run_all(
                 print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
                 if keep_workspace and run.workspace:
                     print(f"  workspace: {run.workspace}")
+                if run.failure_kind == "infrastructure":
+                    break
         except KeyboardInterrupt:
             _write_interrupted_results_json(results, json_output, pending_attempts, attempts)
             raise
@@ -227,6 +230,11 @@ def run_all(
                 )
                 if keep_workspace and run.workspace:
                     print(f"           workspace: {run.workspace}")
+            if run.failure_kind == "infrastructure":
+                interrupted = True
+                for pending in future_to_task:
+                    pending.cancel()
+                break
     except KeyboardInterrupt:
         interrupted = True
         for future in future_to_task:
