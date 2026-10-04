@@ -29,6 +29,45 @@ Use a fresh result JSON path for v0.18.0; do not resume an older-version report
 into the new task set. Both new waves belong to the default scored suite.
 Earlier 411-task and 391-task results below are historical and are not scores on v0.18.0.
 
+### GigaChat production matrix
+
+24 completed, validated full runs, measured 2026-10-02–04. The production matrix is still running; incomplete runs and infrastructure failures are excluded. Each configuration has one run (k=1), with eight task slots across the matrix and bwrap isolation.
+
+| Harness | Model | Passed | Score | Steps | Tokens (raw) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| mini-SWE-agent | GigaChat 2 Reasoning (PROM) (medium) | 371/431 | 86.1% | 6,233 | 72,482,990 |
+| OpenCode | GigaChat 2 Reasoning (PROM) (medium) | 329/431 | 76.3% | 3,612 | 0 |
+| OpenCode | GigaChat 2 Max (PROM) | 327/431 | 75.9% | 4,693 | 0 |
+| deepagents (GigaChat profile) | GigaChat 2 Max (PROM) | 322/431 | 74.7% | 4,976 | 267,982,386† |
+| deepagents (no profile) | GigaChat 2 Max (PROM) | 302/431 | 70.1% | 10,433 | 1,004,755,677† |
+| pi-mono | GigaChat 2 Max (PROM) | 298/431 | 69.1% | 0 | 0 |
+| mini-SWE-agent | GigaChat 2 Pro (PROM) | 266/431 | 61.7% | 11,451 | 231,616,980 |
+| deepagents (GigaChat profile) | GigaChat 2 Reasoning (PROM) (medium) | 252/431 | 58.5% | 5,595 | 138,611,193† |
+| deepagents (GigaChat profile) | GigaChat 2 Pro (PROM) | 224/431 | 52.0% | 5,159 | 368,044,770† |
+| Hermes | GigaChat 2 Pro (PROM) | 220/431 | 51.0% | 0 | 0 |
+| pi-mono | GigaChat 2 Pro (PROM) | 205/431 | 47.6% | 0 | 0 |
+| mini-SWE-agent | GigaChat 2 Max (PROM) | 198/431 | 45.9% | 4,932 | 107,919,373 |
+| OpenCode | GigaChat 2 Pro (PROM) | 169/431 | 39.2% | 3,001 | 0 |
+| pi-mono | GigaChat 2 (PROM) | 164/431 | 38.1% | 0 | 0 |
+| OpenHands | GigaChat 2 Reasoning (PROM) (medium) | 160/431 | 37.1% | 0 | 0 |
+| Hermes | GigaChat 2 Reasoning (PROM) (medium) | 159/431 | 36.9% | 0 | 0 |
+| OpenHands | GigaChat 2 (PROM) | 159/431 | 36.9% | 0 | 0 |
+| deepagents (GigaChat profile) | GigaChat 2 (PROM) | 144/431 | 33.4% | 2,817 | 136,240,902† |
+| Hermes | GigaChat 2 (PROM) | 141/431 | 32.7% | 0 | 0 |
+| OpenCode | GigaChat 2 (PROM) | 139/431 | 32.3% | 8,575 | 0 |
+| deepagents (GigaChat profile) | GigaChat 3 Lightning (PROM) | 134/431 | 31.1% | 3,545 | 148,656,135† |
+| deepagents (no profile) | GigaChat 2 (PROM) | 111/431 | 25.8% | 5,336 | 288,537,210† |
+| mini-SWE-agent | GigaChat 2 (PROM) | 21/431 | 4.9% | 1,786 | 4,976,949 |
+| mini-SWE-agent | GigaChat 3 Lightning (PROM) | 9/431 | 2.1% | 2,042 | 4,511,527 |
+
+All PROM matrix runs listed above scored **0/20 on the long-context wave (392–411)**. Tool-reflection scores (412–431): GigaChat 2 Reasoning + mini-SWE-agent: 8/20; GigaChat 2 Reasoning + OpenCode: 1/20; GigaChat 2 Pro + mini-SWE-agent: 1/20; GigaChat 2 Reasoning + deepagents (GigaChat profile): 2/20. Other listed runs scored 0/20. These are single runs with different tools, profiles and budgets; they do not isolate the effect of the harness.
+
+**Telemetry:** 0 means the metric is absent from the result artifact, not zero work or spend. † Deepagents token totals are raw, unaudited counters with known duplicate usage accounting; they are not verified token spend or cost. CLI counters remain pending native-trace audit except for the recorded mini-SWE-agent metrics.
+
+**Models and settings:** GigaChat 2 and GigaChat 3 Lightning (PROM), build `32.4.16.3`; GigaChat 2 Pro (PROM), build `32.4.30.3`; GigaChat 2 Max (PROM), build `32.9.16.9`; GigaChat 2 Reasoning (PROM), build `3.5.16.9`, reasoning medium. For non-Reasoning models, reasoning is default (not explicitly set) for deepagents, pi-mono, mini-SWE-agent and OpenCode; not requested for OpenHands; medium (native default) for Hermes. Runtime versions: deepagents 0.6.12, deepagents-gigachat 0.0.4, pi-mono 0.73.1, mini-SWE-agent 2.4.6, OpenCode 1.18.33, OpenHands 1.16.0 / SDK 1.21.0, Hermes revision `5307e93252ac`. The GigaChat deepagents profile is bridged onto ChatOpenAI through gpt2giga 0.3.0; earlier native GigaChat-profile runs use a different integration. Task-specific timeout and recursion floors apply, including 7200 seconds for long-context tasks.
+
+Use a fresh result JSON path for v0.18.0; do not resume an older-version report into the new task set. The tool-reflection wave is included in the default suite and is also available through `--suite reflect`. Earlier 411-task and 391-task results below are historical.
+
 ## Historical results (task-set v0.17.0, 411 tasks)
 
 | Harness | Profile | Model | Result | % | Long wave (392–411) | Steps | Tokens |
