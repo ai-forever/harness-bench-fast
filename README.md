@@ -9,6 +9,7 @@ Current task set: **431 tasks, `task-set v0.18.0`**. Tasks 392–411 are the lon
 | harness | model | passed | score | steps | tokens |
 |---|---|---:|---:|---:|---:|
 | dsh headless | DeepSeek V4.1 Flash (high) | 422/431 | 97.9% | 3,973 | 249,558,870 |
+| free-code | DeepSeek V4.1 Flash (high) | 421/431 | 97.7% | 4,091 | 638,747,866 |
 
 One full **k=1** run, measured 2026-10-03/04 with dsh **0.2.0-rc.2**,
 profile `hbf` (dsh-base + dsh-headless), model `deepseek-v4.1-flash`,
@@ -24,6 +25,18 @@ infrastructure failures. Steps and tokens are runner telemetry with coverage
 **430/431**: the timed-out task has no recorded usage, so totals are lower bounds.
 This is a single run, not a mean over three runs. The subsequent repeat hit another
 server outage and is excluded; no mean@3 result is available yet.
+
+The free-code row is **@mean1** (one completed full run), measured 2026-10-04
+with **free-code 2.1.251-free-code.1**, model `deepseek-v4.1-flash`, reasoning
+**high**, concurrency 3 and Linux **bwrap** isolation. The dsh row above is
+also **@mean1**. Free-code uses the same task timeouts: 900 s, with long-wave
+and reflection floors of 7200 s and 1800 s. It scores **390/391 (99.7%)** on
+tasks 1–391, **14/20 (70.0%)** on tasks 392–411 and **17/20 (85.0%)** on
+412–431. No server outage was recorded. Task 407 timed out after 7200 s and
+counts as a failure. Step and token coverage is **430/431**, so totals are
+recorded lower bounds; token telemetry has not been independently audited.
+Two additional independent full free-code runs are in progress/queued and
+are excluded until complete; **@mean3 is not available yet**.
 
 Use a fresh result JSON path for v0.18.0; do not resume an older-version report
 into the new task set. Both new waves belong to the default scored suite.
