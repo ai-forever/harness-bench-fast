@@ -53,7 +53,7 @@
           <div class="summary-grid">
             <div><span class="metric">431</span><span class="label">tasks</span></div>
             <div><span class="metric">20</span><span class="label">new tool-reflection tasks</span></div>
-            <div><span class="metric">0</span><span class="label">full v0.18.0 runs published</span></div>
+            <div><span class="metric">1</span><span class="label">full v0.18.0 runs published</span></div>
             <div><span class="metric">v0.18.0</span><span class="label">task-set version</span></div>
           </div>
           <p>Previous scores use 411 or fewer tasks. They are listed below as history.</p>
@@ -91,18 +91,39 @@
         <div class="section-heading">
           <p class="eyebrow">Current task set, v0.18.0</p>
           <h2 id="current-title">431 tasks, including 20 tool-reflection tasks</h2>
-          <p>No completed full 431-task runs are published yet. New runs include tasks 412–431;
-            the corrected wave is also available through <code>--suite reflect</code>.</p>
+          <p>One complete k=1 run on the full v0.18.0 set, including the long-context
+            and tool-reflection waves. dsh 0.2.0-rc.2 headless, profile hbf,
+            DeepSeek V4.1 Flash (<code>deepseek-v4.1-flash</code>), reasoning high,
+            concurrency 3, Linux bwrap isolation; measured 2026-10-03/04.</p>
+          <p>Server-outage attempts were replaced by recovery attempts. The subsequent
+            repeat hit another outage and is excluded; this is not mean@3.
+            Steps and tokens cover 430/431 tasks and are lower bounds because
+            usage for the timed-out task is absent. See the
+            <a href="https://github.com/ai-forever/harness-bench-fast#results-task-set-v0180-431-tasks">README measurement notes</a>.</p>
           <p>Results from earlier task-set versions are historical and cannot be compared
             directly with v0.18.0. The pre-publication reflect calibration also predates
             the IAM and wiki fixes; it is retained in the README with its original labels.</p>
         </div>
+        <div class="leaderboard">
+          <article class="result-row" data-harness="dsh" data-group="other">
+            <div class="rank">1</div>
+            <div class="who"><h3>dsh headless</h3><p>DeepSeek V4.1 Flash (high)</p></div>
+            <div class="score">422/431</div>
+            <div class="percent">97.9%</div>
+            <div class="bar"><span style="width: 97.9%"></span></div>
+            <div class="meta">Long wave 14/20 · Reflection 18/20 · Steps 3,973 · Tokens 249,558,870</div>
+          </article>
+        </div>
       </section>
 
       <section class="section history" id="history" aria-labelledby="history-title">
+        <details>
+          <summary><span class="eyebrow">History</span>
+            <span class="history-title" id="history-title">Earlier results: task-set v0.17.0, 411 tasks</span>
+          </summary>
         <div class="section-heading">
           <p class="eyebrow">Historical results, task-set v0.17.0</p>
-          <h2 id="history-title">Earlier leaderboard: 411 tasks</h2>
+          <h2>Earlier leaderboard: 411 tasks</h2>
           <p>
             Every run covers the full 411-task set, including the long-context
             wave (tasks 392–411). One full run per harness + model setup,
@@ -249,9 +270,10 @@
             <div class="meta">Long wave 0/20 · Steps 3,879 · Tokens 38,611,899</div>
           </article>
         </div>
+        </details>
       </section>
 
-            <section class="section history" id="history-v016" aria-labelledby="history-v016-title">
+      <section class="section history" id="history-v016" aria-labelledby="history-v016-title">
         <details>
           <summary>
             <span class="eyebrow">History</span>

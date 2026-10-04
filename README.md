@@ -6,9 +6,27 @@ Current task set: **431 tasks, `task-set v0.18.0`**. Tasks 392–411 are the lon
 
 ## Results (task-set v0.18.0, 431 tasks)
 
-No completed full 431-task runs are published yet. Use a fresh result JSON path
-for v0.18.0; do not resume an older-version report into the new task set. The new tool-reflection wave is
-included in the default suite and can also be selected with `--suite reflect`.
+| harness | model | passed | score | steps | tokens |
+|---|---|---:|---:|---:|---:|
+| dsh headless | DeepSeek V4.1 Flash (high) | 422/431 | 97.9% | 3,973 | 249,558,870 |
+
+One full **k=1** run, measured 2026-10-03/04 with dsh **0.2.0-rc.2**,
+profile `hbf` (dsh-base + dsh-headless), model `deepseek-v4.1-flash`,
+reasoning effort **high**, concurrency 3 and Linux **bwrap** isolation.
+Timeout: 900 s, with task-specific floors of 7200 s for the long wave and
+1800 s for the reflection wave. All 431 tasks are included: **390/391 (99.7%)**
+on tasks 1–391, **14/20 (70.0%)** on long-context tasks 392–411, and
+**18/20 (90.0%)** on tool-reflection tasks 412–431.
+
+Server-outage attempts in the affected tail were replaced by recovery attempts;
+unchanged completed results were retained. The final report contains no recorded
+infrastructure failures. Steps and tokens are runner telemetry with coverage
+**430/431**: the timed-out task has no recorded usage, so totals are lower bounds.
+This is a single run, not a mean over three runs. The subsequent repeat hit another
+server outage and is excluded; no mean@3 result is available yet.
+
+Use a fresh result JSON path for v0.18.0; do not resume an older-version report
+into the new task set. Both new waves belong to the default scored suite.
 Earlier 411-task and 391-task results below are historical and are not scores on v0.18.0.
 
 ## Historical results (task-set v0.17.0, 411 tasks)
