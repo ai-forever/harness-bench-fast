@@ -54,7 +54,7 @@ Earlier 411-task and 391-task results below are historical and are not scores on
 
 ### GigaChat production matrix
 
-39 completed, validated full runs, measured 2026-10-02–05. The production matrix is still running; incomplete runs and infrastructure failures are excluded. Each configuration has one run (k=1), with eight task slots across the matrix and bwrap isolation.
+42 completed, validated full runs, measured 2026-10-02–05. The production matrix is still running; incomplete runs and infrastructure failures are excluded. Each configuration has one run (k=1), with eight task slots across the matrix and bwrap isolation.
 
 | Harness | Model | Passed | Score | Steps | Tokens (raw) |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -63,17 +63,20 @@ Earlier 411-task and 391-task results below are historical and are not scores on
 | OpenCode | GigaChat 2 Max (PROM) | 327/431 | 75.9% | 4,693 | 0 |
 | deepagents (GigaChat profile) | GigaChat 2 Max (PROM) | 322/431 | 74.7% | 4,976 | 267,982,386† |
 | deepagents (GigaChat profile) | GigaChat 3 Ultra (PROM) | 322/431 | 74.7% | 4,447 | 366,492,603† |
+| deepagents (no profile) | GigaChat 3 Ultra (PROM) | 305/431 | 70.8% | 10,351 | 841,669,092† |
 | deepagents (no profile) | GigaChat 2 Max (PROM) | 302/431 | 70.1% | 10,433 | 1,004,755,677† |
 | pi-mono | GigaChat 2 Max (PROM) | 298/431 | 69.1% | 0 | 0 |
 | pi-mono | GigaChat 3 Ultra (PROM) | 295/431 | 68.4% | 0 | 0 |
 | deepagents (no profile)‡ | GigaChat 2 Reasoning (PROM) (medium) | 273/431 | 63.3% | 10,702 | 453,994,698† |
 | mini-SWE-agent | GigaChat 2 Pro (PROM) | 266/431 | 61.7% | 11,451 | 231,616,980 |
+| mini-SWE-agent | GigaChat 3 Pro (PROM) | 253/431 | 58.7% | 9,169 | 172,168,626 |
 | deepagents (GigaChat profile) | GigaChat 2 Reasoning (PROM) (medium) | 252/431 | 58.5% | 5,595 | 138,611,193† |
 | deepagents (GigaChat profile) | GigaChat 2 Pro (PROM) | 224/431 | 52.0% | 5,159 | 368,044,770† |
 | Hermes | GigaChat 2 Pro (PROM) | 220/431 | 51.0% | 0 | 0 |
 | Hermes | GigaChat 3 Pro (PROM) | 217/431 | 50.3% | 0 | 0 |
 | pi-mono | GigaChat 3 Pro (PROM) | 216/431 | 50.1% | 0 | 0 |
 | deepagents (GigaChat profile) | GigaChat 3 Pro (PROM) | 212/431 | 49.2% | 6,289 | 486,699,543† |
+| mini-SWE-agent | GigaChat 3 Ultra (PROM) | 207/431 | 48.0% | 4,820 | 124,288,018 |
 | pi-mono | GigaChat 2 Pro (PROM) | 205/431 | 47.6% | 0 | 0 |
 | mini-SWE-agent | GigaChat 2 Max (PROM) | 198/431 | 45.9% | 4,932 | 107,919,373 |
 | deepagents (no profile)‡ | GigaChat 3 Pro (PROM) | 191/431 | 44.3% | 5,711 | 295,423,833† |
