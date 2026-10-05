@@ -8,8 +8,9 @@ Current task set: **431 tasks, `task-set v0.18.0`**. Tasks 392–411 are the lon
 
 | harness | model | passed | score | steps | tokens |
 |---|---|---:|---:|---:|---:|
+| pi-mono | DeepSeek V4.1 Flash (high) | 423/431 | 98.1% | 0 | 0 |
 | dsh headless | DeepSeek V4.1 Flash (high) | 422/431 | 97.9% | 3,973 | 249,558,870 |
-| free-code | DeepSeek V4.1 Flash (high) | 421/431 | 97.7% | 4,091 | 638,747,866 |
+| free-code | DeepSeek V4.1 Flash (high) | 419/431 | 97.2% | 4,311 | 631,963,525 |
 
 One full **k=1** run, measured 2026-10-03/04 with dsh **0.2.0-rc.2**,
 profile `hbf` (dsh-base + dsh-headless), model `deepseek-v4.1-flash`,
@@ -24,19 +25,28 @@ unchanged completed results were retained. The final report contains no recorded
 infrastructure failures. Steps and tokens are runner telemetry with coverage
 **430/431**: the timed-out task has no recorded usage, so totals are lower bounds.
 This is a single run, not a mean over three runs. The subsequent repeat hit another
-server outage and is excluded; no mean@3 result is available yet.
+server outage and is excluded; no dsh mean@3 result is available yet.
 
-The free-code row is **@mean1** (one completed full run), measured 2026-10-04
-with **free-code 2.1.251-free-code.1**, model `deepseek-v4.1-flash`, reasoning
-**high**, concurrency 3 and Linux **bwrap** isolation. The dsh row above is
-also **@mean1**. Free-code uses the same task timeouts: 900 s, with long-wave
-and reflection floors of 7200 s and 1800 s. It scores **390/391 (99.7%)** on
-tasks 1–391, **14/20 (70.0%)** on tasks 392–411 and **17/20 (85.0%)** on
-412–431. No server outage was recorded. Task 407 timed out after 7200 s and
-counts as a failure. Step and token coverage is **430/431**, so totals are
-recorded lower bounds; token telemetry has not been independently audited.
-Two additional independent full free-code runs are in progress/queued and
-are excluded until complete; **@mean3 is not available yet**.
+The free-code row is **@mean3**, measured 2026-10-04/05 with
+**free-code 2.1.251-free-code.1**, model `deepseek-v4.1-flash`, reasoning
+**high**, concurrency 3 and Linux **bwrap** isolation. Three independent
+431-task runs scored **421, 416, 420**, averaging **419/431 (97.2%) ± 0.6
+percentage points** (sample standard deviation). Steps and tokens in the table
+are rounded per-run means, not totals across three runs; coverage was
+430/431, 428/431 and 430/431, so telemetry is a lower bound and tokens are
+not independently audited. Average wave scores: ordinary **99.6%**, long
+**63.3%**, reflection **85.0%**. **pass@3: 425/431 (98.6%)**;
+**pass^3: 409/431 (94.9%)**. No server outages were recorded.
+The dsh row remains **@mean1**.
+
+The pi-mono row is **@mean1**, measured 2026-10-05 with **pi-mono 0.73.1**,
+model `deepseek-v4.1-flash`, reasoning **high**, concurrency 3 and bwrap.
+It covers all 431 tasks: ordinary **391/391 (100.0%)**, long **13/20 (65.0%)**,
+reflection **19/20 (95.0%)**. No infrastructure failures were recorded.
+Steps and tokens are **0 because these metrics are absent from the artifact**,
+not because no work or tokens were spent. Native traces remain on the benchmark
+server. Both configurations use timeout 900 s with task-specific floors of
+7200 s (long) and 1800 s (reflection).
 
 Use a fresh result JSON path for v0.18.0; do not resume an older-version report
 into the new task set. Both new waves belong to the default scored suite.
