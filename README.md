@@ -44,7 +44,7 @@ Earlier 411-task and 391-task results below are historical and are not scores on
 
 ### GigaChat production matrix
 
-29 completed, validated full runs, measured 2026-10-02–04. The production matrix is still running; incomplete runs and infrastructure failures are excluded. Each configuration has one run (k=1), with eight task slots across the matrix and bwrap isolation.
+34 completed, validated full runs, measured 2026-10-02–05. The production matrix is still running; incomplete runs and infrastructure failures are excluded. Each configuration has one run (k=1), with eight task slots across the matrix and bwrap isolation.
 
 | Harness | Model | Passed | Score | Steps | Tokens (raw) |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -58,20 +58,25 @@ Earlier 411-task and 391-task results below are historical and are not scores on
 | deepagents (GigaChat profile) | GigaChat 2 Reasoning (PROM) (medium) | 252/431 | 58.5% | 5,595 | 138,611,193† |
 | deepagents (GigaChat profile) | GigaChat 2 Pro (PROM) | 224/431 | 52.0% | 5,159 | 368,044,770† |
 | Hermes | GigaChat 2 Pro (PROM) | 220/431 | 51.0% | 0 | 0 |
+| Hermes | GigaChat 3 Pro (PROM) | 217/431 | 50.3% | 0 | 0 |
+| pi-mono | GigaChat 3 Pro (PROM) | 216/431 | 50.1% | 0 | 0 |
 | deepagents (GigaChat profile) | GigaChat 3 Pro (PROM) | 212/431 | 49.2% | 6,289 | 486,699,543† |
 | pi-mono | GigaChat 2 Pro (PROM) | 205/431 | 47.6% | 0 | 0 |
 | mini-SWE-agent | GigaChat 2 Max (PROM) | 198/431 | 45.9% | 4,932 | 107,919,373 |
+| OpenCode | GigaChat 3 Pro (PROM) | 174/431 | 40.4% | 3,071 | 0 |
 | pi-mono | GigaChat 3 Lightning (PROM) | 171/431 | 39.7% | 0 | 0 |
 | OpenCode | GigaChat 2 Pro (PROM) | 169/431 | 39.2% | 3,001 | 0 |
 | pi-mono | GigaChat 2 (PROM) | 164/431 | 38.1% | 0 | 0 |
 | OpenHands | GigaChat 2 Reasoning (PROM) (medium) | 160/431 | 37.1% | 0 | 0 |
 | OpenHands | GigaChat 2 (PROM) | 159/431 | 36.9% | 0 | 0 |
 | Hermes | GigaChat 2 Reasoning (PROM) (medium) | 159/431 | 36.9% | 0 | 0 |
+| Hermes | GigaChat 3 Lightning (PROM) | 156/431 | 36.2% | 0 | 0 |
 | OpenHands | GigaChat 3 Lightning (PROM) | 146/431 | 33.9% | 0 | 0 |
 | deepagents (GigaChat profile) | GigaChat 2 (PROM) | 144/431 | 33.4% | 2,817 | 136,240,902† |
 | Hermes | GigaChat 2 (PROM) | 141/431 | 32.7% | 0 | 0 |
 | OpenCode | GigaChat 2 (PROM) | 139/431 | 32.3% | 8,575 | 0 |
 | deepagents (GigaChat profile) | GigaChat 3 Lightning (PROM) | 134/431 | 31.1% | 3,545 | 148,656,135† |
+| OpenCode | GigaChat 3 Lightning (PROM) | 134/431 | 31.1% | 10,580 | 0 |
 | deepagents (no profile) | GigaChat 3 Lightning (PROM) | 113/431 | 26.2% | 5,330 | 326,514,969† |
 | deepagents (no profile) | GigaChat 2 (PROM) | 111/431 | 25.8% | 5,336 | 288,537,210† |
 | mini-SWE-agent | GigaChat 2 (PROM) | 21/431 | 4.9% | 1,786 | 4,976,949 |
