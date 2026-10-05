@@ -316,7 +316,7 @@ def is_transient_model_error(exc: BaseException) -> bool:
             return True
         api_status_error = getattr(openai, "APIStatusError", None)
         if api_status_error is not None and isinstance(exc, api_status_error):
-            return exc.status_code in _TRANSIENT_STATUS_CODES
+            return exc.status_code in _TRANSIENT_STATUS_CODES or 500 <= exc.status_code < 600
 
     if httpx is not None and isinstance(exc, (httpx.TimeoutException, httpx.TransportError)):
         return True

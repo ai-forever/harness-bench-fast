@@ -85,8 +85,9 @@ def _agent_exception_task_run(
     elapsed_seconds: float,
     recursion_limit: int,
     workspace: Path | None,
+    endpoint_unavailable: bool = False,
 ) -> TaskRun:
-    """Convert an agent/runtime exception into a normal task failure."""
+    """Score agent exceptions; only model endpoint failures invalidate a run."""
     if isinstance(exc, TaskTimeoutError):
         return TaskRun(
             task_id=task_id,
@@ -106,10 +107,11 @@ def _agent_exception_task_run(
     return TaskRun(
         task_id=task_id,
         passed=False,
-        message="",
+        message=f"{type(exc).__name__}: {exc}" if endpoint_unavailable else traceback.format_exc(),
         elapsed_seconds=elapsed_seconds,
-        error=traceback.format_exc(),
+        error=traceback.format_exc() if endpoint_unavailable else None,
         workspace=workspace,
+        failure_kind="infrastructure" if endpoint_unavailable else "model_error",
     )
 
 
@@ -539,16 +541,17 @@ def run_task(
                 stats,
                 min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
             )
-        except Exception as exc:  # noqa: BLE001 — log and surface as task failure
+            result = task.verify(workspace_path)
+        except (Exception, SystemExit) as exc:  # noqa: BLE001 — log and surface as task failure
             run = _agent_exception_task_run(
                 exc,
                 task_id=task.id,
                 elapsed_seconds=time.monotonic() - started,
                 recursion_limit=recursion_limit,
                 workspace=workspace_path if keep_workspace else None,
+                endpoint_unavailable=stats.endpoint_unavailable(exc),
             )
             return replace(run, **stats.merged())
-        result = task.verify(workspace_path)
         return _task_run_with_agent_stats(
             task_id=task.id,
             passed=result.passed,
@@ -618,6 +621,8 @@ def run_all(
                 print(f"  [{status}] {run.elapsed_seconds:5.1f}s — {_one_line_detail(run)}")
                 if keep_workspace and run.workspace:
                     print(f"  workspace: {run.workspace}")
+                if run.failure_kind == "infrastructure":
+                    break
         except KeyboardInterrupt:
             _write_interrupted_results_json(results, json_output, pending_attempts, attempts)
             raise
@@ -656,6 +661,11 @@ def run_all(
                 )
                 if keep_workspace and run.workspace:
                     print(f"           workspace: {run.workspace}")
+            if run.failure_kind == "infrastructure":
+                interrupted = True
+                for pending in future_to_task:
+                    pending.cancel()
+                break
     except KeyboardInterrupt:
         interrupted = True
         for future in future_to_task:
