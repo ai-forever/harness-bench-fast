@@ -137,6 +137,22 @@
             no infrastructure failures remain in the final reports. Raw token counters
             are not independently audited; deepagents telemetry covers 429/431 tasks
             and has known duplicate usage accounting. Zero denotes absent telemetry.</p>
+        <div class="filter-bar" role="group" aria-label="Current results filters">
+          <label class="filter-select" for="current-model-filter">Model
+            <select id="current-model-filter"><option value="all">All models</option></select>
+          </label>
+          <label class="filter-select" for="current-harness-filter">Harness
+            <select id="current-harness-filter"><option value="all">All harnesses</option></select>
+          </label>
+          <label class="filter-select" for="current-sort">Sort by
+            <select id="current-sort">
+              <option value="score">Score</option>
+              <option value="model">Model</option>
+              <option value="harness">Harness</option>
+            </select>
+          </label>
+          <p class="filter-count" id="current-filter-count" aria-live="polite"></p>
+        </div>
         <div class="leaderboard" aria-label="Completed v0.18.0 results">
           <article class="result-row" data-harness="pi-mono" data-group="other">
             <div class="rank">1</div>
@@ -525,6 +541,7 @@
             <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0</div>
           </article>
         </div>
+        <p class="filter-empty" id="current-filter-empty" hidden>No runs match these filters.</p>
       </section>
 
       <section class="section history" id="history" aria-labelledby="history-title">
@@ -928,6 +945,60 @@
     </footer>
 
     <script>
+      (function () {
+        var list = document.querySelector("#current .leaderboard");
+        var rows = Array.prototype.slice.call(list.querySelectorAll(".result-row"));
+        var modelSelect = document.getElementById("current-model-filter");
+        var harnessSelect = document.getElementById("current-harness-filter");
+        var sortSelect = document.getElementById("current-sort");
+        var count = document.getElementById("current-filter-count");
+        var empty = document.getElementById("current-filter-empty");
+
+        rows.forEach(function (row) {
+          row.dataset.modelName = row.querySelector(".who p").textContent.trim();
+          row.dataset.harnessName = row.querySelector(".who h3").textContent.replace(/[†‡]/g, "").trim();
+          row.dataset.passed = row.querySelector(".score").textContent.split("/")[0];
+        });
+
+        function populate(select, key) {
+          var values = rows.map(function (row) { return row.dataset[key]; });
+          values.filter(function (value, index) { return values.indexOf(value) === index; })
+            .sort(function (a, b) { return a.localeCompare(b, "en", { numeric: true }); })
+            .forEach(function (value) {
+              var option = document.createElement("option");
+              option.value = value;
+              option.textContent = value;
+              select.appendChild(option);
+            });
+        }
+        populate(modelSelect, "modelName");
+        populate(harnessSelect, "harnessName");
+
+        function apply() {
+          var key = sortSelect.value === "model" ? "modelName" : "harnessName";
+          rows.sort(function (a, b) {
+            var byScore = Number(b.dataset.passed) - Number(a.dataset.passed);
+            if (sortSelect.value === "score") { return byScore; }
+            return a.dataset[key].localeCompare(b.dataset[key], "en", { numeric: true }) || byScore;
+          });
+          var shown = 0;
+          rows.forEach(function (row) {
+            var visible = row.dataset.hidden !== "true" &&
+              (modelSelect.value === "all" || row.dataset.modelName === modelSelect.value) &&
+              (harnessSelect.value === "all" || row.dataset.harnessName === harnessSelect.value);
+            row.classList.toggle("is-hidden", !visible);
+            if (visible) { shown += 1; }
+            list.appendChild(row);
+          });
+          count.textContent = shown + " of " + rows.length + " shown";
+          empty.hidden = shown !== 0;
+        }
+        [modelSelect, harnessSelect, sortSelect].forEach(function (select) {
+          select.addEventListener("change", apply);
+        });
+        apply();
+      })();
+
       (function () {
         var rows = Array.prototype.slice.call(
           document.querySelectorAll("#leaderboard .leaderboard .result-row")

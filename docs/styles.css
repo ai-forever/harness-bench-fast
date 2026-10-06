@@ -608,6 +608,7 @@ h3 {
 
   .filter-select select {
     flex: 1;
+    min-width: 0;
   }
 
   .footer {
