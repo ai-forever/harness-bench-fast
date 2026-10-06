@@ -54,7 +54,7 @@ Earlier 411-task and 391-task results below are historical and are not scores on
 
 ### GigaChat production matrix
 
-42 completed, validated full runs, measured 2026-10-02–05. The production matrix is still running; incomplete runs and infrastructure failures are excluded. Each configuration has one run (k=1), with eight task slots across the matrix and bwrap isolation.
+42 completed, validated matrix runs, measured 2026-10-02–05, plus one separate maestro harness run on 2026-10-05. The production matrix is still running; incomplete runs and infrastructure failures are excluded. Each configuration has one run (k=1), with eight task slots across the matrix and bwrap isolation. The separate maestro harness run used four task workers and bwrap.
 
 | Harness | Model | Passed | Score | Steps | Tokens (raw) |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -71,6 +71,7 @@ Earlier 411-task and 391-task results below are historical and are not scores on
 | mini-SWE-agent | GigaChat 2 Pro (PROM) | 266/431 | 61.7% | 11,451 | 231,616,980 |
 | mini-SWE-agent | GigaChat 3 Pro (PROM) | 253/431 | 58.7% | 9,169 | 172,168,626 |
 | deepagents (GigaChat profile) | GigaChat 2 Reasoning (PROM) (medium) | 252/431 | 58.5% | 5,595 | 138,611,193† |
+| maestro harness | GigaChat 2 Reasoning (PROM) (medium) | 248/431 | 57.5% | 2,214 | 6,210,278 |
 | deepagents (GigaChat profile) | GigaChat 2 Pro (PROM) | 224/431 | 52.0% | 5,159 | 368,044,770† |
 | Hermes | GigaChat 2 Pro (PROM) | 220/431 | 51.0% | 0 | 0 |
 | Hermes | GigaChat 3 Pro (PROM) | 217/431 | 50.3% | 0 | 0 |
@@ -101,13 +102,15 @@ Earlier 411-task and 391-task results below are historical and are not scores on
 | mini-SWE-agent | GigaChat 3 Lightning (PROM) | 9/431 | 2.1% | 2,042 | 4,511,527 |
 | Hermes | GigaChat 2 Max (PROM) | 0/431 | 0.0% | 0 | 0 |
 
-All PROM matrix runs listed above scored **0/20 on the long-context wave (392–411)**. Tool-reflection scores (412–431): GigaChat 2 Reasoning + mini-SWE-agent: 8/20; GigaChat 2 Reasoning + OpenCode: 1/20; GigaChat 2 Reasoning + deepagents (no profile): 1/20; GigaChat 2 Pro + mini-SWE-agent: 1/20; GigaChat 2 Reasoning + deepagents (GigaChat profile): 2/20. Other listed runs scored 0/20. These are single runs with different tools, profiles and budgets; they do not isolate the effect of the harness.
+All PROM matrix runs listed above scored **0/20 on the long-context wave (392–411)**. Tool-reflection scores (412–431): GigaChat 2 Reasoning + mini-SWE-agent: 8/20; GigaChat 2 Reasoning + OpenCode: 1/20; GigaChat 2 Reasoning + deepagents (no profile): 1/20; GigaChat 2 Pro + mini-SWE-agent: 1/20; GigaChat 2 Reasoning + deepagents (GigaChat profile): 2/20. The separate maestro harness run scored 0/20 long and 1/20 reflection. Other listed runs scored 0/20. These are single runs with different tools, profiles and budgets; they do not isolate the effect of the harness.
 
 GigaChat 2 Max + Hermes completed with 0/431 and no infrastructure failures recorded by the runner; the cause of the all-fail result remains under investigation.
 
 ‡ Three deepagents runs without profile (GigaChat 2 Pro, GigaChat 2 Reasoning and GigaChat 3 Pro) had HTTP 422 CONTEXT_TOO_LONG incorrectly classified as infrastructure errors. These are normal model/harness failures. Corrected derived reports retain the full denominator and original scores; source reports remain unchanged.
 
-**Telemetry:** 0 means the metric is absent from the result artifact, not zero work or spend. † Deepagents token totals are raw, unaudited counters with known duplicate usage accounting; they are not verified token spend or cost. CLI counters remain pending native-trace audit except for the recorded mini-SWE-agent metrics.
+**Telemetry:** 0 means the metric is absent from the result artifact, not zero work or spend. † Deepagents token totals are raw, unaudited counters with known duplicate usage accounting; they are not verified token spend or cost. CLI counters remain pending native-trace audit except for the recorded mini-SWE-agent and maestro harness metrics.
+
+**maestro harness:** [MAESTRO CARL](https://github.com/AIRI-Institute/maestro-core/tree/9c2ac0d4aedb4bb8bfd53e9694bbbac05c4a725c) with a custom coding adapter, not an upstream ready-made coding agent. Native CARL schedules LLM/tool steps; the adapter provides a shell tool, outer loop and reasoning-history replay. One full k=1 run on 2026-10-05, GigaChat 2 Reasoning (PROM), build `3.5.16.9`, reasoning medium: ordinary **247/391 (63.2%)**, long **0/20 (0.0%)**, reflection **1/20 (5.0%)**. No infrastructure failures. No compaction, self-critic or subagents. Budget: 200 model turns and 900 s per task, with native task-specific floors; `max_tokens=16384`. The 2,214 steps count completed model responses, including final answers; 6,210,278 tokens comprise 5,102,319 input and 1,107,959 output tokens, checked against native traces for all 431 tasks. Elapsed time: 63.8 minutes. This measures this adapter configuration, not CARL as a whole; no repeat-based variance estimate is available. Raw traces remain private.
 
 **Models and settings:** GigaChat 2 and GigaChat 3 Lightning (PROM), build `32.4.16.3`; GigaChat 2 Pro and GigaChat 3 Pro (PROM), build `32.4.30.3`; GigaChat 2 Max and GigaChat 3 Ultra (PROM), build `32.9.16.9`; GigaChat 2 Reasoning (PROM), build `3.5.16.9`, reasoning medium. For non-Reasoning models, reasoning is default (not explicitly set) for deepagents, pi-mono, mini-SWE-agent and OpenCode; not requested for OpenHands; medium (native default) for Hermes. Runtime versions: deepagents 0.6.12, deepagents-gigachat 0.0.4, pi-mono 0.73.1, mini-SWE-agent 2.4.6, OpenCode 1.18.33, OpenHands 1.16.0 / SDK 1.21.0, Hermes revision `5307e93252ac`. The GigaChat deepagents profile is bridged onto ChatOpenAI through gpt2giga 0.3.0; earlier native GigaChat-profile runs use a different integration. Task-specific timeout and recursion floors apply, including 7200 seconds for long-context tasks.
 
