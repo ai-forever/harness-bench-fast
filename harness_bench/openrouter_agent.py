@@ -210,6 +210,7 @@ def build_agent(
     prompt_cache: bool = False,
     no_subagents: bool = False,
     responses_api: bool = False,
+    backend: Any | None = None,
 ) -> Any:
     """Build a stock `deepagents` agent backed by an OpenRouter model.
 
@@ -228,11 +229,18 @@ def build_agent(
     else:
         from chat_openai import ReasoningAwareChatOpenAI
 
-    backend = LocalShellBackend(
-        root_dir=workspace,
-        virtual_mode=True,
-        inherit_env=True,
-    )
+    if backend is None:
+        backend = LocalShellBackend(
+            root_dir=workspace,
+            virtual_mode=True,
+            inherit_env=True,
+        )
+        has_memory = (workspace / "AGENTS.md").exists()
+        has_skills = (workspace / ".agents" / "skills").is_dir()
+    else:
+        # RLI reports these after setup inside the session; the local path is not the workspace.
+        has_memory = bool(getattr(backend, "memory", False))
+        has_skills = bool(getattr(backend, "skills", False))
     model_kwargs: dict[str, Any] = {}
     if max_tokens is not None:
         model_kwargs["max_tokens"] = max_tokens
@@ -283,10 +291,10 @@ def build_agent(
     # Memory tasks (222–231) ship an AGENTS.md fixture; pre-existing 221
     # tasks do not. `LocalShellBackend(virtual_mode=True)` maps
     # `/AGENTS.md` to `<workspace>/AGENTS.md`.
-    memory_sources = ["/AGENTS.md"] if (workspace / "AGENTS.md").exists() else None
+    memory_sources = ["/AGENTS.md"] if has_memory else None
     # Skill tasks ship `.agents/skills/`; wire SkillsMiddleware in only when
     # present so the skill-less tasks stay unchanged (see runner.build_agent).
-    skill_sources = ["/.agents/skills"] if (workspace / ".agents" / "skills").is_dir() else None
+    skill_sources = ["/.agents/skills"] if has_skills else None
     agent = create_deep_agent(
         model=model, backend=backend, memory=memory_sources, skills=skill_sources
     )

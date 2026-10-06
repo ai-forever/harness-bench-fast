@@ -759,7 +759,10 @@ for each task agent. Fixture setup and verification stay in the host parent;
 the worker sees its workspace, private scratch/home, and allowlisted runtime
 files. It cannot read the host benchmark registry, gold data or old workspaces.
 Bubblewrap (`bwrap`) must be installed on the runner. `--isolation none` retains
-host execution for diagnostics. The native GigaChat `run` / `run-pure` commands
+host execution for diagnostics. `run-openrouter --rli --isolation none` instead
+runs every tool and the verifier inside an RLI session (`harness_bench.rli_backend`);
+the image registered via `rli/register.py` must contain the same task-set version.
+The native GigaChat `run` / `run-pure` commands
 still execute on the host and are not isolated by this change. Docker is only
 needed when invoking Harbor's own local runner.
 

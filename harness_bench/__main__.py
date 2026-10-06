@@ -237,6 +237,7 @@ def _cmd_run_openrouter(args: argparse.Namespace) -> int:
         isolation=args.isolation,
         runtime_paths=load_manifest(args.sandbox_manifest),
         artifacts_root=args.artifacts_dir,
+        rli=args.rli,
     )
     _summarize_run(results, metric_ks)
     _maybe_report_json(args, results)
@@ -578,6 +579,15 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     p_or.add_argument("--concurrency", type=int, default=1)
+    p_or.add_argument(
+        "--rli",
+        action="store_true",
+        help=(
+            "Run task tools and verification in isolated RLI sessions. "
+            "Requires --isolation none. The image must contain this task-set version; "
+            "override the environment with HARNESS_BENCH_RLI_ENV and HARNESS_BENCH_RLI_VERSION."
+        ),
+    )
     p_or.add_argument(
         "--transient-attempts",
         type=int,

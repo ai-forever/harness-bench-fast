@@ -43,6 +43,7 @@ from harness_bench.runner import (
     _task_attempt_label_for,
     _task_run_with_agent_stats,
     _task_sort_key,
+    _task_timeout_seconds,
     _write_interrupted_results_json,
     _write_partial_results_json,
     invoke_agent_with_stats,
@@ -259,13 +260,15 @@ def build_agent(
     prompt_cache: bool = False,
     no_subagents: bool = False,
     responses_api: bool = False,
+    rli_backend: Any | None = None,
 ) -> Any:
     """Build the same model used by the standalone isolated worker."""
     _apply_internal_tagme_defaults()
     return _runtime_build_agent(workspace, api_key=_openrouter_api_key(), model_name=model_name,
         recursion_limit=recursion_limit, max_tokens=max_tokens, harness_profile=harness_profile,
         forward_reasoning_history=forward_reasoning_history, compact_at_tokens=compact_at_tokens,
-        prompt_cache=prompt_cache, no_subagents=no_subagents, responses_api=responses_api)
+        prompt_cache=prompt_cache, no_subagents=no_subagents, responses_api=responses_api,
+        backend=rli_backend)
 
 
 def run_task(
@@ -282,6 +285,7 @@ def run_task(
     prompt_cache: bool = False,
     no_subagents: bool = False,
     responses_api: bool = False,
+    rli: bool = False,
 ) -> TaskRun:
     if transient_attempts < 1:
         raise ValueError("transient_attempts must be positive")
@@ -291,8 +295,14 @@ def run_task(
     last_run: TaskRun | None = None
     for attempt in range(1, transient_attempts + 1):
         workspace_keepalive: TemporaryDirectory | None = None
+        rli_backend = None
         try:
-            if keep_workspace and attempt == transient_attempts:
+            if rli:
+                from harness_bench.rli_backend import RLIBackend
+
+                rli_backend = RLIBackend(task.id, timeout=int(_task_timeout_seconds()))
+                workspace_path = Path("/workspace")
+            elif keep_workspace and attempt == transient_attempts:
                 workspace_path = Path(
                     __import__("tempfile").mkdtemp(prefix=f"hb_or_{task.id}_")
                 )
@@ -300,9 +310,12 @@ def run_task(
                 workspace_keepalive = TemporaryDirectory(prefix=f"hb_or_{task.id}_")
                 workspace_path = Path(workspace_keepalive.name)
 
-            task.setup(workspace_path)
             stats = AgentRunStatsCollector()
             try:
+                if rli_backend is not None:
+                    rli_backend.start()
+                else:
+                    task.setup(workspace_path)
                 agent = build_agent(
                     workspace_path,
                     model_name=model_name,
@@ -314,6 +327,7 @@ def run_task(
                     prompt_cache=prompt_cache,
                     no_subagents=no_subagents,
                     responses_api=responses_api,
+                    rli_backend=rli_backend,
                 )
                 invocation_result = invoke_agent_with_stats(
                     agent,
@@ -321,23 +335,35 @@ def run_task(
                     stats,
                     min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
                 )
+                if rli_backend is not None:
+                    verified = rli_backend.verify()
             except Exception as exc:  # noqa: BLE001 — retry transient model failures.
+                error = exc
+                retryable = _is_transient_model_error(exc)
+                if rli_backend is not None and rli_backend.error is not None:
+                    error = rli_backend.error
+                    retryable = _is_transient_model_error(error)
+                    from gigarli import RLIClientError, RLIIncompleteStepStreamError
+
+                    retryable = retryable or isinstance(error, RLIIncompleteStepStreamError) or (
+                        isinstance(error, RLIClientError) and error.error.retryable
+                    )
                 run = _agent_exception_task_run(
-                    exc,
+                    error,
                     task_id=task.id,
                     elapsed_seconds=time.monotonic() - started,
                     recursion_limit=recursion_limit,
-                    workspace=workspace_path if keep_workspace else None,
+                    workspace=None if rli else (workspace_path if keep_workspace else None),
                 )
                 last_run = replace(
                     run,
                     **stats.merged(),
                     **stats.extra(),
-                    agent_compactions=count_compactions(workspace_path),
+                    agent_compactions=0 if rli else count_compactions(workspace_path),
                 )
-                if _is_transient_model_error(exc) and attempt < transient_attempts:
+                if retryable and attempt < transient_attempts:
                     continue
-                if _is_transient_model_error(exc):
+                if retryable:
                     return replace(
                         last_run,
                         message=(
@@ -347,18 +373,24 @@ def run_task(
                     )
                 return last_run
             _dump_trace(task.id, invocation_result)
-            compactions = count_compactions(workspace_path)
-            result = task.verify(workspace_path)
+            if rli_backend is not None:
+                compactions = 0
+                result = verified
+            else:
+                compactions = count_compactions(workspace_path)
+                result = task.verify(workspace_path)
             run = _task_run_with_agent_stats(
                 task_id=task.id,
                 passed=result.passed,
                 message=result.message,
                 elapsed_seconds=time.monotonic() - started,
                 stats=stats.merged(invocation_result),
-                workspace=workspace_path if keep_workspace else None,
+                workspace=None if rli else (workspace_path if keep_workspace else None),
             )
             return replace(run, **stats.extra(), agent_compactions=compactions)
         finally:
+            if rli_backend is not None:
+                rli_backend.close()
             if workspace_keepalive is not None:
                 workspace_keepalive.cleanup()
 
@@ -389,7 +421,12 @@ def run_all(
     isolation: str = "none",
     runtime_paths: tuple[str, ...] = (),
     artifacts_root: Path | None = None,
+    rli: bool = False,
 ) -> list[TaskRun]:
+    if rli and keep_workspace:
+        raise ValueError("--keep is unavailable for RLI: sessions are always closed after each attempt")
+    if rli and isolation != "none":
+        raise ValueError("--rli runs tools and verification in RLI and requires --isolation none")
     _load_env_from_dotenv()
     _ensure_openrouter_key()
     json_output = normalize_json_output_path(json_output)
@@ -461,6 +498,7 @@ def run_all(
                     prompt_cache=prompt_cache,
                     no_subagents=no_subagents,
                     responses_api=responses_api,
+                    rli=rli,
                 )
                 run = _mark_attempt(run, attempt, attempts)
                 results.append(run)
@@ -502,6 +540,7 @@ def run_all(
                 prompt_cache=prompt_cache,
                 no_subagents=no_subagents,
                 responses_api=responses_api,
+                rli=rli,
             ): (task, attempt)
             for task, attempt in pending_attempts
         }
