@@ -155,9 +155,17 @@
             Revisions without added tasks contribute zero tasks. Scores use current v0.18.0 task definitions, not historical results. Steps and tokens below remain full-run totals.</p>
         </div>
         <div class="filter-bar" role="group" aria-label="Current results filters">
-          <label class="filter-select" for="current-model-filter">Model
-            <select id="current-model-filter"><option value="all">All models</option></select>
-          </label>
+          <details class="model-picker" id="current-model-filter">
+            <summary>Models <span id="selected-model-count"></span></summary>
+            <div class="model-picker-panel">
+              <div class="model-presets" role="group" aria-label="Model selection presets">
+                <button type="button" class="chip" id="models-all">All models</button>
+                <button type="button" class="chip" id="models-gigachat">All GigaChat</button>
+                <button type="button" class="chip" id="models-none">Clear</button>
+              </div>
+              <fieldset id="model-options"><legend>Select models to compare</legend></fieldset>
+            </div>
+          </details>
           <label class="filter-select" for="current-harness-filter">Harness
             <select id="current-harness-filter"><option value="all">All harnesses</option></select>
           </label>
@@ -1017,7 +1025,32 @@
               select.appendChild(option);
             });
         }
-        populate(modelSelect, "modelName");
+        var modelInputs = [];
+        var modelNames = rows.map(function (row) { return row.dataset.modelName; })
+          .filter(function (value, index, values) { return values.indexOf(value) === index; })
+          .sort(function (a, b) { return a.localeCompare(b, "en", { numeric: true }); });
+        modelNames.forEach(function (name) {
+          var label = document.createElement("label");
+          var input = document.createElement("input");
+          input.type = "checkbox"; input.value = name; input.checked = true;
+          label.appendChild(input); label.appendChild(document.createTextNode(name));
+          document.getElementById("model-options").appendChild(label);
+          modelInputs.push(input);
+          input.addEventListener("change", apply);
+        });
+        function chooseModels(predicate) {
+          modelInputs.forEach(function (input) { input.checked = predicate(input.value); });
+          apply();
+        }
+        document.getElementById("models-all").addEventListener("click", function () {
+          chooseModels(function () { return true; });
+        });
+        document.getElementById("models-none").addEventListener("click", function () {
+          chooseModels(function () { return false; });
+        });
+        document.getElementById("models-gigachat").addEventListener("click", function () {
+          chooseModels(function (name) { return name.indexOf("GigaChat ") === 0; });
+        });
         populate(harnessSelect, "harnessName");
 
         var waveData = window.HBF_WAVE_RESULTS;
@@ -1027,6 +1060,10 @@
           return Math.abs(value - Math.round(value)) < 1e-9 ? String(Math.round(value)) : value.toFixed(1);
         }
         function apply() {
+          var selectedModels = modelInputs.filter(function (input) { return input.checked; })
+            .map(function (input) { return input.value; });
+          document.getElementById("selected-model-count").textContent =
+            selectedModels.length + " / " + modelInputs.length;
           var lo = Number(from.value), hi = Number(to.value);
           var first = waveData.waves[lo - 1], last = waveData.waves[hi - 1];
           var total = waveData.waves.slice(lo - 1, hi).reduce(function (sum, wave) { return sum + wave.count; }, 0);
@@ -1062,7 +1099,7 @@
           var shown = 0;
           rows.forEach(function (row) {
             var visible = total > 0 && row.dataset.hidden !== "true" &&
-              (modelSelect.value === "all" || row.dataset.modelName === modelSelect.value) &&
+              selectedModels.indexOf(row.dataset.modelName) !== -1 &&
               (harnessSelect.value === "all" || row.dataset.harnessName === harnessSelect.value);
             row.classList.toggle("is-hidden", !visible);
             if (visible) { shown += 1; }
@@ -1082,7 +1119,7 @@
         document.getElementById("wave-reset").addEventListener("click", function () {
           from.value = 1; to.value = waveData.waves.length; apply();
         });
-        [modelSelect, harnessSelect, sortSelect].forEach(function (select) {
+        [harnessSelect, sortSelect].forEach(function (select) {
           select.addEventListener("change", apply);
         });
         apply();

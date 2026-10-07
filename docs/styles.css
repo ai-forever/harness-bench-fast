@@ -658,3 +658,12 @@ h3 {
 .wave-filter output { font-weight: 600; }
 .wave-filter input { width: 100%; accent-color: #16836b; cursor: pointer; }
 .wave-filter p { flex-basis: 100%; margin: 0; }
+
+.model-picker { flex: 1 1 240px; color: var(--ink); }
+.model-picker summary { cursor: pointer; font-weight: 700; padding: 8px; }
+.model-picker-panel { margin-top: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+.model-presets { display: flex; flex-wrap: wrap; gap: 4px; }
+#model-options { margin: 8px 0 0; padding: 8px; border: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 10px; }
+#model-options legend { color: var(--muted); font-size: 14px; }
+#model-options label { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
+#model-options input { flex-shrink: 0; margin-top: 4px; accent-color: #16836b; }
