@@ -142,17 +142,17 @@
             concurrency 3, with the same frozen harness versions as the DeepSeek matrix.
             Infrastructure attempts were replaced by retries; final reports contain no infrastructure errors.
             Token telemetry is raw and not independently audited; zero means absent.</p>
-        <div class="wave-filter" role="group" aria-label="Wave range">
-          <label for="wave-from">From wave <output id="wave-from-label">1 · core</output>
-            <input type="range" id="wave-from" min="1" max="15" value="1" step="1">
+        <div class="wave-filter" role="group" aria-label="Task-set version range">
+          <label for="wave-from">From version <output id="wave-from-label">v0.1.0</output>
+            <input type="range" id="wave-from" min="1" max="17" value="1" step="1">
           </label>
-          <label for="wave-to">To wave <output id="wave-to-label">15 · reflect</output>
-            <input type="range" id="wave-to" min="1" max="15" value="15" step="1">
+          <label for="wave-to">To version <output id="wave-to-label">v0.18.0</output>
+            <input type="range" id="wave-to" min="1" max="17" value="17" step="1">
           </label>
-          <p id="wave-range-summary" aria-live="polite">Waves 1–15 · tasks 1–431 · 431 tasks</p>
-          <button type="button" class="chip" id="wave-reset">All waves</button>
-          <p>Scores and ranks use only selected waves. @mean3 remains a mean of three runs.
-            Steps and tokens below are totals for the full run, not for the selected range.</p>
+          <p id="wave-range-summary" aria-live="polite">v0.1.0–v0.18.0 · 431 tasks</p>
+          <button type="button" class="chip" id="wave-reset">All versions</button>
+          <p>Scores and ranks use tasks introduced in the selected versions. @mean3 remains a mean of three runs.
+            Revisions without added tasks contribute zero tasks. Scores use current v0.18.0 task definitions, not historical results. Steps and tokens below remain full-run totals.</p>
         </div>
         <div class="filter-bar" role="group" aria-label="Current results filters">
           <label class="filter-select" for="current-model-filter">Model
@@ -1029,18 +1029,18 @@
         function apply() {
           var lo = Number(from.value), hi = Number(to.value);
           var first = waveData.waves[lo - 1], last = waveData.waves[hi - 1];
-          var total = last.end - first.start + 1;
-          document.getElementById("wave-from-label").textContent = lo + " · " + first.name;
-          document.getElementById("wave-to-label").textContent = hi + " · " + last.name;
+          var total = waveData.waves.slice(lo - 1, hi).reduce(function (sum, wave) { return sum + wave.count; }, 0);
+          document.getElementById("wave-from-label").textContent = first.name;
+          document.getElementById("wave-to-label").textContent = last.name;
           document.getElementById("wave-range-summary").textContent =
-            "Waves " + lo + "–" + hi + " · tasks " + first.start + "–" + last.end + " · " + total + " tasks";
+            first.name + "–" + last.name + " · " + total + " tasks introduced" + (total === 0 ? " · No tasks added in this range" : "");
           rows.forEach(function (row) {
             var passed = waveData.rows[row.dataset.waveId].passed.slice(lo - 1, hi)
               .reduce(function (sum, value) { return sum + value; }, 0);
-            var score = passed / total * 100;
+            var score = total ? passed / total * 100 : 0;
             row.dataset.passed = passed;
-            row.querySelector(".score").textContent = formatPassed(passed) + "/" + total;
-            row.querySelector(".percent").textContent = score.toFixed(1) + "%";
+            row.querySelector(".score").textContent = total ? formatPassed(passed) + "/" + total : "—";
+            row.querySelector(".percent").textContent = total ? score.toFixed(1) + "%" : "—";
             row.querySelector(".bar span").style.width = score + "%";
           });
           var ranked = rows.slice().sort(function (a, b) {
@@ -1061,7 +1061,7 @@
           });
           var shown = 0;
           rows.forEach(function (row) {
-            var visible = row.dataset.hidden !== "true" &&
+            var visible = total > 0 && row.dataset.hidden !== "true" &&
               (modelSelect.value === "all" || row.dataset.modelName === modelSelect.value) &&
               (harnessSelect.value === "all" || row.dataset.harnessName === harnessSelect.value);
             row.classList.toggle("is-hidden", !visible);

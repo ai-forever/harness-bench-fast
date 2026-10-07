@@ -25,8 +25,10 @@ and task budgets as the DeepSeek matrix.
 | OpenCode | GLM-5.3 Flash Uncensored (high) | 397/431 | 92.1% | 2,911 | 0 |
 | deepagents | GLM-5.3 Flash Uncensored (high) | 375/431 | 87.0% | 6,627 | 373,783,977 |
 
-The live leaderboard supports an inclusive wave range with two sliders.
-Current v0.18.0 has 15 waves, in `TASK_WAVES` order (core through reflect).
+The live leaderboard supports an inclusive task-set version range with two sliders.
+The range follows `TASK_SET_REVISIONS`, currently v0.1.0 through v0.18.0,
+and selects tasks introduced by those revisions, using current task definitions.
+Revisions with no added tasks contribute zero tasks; an empty range has no score.
 Scores and ranks are recomputed from per-wave passed counts; @mean3 remains
 an arithmetic mean over all three runs. Steps/tokens remain full-run totals.
 The public `docs/wave-results.js` contains only wave summaries; raw task
