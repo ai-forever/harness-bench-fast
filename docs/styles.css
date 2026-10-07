@@ -652,3 +652,9 @@ h3 {
 .history details[open] > summary {
   margin-bottom: 20px;
 }
+
+.wave-filter { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; padding: 1.25rem; margin: 1.5rem 0; border: 1px solid var(--line, #ccc); border-radius: 12px; }
+.wave-filter label { display: flex; flex-direction: column; gap: .6rem; flex: 1 1 240px; }
+.wave-filter output { font-weight: 600; }
+.wave-filter input { width: 100%; accent-color: #16836b; cursor: pointer; }
+.wave-filter p { flex-basis: 100%; margin: 0; }

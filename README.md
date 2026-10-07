@@ -12,6 +12,26 @@ Current task set: **431 tasks, `task-set v0.18.0`**. Tasks 392–411 are the lon
 | dsh headless | DeepSeek V4.1 Flash (high) | 422/431 | 97.9% | 3,973 | 249,558,870 |
 | free-code | DeepSeek V4.1 Flash (high) | 419/431 | 97.2% | 4,311 | 631,963,525 |
 
+GLM-5.3 Flash Uncensored (`glm-5.3-flash-uncensored`), **@mean1**, measured
+2026-10-06/07, reasoning high, Linux bwrap, concurrency 3. Four completed
+431-task runs; infrastructure attempts replaced by retries. Raw token telemetry
+is not independently audited; zero means absent. Same frozen harness versions
+and task budgets as the DeepSeek matrix.
+
+| harness | model | passed | score | steps | tokens |
+|---|---|---:|---:|---:|---:|
+| mini-SWE-agent | GLM-5.3 Flash Uncensored (high) | 404/431 | 93.7% | 5,109 | 375,324,319 |
+| pi-mono | GLM-5.3 Flash Uncensored (high) | 397/431 | 92.1% | 0 | 0 |
+| OpenCode | GLM-5.3 Flash Uncensored (high) | 397/431 | 92.1% | 2,911 | 0 |
+| deepagents | GLM-5.3 Flash Uncensored (high) | 375/431 | 87.0% | 6,627 | 373,783,977 |
+
+The live leaderboard supports an inclusive wave range with two sliders.
+Current v0.18.0 has 15 waves, in `TASK_WAVES` order (core through reflect).
+Scores and ranks are recomputed from per-wave passed counts; @mean3 remains
+an arithmetic mean over all three runs. Steps/tokens remain full-run totals.
+The public `docs/wave-results.js` contains only wave summaries; raw task
+results and traces remain on bench.
+
 One full **k=1** run, measured 2026-10-03/04 with dsh **0.2.0-rc.2**,
 profile `hbf` (dsh-base + dsh-headless), model `deepseek-v4.1-flash`,
 reasoning effort **high**, concurrency 3 and Linux **bwrap** isolation.
