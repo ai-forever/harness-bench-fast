@@ -6,24 +6,32 @@ Current task set: **431 tasks, `task-set v0.18.0`**. Tasks 392–411 are the lon
 
 ## Results (task-set v0.18.0, 431 tasks)
 
+The stand owner identified the measured models as uncensored FP8 snapshots:
+[dealignai/DeepSeek-V4.1-Flash-UNCENSORED-FP8](https://huggingface.co/dealignai/DeepSeek-V4.1-Flash-UNCENSORED-FP8)
+and [dealignai/GLM-5.3-Flash-UNCENSORED-FP8](https://huggingface.co/dealignai/GLM-5.3-Flash-UNCENSORED-FP8).
+Results refer to these modified snapshots, not the original base checkpoints.
+
+
 | harness | model | passed | score | steps | tokens |
 |---|---|---:|---:|---:|---:|
-| pi-mono | DeepSeek V4.1 Flash (high) | 423/431 | 98.1% | 0 | 0 |
-| dsh headless | DeepSeek V4.1 Flash (high) | 422/431 | 97.9% | 3,973 | 249,558,870 |
-| free-code | DeepSeek V4.1 Flash (high) | 419/431 | 97.2% | 4,311 | 631,963,525 |
+| pi-mono | DeepSeek V4.1 Flash Uncensored FP8 (high) | 423/431 | 98.1% | 0 | 0 |
+| dsh headless | DeepSeek V4.1 Flash Uncensored FP8 (high) | 422/431 | 97.9% | 3,973 | 249,558,870 |
+| free-code | DeepSeek V4.1 Flash Uncensored FP8 (high) | 419/431 | 97.2% | 4,311 | 631,963,525 |
 
 GLM-5.3 Flash Uncensored (`glm-5.3-flash-uncensored`), **@mean1**, measured
-2026-10-06/07, reasoning high, Linux bwrap, concurrency 3. Four completed
+2026-10-06/07, reasoning high, Linux bwrap, concurrency 3. Six completed
 431-task runs; infrastructure attempts replaced by retries. Raw token telemetry
 is not independently audited; zero means absent. Same frozen harness versions
 and task budgets as the DeepSeek matrix.
 
 | harness | model | passed | score | steps | tokens |
 |---|---|---:|---:|---:|---:|
-| mini-SWE-agent | GLM-5.3 Flash Uncensored (high) | 404/431 | 93.7% | 5,109 | 375,324,319 |
-| pi-mono | GLM-5.3 Flash Uncensored (high) | 397/431 | 92.1% | 0 | 0 |
-| OpenCode | GLM-5.3 Flash Uncensored (high) | 397/431 | 92.1% | 2,911 | 0 |
-| deepagents | GLM-5.3 Flash Uncensored (high) | 375/431 | 87.0% | 6,627 | 373,783,977 |
+| mini-SWE-agent | GLM-5.3 Flash Uncensored FP8 (high) | 404/431 | 93.7% | 5,109 | 375,324,319 |
+| Hermes | GLM-5.3 Flash Uncensored FP8 (high) | 399/431 | 92.6% | 0 | 0 |
+| pi-mono | GLM-5.3 Flash Uncensored FP8 (high) | 397/431 | 92.1% | 0 | 0 |
+| OpenCode | GLM-5.3 Flash Uncensored FP8 (high) | 397/431 | 92.1% | 2,911 | 0 |
+| OpenHands | GLM-5.3 Flash Uncensored FP8 (high) | 393/431 | 91.2% | 0 | 0 |
+| deepagents | GLM-5.3 Flash Uncensored FP8 (high) | 375/431 | 87.0% | 6,627 | 373,783,977 |
 
 The live leaderboard supports an inclusive task-set version range with two sliders.
 The range follows `TASK_SET_REVISIONS`, currently v0.1.0 through v0.18.0,
@@ -147,7 +155,7 @@ Use a fresh result JSON path for v0.18.0; do not resume an older-version report 
 
 | Harness | Profile | Model | Result | % | Long wave (392–411) | Steps | Tokens |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| deepagents | none | DeepSeek V4.1 Flash (high) | 406/411 | 98.8% | 18/20 | 10,457 | 1,693,784,997 |
+| deepagents | none | DeepSeek V4.1 Flash Uncensored FP8 (high) | 406/411 | 98.8% | 18/20 | 10,457 | 1,693,784,997 |
 | deepagents | none | GPT-6 Luna (high) | 390/411 | 94.9% | 12/20 | 9,822 | 360,640,300 |
 | deepagents | none | GLM-5.3 (high) | 389/411 | 94.6% | 14/20 | 8,031 | 1,005,651,882 |
 | mini-SWE-agent | — | GigaChat 3.5 Ultra Reasoning (PROM)² | 366/411 | 89.1% | 0/20 | 5,898 | 60,635,573 |
@@ -726,7 +734,7 @@ wave, and the old results must not be relabelled as new-version scores.
 Calibration, 2026-09-30, two attempts per task, `run-openrouter` in the bwrap sandbox
 (GigaChat: native `run` with `deepagents-gigachat` 0.0.4); passed attempts out of two:
 
-| task | GigaChat 3.5 xxxB (internal version) | gpt-oss-120b | Qwen3.6-35B-A3B | Claude Haiku 4.5 | DeepSeek V4.1 Flash (high) | GPT-6 Luna (high) | Claude Opus 5.5 |
+| task | GigaChat 3.5 xxxB (internal version) | gpt-oss-120b | Qwen3.6-35B-A3B | Claude Haiku 4.5 | DeepSeek V4.1 Flash Uncensored FP8 (high) | GPT-6 Luna (high) | Claude Opus 5.5 |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | reflect_01_supplier_minimum | 0/2 | 0/2 | 1/2 | 1/2 | 2/2 | 2/2 | 1/2 |
 | reflect_02_crm_pagination | 0/2 | 0/2 | 2/2 | 1/2 | 2/2 | 1/2 | 2/2 |
