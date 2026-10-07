@@ -19,14 +19,16 @@ Results refer to these modified snapshots, not the original base checkpoints.
 | free-code | DeepSeek V4.1 Flash Uncensored FP8 (high) | 419/431 | 97.2% | 4,311 | 631,963,525 |
 
 GLM-5.3 Flash Uncensored (`glm-5.3-flash-uncensored`), **@mean1**, measured
-2026-10-06/07, reasoning high, Linux bwrap, concurrency 3. Six completed
+2026-10-06/07, reasoning high, Linux bwrap, concurrency 3. Eight completed
 431-task runs; infrastructure attempts replaced by retries. Raw token telemetry
 is not independently audited; zero means absent. Same frozen harness versions
 and task budgets as the DeepSeek matrix.
 
 | harness | model | passed | score | steps | tokens |
 |---|---|---:|---:|---:|---:|
+| dsh headless | GLM-5.3 Flash Uncensored FP8 (high) | 405/431 | 94.0% | 3,833 | 234,756,961 |
 | mini-SWE-agent | GLM-5.3 Flash Uncensored FP8 (high) | 404/431 | 93.7% | 5,109 | 375,324,319 |
+| free-code | GLM-5.3 Flash Uncensored FP8 (high) | 404/431 | 93.7% | 4,924 | 516,879,409 |
 | Hermes | GLM-5.3 Flash Uncensored FP8 (high) | 399/431 | 92.6% | 0 | 0 |
 | pi-mono | GLM-5.3 Flash Uncensored FP8 (high) | 397/431 | 92.1% | 0 | 0 |
 | OpenCode | GLM-5.3 Flash Uncensored FP8 (high) | 397/431 | 92.1% | 2,911 | 0 |
