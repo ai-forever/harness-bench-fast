@@ -67,6 +67,8 @@ include = [
     "/README.md",
     "/pyproject.toml",
     "/tests",
+    "/scripts/hb-strands",
+    "/scripts/strands_smoke.py",
 ]
 exclude = [
     "/.github",

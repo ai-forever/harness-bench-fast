@@ -486,6 +486,103 @@ uv run python -m harness_bench apply-gold \
     --task task_06_toggle_debug --workspace /path/to/workspace
 ```
 
+### Strands harness through `run-cli`
+
+`scripts/hb-strands` runs an existing Node Strands runtime from each task's
+workspace. It requires Node 22 or newer, an absolute `STRANDS_RUNNER` path,
+`OPENAI_BASE_URL` ending in `/v1`, `OPENAI_API_KEY`, and an exact
+`STRANDS_MODEL_ID`. It does not install packages. The runtime must contain the
+native `runner.mjs` and its pinned `@strands-agents/harness` / SDK dependencies;
+Polar and VERL processes are not needed.
+
+First check the installed runtime with the offline smoke helper:
+
+```bash
+export STRANDS_RUNNER=/absolute/strands-runtime/runner.mjs
+export STRANDS_NODE="$(command -v node)"
+uv run python scripts/strands_smoke.py
+```
+
+The helper exercises the real SDK and launcher against a deterministic local
+HTTP fixture. It does not call a model provider. It writes its diagnostic
+artifacts to a fresh directory under `jobs/`; use `--output-dir DIR` to select
+another directory. Passing this check verifies the local integration only.
+
+Start with one diagnostic task and a fresh result path. Set the endpoint, key,
+and model to your deployment before executing this example. Record the exact
+served model ID/build in the private run artifact. Public reports should use
+the approved model label.
+
+```bash
+export STRANDS_RUNNER=/absolute/strands-runtime/runner.mjs
+export STRANDS_NODE="$(command -v node)"
+export OPENAI_BASE_URL=http://127.0.0.1:19000/v1
+export OPENAI_API_KEY=your-deployment-key
+export STRANDS_MODEL_ID=your-exact-served-model-id
+export STRANDS_MAX_STEPS=32
+export STRANDS_TIMEOUT_SECONDS=600
+export STRANDS_REQUEST_TIMEOUT_SECONDS=120
+export STRANDS_MODEL_PARAMS_JSON='{"temperature":0,"max_tokens":4096}'
+
+uv run python -m harness_bench run-cli \
+  --cli-command "$(pwd -P)/scripts/hb-strands" \
+  --task task_01_create_hello --concurrency 1 --timeout 660 --keep \
+  --isolation none --json-output strands_smoke.json
+```
+
+For a repeatable three-task provider smoke, set the same environment and run
+`uv run python scripts/strands_smoke.py --live`. This explicitly opts into model
+calls and uses the endpoint, credentials, model and sampling parameters from
+the environment. Both helper modes use `--isolation none`; neither produces a
+full benchmark score. Keep live artifacts private because they record exact
+model identities and configuration.
+
+The launcher defaults to the same 32 model calls, 600-second session,
+120-second request deadline, temperature 0 and 4096 completion-token cap when
+these settings are absent. These are bounded smoke settings; select explicit
+budgets before a benchmark campaign. Keep HBF's `--timeout` above the Strands
+session limit to allow native cancellation and the final metrics event.
+HBF's per-task timeout floors do not change `STRANDS_TIMEOUT_SECONDS`; long
+tasks require corresponding runner budgets. A saved result path resumes saved
+attempts, so use a fresh path after changing configuration.
+
+This profile enables `shell`, `read`, `write`, and `edit`, with memory, sessions,
+subagents, environment context, and context compaction disabled. The launcher
+prefixes each task with its physical working directory (`pwd -P`) and directs
+the agent to resolve relative task paths against that directory. The original
+task prompt follows a blank-line separator verbatim, including trailing newlines.
+This workspace prefix is part of the Strands benchmark configuration.
+The runner emits a terminal
+`strands_result` event with model calls, tool calls, available token usage,
+model/configuration metadata, and failure classification. Reasoning is recorded
+as `default` when no supported level is explicitly selected. Missing provider
+usage remains incomplete, and interrupted-call token totals are lower bounds.
+Transient provider errors are infrastructure failures and receive bounded retries.
+Native diagnostics retain safe transport cause codes and completion shape in
+`execution_history[].strands.error_details`. A `tool_calls` finish with no
+executable calls is an agent failure; the runner does not repair generated JSON.
+The native HTTP adapter opens a fresh connection for each model request to avoid
+closed keep-alive sockets on compatible serving endpoints and SSH tunnels.
+Step/token-limited attempts are graded by the task verifier; a session deadline
+is a scored task failure. Each physical retry retains its own observed usage.
+
+`--isolation none` is a host-level diagnostic, including on macOS. For a Linux
+benchmark, use `--isolation bwrap --sandbox-manifest strands-runtime.json`.
+Prepare a separate, pinned runtime directory containing only the runner, its
+dependencies and the Node runtime, for example:
+
+```json
+{"runtime_paths": ["/opt/strands-runtime"]}
+```
+
+Point `STRANDS_RUNNER` and `STRANDS_NODE` inside that directory. Do not allowlist
+the HBF repository, task/answer data, or the entire VERL checkout. Invoke the
+launcher directly as shown, so HBF automatically mounts the launcher file;
+using `bash /path/to/hb-strands` would also require allowlisting that script.
+The runtime can reach the configured network endpoint. Verify a single task
+under bwrap before expanding the run; a local diagnostic does not validate
+Linux isolation or establish a full benchmark score.
+
 `.env` at the repo root is auto-loaded by every runner.
 
 ## What's inside

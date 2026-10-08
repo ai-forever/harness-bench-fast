@@ -138,6 +138,131 @@ _AGENT_METRIC_KEYS = (
 """Per-task effort metrics written to result JSON when a parser recognizes a run."""
 
 
+def _is_strands_command(argv: list[str]) -> bool:
+    """Recognize our native launcher, never arbitrary prompt/argument contents."""
+    if not argv:
+        return False
+    if Path(argv[0]).name == "hb-strands":
+        return True
+    return (
+        Path(argv[0]).name in {"bash", "sh"}
+        and len(argv) > 1
+        and Path(argv[1]).name == "hb-strands"
+    )
+
+
+def _strands_terminal_result(stdout: str | bytes | None) -> dict:
+    """Validate the native, single-event stdout protocol without scanning text.
+
+    Diagnostics belong on stderr. Task/tool text may contain arbitrary error
+    strings; only the terminal event determines retry and failure semantics.
+    """
+    invalid = {
+        "failure_kind": "infrastructure", "retryable": False,
+        "error": "strands_invalid_terminal_event", "stats": {},
+    }
+    if isinstance(stdout, bytes):
+        stdout = stdout.decode("utf-8", errors="replace")
+    lines = [line for line in (stdout or "").splitlines() if line.strip()]
+    if len(lines) != 1:
+        return invalid
+    try:
+        event = json.loads(lines[0])
+    except (ValueError, TypeError):
+        return invalid
+    if not isinstance(event, dict):
+        return invalid
+    if event.get("type") != "strands_result" or type(event.get("schema_version")) is not int or event["schema_version"] != 1:
+        return invalid
+    status = event.get("strands_status")
+    if status not in ("completed", "limited", "failed"):
+        return invalid
+    if "failure_kind" not in event or event["failure_kind"] not in (None, "infrastructure", "timeout"):
+        return invalid
+    kind = event["failure_kind"]
+    if type(event.get("retryable")) is not bool or type(event.get("usage_complete")) is not bool:
+        return invalid
+    if "error" not in event or (event["error"] is not None and (
+        not isinstance(event["error"], str) or not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", event["error"])
+    )):
+        return invalid
+    if status != "failed" and (kind is not None or event["retryable"]):
+        return invalid
+    if status == "completed" and event["error"] is not None:
+        return invalid
+    if status == "limited" and event["error"] not in ("model_call_limit", "model_token_limit"):
+        return invalid
+    if status == "failed" and event["error"] is None:
+        return invalid
+    if event["retryable"] and kind != "infrastructure":
+        return invalid
+    stats = event.get("stats")
+    if not isinstance(stats, dict) or any(
+        key not in _AGENT_METRIC_KEYS or type(value) is not int or value < 0
+        for key, value in stats.items()
+    ):
+        return invalid
+    if status != "failed" and not all(key in stats for key in (
+        "agent_steps", "agent_llm_calls", "agent_tool_calls"
+    )):
+        return invalid
+    if event["usage_complete"] and not all(key in stats for key in (
+        "agent_input_tokens", "agent_output_tokens", "agent_total_tokens"
+    )):
+        return invalid
+    # A scored execution must identify its requested model and reasoning level.
+    # Pre-launch/configuration failures may legitimately have no identity yet.
+    if status != "failed":
+        if any(not isinstance(event.get(key), str) or not event[key].strip() for key in (
+            "model", "requested_model", "reasoning_effort"
+        )):
+            return invalid
+        models = event.get("response_models")
+        if not isinstance(models, list) or any(not isinstance(model, str) or not model.strip() for model in models):
+            return invalid
+    return event
+
+
+def _strands_execution_metadata(event: dict) -> dict:
+    """Preserve counts/completeness and identity, excluding arbitrary tool output."""
+    keys = (
+        "schema_version", "strands_status", "failure_kind", "retryable", "error",
+        "stats", "usage_complete", "model", "requested_model", "response_models",
+        "reasoning_effort", "reasoning_enabled", "model_params", "stop_reason",
+        "max_steps", "timeout_seconds", "request_timeout_seconds",
+    )
+    metadata = {key: event[key] for key in keys if key in event}
+    if isinstance(event.get("error_details"), dict):
+        details = event["error_details"]
+        safe = {}
+        enums = {
+            "phase": ("headers", "body", "completion"),
+            "finish_reason": ("stop", "tool_calls", "length", "content_filter", "function_call", "unknown", None),
+            "content_type": ("string", "null", "undefined", "other"),
+        }
+        for key, values in enums.items():
+            if key in details and details[key] in values:
+                safe[key] = details[key]
+        for key in ("content_length", "reasoning_length", "tool_call_count"):
+            if type(details.get(key)) is int and details[key] >= 0:
+                safe[key] = details[key]
+        # The runner's error objects can contain credentials, request bodies and
+        # raw provider output. Persist only bounded, known transport codes.
+        codes = details.get("cause_codes")
+        known_codes = {
+            "ECONNRESET", "ECONNREFUSED", "ETIMEDOUT", "EPIPE", "EHOSTUNREACH",
+            "ENETUNREACH", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT",
+            "UND_ERR_HEADERS_TIMEOUT", "UND_ERR_BODY_TIMEOUT", "UND_ERR_SOCKET",
+            "UND_ERR_ABORTED", "UND_ERR_REQ_CONTENT_LENGTH_MISMATCH",
+            "UND_ERR_RES_CONTENT_LENGTH_MISMATCH", "UND_ERR_DESTROYED", "UND_ERR_CLOSED",
+        }
+        if isinstance(codes, list):
+            safe["cause_codes"] = [code for code in codes if isinstance(code, str) and code in known_codes][:5]
+        if safe:
+            metadata["error_details"] = safe
+    return metadata
+
+
 def _is_opencode_run_command(argv: list[str]) -> bool:
     if len(argv) < 2:
         return False
@@ -1022,9 +1147,16 @@ def _task_run_with_cli_stats(
     error: str | None = None,
     workspace: Path | None = None,
     stats_workspace: Path | None = None,
+    native_stats: dict | None = None,
 ) -> TaskRun:
-    native = _deepagents_worker_result(result.stdout or "") if result is not None else None
-    stats = {key: value for key, value in native.get("stats", {}).items() if key.startswith("agent_") and key in TaskRun.__dataclass_fields__} if native else None
+    stats = native_stats
+    if stats is None and result is not None:
+        native = _deepagents_worker_result(result.stdout or "")
+        if native:
+            stats = {
+                key: value for key, value in native.get("stats", {}).items()
+                if key.startswith("agent_") and key in TaskRun.__dataclass_fields__
+            }
     if stats is None:
         stats = _codex_json_event_stats(result.stdout or "") if result is not None else None
     if stats is None and result is not None:
@@ -1444,6 +1576,7 @@ def run_task_cli(
         raise ValueError("cli_command is empty")
     if isolation not in {"none", "bwrap"}:
         raise ValueError(f"unknown isolation mode: {isolation}")
+    is_strands = _is_strands_command(base_argv)
     artifacts_root = artifacts_root or Path("jobs/cli_artifacts").resolve()
     identity = {"isolation": isolation, "cli_command_sha256": hashlib.sha256(cli_command.encode()).hexdigest(),
                 "runtime_paths": list(runtime_paths), "timeout": timeout}
@@ -1491,6 +1624,7 @@ def run_task_cli(
         retryable = False
         phase = "setup"
         wire_session = None
+        strands = None
         try:
             task.setup(workspace)
             if _STOP_REQUESTED.is_set():
@@ -1500,7 +1634,11 @@ def run_task_cli(
             if inject_agents_md and agents_md.exists():
                 argv += ["--append-system-prompt", agents_md.read_text(encoding="utf-8")]
             argv += [task.prompt]
-            env = {**(os.environ if extra_env and "HBF_WORKER_API_KEY" in extra_env else (_subprocess_env_with_token() or os.environ)), **(extra_env or {}),
+            # Native workers carry their own provider credentials. In particular,
+            # Strands uses OPENAI_API_KEY; unrelated GigaChat OAuth settings in a
+            # repository .env must not trigger network requests before it starts.
+            native_credentials = is_strands or (extra_env and "HBF_WORKER_API_KEY" in extra_env)
+            env = {**(os.environ if native_credentials else (_subprocess_env_with_token() or os.environ)), **(extra_env or {}),
                    "HBF_TASK_MIN_RECURSION_LIMIT": str(getattr(task, "min_recursion_limit", None) or 0)}
             if wire_base := env.get("HBF_WIRE_BASE_URL"):
                 wire_url = urlsplit(wire_base)
@@ -1517,9 +1655,24 @@ def run_task_cli(
                 env = {**(env or os.environ), "TMPDIR": str(scratch), "TMP": str(scratch), "TEMP": str(scratch)}
             phase = "cli"
             result = _run_cli_subprocess(argv, cwd=workspace, timeout=timeout, env=env)
-            native = _deepagents_worker_result(result.stdout or "")
-            error = _infrastructure_error(result)
-            if extra_env and "HBF_WORKER_API_KEY" in extra_env:
+            if is_strands:
+                strands = _strands_terminal_result(result.stdout)
+                status = strands.get("strands_status")
+                if ((status == "completed" and result.returncode != 0)
+                    or (status == "limited" and result.returncode != {
+                        "model_call_limit": 3, "model_token_limit": 4,
+                    }[strands["error"]])
+                    or (status == "failed" and result.returncode == 0)):
+                    strands = _strands_terminal_result(None)
+                native = dict(strands)
+                if status == "failed" and not native.get("failure_kind"):
+                    native["failure_kind"] = "agent_error"
+                native["message"] = native.get("error") or "Strands worker failed"
+                error = None
+            else:
+                native = _deepagents_worker_result(result.stdout or "")
+                error = _infrastructure_error(result)
+            if not is_strands and extra_env and "HBF_WORKER_API_KEY" in extra_env:
                 terminal_count = sum(1 for line in (result.stdout or "").splitlines() if _deepagents_worker_result(line))
                 if terminal_count != 1 or not native or not isinstance(native.get("stats"), dict) or (result.returncode and not native.get("failure_kind")):
                     native = {"failure_kind": "infrastructure", "message": "Deepagents worker did not produce exactly one valid terminal event", "retryable": False, "stats": {}}
@@ -1529,7 +1682,8 @@ def run_task_cli(
                 run = _task_run_with_cli_stats(task_id=task.id, passed=False, message=error,
                     elapsed_seconds=time.monotonic()-started, result=result,
                     error=error if kind == "infrastructure" else None,
-                    workspace=workspace if keep_workspace else None, stats_workspace=workspace)
+                    workspace=workspace if keep_workspace else None, stats_workspace=workspace,
+                    native_stats=strands["stats"] if strands is not None else None)
             elif error:
                 kind = "infrastructure"
                 retryable = bool(_TRANSIENT_ERROR_PATTERN.search(error))
@@ -1541,10 +1695,18 @@ def run_task_cli(
                     message += f" | CLI exit={result.returncode}: {(result.stderr or result.stdout).strip()[-300:]!r}"
                 run = _task_run_with_cli_stats(task_id=task.id, passed=outcome.passed, message=message,
                     elapsed_seconds=time.monotonic()-started, result=result,
-                    workspace=workspace if keep_workspace else None, stats_workspace=workspace)
+                    workspace=workspace if keep_workspace else None, stats_workspace=workspace,
+                    native_stats=strands["stats"] if strands is not None else None)
         except subprocess.TimeoutExpired as exc:
             kind, error = "timeout", f"CLI timed out after {timeout}s"
             result = subprocess.CompletedProcess(base_argv, -1, exc.stdout, exc.stderr)
+            if is_strands:
+                # A terminal event may have been flushed before a child hung.
+                # The outer timeout remains authoritative; keep observed usage.
+                strands = _strands_terminal_result(exc.stdout)
+                run = _task_run_with_cli_stats(task_id=task.id, passed=False, message=error,
+                    elapsed_seconds=time.monotonic()-started, result=result, error=error,
+                    workspace=workspace if keep_workspace else None, native_stats=strands["stats"])
         except Exception:  # noqa: BLE001 — preserve setup/launcher/verifier evidence
             kind, error = "infrastructure", traceback.format_exc()
         except KeyboardInterrupt:
@@ -1556,6 +1718,8 @@ def run_task_cli(
                      "passed": bool(run and run.passed), "isolation": isolation,
                      "cli_command_sha256": hashlib.sha256(cli_command.encode()).hexdigest(),
                      "timeout": timeout, "runtime_paths": list(runtime_paths), "wire_session": wire_session}
+            if strands is not None:
+                entry["strands"] = _strands_execution_metadata(strands)
             history.append(entry)
             try:
                 record_execution(execution, stdout=result.stdout, stderr=result.stderr,
@@ -1583,7 +1747,8 @@ def run_task_cli(
             continue
         if run is None:
             run = TaskRun(task.id, False, "", time.monotonic()-started, error=error,
-                          workspace=workspace if keep_workspace else None, failure_kind=kind)
+                          workspace=workspace if keep_workspace else None, failure_kind=kind,
+                          **(strands["stats"] if strands is not None else {}))
         return replace(run, failure_kind=kind, execution_history=history)
     raise RuntimeError("run_task_cli retry loop fell through")
 
