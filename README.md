@@ -16,6 +16,7 @@ Results refer to these modified snapshots, not the original base checkpoints.
 |---|---|---:|---:|---:|---:|
 | pi-mono | DeepSeek V4.1 Flash Uncensored FP8 (high) | 423/431 | 98.1% | 0 | 0 |
 | dsh headless | DeepSeek V4.1 Flash Uncensored FP8 (high) | 422/431 | 97.9% | 3,973 | 249,558,870 |
+| Codex CLI | GPT-6.1 Sol (low) | 420/431 | 97.4% | 2,817 | 69,419,504 |
 | free-code | DeepSeek V4.1 Flash Uncensored FP8 (high) | 419/431 | 97.2% | 4,311 | 631,963,525 |
 
 GLM-5.3 Flash Uncensored (`glm-5.3-flash-uncensored`), **@mean1**, measured
@@ -43,6 +44,16 @@ Scores and ranks are recomputed from per-wave passed counts; @mean3 remains
 an arithmetic mean over all three runs. Steps/tokens remain full-run totals.
 The public `docs/wave-results.js` contains only wave summaries; raw task
 results and traces remain on bench.
+
+Codex CLI **0.159.3** + **`gpt-6.1-sol`, reasoning low**, **@mean1**, measured
+2026-10-07: **420/431 (97.4%)**. Ordinary **388/391 (99.2%)**, long
+**19/20 (95.0%)**, reflection **13/20 (65.0%)**. No infrastructure errors in
+final results. Linux bwrap, concurrency 3, ChatGPT OAuth; multi-agent and user
+configs disabled. Timeout 900 s, with long/reflection floors 7200/1800 s.
+Native sessions confirm model and effort. Raw runner telemetry: 2,817 steps,
+69,419,504 tokens, not independently audited. End-to-end TLS used a Mac
+CONNECT/SSH tunnel; runner and tasks stayed on bench. OAuth credentials are
+excluded from final artifacts; initial transport/isolation calibration is excluded.
 
 One full **k=1** run, measured 2026-10-03/04 with dsh **0.2.0-rc.2**,
 profile `hbf` (dsh-base + dsh-headless), model `deepseek-v4.1-flash`,
