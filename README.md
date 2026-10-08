@@ -489,18 +489,57 @@ uv run python -m harness_bench apply-gold \
 ### Strands CLI through `run-cli`
 
 Install the [official Strands CLI](https://github.com/strands-agents/harness-sdk/tree/main/strands-cli)
-with Node 22 or newer, configure its provider and model, then pass it directly to HBF:
+with Node 22 or newer:
 
 ```bash
 npm install -g @strands-agents/cli
 strands --version  # Record the installed version with the benchmark results.
-strands --setup
+```
+
+For an OpenAI-compatible **Chat Completions** endpoint (`/v1/chat/completions`),
+use the CLI's `litellm/` provider. This connects directly to your endpoint;
+installing or running a separate LiteLLM proxy is not required.
+
+```bash
+export LITELLM_API_KEY='your-api-key'
+export LITELLM_BASE_URL='http://localhost:9000/v1'
+export MODEL_NAME='your-exact-model-id'
+
+# Check the provider configuration before running the benchmark.
+strands -p --model "litellm/$MODEL_NAME" 'Reply with one word: ready'
 
 uv run python -m harness_bench run-cli \
-    --cli-command 'strands -p' \
+    --cli-command "strands -p --model litellm/$MODEL_NAME" \
     --task task_01_create_hello --timeout 900 --concurrency 1 \
-    --isolation none --json-output jobs/strands.json
+    --isolation none --json-output jobs/strands-chat-smoke.json
 ```
+
+Replace the key, URL and model ID with your deployment's values. Use `local`
+as the key only if the server does not require authentication. The URL includes
+`/v1`, without `/chat/completions`; the provider appends the request path.
+`litellm/` selects the CLI provider and is stripped before sending the model ID
+to the server.
+
+For a server supporting **Responses API** (`/v1/responses`), use `openai/`
+and the corresponding environment variables instead:
+
+```bash
+export OPENAI_API_KEY='your-api-key'
+export OPENAI_BASE_URL='https://your-server.example/v1'
+export MODEL_NAME='your-exact-model-id'
+
+strands -p --model "openai/$MODEL_NAME" 'Reply with one word: ready'
+
+uv run python -m harness_bench run-cli \
+    --cli-command "strands -p --model openai/$MODEL_NAME" \
+    --task task_01_create_hello --timeout 900 --concurrency 1 \
+    --isolation none --json-output jobs/strands-responses-smoke.json
+```
+
+In CLI `0.1.4`, `openai/` uses Responses API; changing `OPENAI_BASE_URL` alone
+does not switch it to Chat Completions. Choose the provider that matches your
+server's API. These examples configure the invocation through environment
+variables and flags; `strands --setup` is an alternative for saving a profile.
 
 `-p` answers once and exits; HBF appends each task prompt and runs the CLI in its
 task workspace. Omit `--task` for the full task set. The CLI uses its standard
