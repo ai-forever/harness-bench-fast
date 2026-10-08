@@ -486,59 +486,35 @@ uv run python -m harness_bench apply-gold \
     --task task_06_toggle_debug --workspace /path/to/workspace
 ```
 
-### Strands harness through `run-cli`
+### Strands CLI through `run-cli`
 
-`scripts/hb-strands` runs the bundled Node Strands harness from each task's
-workspace, with `shell`, `read`, `write`, and `edit` tools. Memory, sessions,
-subagents and context compaction are disabled. From the repository checkout,
-install its pinned dependencies with Node 22 or newer, then check the integration:
+Install the [official Strands CLI](https://github.com/strands-agents/harness-sdk/tree/main/strands-cli)
+with Node 22 or newer, configure its provider and model, then pass it directly to HBF:
 
 ```bash
-npm ci --prefix harness_bench/strands
-uv run python scripts/strands_smoke.py
-```
+npm install -g @strands-agents/cli
+strands --version  # Record the installed version with the benchmark results.
+strands --setup
 
-The default smoke uses the real SDK with a local HTTP fixture and makes no
-provider calls. It checks tool/reasoning history, metrics, and a fresh task
-retry after HTTP 429. Evidence goes to a new directory under `jobs/`; use
-`--output-dir DIR` to choose another new directory.
-
-Set an OpenAI-compatible endpoint and exact model ID for a live smoke or run:
-
-```bash
-export OPENAI_BASE_URL=http://127.0.0.1:8000/v1
-export OPENAI_API_KEY=your-api-key
-export STRANDS_MODEL_ID=your-model-id
-export STRANDS_MODEL_PARAMS_JSON='{"temperature":0,"max_tokens":4096}'
-
-# Three sequential diagnostic tasks; explicitly enables model calls.
-uv run python scripts/strands_smoke.py --live
-
-# One task through the standard CLI runner; omit --task for the full task set.
 uv run python -m harness_bench run-cli \
-  --cli-command "$(pwd -P)/scripts/hb-strands" \
-  --task task_01_create_hello --concurrency 1 --timeout 660 \
-  --isolation none --json-output jobs/strands-smoke.json
+    --cli-command 'strands -p' \
+    --task task_01_create_hello --timeout 900 --concurrency 1 \
+    --isolation none --json-output jobs/strands.json
 ```
 
-The launcher defaults to 32 model calls, a 600-second session and a 120-second
-request deadline. Override these with `STRANDS_MAX_STEPS`,
-`STRANDS_TIMEOUT_SECONDS`, and `STRANDS_REQUEST_TIMEOUT_SECONDS`; keep HBF's
-`--timeout` above the session deadline. The live smoke defaults to 16 calls,
-240 seconds per session and 90 seconds per request. `STRANDS_NODE` optionally
-selects Node; `STRANDS_RUNNER` optionally selects another absolute runner path.
-Use a fresh result path when changing configuration. The examples use local
-execution (`--isolation none`), including on macOS. For Linux `bwrap`, add only
-the absolute `harness_bench/strands` directory (and a custom Node runtime, if
-needed) to the sandbox manifest; the launcher itself is mounted automatically.
+`-p` answers once and exits; HBF appends each task prompt and runs the CLI in its
+task workspace. Omit `--task` for the full task set. The CLI uses its standard
+saved configuration; optional `--model provider/model` and `--effort high`
+flags override the model and reasoning effort for the invocation. These flags
+were checked with CLI `0.1.4`; use `strands --help` for the installed version.
 
-Results retain steps, tool calls, available tokens, exact model/build identity,
-sampling settings and reasoning level (`default` when unset). Keep live
-artifacts private. Missing usage remains unknown; interrupted-call token sums
-are lower bounds. Transient infrastructure errors receive bounded retries, while session
-timeouts and unusable model tool calls count as task failures. Step/token-limited
-attempts are graded by the verifier. The smoke is a diagnostic, not a full
-benchmark score.
+HBF reads token counts from the CLI's final usage line; post-run/background
+requests may not be included. Step counts remain unavailable.
+
+Record the CLI version, exact model/build, effective reasoning level (`default`
+if unset), and relevant CLI configuration with each run. Report missing step or
+token metrics as unavailable; `0` in the standard result table means the
+artifact omitted that metric, not that no resources were spent.
 
 `.env` at the repo root is auto-loaded by every runner.
 

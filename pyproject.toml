@@ -60,9 +60,6 @@ Issues = "https://github.com/ai-forever/harness-bench-fast/issues"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.build]
-exclude = ["**/node_modules"]
-
 [tool.hatch.build.targets.sdist]
 include = [
     "/harness_bench",
@@ -70,11 +67,8 @@ include = [
     "/README.md",
     "/pyproject.toml",
     "/tests",
-    "/scripts/hb-strands",
-    "/scripts/strands_smoke.py",
 ]
 exclude = [
-    "**/node_modules",
     "/.github",
     "/.gitignore",
     "/.venv",
@@ -112,5 +106,4 @@ norecursedirs = [
     "harbor_dataset*",
     "harbor_jobs*",
     "jobs",
-    "node_modules",
 ]
