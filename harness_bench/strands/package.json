@@ -1,0 +1,17 @@
+{
+  "name": "hbf-strands-runner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "test": "node --test runner.test.mjs"
+  },
+  "dependencies": {
+    "@strands-agents/harness": "0.1.1",
+    "@strands-agents/sdk": "1.19.0",
+    "undici": "7.30.0"
+  }
+}

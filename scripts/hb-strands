@@ -10,6 +10,16 @@ fail() {
 
 [[ $# -eq 1 ]] || fail launcher_expected_one_prompt
 [[ -n "$1" ]] || fail launcher_empty_prompt
+if [[ ! ${STRANDS_RUNNER+x} ]]; then
+  # Resolve relative to this launcher, never to the task workspace. The cd is
+  # confined to a subshell so native tools retain HBF's task cwd.
+  strands_repo="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." 2>/dev/null && pwd -P)" || fail launcher_installation_unavailable
+  export STRANDS_RUNNER="$strands_repo/harness_bench/strands/runner.mjs"
+  [[ -f "$STRANDS_RUNNER" && -r "$STRANDS_RUNNER" ]] || fail launcher_bundled_runner_missing
+  for strands_package in @strands-agents/harness @strands-agents/sdk undici; do
+    [[ -r "$strands_repo/harness_bench/strands/node_modules/$strands_package/package.json" ]] || fail launcher_missing_dependencies_run_npm_ci_in_harness_bench_strands
+  done
+fi
 [[ "${STRANDS_RUNNER:-}" = /* ]] || fail launcher_requires_absolute_STRANDS_RUNNER
 [[ -f "$STRANDS_RUNNER" && -r "$STRANDS_RUNNER" ]] || fail launcher_unreadable_STRANDS_RUNNER
 

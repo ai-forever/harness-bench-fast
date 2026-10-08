@@ -2,6 +2,7 @@
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -140,3 +141,59 @@ def test_workspace_header_uses_physical_path(runtime):
     assert result.returncode == 0, result.stderr
     instruction = json.loads(result.stdout)["env"]["STRANDS_INSTRUCTION"]
     assert instruction.startswith(f"Working directory: {workspace.resolve()}\n")
+
+
+@pytest.fixture
+def bundled_installation(runtime, tmp_path):
+    repo = tmp_path / "standalone hbf checkout"
+    script = repo / "scripts" / "hb-strands"
+    script.parent.mkdir(parents=True)
+    shutil.copy2(LAUNCHER, script)
+    runner = repo / "harness_bench" / "strands" / "runner.mjs"
+    runner.parent.mkdir(parents=True)
+    runner.write_text("// bundled fixture runner\n")
+    for package in ("@strands-agents/harness", "@strands-agents/sdk", "undici"):
+        metadata = runner.parent / "node_modules" / package / "package.json"
+        metadata.parent.mkdir(parents=True)
+        metadata.write_text("{}")
+    workspace, _, _, env = runtime
+    env = {key: value for key, value in env.items() if key != "STRANDS_RUNNER"}
+    return script, runner, workspace, env
+
+
+def test_defaults_to_bundled_runner_without_changing_task_cwd(bundled_installation):
+    script, runner, workspace, env = bundled_installation
+    prompt = "Literal $(touch injected) `touch injected2`\n\n"
+    result = subprocess.run(
+        [str(script), prompt], cwd=workspace, env=env, capture_output=True, text=True, timeout=5,
+    )
+    assert result.returncode == 0, result.stderr
+    output = json.loads(result.stdout)
+    assert output["argv"] == [str(runner.resolve())]
+    assert output["env"]["STRANDS_RUNNER"] == str(runner.resolve())
+    assert Path(output["cwd"]).resolve() == workspace.resolve()
+    assert output["env"]["STRANDS_INSTRUCTION"].startswith(f"Working directory: {workspace.resolve()}\n")
+    assert output["env"]["STRANDS_INSTRUCTION"].split("\n\n", 1)[1] == prompt
+    assert not list(workspace.iterdir())
+
+
+@pytest.mark.parametrize("missing", ["runner", "@strands-agents/harness", "@strands-agents/sdk", "undici"])
+def test_missing_bundled_runtime_is_a_clear_infrastructure_failure(bundled_installation, missing):
+    script, runner, workspace, env = bundled_installation
+    if missing == "runner":
+        runner.unlink()
+        code = "launcher_bundled_runner_missing"
+    else:
+        (runner.parent / "node_modules" / missing / "package.json").unlink()
+        code = "launcher_missing_dependencies_run_npm_ci_in_harness_bench_strands"
+    result = subprocess.run(
+        [str(script), "sensitive task prompt"], cwd=workspace,
+        env={**env, "OPENAI_API_KEY": "sensitive-key"}, capture_output=True, text=True, timeout=5,
+    )
+    assert result.returncode == 2
+    output = json.loads(result.stdout)
+    assert output["error"] == code
+    assert output["failure_kind"] == "infrastructure"
+    assert output["retryable"] is False
+    assert "sensitive" not in result.stdout + result.stderr
+    assert result.stderr == ""

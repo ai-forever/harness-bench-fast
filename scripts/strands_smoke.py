@@ -44,7 +44,8 @@ def write_json(path: Path, value: object, api_key: str = "") -> None:
 
 
 def configuration(live: bool) -> dict[str, str]:
-    runner = Path(os.environ.get("STRANDS_RUNNER", ""))
+    bundled_runner = ROOT / "harness_bench" / "strands" / "runner.mjs"
+    runner = Path(os.environ.get("STRANDS_RUNNER", str(bundled_runner)))
     if not runner.is_absolute() or not runner.is_file():
         raise ValueError("STRANDS_RUNNER must name an existing absolute runner.mjs path")
     node = shutil.which(os.environ.get("STRANDS_NODE") or "node")

@@ -37,6 +37,29 @@ def test_offline_configuration_overrides_provider_and_budgets(env, monkeypatch):
     assert config["STRANDS_NODE"] == "/fixture/node"
 
 
+def test_unset_runner_uses_repository_bundle(env, monkeypatch, tmp_path):
+    monkeypatch.delenv("STRANDS_RUNNER")
+    monkeypatch.setattr(smoke, "ROOT", tmp_path)
+    bundled_runner = tmp_path / "harness_bench" / "strands" / "runner.mjs"
+    bundled_runner.parent.mkdir(parents=True)
+    bundled_runner.write_text("// bundled fixture")
+    assert smoke.configuration(False)["STRANDS_RUNNER"] == str(bundled_runner)
+
+
+def test_explicit_runner_override_is_preserved(env, monkeypatch, tmp_path):
+    override = tmp_path / "custom-runtime" / "runner.mjs"
+    override.parent.mkdir()
+    override.write_text("// custom fixture")
+    monkeypatch.setenv("STRANDS_RUNNER", str(override))
+    assert smoke.configuration(False)["STRANDS_RUNNER"] == str(override)
+
+
+def test_explicit_empty_runner_does_not_fall_back(env, monkeypatch):
+    monkeypatch.setenv("STRANDS_RUNNER", "")
+    with pytest.raises(ValueError, match="STRANDS_RUNNER"):
+        smoke.configuration(False)
+
+
 def test_live_preserves_exact_caller_params(env, monkeypatch):
     params = '{ "reasoning_effort": "high", "chat_template_kwargs": {"reasoning": true} }'
     monkeypatch.setenv("STRANDS_MODEL_PARAMS_JSON", params)
