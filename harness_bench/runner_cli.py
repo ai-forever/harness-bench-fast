@@ -209,6 +209,8 @@ def _strands_provider_error(result: subprocess.CompletedProcess[str]) -> str | N
         return "network error"
     if re.search(r"^error: Request timed out\.", result.stderr or "", re.MULTILINE):
         return "request timeout"
+    if re.search(r"^error: Stream ended without completing a message\s*$", result.stderr or "", re.MULTILINE):
+        return "streaming request failed: Stream ended without completing a message"
     return None
 
 

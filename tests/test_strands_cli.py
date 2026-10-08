@@ -106,6 +106,7 @@ def test_strands_bypasses_unrelated_gigachat_oauth(monkeypatch, tmp_path):
     "error: 429 Rate limit reached\n", "error: 503 Service unavailable\n",
     "error: Connection error.\n", "error: Request timed out.\n",
     "error: HTTP status 529 Overloaded\n",
+    "error: Stream ended without completing a message\n",
 ])
 def test_official_provider_errors_retry_fresh_workspace(monkeypatch, tmp_path, stderr):
     workspaces = []
@@ -134,6 +135,13 @@ def test_exhausted_provider_error_invalidates_and_retains_observed_usage(monkeyp
     run = runner_cli.run_task_cli(fake_task(), cli_command="strands -p", transient_retries=0, artifacts_root=tmp_path)
     assert run.failure_kind == "infrastructure" and not run.passed
     assert run.agent_total_tokens == 2 and results_to_payload([run])["measurement_valid"] is False
+
+
+def test_incomplete_stream_invalidates_even_if_files_pass_verification(monkeypatch, tmp_path):
+    run = run_output(monkeypatch, tmp_path, "", returncode=1,
+                     stderr="error: Stream ended without completing a message\n")
+    assert run.failure_kind == "infrastructure" and not run.passed
+    assert results_to_payload([run])["measurement_valid"] is False
 
 
 def test_authentication_error_invalidates_without_retry_or_verifier_pass(monkeypatch, tmp_path):
