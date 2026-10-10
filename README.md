@@ -15,6 +15,7 @@ Results refer to these modified snapshots, not the original base checkpoints.
 | harness | model | passed | score | steps | tokens |
 |---|---|---:|---:|---:|---:|
 | pi-mono | DeepSeek V4.1 Flash Uncensored FP8 (high) | 423/431 | 98.1% | 0 | 0 |
+| GigaCode Universal Agent (gc-cli) | GLM-5.3 (TagMe gateway) (high) | 423/431 | 98.1% | 4,581 | 271,316,552 |
 | dsh headless | DeepSeek V4.1 Flash Uncensored FP8 (high) | 422/431 | 97.9% | 3,973 | 249,558,870 |
 | Codex CLI | GPT-6.1 Sol (low) | 420/431 | 97.4% | 2,817 | 69,419,504 |
 | free-code | DeepSeek V4.1 Flash Uncensored FP8 (high) | 419/431 | 97.2% | 4,311 | 631,963,525 |
@@ -104,6 +105,17 @@ model responses and tokens are summed from the agent's own `run_usage` events
 audited. Guards (write/read/command moderation) and built-in skills were disabled,
 summarisation thresholds 200k tokens, timeout 900 s with task-specific floors of
 7200 s (long) and 1800 s (reflection).
+
+The GigaCode Universal Agent + GLM-5.3 row is **@mean1**, measured 2026-10-09/10
+with the same gc-cli 0.4.0 build and run-cli/bwrap setup as the DeepSeek row,
+model `z-ai/glm-5.3` served through the internal TagMe OpenRouter-compatible
+gateway with `reasoning.effort: high` (upstream weights, **not** the
+`glm-5.3-flash-uncensored` FP8 snapshot measured by the eight-harness GLM matrix
+below; the two are not comparable). Ordinary **388/391 (99.2%)**, long
+**16/20 (80.0%)**, reflection **19/20 (95.0%)**. No infrastructure failures or
+retries; two long tasks hit the 7200 s floor and are scored as fails. Steps and
+tokens are the agent's own usage counters with coverage 429/431 (absent for the
+two timed-out tasks, so totals are lower bounds), not independently audited.
 
 Use a fresh result JSON path for v0.18.0; do not resume an older-version report
 into the new task set. Both new waves belong to the default scored suite.

@@ -53,7 +53,7 @@
           <div class="summary-grid">
             <div><span class="metric">431</span><span class="label">tasks</span></div>
             <div><span class="metric">20</span><span class="label">new tool-reflection tasks</span></div>
-            <div><span class="metric">67</span><span class="label">full v0.18.0 runs published</span></div>
+            <div><span class="metric">68</span><span class="label">full v0.18.0 runs published</span></div>
             <div><span class="metric">v0.18.0</span><span class="label">task-set version</span></div>
           </div>
           <p>Previous scores use 411 or fewer tasks. They are listed below as history.</p>
@@ -91,7 +91,7 @@
         <div class="section-heading">
           <p class="eyebrow">Current task set, v0.18.0</p>
           <h2 id="current-title">431 tasks, including 20 tool-reflection tasks</h2>
-          <p>Completed, validated full runs measured 2026-10-02–09. The PROM matrix is still running;
+          <p>Completed, validated full runs measured 2026-10-02–10. The PROM matrix is still running;
             incomplete runs and infrastructure failures are excluded. The PROM matrix uses one run per configuration (k=1),
             eight task slots across the matrix, bwrap isolation. The separate maestro harness run used four task workers and bwrap.</p>
           <p>All listed PROM matrix runs scored 0/20 on the long-context wave. Reflection: GigaChat 2 Reasoning + mini-SWE-agent: 8/20; GigaChat 2 Reasoning + OpenCode: 1/20; GigaChat 2 Reasoning + deepagents (no profile): 1/20; GigaChat 2 Pro + mini-SWE-agent: 1/20; GigaChat 2 Reasoning + deepagents (GigaChat profile): 2/20; maestro harness: 1/20 (and 0/20 long); other listed runs 0/20.
@@ -155,6 +155,12 @@
             guards and built-in skills disabled. Steps count model responses; tokens are the
             agent's own usage counters (coverage 431/431), not independently audited.
             Timeout 900 s with floors of 7200 s for long and 1800 s for reflection.</p>
+          <p>GigaCode Universal Agent gc-cli 0.4.0 + GLM-5.3 (<code>z-ai/glm-5.3</code>, upstream weights through the
+            internal TagMe gateway, reasoning high): 423/431 (98.1%), @mean1, measured 2026-10-09/10 with the same
+            run-cli/bwrap setup; ordinary 388/391, long 16/20, reflection 19/20. No infrastructure failures;
+            two long tasks timed out at 7200 s and count as fails. Steps and tokens are the agent's own counters
+            with coverage 429/431 (lower bounds), not independently audited. This is not the
+            <code>glm-5.3-flash-uncensored</code> FP8 snapshot of the eight-harness GLM matrix and is not comparable to it.</p>
           <p>Codex CLI 0.159.3 + GPT-6.1 Sol (<code>gpt-6.1-sol</code>), reasoning low:
             completed @mean1 on 2026-10-07, 420/431 (97.4%). Ordinary 388/391,
             long 19/20, reflection 13/20; no infrastructure failures in the final report.
@@ -206,6 +212,13 @@
             <div class="score">423/431</div><div class="percent">98.1%</div>
             <div class="bar"><span style="width:98.1%"></span></div>
             <div class="meta">@mean1 · Long wave 13/20 · Reflection 19/20 · Steps 0 · Tokens 0 (metrics absent)</div>
+          </article>
+          <article data-wave-id="ua-glm53" class="result-row" data-harness="universal-agent" data-group="other">
+            <div class="rank">1</div>
+            <div class="who"><h3>GigaCode Universal Agent (gc-cli)</h3><p>GLM-5.3 (TagMe gateway) (high)</p></div>
+            <div class="score">423/431</div><div class="percent">98.1%</div>
+            <div class="bar"><span style="width:98.1%"></span></div>
+            <div class="meta">@mean1 · Long wave 16/20 · Reflection 19/20 · Steps 4,581 · Tokens 271,316,552 (coverage 429/431)</div>
           </article>
           <article data-wave-id="run-1" class="result-row" data-harness="dsh" data-group="other">
             <div class="rank">2</div>
