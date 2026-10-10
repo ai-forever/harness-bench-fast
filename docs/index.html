@@ -53,7 +53,7 @@
           <div class="summary-grid">
             <div><span class="metric">431</span><span class="label">tasks</span></div>
             <div><span class="metric">20</span><span class="label">new tool-reflection tasks</span></div>
-            <div><span class="metric">68</span><span class="label">full v0.18.0 runs published</span></div>
+            <div><span class="metric">72</span><span class="label">full v0.18.0 runs published</span></div>
             <div><span class="metric">v0.18.0</span><span class="label">task-set version</span></div>
           </div>
           <p>Previous scores use 411 or fewer tasks. They are listed below as history.</p>
@@ -161,6 +161,13 @@
             two long tasks timed out at 7200 s and count as fails. Steps and tokens are the agent's own counters
             with coverage 429/431 (lower bounds), not independently audited. This is not the
             <code>glm-5.3-flash-uncensored</code> FP8 snapshot of the eight-harness GLM matrix and is not comparable to it.</p>
+          <p>GLM-5.3 (<code>z-ai/glm-5.3</code>, upstream weights through the internal TagMe gateway, reasoning high)
+            harness matrix, four of six runs completed 2026-10-09/10, each @mean1 on all 431 tasks with the same frozen
+            runtimes as the DeepSeek matrix, Linux bwrap, concurrency 3: OpenCode 413/431 (ordinary 386, long 12,
+            reflection 15), deepagents 408/431 (381/14/13), mini-SWE-agent 407/431 (385/9/13), pi-mono 396/431
+            (376/6/14). Hermes and OpenHands are still running. No infrastructure failures remain; timed-out tasks
+            count as fails. Token telemetry is raw and not independently audited; zero means absent. Not comparable
+            with the <code>glm-5.3-flash-uncensored</code> FP8 rows.</p>
           <p>Codex CLI 0.159.3 + GPT-6.1 Sol (<code>gpt-6.1-sol</code>), reasoning low:
             completed @mean1 on 2026-10-07, 420/431 (97.4%). Ordinary 388/391,
             long 19/20, reflection 13/20; no infrastructure failures in the final report.
@@ -219,6 +226,34 @@
             <div class="score">423/431</div><div class="percent">98.1%</div>
             <div class="bar"><span style="width:98.1%"></span></div>
             <div class="meta">@mean1 · Long wave 16/20 · Reflection 19/20 · Steps 4,581 · Tokens 271,316,552 (coverage 429/431)</div>
+          </article>
+          <article data-wave-id="glm53-tagme-opencode" class="result-row" data-harness="opencode" data-group="other">
+            <div class="rank">-</div>
+            <div class="who"><h3>OpenCode</h3><p>GLM-5.3 (TagMe gateway) (high)</p></div>
+            <div class="score">413/431</div><div class="percent">95.8%</div>
+            <div class="bar"><span style="width:95.8%"></span></div>
+            <div class="meta">@mean1 · Long wave 12/20 · Reflection 15/20 · Steps 3,745 · Tokens 0 (metrics absent)</div>
+          </article>
+          <article data-wave-id="glm53-tagme-deepagents" class="result-row" data-harness="deepagents" data-group="other">
+            <div class="rank">-</div>
+            <div class="who"><h3>deepagents†</h3><p>GLM-5.3 (TagMe gateway) (high)</p></div>
+            <div class="score">408/431</div><div class="percent">94.7%</div>
+            <div class="bar"><span style="width:94.7%"></span></div>
+            <div class="meta">@mean1 · Long wave 14/20 · Reflection 13/20 · Steps 8,271 · Tokens 696,504,696† (coverage 429/431)</div>
+          </article>
+          <article data-wave-id="glm53-tagme-mini" class="result-row" data-harness="mini-swe-agent" data-group="other">
+            <div class="rank">-</div>
+            <div class="who"><h3>mini-SWE-agent</h3><p>GLM-5.3 (TagMe gateway) (high)</p></div>
+            <div class="score">407/431</div><div class="percent">94.4%</div>
+            <div class="bar"><span style="width:94.4%"></span></div>
+            <div class="meta">@mean1 · Long wave 9/20 · Reflection 13/20 · Steps 5,191 · Tokens 769,563,983 (coverage 428/431)</div>
+          </article>
+          <article data-wave-id="glm53-tagme-pi" class="result-row" data-harness="pi-mono" data-group="other">
+            <div class="rank">-</div>
+            <div class="who"><h3>pi-mono</h3><p>GLM-5.3 (TagMe gateway) (high)</p></div>
+            <div class="score">396/431</div><div class="percent">91.9%</div>
+            <div class="bar"><span style="width:91.9%"></span></div>
+            <div class="meta">@mean1 · Long wave 6/20 · Reflection 14/20 · Steps 0 · Tokens 0 (metrics absent)</div>
           </article>
           <article data-wave-id="run-1" class="result-row" data-harness="dsh" data-group="other">
             <div class="rank">2</div>

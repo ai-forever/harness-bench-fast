@@ -117,6 +117,34 @@ retries; two long tasks hit the 7200 s floor and are scored as fails. Steps and
 tokens are the agent's own usage counters with coverage 429/431 (absent for the
 two timed-out tasks, so totals are lower bounds), not independently audited.
 
+### GLM-5.3 (upstream weights, TagMe gateway) harness matrix
+
+Four of six completed @mean1 runs of the 2026-10-05 TagMe matrix, measured
+2026-10-09/10: `z-ai/glm-5.3` upstream weights through the internal TagMe
+OpenRouter-compatible gateway with `reasoning.effort: high`, the same frozen
+harness runtimes as the DeepSeek matrix (pi-mono 0.73.1, mini-SWE-agent 2.4.6,
+deepagents 0.6.12, OpenCode 1.18.33), Linux bwrap, concurrency 3, timeout 900 s
+with floors of 7200 s (long) and 1800 s (reflection). This is **not** the
+`glm-5.3-flash-uncensored` FP8 snapshot measured by the eight-harness matrix
+below; the two are not comparable. Hermes and OpenHands are still running.
+No infrastructure failures remain in the final reports (mini-SWE-agent replaced
+three transient request failures on one task by retries, which then timed out).
+Timed-out tasks count as fails. Token telemetry is raw and not independently
+audited; zero means absent.
+
+| harness | model | passed | score | steps | tokens |
+|---|---|---:|---:|---:|---:|
+| GigaCode Universal Agent (gc-cli) | GLM-5.3 (TagMe gateway) (high) | 423/431 | 98.1% | 4,581 | 271,316,552 |
+| OpenCode | GLM-5.3 (TagMe gateway) (high) | 413/431 | 95.8% | 3,745 | 0 |
+| deepagents | GLM-5.3 (TagMe gateway) (high) | 408/431 | 94.7% | 8,271 | 696,504,696† |
+| mini-SWE-agent | GLM-5.3 (TagMe gateway) (high) | 407/431 | 94.4% | 5,191 | 769,563,983 |
+| pi-mono | GLM-5.3 (TagMe gateway) (high) | 396/431 | 91.9% | 0 | 0 |
+
+Wave scores (ordinary / long / reflection): Universal Agent 388/16/19,
+OpenCode 386/12/15, deepagents 381/14/13, mini-SWE-agent 385/9/13,
+pi-mono 376/6/14. † deepagents tokens are raw counters with known duplicate
+usage accounting.
+
 Use a fresh result JSON path for v0.18.0; do not resume an older-version report
 into the new task set. Both new waves belong to the default scored suite.
 Earlier 411-task and 391-task results below are historical and are not scores on v0.18.0.
