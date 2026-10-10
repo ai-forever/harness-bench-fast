@@ -53,7 +53,7 @@
           <div class="summary-grid">
             <div><span class="metric">431</span><span class="label">tasks</span></div>
             <div><span class="metric">20</span><span class="label">new tool-reflection tasks</span></div>
-            <div><span class="metric">66</span><span class="label">full v0.18.0 runs published</span></div>
+            <div><span class="metric">67</span><span class="label">full v0.18.0 runs published</span></div>
             <div><span class="metric">v0.18.0</span><span class="label">task-set version</span></div>
           </div>
           <p>Previous scores use 411 or fewer tasks. They are listed below as history.</p>
@@ -91,7 +91,7 @@
         <div class="section-heading">
           <p class="eyebrow">Current task set, v0.18.0</p>
           <h2 id="current-title">431 tasks, including 20 tool-reflection tasks</h2>
-          <p>Completed, validated full runs measured 2026-10-02–07. The PROM matrix is still running;
+          <p>Completed, validated full runs measured 2026-10-02–09. The PROM matrix is still running;
             incomplete runs and infrastructure failures are excluded. The PROM matrix uses one run per configuration (k=1),
             eight task slots across the matrix, bwrap isolation. The separate maestro harness run used four task workers and bwrap.</p>
           <p>All listed PROM matrix runs scored 0/20 on the long-context wave. Reflection: GigaChat 2 Reasoning + mini-SWE-agent: 8/20; GigaChat 2 Reasoning + OpenCode: 1/20; GigaChat 2 Reasoning + deepagents (no profile): 1/20; GigaChat 2 Pro + mini-SWE-agent: 1/20; GigaChat 2 Reasoning + deepagents (GigaChat profile): 2/20; maestro harness: 1/20 (and 0/20 long); other listed runs 0/20.
@@ -147,6 +147,14 @@
             <a href="https://huggingface.co/dealignai/DeepSeek-V4.1-Flash-UNCENSORED-FP8">dealignai/DeepSeek-V4.1-Flash-UNCENSORED-FP8</a>
             and <a href="https://huggingface.co/dealignai/GLM-5.3-Flash-UNCENSORED-FP8">dealignai/GLM-5.3-Flash-UNCENSORED-FP8</a>.
             These scores describe the modified snapshots and are not measurements of the original base checkpoints.</p>
+          <p>GigaCode Universal Agent <a href="https://gitverse.ru/gigacode-ai/universal-agent">gc-cli 0.4.0</a>
+            (commit 8c76e8b0c) + DeepSeek V4.1 Flash Uncensored FP8 (high): 419/431 (97.2%), @mean1,
+            measured 2026-10-09, concurrency 3, Linux bwrap via run-cli; ordinary 389/391,
+            long 12/20, reflection 18/20. No infrastructure failures, retries or timeouts.
+            Main loop reasoning high, auxiliary finish-gate/summary calls without thinking;
+            guards and built-in skills disabled. Steps count model responses; tokens are the
+            agent's own usage counters (coverage 431/431), not independently audited.
+            Timeout 900 s with floors of 7200 s for long and 1800 s for reflection.</p>
           <p>Codex CLI 0.159.3 + GPT-6.1 Sol (<code>gpt-6.1-sol</code>), reasoning low:
             completed @mean1 on 2026-10-07, 420/431 (97.4%). Ordinary 388/391,
             long 19/20, reflection 13/20; no infrastructure failures in the final report.
@@ -234,6 +242,13 @@
             <div class="score">419/431</div><div class="percent">97.2%</div>
             <div class="bar"><span style="width:97.2%"></span></div>
             <div class="meta">@mean3 · SD 0.6 pp · Long mean 63.3% · Reflection mean 85.0% · Mean steps 4,311 · Mean tokens 631,963,525</div>
+          </article>
+          <article data-wave-id="ua-ds41" class="result-row" data-harness="universal-agent" data-group="other">
+            <div class="rank">5</div>
+            <div class="who"><h3>GigaCode Universal Agent (gc-cli)</h3><p>DeepSeek V4.1 Flash Uncensored FP8 (high)</p></div>
+            <div class="score">419/431</div><div class="percent">97.2%</div>
+            <div class="bar"><span style="width:97.2%"></span></div>
+            <div class="meta">@mean1 · Long wave 12/20 · Reflection 18/20 · Steps 5,210 · Tokens 386,165,256</div>
           </article>
           <article data-wave-id="run-5" class="result-row" data-harness="mini-swe-agent" data-group="other">
             <div class="rank">7</div>

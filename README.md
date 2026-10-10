@@ -18,6 +18,7 @@ Results refer to these modified snapshots, not the original base checkpoints.
 | dsh headless | DeepSeek V4.1 Flash Uncensored FP8 (high) | 422/431 | 97.9% | 3,973 | 249,558,870 |
 | Codex CLI | GPT-6.1 Sol (low) | 420/431 | 97.4% | 2,817 | 69,419,504 |
 | free-code | DeepSeek V4.1 Flash Uncensored FP8 (high) | 419/431 | 97.2% | 4,311 | 631,963,525 |
+| GigaCode Universal Agent (gc-cli) | DeepSeek V4.1 Flash Uncensored FP8 (high) | 419/431 | 97.2% | 5,210 | 386,165,256 |
 
 GLM-5.3 Flash Uncensored (`glm-5.3-flash-uncensored`), **@mean1**, measured
 2026-10-06/07, reasoning high, Linux bwrap, concurrency 3. Eight completed
@@ -89,6 +90,19 @@ reflection **19/20 (95.0%)**. No infrastructure failures were recorded.
 Steps and tokens are **0 because these metrics are absent from the artifact**,
 not because no work or tokens were spent. Native traces remain on the benchmark
 server. Both configurations use timeout 900 s with task-specific floors of
+7200 s (long) and 1800 s (reflection).
+
+The GigaCode Universal Agent row is **@mean1**, measured 2026-10-09 with
+[gc-cli 0.4.0](https://gitverse.ru/gigacode-ai/universal-agent) (commit `8c76e8b0c`),
+model `deepseek-v4.1-flash`, reasoning **high** for the main loop and thinking
+disabled for the auxiliary finish-gate/summary calls, concurrency 3 and Linux
+**bwrap** isolation through `run-cli`. It covers all 431 tasks: ordinary
+**389/391 (99.5%)**, long **12/20 (60.0%)**, reflection **18/20 (90.0%)**.
+No infrastructure failures, retries or timeouts were recorded. Steps count main-loop
+model responses and tokens are summed from the agent's own `run_usage` events
+(including finish-gate calls) with coverage 431/431; they are not independently
+audited. Guards (write/read/command moderation) and built-in skills were disabled,
+summarisation thresholds 200k tokens, timeout 900 s with task-specific floors of
 7200 s (long) and 1800 s (reflection).
 
 Use a fresh result JSON path for v0.18.0; do not resume an older-version report
