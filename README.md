@@ -566,6 +566,173 @@ uv run python -m harness_bench apply-gold \
     --task task_06_toggle_debug --workspace /path/to/workspace
 ```
 
+### Strands CLI through `run-cli`
+
+Install the [official Strands CLI](https://github.com/strands-agents/harness-sdk/tree/main/strands-cli)
+with Node 22 or newer:
+
+```bash
+npm install -g @strands-agents/cli
+strands --version  # Record the installed version with the benchmark results.
+```
+
+For an OpenAI-compatible **Chat Completions** endpoint (`/v1/chat/completions`),
+use the CLI's `litellm/` provider. This connects directly to your endpoint;
+installing or running a separate LiteLLM proxy is not required.
+The endpoint must return Chat Completions SSE for `stream: true`. For a
+JSON-only endpoint, use the buffered-response adapter below.
+
+```bash
+export LITELLM_API_KEY='your-api-key'
+export LITELLM_BASE_URL='http://localhost:9000/v1'
+export MODEL_NAME='your-exact-model-id'
+
+# Check the provider connection without skills or background memory extraction.
+strands -p --model "litellm/$MODEL_NAME" \
+    --set builtinTools.web_search=false \
+    --set "builtinTools.web_fetch.model=litellm/$MODEL_NAME" \
+    --skills off --memory off --session off \
+    'Reply with one word: ready'
+
+# Benchmark tasks keep memory and load skills supplied in each task workspace.
+uv run python -m harness_bench run-cli \
+    --cli-command "strands -p --model litellm/$MODEL_NAME --set builtinTools.web_search=false --set builtinTools.web_fetch.model=litellm/$MODEL_NAME --skills .agents/skills --memory on" \
+    --task task_01_create_hello --timeout 900 --concurrency 1 \
+    --isolation none --json-output jobs/strands-chat-smoke.json
+```
+
+Replace the key, URL and model ID with your deployment's values. Use `local`
+as the key only if the server does not require authentication. The URL includes
+`/v1`, without `/chat/completions`; the provider appends the request path.
+`litellm/` selects the CLI provider and is stripped before sending the model ID
+to the server.
+
+The Chat Completions examples disable unsupported native web search and
+explicitly reuse the main model for `web_fetch` summaries. Other built-in
+tools, including delegation, retain their defaults. If you want web search
+through the third-party Exa service, replace `builtinTools.web_search=false`
+with `builtinTools.web_search=exa`; search queries will be sent to Exa.
+
+For a server supporting **Responses API** (`/v1/responses`), use `openai/`
+and the corresponding environment variables instead:
+
+```bash
+export OPENAI_API_KEY='your-api-key'
+export OPENAI_BASE_URL='https://your-server.example/v1'
+export MODEL_NAME='your-exact-model-id'
+
+strands -p --model "openai/$MODEL_NAME" \
+    --set builtinTools.web_search=false \
+    --set "builtinTools.web_fetch.model=openai/$MODEL_NAME" \
+    --skills off --memory off --session off \
+    'Reply with one word: ready'
+
+uv run python -m harness_bench run-cli \
+    --cli-command "strands -p --model openai/$MODEL_NAME --set builtinTools.web_search=false --set builtinTools.web_fetch.model=openai/$MODEL_NAME --skills .agents/skills --memory on" \
+    --task task_01_create_hello --timeout 900 --concurrency 1 \
+    --isolation none --json-output jobs/strands-responses-smoke.json
+```
+
+In CLI `0.1.4`, `openai/` uses Responses API; changing `OPENAI_BASE_URL` alone
+does not switch it to Chat Completions. Choose the provider that matches your
+server's API. These examples configure the invocation through environment
+variables and flags; `strands --setup` is an alternative for saving a profile.
+Custom Responses endpoints do not necessarily implement native web search
+or serve the provider's default summarizer, so this example also disables
+search and selects the main model for summaries.
+
+`-p` answers once and exits; HBF appends each task prompt and runs the CLI in its
+task workspace. Omit `--task` for the full task set. The CLI uses its standard
+saved configuration at `~/.strands/cli/config.json`; explicit flags override it
+for this invocation. Flags were checked with CLI `0.1.4`; use `strands --help`
+for the installed version. In this version, `litellm/` accepts only `--effort auto`
+(the default) or `--effort off`; neither sends a reasoning level to the server.
+Do not use `--effort high` with this provider. Providers with reasoning support
+accept their own effort levels.
+
+The connection check disables skills and memory only for that one request.
+The HBF commands use `.agents/skills` relative to each task workspace and keep
+memory enabled. Tasks without skills may still print a missing-directory
+warning. Do not copy `--skills off --memory off` into a full benchmark merely
+to silence warnings: the task set includes skills and memory tasks.
+
+**Startup diagnostics (CLI 0.1.4):**
+
+| Message | Meaning and action |
+| --- | --- |
+| `Cannot convert argument to a ByteString ... index 7 ... 1090` | A Cyrillic `т` immediately after `Bearer ` reproduces this error. Check for a copied placeholder in `LITELLM_API_KEY` (or `OPENAI_API_KEY`). Set the actual key, without spaces or newlines; use `local` only for a server without authentication. This fails while constructing the HTTP header, before the request reaches the model. Russian prompts are valid. |
+| `memory extraction failed` with the same ByteString error | The background memory request uses the same invalid credentials. Fix the key; disabling memory does not fix authentication. |
+| `Stream ended without completing a message` | The SDK did not receive a complete streaming message. A JSON-only server reproduces this error even when its JSON completion is valid; a truncated SSE response can also cause it. CLI `0.1.4` always requests streaming for `litellm/`, and `params.stream=false` is overridden by the SDK. Use the adapter below for a JSON-only endpoint. HBF treats this as infrastructure failure and invalidates results if retries do not recover. |
+| `has no native web search` | The `litellm/` shortcut does not provide native search. Use `--set builtinTools.web_search=false`, as above, or explicitly opt into Exa. |
+| `no separate web_fetch summarizer ... reusing the main model` | A warning, not a failed request. Set `--set "builtinTools.web_fetch.model=litellm/$MODEL_NAME"` to make that choice explicit, or select another model served by the same endpoint. |
+| `skill source does not exist` / `no skills were loaded` | No skills were found at the configured path. The connection check can use `--skills off`; HBF skill tasks supply `.agents/skills`. Creating an empty directory does not provide skills. |
+| `contextWindowLimit ... default of 200000` | The SDK does not know this model alias's context window and uses 200,000 tokens to estimate utilization and manage context. This does not establish the server's real limit. CLI `0.1.4` has no direct context-window flag for a `provider/model` shortcut; `--set contextWindowLimit=...` is invalid. An explicit limit requires a configured SDK model via the CLI's supported model-module/agent import. Confirm the deployment's limit before long-context runs; do not substitute an arbitrary value or disable context management to hide the warning. |
+
+Check the exported key locally without displaying it or making a request:
+
+```bash
+node - <<'JS'
+const key = process.env.LITELLM_API_KEY;
+if (!key || !/^[\x21-\x7e]+$/.test(key) || key === 'your-api-key') {
+    console.error('Set LITELLM_API_KEY to a real ASCII key with no whitespace (local only for an unauthenticated server).');
+    process.exit(1);
+}
+console.log('API key format OK; authentication has not been tested.');
+JS
+```
+
+Run this in the same shell as Strands. For `openai/`, check `OPENAI_API_KEY`
+instead. HBF loads the repository's `.env`, but direct `strands` does not load
+it automatically: export the variables first, or explicitly pass
+`--env-file /absolute/path/to/.env`. Existing exported values take precedence,
+so correct or unset a stale key before relying on an env file.
+
+**Using a JSON-only Chat Completions endpoint:**
+
+Run the separate adapter from this checkout in one terminal, with
+`LITELLM_BASE_URL` still pointing at the existing model endpoint:
+
+```bash
+python3 scripts/openai_stream_proxy.py \
+    --upstream "$LITELLM_BASE_URL" --port 9010 --timeout 600
+```
+
+In the terminal running Strands or HBF, keep the provider key and model ID
+configured as above and point the client at the adapter:
+
+```bash
+export LITELLM_BASE_URL='http://127.0.0.1:9010/v1'
+
+strands -p --model "litellm/$MODEL_NAME" \
+    --set builtinTools.web_search=false \
+    --set "builtinTools.web_fetch.model=litellm/$MODEL_NAME" \
+    --skills off --memory off --session off \
+    'Reply with one word: ready'
+```
+
+Then use the HBF command above with the same environment. The adapter forwards
+credentials, sends `stream: false` upstream, removes `stream_options`, and
+encodes the completed JSON response as SSE with tool-call IDs and arguments,
+original finish reasons, requested usage, and `[DONE]`. It preserves model
+parameters and content, including any reasoning fields or markup already
+returned by the endpoint. Upstream HTTP errors retain their status and body.
+
+This is buffered delivery: the client receives output after generation
+finishes. Existing client and task deadlines still apply; `--timeout` only
+sets the adapter's upstream socket timeout. The adapter binds to loopback,
+uses only the Python standard library, and supports `/v1/chat/completions`
+and `/v1/models`. It does not implement Responses API or parse model-specific
+tool markup. The existing server, deployment recipe, and CLI require no edits.
+Stop the adapter with Ctrl-C in its terminal.
+
+HBF reads token counts from the CLI's final usage line; post-run/background
+requests may not be included. Step counts remain unavailable.
+
+Record the CLI version, exact model/build, effective reasoning level (`default`
+if unset), and relevant CLI configuration with each run. Report missing step or
+token metrics as unavailable; `0` in the standard result table means the
+artifact omitted that metric, not that no resources were spent.
+
 `.env` at the repo root is auto-loaded by every runner.
 
 ## What's inside
