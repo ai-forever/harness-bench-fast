@@ -102,7 +102,7 @@
             Runtime versions and integration details are recorded in the README.</p>
           <p>GigaChat 2 Max + Hermes completed with 0/431 and no infrastructure failures recorded by the runner; the cause of the all-fail result remains under investigation.</p>
           <p>‡ Three deepagents runs without profile (GigaChat 2 Pro, GigaChat 2 Reasoning and GigaChat 3 Pro) had HTTP 422 CONTEXT_TOO_LONG incorrectly classified as infrastructure errors. These are normal model/harness failures. Corrected derived reports retain the full denominator and original scores; source reports remain unchanged.</p>
-          <p>Telemetry: 0 means absent from the artifact. † Deepagents tokens are raw, unaudited
+          <p>Telemetry: 0 means absent from the artifact. * Deepagents tokens are raw, unaudited
             counters with known duplicate usage accounting, not verified spend or cost.
             CLI counters await native-trace audit except for recorded mini-SWE-agent and maestro harness metrics.</p>
           <p><strong>maestro harness:</strong> <a href="https://github.com/AIRI-Institute/maestro-core/tree/9c2ac0d4aedb4bb8bfd53e9694bbbac05c4a725c">MAESTRO CARL</a> with a custom shell coding adapter and reasoning-history replay, not an upstream ready-made coding agent. Measured 2026-10-05, k=1; no compaction, self-critic or subagents. Ordinary 247/391 (63.2%), long 0/20, reflection 1/20; no infrastructure failures. Budget: 200 model turns / 900 s with native task-specific floors, max_tokens 16384. Steps count completed model responses; token totals were checked against native traces for all 431 tasks. Elapsed time 63.8 minutes. This result describes this adapter configuration; raw traces remain private.</p>
@@ -155,13 +155,13 @@
             guards and built-in skills disabled. Steps count model responses; tokens are the
             agent's own usage counters (coverage 431/431), not independently audited.
             Timeout 900 s with floors of 7200 s for long and 1800 s for reflection.</p>
-          <p>GigaCode Universal Agent gc-cli 0.4.0 + GLM-5.3 (<code>z-ai/glm-5.3</code>, upstream weights through the
-            internal TagMe gateway, reasoning high): 423/431 (98.1%), @mean1, measured 2026-10-09/10 with the same
+          <p>GigaCode Universal Agent gc-cli 0.4.0 + GLM-5.3 (<code>z-ai/glm-5.3</code>, upstream weights through
+            OpenRouter, reasoning high): 423/431 (98.1%), @mean1, measured 2026-10-09/10 with the same
             run-cli/bwrap setup; ordinary 388/391, long 16/20, reflection 19/20. No infrastructure failures;
             two long tasks timed out at 7200 s and count as fails. Steps and tokens are the agent's own counters
             with coverage 429/431 (lower bounds), not independently audited. This is not the
             <code>glm-5.3-flash-uncensored</code> FP8 snapshot of the eight-harness GLM matrix and is not comparable to it.</p>
-          <p>GLM-5.3 (<code>z-ai/glm-5.3</code>, upstream weights through the internal TagMe gateway, reasoning high)
+          <p>GLM-5.3 (<code>z-ai/glm-5.3</code>, upstream weights through OpenRouter, reasoning high)
             harness matrix, four of six runs completed 2026-10-09/10, each @mean1 on all 431 tasks with the same frozen
             runtimes as the DeepSeek matrix, Linux bwrap, concurrency 3: OpenCode 413/431 (ordinary 386, long 12,
             reflection 15), deepagents 408/431 (381/14/13), mini-SWE-agent 407/431 (385/9/13), pi-mono 396/431
@@ -222,35 +222,35 @@
           </article>
           <article data-wave-id="ua-glm53" class="result-row" data-harness="universal-agent" data-group="other">
             <div class="rank">1</div>
-            <div class="who"><h3>GigaCode Universal Agent (gc-cli)</h3><p>GLM-5.3 (TagMe gateway) (high)</p></div>
+            <div class="who"><h3>GigaCode Universal Agent (gc-cli)</h3><p>GLM-5.3 (OpenRouter) (high)</p></div>
             <div class="score">423/431</div><div class="percent">98.1%</div>
             <div class="bar"><span style="width:98.1%"></span></div>
             <div class="meta">@mean1 · Long wave 16/20 · Reflection 19/20 · Steps 4,581 · Tokens 271,316,552 (coverage 429/431)</div>
           </article>
-          <article data-wave-id="glm53-tagme-opencode" class="result-row" data-harness="opencode" data-group="other">
+          <article data-wave-id="glm53-openrouter-opencode" class="result-row" data-harness="opencode" data-group="other">
             <div class="rank">-</div>
-            <div class="who"><h3>OpenCode</h3><p>GLM-5.3 (TagMe gateway) (high)</p></div>
+            <div class="who"><h3>OpenCode</h3><p>GLM-5.3 (OpenRouter) (high)</p></div>
             <div class="score">413/431</div><div class="percent">95.8%</div>
             <div class="bar"><span style="width:95.8%"></span></div>
             <div class="meta">@mean1 · Long wave 12/20 · Reflection 15/20 · Steps 3,745 · Tokens 0 (metrics absent)</div>
           </article>
-          <article data-wave-id="glm53-tagme-deepagents" class="result-row" data-harness="deepagents" data-group="other">
+          <article data-wave-id="glm53-openrouter-deepagents" class="result-row" data-harness="deepagents" data-group="other">
             <div class="rank">-</div>
-            <div class="who"><h3>deepagents†</h3><p>GLM-5.3 (TagMe gateway) (high)</p></div>
+            <div class="who"><h3>deepagents*</h3><p>GLM-5.3 (OpenRouter) (high)</p></div>
             <div class="score">408/431</div><div class="percent">94.7%</div>
             <div class="bar"><span style="width:94.7%"></span></div>
-            <div class="meta">@mean1 · Long wave 14/20 · Reflection 13/20 · Steps 8,271 · Tokens 696,504,696† (coverage 429/431)</div>
+            <div class="meta">@mean1 · Long wave 14/20 · Reflection 13/20 · Steps 8,271 · Tokens 696,504,696* (coverage 429/431)</div>
           </article>
-          <article data-wave-id="glm53-tagme-mini" class="result-row" data-harness="mini-swe-agent" data-group="other">
+          <article data-wave-id="glm53-openrouter-mini" class="result-row" data-harness="mini-swe-agent" data-group="other">
             <div class="rank">-</div>
-            <div class="who"><h3>mini-SWE-agent</h3><p>GLM-5.3 (TagMe gateway) (high)</p></div>
+            <div class="who"><h3>mini-SWE-agent</h3><p>GLM-5.3 (OpenRouter) (high)</p></div>
             <div class="score">407/431</div><div class="percent">94.4%</div>
             <div class="bar"><span style="width:94.4%"></span></div>
             <div class="meta">@mean1 · Long wave 9/20 · Reflection 13/20 · Steps 5,191 · Tokens 769,563,983 (coverage 428/431)</div>
           </article>
-          <article data-wave-id="glm53-tagme-pi" class="result-row" data-harness="pi-mono" data-group="other">
+          <article data-wave-id="glm53-openrouter-pi" class="result-row" data-harness="pi-mono" data-group="other">
             <div class="rank">-</div>
-            <div class="who"><h3>pi-mono</h3><p>GLM-5.3 (TagMe gateway) (high)</p></div>
+            <div class="who"><h3>pi-mono</h3><p>GLM-5.3 (OpenRouter) (high)</p></div>
             <div class="score">396/431</div><div class="percent">91.9%</div>
             <div class="bar"><span style="width:91.9%"></span></div>
             <div class="meta">@mean1 · Long wave 6/20 · Reflection 14/20 · Steps 0 · Tokens 0 (metrics absent)</div>
@@ -310,7 +310,7 @@
             <div class="who"><h3>deepagents</h3><p>DeepSeek V4.1 Flash Uncensored FP8 (high)</p></div>
             <div class="score">411/431</div><div class="percent">95.4%</div>
             <div class="bar"><span style="width:95.4%"></span></div>
-            <div class="meta">@mean1 · Long wave 10/20 · Reflection 18/20 · Steps 10,086 · Tokens 854,671,935 (raw)†</div>
+            <div class="meta">@mean1 · Long wave 10/20 · Reflection 18/20 · Steps 10,086 · Tokens 854,671,935 (raw)*</div>
           </article>
           <article data-wave-id="glm-dsh" class="result-row" data-group="other">
             <div class="rank">9</div>
@@ -401,42 +401,42 @@
             <div class="who"><h3>deepagents (GigaChat profile)</h3><p>GigaChat 2 Max (PROM)</p></div>
             <div class="score">322/431</div><div class="percent">74.7%</div>
             <div class="bar"><span style="width:74.7%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 4,976 · Tokens (raw) 267,982,386†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 4,976 · Tokens (raw) 267,982,386*</div>
           </article>
           <article data-wave-id="run-12" class="result-row">
             <div class="rank">22</div>
             <div class="who"><h3>deepagents (GigaChat profile)</h3><p>GigaChat 3.5 (PROM)</p></div>
             <div class="score">322/431</div><div class="percent">74.7%</div>
             <div class="bar"><span style="width:74.7%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,329 · Tokens (raw) 317,335,707†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,329 · Tokens (raw) 317,335,707*</div>
           </article>
           <article data-wave-id="run-13" class="result-row">
             <div class="rank">23</div>
             <div class="who"><h3>deepagents (GigaChat profile)</h3><p>GigaChat 3 Ultra (PROM)</p></div>
             <div class="score">322/431</div><div class="percent">74.7%</div>
             <div class="bar"><span style="width:74.7%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 4,447 · Tokens (raw) 366,492,603†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 4,447 · Tokens (raw) 366,492,603*</div>
           </article>
           <article data-wave-id="run-14" class="result-row">
             <div class="rank">24</div>
             <div class="who"><h3>deepagents (no profile)</h3><p>GigaChat 3 Ultra (PROM)</p></div>
             <div class="score">305/431</div><div class="percent">70.8%</div>
             <div class="bar"><span style="width:70.8%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 1/20 · Steps 10,351 · Tokens (raw) 841,669,092†</div>
+            <div class="meta">Long wave 0/20 · Reflection 1/20 · Steps 10,351 · Tokens (raw) 841,669,092*</div>
           </article>
           <article data-wave-id="run-15" class="result-row">
             <div class="rank">25</div>
             <div class="who"><h3>deepagents (no profile)</h3><p>GigaChat 2 Max (PROM)</p></div>
             <div class="score">302/431</div><div class="percent">70.1%</div>
             <div class="bar"><span style="width:70.1%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 10,433 · Tokens (raw) 1,004,755,677†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 10,433 · Tokens (raw) 1,004,755,677*</div>
           </article>
           <article data-wave-id="run-16" class="result-row">
             <div class="rank">26</div>
             <div class="who"><h3>deepagents (no profile)</h3><p>GigaChat 3.5 (PROM)</p></div>
             <div class="score">299/431</div><div class="percent">69.4%</div>
             <div class="bar"><span style="width:69.4%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 11,130 · Tokens (raw) 718,324,734†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 11,130 · Tokens (raw) 718,324,734*</div>
           </article>
           <article data-wave-id="run-17" class="result-row">
             <div class="rank">27</div>
@@ -464,7 +464,7 @@
             <div class="who"><h3>deepagents (no profile)‡</h3><p>GigaChat 2 Reasoning (PROM) (medium)</p></div>
             <div class="score">273/431</div><div class="percent">63.3%</div>
             <div class="bar"><span style="width:63.3%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 1/20 · Steps 10,702 · Tokens (raw) 453,994,698†</div>
+            <div class="meta">Long wave 0/20 · Reflection 1/20 · Steps 10,702 · Tokens (raw) 453,994,698*</div>
           </article>
           <article data-wave-id="run-21" class="result-row">
             <div class="rank">31</div>
@@ -485,7 +485,7 @@
             <div class="who"><h3>deepagents (GigaChat profile)</h3><p>GigaChat 2 Reasoning (PROM) (medium)</p></div>
             <div class="score">252/431</div><div class="percent">58.5%</div>
             <div class="bar"><span style="width:58.5%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 2/20 · Steps 5,595 · Tokens (raw) 138,611,193†</div>
+            <div class="meta">Long wave 0/20 · Reflection 2/20 · Steps 5,595 · Tokens (raw) 138,611,193*</div>
           </article>
           <article data-wave-id="run-24" class="result-row" data-harness="maestro harness" data-group="gigachat">
             <div class="rank">34</div>
@@ -499,7 +499,7 @@
             <div class="who"><h3>deepagents (GigaChat profile)</h3><p>GigaChat 2 Pro (PROM)</p></div>
             <div class="score">224/431</div><div class="percent">52.0%</div>
             <div class="bar"><span style="width:52.0%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,159 · Tokens (raw) 368,044,770†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,159 · Tokens (raw) 368,044,770*</div>
           </article>
           <article data-wave-id="run-26" class="result-row">
             <div class="rank">36</div>
@@ -534,7 +534,7 @@
             <div class="who"><h3>deepagents (GigaChat profile)</h3><p>GigaChat 3 Pro (PROM)</p></div>
             <div class="score">212/431</div><div class="percent">49.2%</div>
             <div class="bar"><span style="width:49.2%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 6,289 · Tokens (raw) 486,699,543†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 6,289 · Tokens (raw) 486,699,543*</div>
           </article>
           <article data-wave-id="run-31" class="result-row">
             <div class="rank">41</div>
@@ -562,14 +562,14 @@
             <div class="who"><h3>deepagents (no profile)‡</h3><p>GigaChat 3 Pro (PROM)</p></div>
             <div class="score">191/431</div><div class="percent">44.3%</div>
             <div class="bar"><span style="width:44.3%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,711 · Tokens (raw) 295,423,833†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,711 · Tokens (raw) 295,423,833*</div>
           </article>
           <article data-wave-id="run-35" class="result-row">
             <div class="rank">45</div>
             <div class="who"><h3>deepagents (no profile)‡</h3><p>GigaChat 2 Pro (PROM)</p></div>
             <div class="score">188/431</div><div class="percent">43.6%</div>
             <div class="bar"><span style="width:43.6%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,749 · Tokens (raw) 349,701,240†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,749 · Tokens (raw) 349,701,240*</div>
           </article>
           <article data-wave-id="run-36" class="result-row">
             <div class="rank">46</div>
@@ -639,7 +639,7 @@
             <div class="who"><h3>deepagents (GigaChat profile)</h3><p>GigaChat 2 (PROM)</p></div>
             <div class="score">144/431</div><div class="percent">33.4%</div>
             <div class="bar"><span style="width:33.4%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 2,817 · Tokens (raw) 136,240,902†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 2,817 · Tokens (raw) 136,240,902*</div>
           </article>
           <article data-wave-id="run-46" class="result-row">
             <div class="rank">56</div>
@@ -660,7 +660,7 @@
             <div class="who"><h3>deepagents (GigaChat profile)</h3><p>GigaChat 3 Lightning (PROM)</p></div>
             <div class="score">134/431</div><div class="percent">31.1%</div>
             <div class="bar"><span style="width:31.1%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 3,545 · Tokens (raw) 148,656,135†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 3,545 · Tokens (raw) 148,656,135*</div>
           </article>
           <article data-wave-id="run-49" class="result-row">
             <div class="rank">59</div>
@@ -674,14 +674,14 @@
             <div class="who"><h3>deepagents (no profile)</h3><p>GigaChat 3 Lightning (PROM)</p></div>
             <div class="score">113/431</div><div class="percent">26.2%</div>
             <div class="bar"><span style="width:26.2%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,330 · Tokens (raw) 326,514,969†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,330 · Tokens (raw) 326,514,969*</div>
           </article>
           <article data-wave-id="run-51" class="result-row">
             <div class="rank">61</div>
             <div class="who"><h3>deepagents (no profile)</h3><p>GigaChat 2 (PROM)</p></div>
             <div class="score">111/431</div><div class="percent">25.8%</div>
             <div class="bar"><span style="width:25.8%"></span></div>
-            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,336 · Tokens (raw) 288,537,210†</div>
+            <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 5,336 · Tokens (raw) 288,537,210*</div>
           </article>
           <article data-wave-id="run-52" class="result-row">
             <div class="rank">62</div>
@@ -1121,7 +1121,7 @@
 
         rows.forEach(function (row) {
           row.dataset.modelName = row.querySelector(".who p").textContent.trim();
-          row.dataset.harnessName = row.querySelector(".who h3").textContent.replace(/[†‡]/g, "").trim();
+          row.dataset.harnessName = row.querySelector(".who h3").textContent.replace(/[*‡]/g, "").trim();
           row.dataset.passed = row.querySelector(".score").textContent.split("/")[0];
         });
 

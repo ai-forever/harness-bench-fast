@@ -15,7 +15,7 @@ Results refer to these modified snapshots, not the original base checkpoints.
 | harness | model | passed | score | steps | tokens |
 |---|---|---:|---:|---:|---:|
 | pi-mono | DeepSeek V4.1 Flash Uncensored FP8 (high) | 423/431 | 98.1% | 0 | 0 |
-| GigaCode Universal Agent (gc-cli) | GLM-5.3 (TagMe gateway) (high) | 423/431 | 98.1% | 4,581 | 271,316,552 |
+| GigaCode Universal Agent (gc-cli) | GLM-5.3 (OpenRouter) (high) | 423/431 | 98.1% | 4,581 | 271,316,552 |
 | dsh headless | DeepSeek V4.1 Flash Uncensored FP8 (high) | 422/431 | 97.9% | 3,973 | 249,558,870 |
 | Codex CLI | GPT-6.1 Sol (low) | 420/431 | 97.4% | 2,817 | 69,419,504 |
 | free-code | DeepSeek V4.1 Flash Uncensored FP8 (high) | 419/431 | 97.2% | 4,311 | 631,963,525 |
@@ -108,8 +108,7 @@ summarisation thresholds 200k tokens, timeout 900 s with task-specific floors of
 
 The GigaCode Universal Agent + GLM-5.3 row is **@mean1**, measured 2026-10-09/10
 with the same gc-cli 0.4.0 build and run-cli/bwrap setup as the DeepSeek row,
-model `z-ai/glm-5.3` served through the internal TagMe OpenRouter-compatible
-gateway with `reasoning.effort: high` (upstream weights, **not** the
+model `z-ai/glm-5.3` served through OpenRouter with `reasoning.effort: high` (upstream weights, **not** the
 `glm-5.3-flash-uncensored` FP8 snapshot measured by the eight-harness GLM matrix
 below; the two are not comparable). Ordinary **388/391 (99.2%)**, long
 **16/20 (80.0%)**, reflection **19/20 (95.0%)**. No infrastructure failures or
@@ -117,11 +116,10 @@ retries; two long tasks hit the 7200 s floor and are scored as fails. Steps and
 tokens are the agent's own usage counters with coverage 429/431 (absent for the
 two timed-out tasks, so totals are lower bounds), not independently audited.
 
-### GLM-5.3 (upstream weights, TagMe gateway) harness matrix
+### GLM-5.3 (upstream weights, OpenRouter) harness matrix
 
-Four of six completed @mean1 runs of the 2026-10-05 TagMe matrix, measured
-2026-10-09/10: `z-ai/glm-5.3` upstream weights through the internal TagMe
-OpenRouter-compatible gateway with `reasoning.effort: high`, the same frozen
+Four of six completed @mean1 runs of the 2026-10-05 OpenRouter matrix, measured
+2026-10-09/10: `z-ai/glm-5.3` upstream weights through OpenRouter with `reasoning.effort: high`, the same frozen
 harness runtimes as the DeepSeek matrix (pi-mono 0.73.1, mini-SWE-agent 2.4.6,
 deepagents 0.6.12, OpenCode 1.18.33), Linux bwrap, concurrency 3, timeout 900 s
 with floors of 7200 s (long) and 1800 s (reflection). This is **not** the
@@ -134,15 +132,15 @@ audited; zero means absent.
 
 | harness | model | passed | score | steps | tokens |
 |---|---|---:|---:|---:|---:|
-| GigaCode Universal Agent (gc-cli) | GLM-5.3 (TagMe gateway) (high) | 423/431 | 98.1% | 4,581 | 271,316,552 |
-| OpenCode | GLM-5.3 (TagMe gateway) (high) | 413/431 | 95.8% | 3,745 | 0 |
-| deepagents | GLM-5.3 (TagMe gateway) (high) | 408/431 | 94.7% | 8,271 | 696,504,696† |
-| mini-SWE-agent | GLM-5.3 (TagMe gateway) (high) | 407/431 | 94.4% | 5,191 | 769,563,983 |
-| pi-mono | GLM-5.3 (TagMe gateway) (high) | 396/431 | 91.9% | 0 | 0 |
+| GigaCode Universal Agent (gc-cli) | GLM-5.3 (OpenRouter) (high) | 423/431 | 98.1% | 4,581 | 271,316,552 |
+| OpenCode | GLM-5.3 (OpenRouter) (high) | 413/431 | 95.8% | 3,745 | 0 |
+| deepagents | GLM-5.3 (OpenRouter) (high) | 408/431 | 94.7% | 8,271 | 696,504,696\* |
+| mini-SWE-agent | GLM-5.3 (OpenRouter) (high) | 407/431 | 94.4% | 5,191 | 769,563,983 |
+| pi-mono | GLM-5.3 (OpenRouter) (high) | 396/431 | 91.9% | 0 | 0 |
 
 Wave scores (ordinary / long / reflection): Universal Agent 388/16/19,
 OpenCode 386/12/15, deepagents 381/14/13, mini-SWE-agent 385/9/13,
-pi-mono 376/6/14. † deepagents tokens are raw counters with known duplicate
+pi-mono 376/6/14. \* deepagents tokens are raw counters with known duplicate
 usage accounting.
 
 Use a fresh result JSON path for v0.18.0; do not resume an older-version report
@@ -159,31 +157,31 @@ Earlier 411-task and 391-task results below are historical and are not scores on
 | OpenCode | GigaChat 3 Ultra (PROM) | 331/431 | 76.8% | 5,271 | 0 |
 | OpenCode | GigaChat 2 Reasoning (PROM) (medium) | 329/431 | 76.3% | 3,612 | 0 |
 | OpenCode | GigaChat 2 Max (PROM) | 327/431 | 75.9% | 4,693 | 0 |
-| deepagents (GigaChat profile) | GigaChat 2 Max (PROM) | 322/431 | 74.7% | 4,976 | 267,982,386† |
-| deepagents (GigaChat profile) | GigaChat 3.5 (PROM) | 322/431 | 74.7% | 5,329 | 317,335,707† |
-| deepagents (GigaChat profile) | GigaChat 3 Ultra (PROM) | 322/431 | 74.7% | 4,447 | 366,492,603† |
-| deepagents (no profile) | GigaChat 3 Ultra (PROM) | 305/431 | 70.8% | 10,351 | 841,669,092† |
-| deepagents (no profile) | GigaChat 2 Max (PROM) | 302/431 | 70.1% | 10,433 | 1,004,755,677† |
-| deepagents (no profile) | GigaChat 3.5 (PROM) | 299/431 | 69.4% | 11,130 | 718,324,734† |
+| deepagents (GigaChat profile) | GigaChat 2 Max (PROM) | 322/431 | 74.7% | 4,976 | 267,982,386\* |
+| deepagents (GigaChat profile) | GigaChat 3.5 (PROM) | 322/431 | 74.7% | 5,329 | 317,335,707\* |
+| deepagents (GigaChat profile) | GigaChat 3 Ultra (PROM) | 322/431 | 74.7% | 4,447 | 366,492,603\* |
+| deepagents (no profile) | GigaChat 3 Ultra (PROM) | 305/431 | 70.8% | 10,351 | 841,669,092\* |
+| deepagents (no profile) | GigaChat 2 Max (PROM) | 302/431 | 70.1% | 10,433 | 1,004,755,677\* |
+| deepagents (no profile) | GigaChat 3.5 (PROM) | 299/431 | 69.4% | 11,130 | 718,324,734\* |
 | pi-mono | GigaChat 2 Max (PROM) | 298/431 | 69.1% | 0 | 0 |
 | pi-mono | GigaChat 3 Ultra (PROM) | 295/431 | 68.4% | 0 | 0 |
 | pi-mono | GigaChat 3.5 (PROM) | 294/431 | 68.2% | 0 | 0 |
-| deepagents (no profile)‡ | GigaChat 2 Reasoning (PROM) (medium) | 273/431 | 63.3% | 10,702 | 453,994,698† |
+| deepagents (no profile)‡ | GigaChat 2 Reasoning (PROM) (medium) | 273/431 | 63.3% | 10,702 | 453,994,698\* |
 | mini-SWE-agent | GigaChat 2 Pro (PROM) | 266/431 | 61.7% | 11,451 | 231,616,980 |
 | mini-SWE-agent | GigaChat 3 Pro (PROM) | 253/431 | 58.7% | 9,169 | 172,168,626 |
-| deepagents (GigaChat profile) | GigaChat 2 Reasoning (PROM) (medium) | 252/431 | 58.5% | 5,595 | 138,611,193† |
+| deepagents (GigaChat profile) | GigaChat 2 Reasoning (PROM) (medium) | 252/431 | 58.5% | 5,595 | 138,611,193\* |
 | maestro harness | GigaChat 2 Reasoning (PROM) (medium) | 248/431 | 57.5% | 2,214 | 6,210,278 |
-| deepagents (GigaChat profile) | GigaChat 2 Pro (PROM) | 224/431 | 52.0% | 5,159 | 368,044,770† |
+| deepagents (GigaChat profile) | GigaChat 2 Pro (PROM) | 224/431 | 52.0% | 5,159 | 368,044,770\* |
 | Hermes | GigaChat 2 Pro (PROM) | 220/431 | 51.0% | 0 | 0 |
 | Hermes | GigaChat 3 Pro (PROM) | 217/431 | 50.3% | 0 | 0 |
 | pi-mono | GigaChat 3 Pro (PROM) | 216/431 | 50.1% | 0 | 0 |
 | mini-SWE-agent | GigaChat 3.5 (PROM) | 212/431 | 49.2% | 3,744 | 54,768,767 |
-| deepagents (GigaChat profile) | GigaChat 3 Pro (PROM) | 212/431 | 49.2% | 6,289 | 486,699,543† |
+| deepagents (GigaChat profile) | GigaChat 3 Pro (PROM) | 212/431 | 49.2% | 6,289 | 486,699,543\* |
 | mini-SWE-agent | GigaChat 3 Ultra (PROM) | 207/431 | 48.0% | 4,820 | 124,288,018 |
 | pi-mono | GigaChat 2 Pro (PROM) | 205/431 | 47.6% | 0 | 0 |
 | mini-SWE-agent | GigaChat 2 Max (PROM) | 198/431 | 45.9% | 4,932 | 107,919,373 |
-| deepagents (no profile)‡ | GigaChat 3 Pro (PROM) | 191/431 | 44.3% | 5,711 | 295,423,833† |
-| deepagents (no profile)‡ | GigaChat 2 Pro (PROM) | 188/431 | 43.6% | 5,749 | 349,701,240† |
+| deepagents (no profile)‡ | GigaChat 3 Pro (PROM) | 191/431 | 44.3% | 5,711 | 295,423,833\* |
+| deepagents (no profile)‡ | GigaChat 2 Pro (PROM) | 188/431 | 43.6% | 5,749 | 349,701,240\* |
 | OpenCode | GigaChat 3 Pro (PROM) | 174/431 | 40.4% | 3,071 | 0 |
 | pi-mono | GigaChat 3 Lightning (PROM) | 171/431 | 39.7% | 0 | 0 |
 | OpenCode | GigaChat 2 Pro (PROM) | 169/431 | 39.2% | 3,001 | 0 |
@@ -193,13 +191,13 @@ Earlier 411-task and 391-task results below are historical and are not scores on
 | Hermes | GigaChat 2 Reasoning (PROM) (medium) | 159/431 | 36.9% | 0 | 0 |
 | Hermes | GigaChat 3 Lightning (PROM) | 156/431 | 36.2% | 0 | 0 |
 | OpenHands | GigaChat 3 Lightning (PROM) | 146/431 | 33.9% | 0 | 0 |
-| deepagents (GigaChat profile) | GigaChat 2 (PROM) | 144/431 | 33.4% | 2,817 | 136,240,902† |
+| deepagents (GigaChat profile) | GigaChat 2 (PROM) | 144/431 | 33.4% | 2,817 | 136,240,902\* |
 | Hermes | GigaChat 2 (PROM) | 141/431 | 32.7% | 0 | 0 |
 | OpenCode | GigaChat 2 (PROM) | 139/431 | 32.3% | 8,575 | 0 |
-| deepagents (GigaChat profile) | GigaChat 3 Lightning (PROM) | 134/431 | 31.1% | 3,545 | 148,656,135† |
+| deepagents (GigaChat profile) | GigaChat 3 Lightning (PROM) | 134/431 | 31.1% | 3,545 | 148,656,135\* |
 | OpenCode | GigaChat 3 Lightning (PROM) | 134/431 | 31.1% | 10,580 | 0 |
-| deepagents (no profile) | GigaChat 3 Lightning (PROM) | 113/431 | 26.2% | 5,330 | 326,514,969† |
-| deepagents (no profile) | GigaChat 2 (PROM) | 111/431 | 25.8% | 5,336 | 288,537,210† |
+| deepagents (no profile) | GigaChat 3 Lightning (PROM) | 113/431 | 26.2% | 5,330 | 326,514,969\* |
+| deepagents (no profile) | GigaChat 2 (PROM) | 111/431 | 25.8% | 5,336 | 288,537,210\* |
 | mini-SWE-agent | GigaChat 2 (PROM) | 21/431 | 4.9% | 1,786 | 4,976,949 |
 | mini-SWE-agent | GigaChat 3 Lightning (PROM) | 9/431 | 2.1% | 2,042 | 4,511,527 |
 | Hermes | GigaChat 2 Max (PROM) | 0/431 | 0.0% | 0 | 0 |
@@ -210,7 +208,7 @@ GigaChat 2 Max + Hermes completed with 0/431 and no infrastructure failures reco
 
 ‡ Three deepagents runs without profile (GigaChat 2 Pro, GigaChat 2 Reasoning and GigaChat 3 Pro) had HTTP 422 CONTEXT_TOO_LONG incorrectly classified as infrastructure errors. These are normal model/harness failures. Corrected derived reports retain the full denominator and original scores; source reports remain unchanged.
 
-**Telemetry:** 0 means the metric is absent from the result artifact, not zero work or spend. † Deepagents token totals are raw, unaudited counters with known duplicate usage accounting; they are not verified token spend or cost. CLI counters remain pending native-trace audit except for the recorded mini-SWE-agent and maestro harness metrics.
+**Telemetry:** 0 means the metric is absent from the result artifact, not zero work or spend. \* Deepagents token totals are raw, unaudited counters with known duplicate usage accounting; they are not verified token spend or cost. CLI counters remain pending native-trace audit except for the recorded mini-SWE-agent and maestro harness metrics.
 
 **maestro harness:** [MAESTRO CARL](https://github.com/AIRI-Institute/maestro-core/tree/9c2ac0d4aedb4bb8bfd53e9694bbbac05c4a725c) with a custom coding adapter, not an upstream ready-made coding agent. Native CARL schedules LLM/tool steps; the adapter provides a shell tool, outer loop and reasoning-history replay. One full k=1 run on 2026-10-05, GigaChat 2 Reasoning (PROM), build `3.5.16.9`, reasoning medium: ordinary **247/391 (63.2%)**, long **0/20 (0.0%)**, reflection **1/20 (5.0%)**. No infrastructure failures. No compaction, self-critic or subagents. Budget: 200 model turns and 900 s per task, with native task-specific floors; `max_tokens=16384`. The 2,214 steps count completed model responses, including final answers; 6,210,278 tokens comprise 5,102,319 input and 1,107,959 output tokens, checked against native traces for all 431 tasks. Elapsed time: 63.8 minutes. This measures this adapter configuration, not CARL as a whole; no repeat-based variance estimate is available. Raw traces remain private.
 
@@ -614,7 +612,7 @@ uv run python -m harness_bench apply-gold \
 | `tasks_skills.py` | 314–330 | skill-discriminator wave: fictional brand/style guides, internal codebooks and policies, bespoke fixed formats, distractor/selection/negative-control skill axes, code-skill creation/repair, fictional DSL/protocol/library specs, spreadsheet reconciliation, and ArcFlux calculation methods. |
 | `tasks_adversarial.py` | 331–351 | adversarial/robustness wave: the agent must diagnose and work around a hostile environment — broken Python versions and imports, unreadable/mis-encoded/permission-locked files, instructions that contradict the environment, broken build commands and skills, and a ~100 MB log that must be streamed rather than read whole. |
 | `tasks_tbench_lite.py` | 352–371 | calibrated Terminal-Bench-inspired workflows: multi-source joins, event reconstruction, parsers, config precedence, conflict resolution, package refactors, SQLite migration, deterministic manifests, and retry-aware aggregation. |
-| `tasks_cli.py` | 372–391 | CLI-composition wave. Thirteen tasks drive bespoke per-task tools (`logq`, `pktool`, `xtab`, `cfgctl`, `depwalk`, `slicer`) built so that reading `--help` is unavoidable: the surface is deliberately unconventional (a leading verb, `--src`/`--cap`/`--map`, mini-languages like `--span LO..HI` and `--pick level=ERROR,WARN`, `--shape` not `--format`), so a guessed invocation exits non-zero — and the semantics that decide the answer (exclusive bounds, nearest-rank percentiles, margins before normalisation, corrupt-record policy) appear only in the `--help` epilog. Two read binary or fixed-width payloads. Seven exercise POSIX tools (multi-key `sort`, `join -1/-2/-a/-e/-o`, `comm`, `grep -oE` with `uniq -c`, `find` predicates with `xargs -0`, `awk`, `sed` ranges): the agent writes `solve.sh` and the verifier deletes the artifact, runs the script, and rejects general-purpose interpreters. **Requires `bash` on `PATH`.** |
+| `tasks_cli.py` | 372–391 | CLI-composition wave. Thirteen tasks drive bespoke per-task tools (`logq`, `pktool`, `xtab`, `cfgctl`, `depwalk`, `slicer`) built so that reading `--help` is unavoidable: the surface is deliberately unconventional (a leading verb, `--src`/`--cap`/`--map`, mini-languages like `--span LO..HI` and `--pick level=ERROR,WARN`, `--shape` not `--format`), so a guessed invocation exits non-zero — and the semantics that decide the answer (exclusive bounds, nearest-rank percentiles, margins before normalisation, corrupt-record policy) appear only in the `--help` epilog. Two read binary or fixed-width payloads. Seven exercise POSIX tools (multi-key `sort`, `join -1/-2/-a/-e/-o`, `comm`, `grep -oE` with `uniq -c`, `find` predicates with `xargs -0`, `awk`, `sed` ranges): the agent writes `solve.sh` and the verifier deletes the artifact, runs the script, and rejects general-purpose interpreters. **Requires `bash` on `PATH`.*\* |
 | `long_tasks/` | 392–411 | Long-context wave. Twenty tasks that require reading a large body of material (a novel, an intranet, parish registers, mail, a codebase, git history, a text adventure, and so on) and that floor each run at 7200 s and 3000 steps, so a full-set run includes them. Select only this wave with `--suite long`. |
 | `reflect_tasks/` | 412–431 | Stateful tool-reflection wave: partial results, pagination, throttling, stale revisions, async deletion, inherited permissions, and mid-course changes visible in tool responses. Signed client journals are replayed by the verifier. Each task floors the runner at 1800 s and 400 steps. Select only this wave with `--suite reflect`. |
 
@@ -645,9 +643,9 @@ changes do not need a task-set bump.
 | `0.13.0` | 2026-07-02 | 338–351 | 351 | Adversarial wave completed: removed-stdlib import, misleading `.python-version`, unneeded uninstallable dependency, `set -e` abort, npm-in-a-Python-project, gzip-masquerade, BOM/NUL log, AGENTS.md wrong layout, wrong tests dir, broken import path, broken package layout, malformed SKILL.md frontmatter, contradictory skills, and a ~100 MB log the agent must stream/grep rather than read whole |
 | `0.14.0` | 2026-07-23 | 352–371 | 371 | Calibrated Terminal-Bench-inspired wave with deterministic, offline, gold-verified multi-step tasks |
 | `0.15.0` | 2026-07-27 | 372–391 | 391 | CLI-composition wave: bespoke tools (`logq`, `pktool`, `xtab`, `cfgctl`, `depwalk`, `slicer`) with a deliberately unguessable surface, so `--help` must be read before anything runs, plus POSIX pipeline tasks (`sort`, `join`, `comm`, `grep`/`uniq -c`, `find`/`xargs -0`, `awk`, `sed`) whose `solve.sh` the verifier executes |
-| `0.16.0` | 2026-07-28 | — | 391 | Audit pass over all 391 tasks: no tasks added or removed, but defects gold-verification cannot see were corrected — tasks winnable without work, prompts whose verifier rejected the work they described, requirements the verifier never checked (notably “do not edit the tests”), and platform/self-pollution issues. **Not score-comparable with v0.15.0.** |
-| `0.17.0` | 2026-09-26 | 392–411 | 411 | Long-context wave, promoted from the separate `--suite long` into the scored set. Registry ids are `task_392_*` … `task_411_*`; generator seeds and paraphrase fixtures stay on `long_NN_*`, so the tasks themselves did not change. Each task floors the runner at 7200 s and 3000 steps. **Not score-comparable with v0.16.0.** |
-| `0.18.0` | 2026-10-02 | 412–431 | 431 | Tool-reflection wave promoted into the scored set, with IAM command/policy and wiki append-position fixes. New ids are `task_412_*` … `task_431_*`; `reflect_NN_*` remain lookup aliases. Each task floors the runner at 1800 s and 400 steps. **Not score-comparable with v0.17.0 or pre-fix reflect calibration.** |
+| `0.16.0` | 2026-07-28 | — | 391 | Audit pass over all 391 tasks: no tasks added or removed, but defects gold-verification cannot see were corrected — tasks winnable without work, prompts whose verifier rejected the work they described, requirements the verifier never checked (notably “do not edit the tests”), and platform/self-pollution issues. **Not score-comparable with v0.15.0.*\* |
+| `0.17.0` | 2026-09-26 | 392–411 | 411 | Long-context wave, promoted from the separate `--suite long` into the scored set. Registry ids are `task_392_*` … `task_411_*`; generator seeds and paraphrase fixtures stay on `long_NN_*`, so the tasks themselves did not change. Each task floors the runner at 7200 s and 3000 steps. **Not score-comparable with v0.16.0.*\* |
+| `0.18.0` | 2026-10-02 | 412–431 | 431 | Tool-reflection wave promoted into the scored set, with IAM command/policy and wiki append-position fixes. New ids are `task_412_*` … `task_431_*`; `reflect_NN_*` remain lookup aliases. Each task floors the runner at 1800 s and 400 steps. **Not score-comparable with v0.17.0 or pre-fix reflect calibration.*\* |
 
 ### Infrastructure
 
@@ -823,7 +821,7 @@ Calibration, 2026-09-30, two attempts per task, `run-openrouter` in the bwrap sa
 | reflect_18_mail_bounce | 0/2 | 0/2 | 1/2 | 0/2 | 2/2 | 2/2 | 2/2 |
 | reflect_19_orders_backorder | 0/2 | 0/2 | 0/2 | 1/2 | 0/2 | 1/2 | 1/2 |
 | reflect_20_admin_elevation | 0/2 | 0/2 | 0/2 | 0/2 | 1/2 | 2/2 | 0/2 |
-| **total** | **1/40** | **0/40** | **22/40** | **15/40** | **30/40** | **31/40** | **30/40** |
+| **total** | **1/40** | **0/40** | **22/40** | **15/40** | **30/40** | **31/40** | **30/40*\* |
 
 ## Harbor export
 
