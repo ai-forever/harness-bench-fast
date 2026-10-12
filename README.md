@@ -20,6 +20,8 @@ Results refer to these modified snapshots, not the original base checkpoints.
 | Codex CLI | GPT-6.1 Sol (low) | 420/431 | 97.4% | 2,817 | 69,419,504 |
 | free-code | DeepSeek V4.1 Flash Uncensored FP8 (high) | 419/431 | 97.2% | 4,311 | 631,963,525 |
 | GigaCode Universal Agent (gc-cli) | DeepSeek V4.1 Flash Uncensored FP8 (high) | 419/431 | 97.2% | 5,210 | 386,165,256 |
+| GigaCode Universal Agent (gc-cli) | Kimi-K3 (OpenRouter) (high) | 417/431 | 96.7% | 3,402 | 171,347,666 |
+| GigaCode Universal Agent (gc-cli) | GPT-6 Luna (OpenRouter) (reasoning none) | 388/431 | 90.0% | 8,716 | 762,784,868 |
 
 GLM-5.3 Flash Uncensored (`glm-5.3-flash-uncensored`), **@mean1**, measured
 2026-10-06/07, reasoning high, Linux bwrap, concurrency 3. Eight completed
@@ -118,13 +120,13 @@ two timed-out tasks, so totals are lower bounds), not independently audited.
 
 ### GLM-5.3 (upstream weights, OpenRouter) harness matrix
 
-Four of six completed @mean1 runs of the 2026-10-05 OpenRouter matrix, measured
+All six @mean1 runs of the 2026-10-05 OpenRouter matrix, measured
 2026-10-09/10: `z-ai/glm-5.3` upstream weights through OpenRouter with `reasoning.effort: high`, the same frozen
 harness runtimes as the DeepSeek matrix (pi-mono 0.73.1, mini-SWE-agent 2.4.6,
-deepagents 0.6.12, OpenCode 1.18.33), Linux bwrap, concurrency 3, timeout 900 s
+deepagents 0.6.12, OpenCode 1.18.33, OpenHands 1.16.0, Hermes 5307e932), Linux bwrap, concurrency 3, timeout 900 s
 with floors of 7200 s (long) and 1800 s (reflection). This is **not** the
 `glm-5.3-flash-uncensored` FP8 snapshot measured by the eight-harness matrix
-below; the two are not comparable. Hermes and OpenHands are still running.
+below; the two are not comparable.
 No infrastructure failures remain in the final reports (mini-SWE-agent replaced
 three transient request failures on one task by retries, which then timed out).
 Timed-out tasks count as fails. Token telemetry is raw and not independently
@@ -136,12 +138,29 @@ audited; zero means absent.
 | OpenCode | GLM-5.3 (OpenRouter) (high) | 413/431 | 95.8% | 3,745 | 0 |
 | deepagents | GLM-5.3 (OpenRouter) (high) | 408/431 | 94.7% | 8,271 | 696,504,696\* |
 | mini-SWE-agent | GLM-5.3 (OpenRouter) (high) | 407/431 | 94.4% | 5,191 | 769,563,983 |
+| OpenHands | GLM-5.3 (OpenRouter) (high) | 404/431 | 93.7% | 0 | 0 |
+| Hermes | GLM-5.3 (OpenRouter) (high) | 402/431 | 93.3% | 0 | 0 |
 | pi-mono | GLM-5.3 (OpenRouter) (high) | 396/431 | 91.9% | 0 | 0 |
 
 Wave scores (ordinary / long / reflection): Universal Agent 388/16/19,
 OpenCode 386/12/15, deepagents 381/14/13, mini-SWE-agent 385/9/13,
-pi-mono 376/6/14. \* deepagents tokens are raw counters with known duplicate
+OpenHands 384/6/14, Hermes 387/3/12, pi-mono 376/6/14. \* deepagents tokens are raw counters with known duplicate
 usage accounting.
+
+The GigaCode Universal Agent + Kimi-K3 row is **@mean1**, measured 2026-10-10/11
+with the same gc-cli 0.4.0 build and run-cli/bwrap setup, model
+`moonshotai/kimi-k3` through OpenRouter, reasoning **high**: ordinary
+**387/391 (99.0%)**, long **13/20 (65.0%)**, reflection **17/20 (85.0%)**. Six
+transient gateway errors were replaced by retries; no infrastructure failures
+remain. Five tasks timed out and count as fails; usage coverage 426/431.
+
+The GigaCode Universal Agent + GPT-6 Luna row is **@mean1**, measured 2026-10-11,
+model `openai/gpt-6-luna` through OpenRouter with **`reasoning_effort: none`**:
+the gateway rejects every other effort value for this model when tools are sent
+on Chat Completions, and gc-cli has no Responses API transport, so this run has
+no reasoning and is **not comparable** with the high-effort rows. Ordinary
+**376/391 (96.2%)**, long **3/20 (15.0%)**, reflection **9/20 (45.0%)**. No
+infrastructure failures; three tasks timed out; usage coverage 428/431.
 
 Use a fresh result JSON path for v0.18.0; do not resume an older-version report
 into the new task set. Both new waves belong to the default scored suite.
