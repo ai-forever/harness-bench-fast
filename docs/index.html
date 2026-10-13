@@ -756,7 +756,7 @@
           <p>
             Every run covers the full 411-task set, including the long-context
             wave (tasks 392–411). One full run per harness + model setup,
-            measured 2026-09-29/30. DeepSeek V4.1 Flash, GPT-6 Luna and GLM-5.3
+            measured 2026-09-29/30, except cowork (2026-10-13). DeepSeek V4.1 Flash, GPT-6 Luna and GLM-5.3
             run on stock deepagents with reasoning effort high (GPT-6 Luna
             through the Responses API); Claude Haiku 4.5 with the built-in
             Anthropic harness profile. The deepagents GigaChat rows use
@@ -776,6 +776,15 @@
             a secret leak; see the
             <a href="https://github.com/ai-forever/harness-bench-fast#historical-results-task-set-v0170-411-tasks">README audit notes</a>.
           </p>
+          <p id="cowork-notes"><strong>cowork:</strong> local CLI adapter around Mimir's model loop,
+            production prompt and reduced evaluation tools; excludes the full Yggdrasil/Restate/MCP/HITL stack.
+            Measured 2026-10-13, k=1, frozen v0.17.0, TagMe, Linux bwrap, concurrency 8, temperature 0.2.
+            GLM-5.3 high: 16,384 tokens per response / 80 tool calls; Haiku 4.5 default: 2,048 / 12.
+            Timeout 900 s with long-wave floors. Native-trace metrics cover 411/411 retained task attempts.
+            Including infrastructure attempts: GLM 87,296,288 tokens, Haiku 37,809,500.
+            GLM task 397 received one technical retry after HTTP 400 of unresolved origin and a streaming
+            replay returning 502; the retry failed at the tool limit, so the score is unchanged.
+            Budgets differ; no repeat-based variance estimate. See the README for audit details.</p>
         </div>
 
         <div class="leaderboard">
@@ -815,8 +824,16 @@
             <div class="meta">Long wave 14/20 · Steps 8,031 · Tokens 1,005,651,882</div>
           </article>
 
-          <article class="result-row" data-harness="mini-SWE-agent" data-group="gigachat">
+          <article class="result-row" data-harness="cowork" data-group="other">
             <div class="rank">4</div>
+            <div class="who"><h3>cowork</h3><p>GLM-5.3 (high)</p></div>
+            <div class="score">367/411</div><div class="percent">89.3%</div>
+            <div class="bar"><span style="width: 89.3%"></span></div>
+            <div class="meta">@mean1 · Mimir local CLI · Long wave 1/20 · Steps 3,187 · Tokens 82,088,043</div>
+          </article>
+
+          <article class="result-row" data-harness="mini-SWE-agent" data-group="gigachat">
+            <div class="rank">5</div>
             <div class="who">
               <h3>mini-SWE-agent</h3>
               <p>GigaChat 3.5 Ultra Reasoning (PROM)</p>
@@ -828,7 +845,7 @@
           </article>
 
           <article class="result-row" data-harness="deepagents" data-group="other">
-            <div class="rank">5</div>
+            <div class="rank">6</div>
             <div class="who">
               <h3>deepagents + Anthropic profile</h3>
               <p>Claude Haiku 4.5</p>
@@ -840,7 +857,7 @@
           </article>
 
           <article class="result-row" data-harness="deepagents" data-group="gigachat">
-            <div class="rank">6</div>
+            <div class="rank">7</div>
             <div class="who">
               <h3>deepagents + GigaChat profile</h3>
               <p>GigaChat 3.5 xxxB (internal version)</p>
@@ -851,8 +868,16 @@
             <div class="meta">Long wave 0/20 · Steps 5,207 · Tokens 61,842,876</div>
           </article>
 
+          <article class="result-row" data-harness="cowork" data-group="other">
+            <div class="rank">8</div>
+            <div class="who"><h3>cowork</h3><p>Claude Haiku 4.5 (default)</p></div>
+            <div class="score">327/411</div><div class="percent">79.6%</div>
+            <div class="bar"><span style="width: 79.6%"></span></div>
+            <div class="meta">@mean1 · Mimir local CLI · Long wave 0/20 · Steps 2,133 · Tokens 37,464,508</div>
+          </article>
+
           <article class="result-row" data-harness="pi-mono" data-group="gigachat">
-            <div class="rank">7</div>
+            <div class="rank">9</div>
             <div class="who">
               <h3>pi-mono</h3>
               <p>GigaChat 3.5 xxxB (internal version)</p>
@@ -864,7 +889,7 @@
           </article>
 
           <article class="result-row" data-harness="pi-mono" data-group="gigachat">
-            <div class="rank">8</div>
+            <div class="rank">10</div>
             <div class="who">
               <h3>pi-mono</h3>
               <p>GigaChat 3.5 Ultra Reasoning (PROM)</p>
@@ -876,7 +901,7 @@
           </article>
 
           <article class="result-row" data-harness="mini-SWE-agent" data-group="gigachat">
-            <div class="rank">9</div>
+            <div class="rank">11</div>
             <div class="who">
               <h3>mini-SWE-agent</h3>
               <p>GigaChat 3.5 xxxB (internal version)</p>
@@ -888,7 +913,7 @@
           </article>
 
           <article class="result-row" data-harness="deepagents" data-group="gigachat">
-            <div class="rank">10</div>
+            <div class="rank">12</div>
             <div class="who">
               <h3>deepagents + GigaChat profile</h3>
               <p>GigaChat 3.5 Ultra Reasoning (PROM, workaround)</p>

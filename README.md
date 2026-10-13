@@ -242,20 +242,39 @@ Use a fresh result JSON path for v0.18.0; do not resume an older-version report 
 | deepagents | none | DeepSeek V4.1 Flash Uncensored FP8 (high) | 406/411 | 98.8% | 18/20 | 10,457 | 1,693,784,997 |
 | deepagents | none | GPT-6 Luna (high) | 390/411 | 94.9% | 12/20 | 9,822 | 360,640,300 |
 | deepagents | none | GLM-5.3 (high) | 389/411 | 94.6% | 14/20 | 8,031 | 1,005,651,882 |
+| cowork | Mimir local CLI | GLM-5.3 (high) | 367/411 | 89.3% | 1/20 | 3,187 | 82,088,043 |
 | mini-SWE-agent | — | GigaChat 3.5 Ultra Reasoning (PROM)² | 366/411 | 89.1% | 0/20 | 5,898 | 60,635,573 |
 | deepagents | Anthropic | Claude Haiku 4.5 | 361/411 | 87.8% | 1/20 | 7,326 | 600,214,572 |
 | deepagents | GigaChat | GigaChat 3.5 xxxB (internal version) | 348/411 | 84.7% | 0/20 | 5,207 | 61,842,876 |
+| cowork | Mimir local CLI | Claude Haiku 4.5 (default) | 327/411 | 79.6% | 0/20 | 2,133 | 37,464,508 |
 | pi-mono | — | GigaChat 3.5 xxxB (internal version)² | 316/411 | 76.9% | 0/20 | 5,027 | 331,507,322 |
 | pi-mono | — | GigaChat 3.5 Ultra Reasoning (PROM)² | 299/411 | 72.7% | 0/20 | 3,291 | 139,229,464 |
 | mini-SWE-agent | — | GigaChat 3.5 xxxB (internal version)² | 237/411 | 57.7% | 0/20 | 5,044 | 44,772,995 |
 | deepagents | GigaChat | GigaChat 3.5 Ultra Reasoning (PROM)¹ | 222/411 | 54.0% | 0/20 | 3,879 | 38,611,899 |
+
+The **cowork** rows measure a local CLI adapter around Mimir's model loop,
+production prompt and reduced evaluation tools, without the full
+Yggdrasil/Restate/MCP/HITL stack. Both are k=1 on frozen task-set v0.17.0,
+through TagMe, Linux bwrap, concurrency 8, temperature 0.2, timeout 900 s
+with task-specific long-wave floors. GLM-5.3 (`z-ai/glm-5.3`) uses reasoning
+high, 16,384 tokens per response and an 80-tool-call limit; Haiku 4.5
+(`anthropic/claude-haiku-4.5`) uses reasoning default, 2,048 tokens and
+12 tool calls. Budgets differ; these are configuration results, with no
+repeat-based variance estimate. Steps and tokens were checked against native
+traces, with metric coverage 411/411. Table totals cover retained task attempts;
+including infrastructure attempts, token totals are 87,296,288 (GLM) and
+37,809,500 (Haiku). GLM task 397 was retried after an HTTP 400 of unresolved
+origin and a diagnostic streaming replay returning 502; the clean retry failed
+at the tool limit, leaving the score unchanged. Original and retry traces are
+preserved privately. Raw task results and traces remain on the benchmark server.
 
 Historical deepagents token totals are preserved as recorded by the runner.
 The collector can count duplicated usage fields more than once; these totals
 have not been independently recalculated and should not be treated as verified
 cost estimates. Pass/fail scores are unaffected.
 
-Each row is one full run, measured 2026-09-29/30. DeepSeek V4.1 Flash
+Each row is one full run. The cowork rows were measured 2026-10-13;
+other rows were measured 2026-09-29/30. DeepSeek V4.1 Flash
 (`deepseek/deepseek-v4.1-flash`), GPT-6 Luna (`openai/gpt-6-luna`) and GLM-5.3
 (`z-ai/glm-5.3`) ran through `run-openrouter` with stock deepagents (no built-in profile
 exists for them), `OPENROUTER_REASONING_EFFORT=high` and `--isolation none`; DeepSeek and
