@@ -19,6 +19,7 @@
         <div class="nav-links">
           <a href="#current">Leaderboard</a>
           <a href="#tasks">Task Set</a>
+          <a href="#cowork-notes">cowork</a>
           <a href="#history">History</a>
           <a href="https://github.com/ai-forever/harness-bench-fast">GitHub</a>
         </div>
@@ -41,6 +42,10 @@
             that requires adapting to partial results, changing constraints,
             and stateful service responses.
           </p>
+          <p><strong>cowork results:</strong> GLM-5.3 (high) <strong>367/411 · 89.3%</strong>;
+            Claude Haiku 4.5 <strong>327/411 · 79.6%</strong>.
+            Measured on task-set v0.17.0 (411 tasks), using the Mimir local CLI.
+            <a href="#cowork-notes">View cowork results and measurement notes</a>.</p>
           <div class="hero-actions">
             <a class="button primary" href="#current">View results</a>
             <a class="button secondary" href="https://github.com/ai-forever/harness-bench-fast">
@@ -746,7 +751,7 @@
       </section>
 
       <section class="section history" id="history" aria-labelledby="history-title">
-        <details>
+        <details open>
           <summary><span class="eyebrow">History</span>
             <span class="history-title" id="history-title">Earlier results: task-set v0.17.0, 411 tasks</span>
           </summary>
