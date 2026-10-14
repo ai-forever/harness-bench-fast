@@ -73,7 +73,7 @@
         <details class="measurement-notes">
           <summary>Measurement notes: models, budgets and audits</summary>
           <div class="notes-body">
-          <p><strong>cowork + GLM-5.3 (TagMe, high):</strong> 376/431 (87.2%), k=1,
+          <p><strong>cowork + GLM-5.3 (OpenRouter, high):</strong> 376/431 (87.2%), k=1,
             completed in two disjoint batches on October 13–14: retained 367/411 plus 9/20 reflection tasks.
             Legacy task definitions and the CLI runner were checked unchanged. Mimir local CLI with reduced evaluation tools,
             Linux bwrap, temperature 0.2, max_tokens 16,384, 80 tool calls, timeout 900 s with task floors.
@@ -390,7 +390,7 @@
           </article>
           <article id="cowork-glm53" data-wave-id="cowork-glm53" class="result-row" data-harness="cowork" data-group="other">
             <div class="rank">26</div>
-            <div class="who"><h3>cowork</h3><p>GLM-5.3 (TagMe) (high)</p></div>
+            <div class="who"><h3>cowork</h3><p>GLM-5.3 (OpenRouter) (high)</p></div>
             <div class="score">376/431</div><div class="percent">87.2%</div>
             <div class="bar"><span style="width:87.2%"></span></div>
             <div class="meta">@mean1 · Long wave 1/20 · Reflection 9/20 · Steps ≥3,568 · Tokens ≥89,614,312 (coverage 429/431)</div>
@@ -786,7 +786,7 @@
           </p>
           <p><strong>cowork:</strong> local CLI adapter around Mimir's model loop,
             production prompt and reduced evaluation tools; excludes the full Yggdrasil/Restate/MCP/HITL stack.
-            Measured 2026-10-13, k=1, frozen v0.17.0, TagMe, Linux bwrap, concurrency 8, temperature 0.2.
+            Measured 2026-10-13, k=1, frozen v0.17.0, OpenRouter, Linux bwrap, concurrency 8, temperature 0.2.
             GLM-5.3 high: 16,384 tokens per response / 80 tool calls; Haiku 4.5 default: 2,048 / 12.
             Timeout 900 s with long-wave floors. Native-trace metrics cover 411/411 retained task attempts.
             Including infrastructure attempts: GLM 87,296,288 tokens, Haiku 37,809,500.

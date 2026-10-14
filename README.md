@@ -141,9 +141,9 @@ audited; zero means absent.
 | OpenHands | GLM-5.3 (OpenRouter) (high) | 404/431 | 93.7% | 0 | 0 |
 | Hermes | GLM-5.3 (OpenRouter) (high) | 402/431 | 93.3% | 0 | 0 |
 | pi-mono | GLM-5.3 (OpenRouter) (high) | 396/431 | 91.9% | 0 | 0 |
-| cowork | GLM-5.3 (TagMe) (high) | 376/431 | 87.2% | ≥3,568 | ≥89,614,312 |
+| cowork | GLM-5.3 (OpenRouter) (high) | 376/431 | 87.2% | ≥3,568 | ≥89,614,312 |
 
-The cowork row uses the same model ID (`z-ai/glm-5.3`) through TagMe, high effort,
+The cowork row uses the same model ID (`z-ai/glm-5.3`) through OpenRouter, high effort,
 and the Mimir local CLI with reduced evaluation tools. Its k=1 coverage was
 completed in two disjoint batches: 367/411 on October 13 and 9/20
 reflection tasks on October 14. Legacy task definitions, verifiers and the CLI
@@ -153,7 +153,7 @@ failures were rerun for this extension. Settings: temperature 0.2, max_tokens
 (first reflection task piloted alone), task timeout 900 s with native floors.
 Steps and tokens were checked against native traces, coverage 429/431.
 They are lower bounds: timed-out tasks without final telemetry remain scored as failures.
-Tools, budgets and serving routes differ across rows; this is one configuration
+Tools and budgets differ across rows; this is one configuration
 run, not a controlled harness-only comparison. The original task-397 technical
 retry remains documented in the historical v0.17 notes. Raw results and traces
 remain on the servers; the 411-task historical row is preserved.
@@ -271,7 +271,7 @@ Use a fresh result JSON path for v0.18.0; do not resume an older-version report 
 The **cowork** rows measure a local CLI adapter around Mimir's model loop,
 production prompt and reduced evaluation tools, without the full
 Yggdrasil/Restate/MCP/HITL stack. Both are k=1 on frozen task-set v0.17.0,
-through TagMe, Linux bwrap, concurrency 8, temperature 0.2, timeout 900 s
+through OpenRouter, Linux bwrap, concurrency 8, temperature 0.2, timeout 900 s
 with task-specific long-wave floors. GLM-5.3 (`z-ai/glm-5.3`) uses reasoning
 high, 16,384 tokens per response and an 80-tool-call limit; Haiku 4.5
 (`anthropic/claude-haiku-4.5`) uses reasoning default, 2,048 tokens and
@@ -501,7 +501,6 @@ uv run python -m harness_bench run-openrouter \
 # Internal OpenAI-compatible gateways can use password auth instead of a
 # static API key. The runner fetches and refreshes a bearer token without
 # printing it:
-# OPENROUTER_USE_INTERNAL_TAGME=1  # local shortcut for the ignored tagme example
 # OPENROUTER_BASE_URL=https://gateway.example/x/ai/llm/v1
 # OPENROUTER_AUTH_URL=https://gateway.example/auth/realms/.../token
 # OPENROUTER_AUTH_USERNAME=...
