@@ -6,6 +6,31 @@ Current task set: **431 tasks, `task-set v0.18.0`**. Tasks 392–411 are the lon
 
 ## Results (task-set v0.18.0, 431 tasks)
 
+### MultiTool CLI (2026-10-14)
+
+Two completed @mean1 runs on all 431 tasks, task-set v0.18.0:
+
+| harness | model | passed | score | steps | tokens |
+|---|---|---:|---:|---:|---:|
+| MultiTool CLI | GLM-5.3 (OpenRouter) (high) | 411/431 | 95.4% | 3,600 | 155,371,241 |
+| MultiTool CLI | Claude Haiku 4.5 (default) | 376/431 | 87.2% | 5,460 | 212,030,792 |
+
+MultiTool CLI package 1.14.33, source snapshot, Bun 1.4.2; Linux bwrap,
+concurrency 4. Model IDs: `z-ai/glm-5.3` (reasoning high) and
+`anthropic/claude-haiku-4.5` (default). API responses confirmed these IDs;
+no build fingerprint was provided. Custom profile: max output **16,384 tokens
+per response**, versus native CLI default 32,000; temperature not explicitly
+set. Timeout 900 s, with task floors 7200 s for long and 1800 s for reflection.
+GLM: ordinary 386/391, long 10/20, reflection 15/20. Haiku: 371/391, 1/20, 4/20.
+Steps count native tool attempts, including failed attempts. Tokens sum input,
+output, reasoning and cache usage across parent and child sessions, audited
+from native SQLite telemetry for all 431 tasks; they do not represent monetary
+cost. Transport-affected attempts were replaced after fixing streaming;
+no transient infrastructure failures remain. Six GLM long-task failures
+exhausted the output budget and were retained. Raw traces remain private.
+
+### Other harness measurements
+
 The stand owner identified the measured models as uncensored FP8 snapshots:
 [dealignai/DeepSeek-V4.1-Flash-UNCENSORED-FP8](https://huggingface.co/dealignai/DeepSeek-V4.1-Flash-UNCENSORED-FP8)
 and [dealignai/GLM-5.3-Flash-UNCENSORED-FP8](https://huggingface.co/dealignai/GLM-5.3-Flash-UNCENSORED-FP8).
