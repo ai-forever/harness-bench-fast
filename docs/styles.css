@@ -683,3 +683,5 @@ h3 {
   .metric { font-size: 28px; }
   .task-strip { grid-template-columns: repeat(2, 1fr); }
 }
+
+.zero-results > .leaderboard { padding: 0 12px 12px; }

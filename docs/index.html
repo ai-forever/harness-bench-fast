@@ -8,7 +8,7 @@
       name="description"
       content="harness-bench task-set v0.18.0 (431 tasks), including the new tool-reflection wave; v0.17.0 and earlier results are history."
     >
-    <link rel="stylesheet" href="styles.css?v=compact-20261014">
+    <link rel="stylesheet" href="styles.css?v=zero-runs-20261014">
   </head>
   <body>
     <header class="site-header">
@@ -718,6 +718,11 @@
             <div class="bar"><span style="width:2.1%"></span></div>
             <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 2,042 · Tokens (raw) 4,511,527</div>
           </article>
+
+        </div>
+        <details class="measurement-notes zero-results" id="zero-results">
+          <summary>Zero-score runs (<span id="zero-results-count">1</span>)</summary>
+          <div class="leaderboard" id="zero-results-list" aria-label="Runs with zero solved tasks">
           <article data-wave-id="run-54" class="result-row">
             <div class="rank">74</div>
             <div class="who"><h3>Hermes</h3><p>GigaChat 2 Max (PROM)</p></div>
@@ -725,7 +730,8 @@
             <div class="bar"><span style="width:0.0%"></span></div>
             <div class="meta">Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0</div>
           </article>
-        </div>
+          </div>
+        </details>
         <p class="filter-empty" id="current-filter-empty" hidden>No runs match these filters.</p>
       </section>
 
@@ -1167,7 +1173,10 @@
     <script>
       (function () {
         var list = document.querySelector("#current .leaderboard");
-        var rows = Array.prototype.slice.call(list.querySelectorAll(".result-row"));
+        var rows = Array.prototype.slice.call(document.querySelectorAll("#current .result-row"));
+        var zeroGroup = document.getElementById("zero-results");
+        var zeroList = document.getElementById("zero-results-list");
+        var zeroCount = document.getElementById("zero-results-count");
         var modelSelect = document.getElementById("current-model-filter");
         var harnessSelect = document.getElementById("current-harness-filter");
         var sortSelect = document.getElementById("current-sort");
@@ -1270,15 +1279,22 @@
             return a.dataset[key].localeCompare(b.dataset[key], "en", { numeric: true }) || byScore;
           });
           var shown = 0;
+          var zeroShown = 0;
           rows.forEach(function (row) {
             var visible = total > 0 && row.dataset.hidden !== "true" &&
               selectedModels.indexOf(row.dataset.modelName) !== -1 &&
               (harnessSelect.value === "all" || row.dataset.harnessName === harnessSelect.value);
             row.classList.toggle("is-hidden", !visible);
-            if (visible) { shown += 1; }
-            list.appendChild(row);
+            var isZero = Number(row.dataset.passed) === 0;
+            if (visible) {
+              shown += 1;
+              if (isZero) { zeroShown += 1; }
+            }
+            (isZero ? zeroList : list).appendChild(row);
           });
-          count.textContent = shown + " of " + rows.length + " shown";
+          zeroGroup.hidden = zeroShown === 0;
+          zeroCount.textContent = zeroShown;
+          count.textContent = (shown - zeroShown) + " ranked · " + zeroShown + " zero-score · " + shown + " of " + rows.length + " match";
           empty.hidden = shown !== 0;
         }
         from.addEventListener("input", function () {
