@@ -8,7 +8,7 @@
       name="description"
       content="harness-bench task-set v0.18.0 (431 tasks), including the new tool-reflection wave; v0.17.0 and earlier results are history."
     >
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=compact-20261014">
   </head>
   <body>
     <header class="site-header">
@@ -31,21 +31,10 @@
         <div class="hero-copy">
           <p class="eyebrow">Current task set: v0.18.0</p>
           <h1 id="title">431 mechanically verified agent tasks</h1>
-          <p class="lead">
-            A compact benchmark for comparing agent harnesses on file edits,
-            data transforms, pytest bug fixes, memory discipline, synthetic
-            benchmark-like workflows, version-control work, skill discovery,
-            adversarial / hostile-environment handling, CLI composition
-            with bespoke tools whose <code>--help</code> must actually be read,
-            and a long-context wave (tasks 392–411) that pushes the harness
-            through context compaction, plus a tool-reflection wave (tasks 412–431)
-            that requires adapting to partial results, changing constraints,
-            and stateful service responses.
-          </p>
-          <p><strong>cowork results:</strong> GLM-5.3 (high) <strong>367/411 · 89.3%</strong>;
-            Claude Haiku 4.5 <strong>327/411 · 79.6%</strong>.
-            Measured on task-set v0.17.0 (411 tasks), using the Mimir local CLI.
-            <a href="#cowork-notes">View cowork results and measurement notes</a>.</p>
+          <p class="lead">Compare agent harnesses on coding, tools, memory and long-context tasks.
+            Every result is checked mechanically.</p>
+          <p class="cowork-callout"><a href="#cowork-notes"><strong>cowork · 411 tasks:</strong>
+            GLM-5.3 high <strong>89.3%</strong> · Haiku 4.5 <strong>79.6%</strong> →</a></p>
           <div class="hero-actions">
             <a class="button primary" href="#current">View results</a>
             <a class="button secondary" href="https://github.com/ai-forever/harness-bench-fast">
@@ -66,37 +55,26 @@
       </section>
 
       <section class="task-strip" id="tasks" aria-label="Task set composition">
-        <div>
-          <span class="strip-number">1-253</span>
-          <span>File, code, data, diagnostic, and memory tasks</span>
-        </div>
-        <div>
-          <span class="strip-number">254-313</span>
-          <span>Synthetic agentic (Terminal-Bench / tau / SWE-bench-like) and Git / version-control workflows</span>
-        </div>
-        <div>
-          <span class="strip-number">314-351</span>
-          <span>Skill-discovery tasks and adversarial / hostile-environment handling (broken versions, unreadable files, contradictions, a ~100&nbsp;MB log)</span>
-        </div>
-        <div>
-          <span class="strip-number">352-391</span>
-          <span>Calibrated Terminal-Bench-inspired workflows and CLI composition: bespoke tools (<code>logq</code>, <code>pktool</code>, <code>xtab</code>, …) with unguessable flags, plus POSIX pipelines whose <code>solve.sh</code> the verifier executes</span>
-        </div>
-        <div>
-          <span class="strip-number">392-411</span>
-          <span>Long-context wave: large reading workloads (novels, registers, mail, codebases, git history) with a 7200&nbsp;s / 3000-step floor, meant to drive context compaction</span>
-        </div>
-        <div>
-          <span class="strip-number">412-431</span>
-          <span>Tool-reflection wave: stateful services with partial results, pagination, throttling, concurrent edits, async actions, and changing constraints. Every client call is recorded in a signed journal and replayed for verification.</span>
-        </div>
+        <div><span class="strip-number">1–253</span><span>Files, code, data & memory</span></div>
+        <div><span class="strip-number">254–313</span><span>Agent workflows & Git</span></div>
+        <div><span class="strip-number">314–351</span><span>Skills & adversarial tasks</span></div>
+        <div><span class="strip-number">352–391</span><span>Terminal & CLI composition</span></div>
+        <div><span class="strip-number">392–411</span><span>Long context</span></div>
+        <div><span class="strip-number">412–431</span><span>Tool reflection</span></div>
       </section>
 
       <section class="section" id="current" aria-labelledby="current-title">
         <div class="section-heading">
-          <p class="eyebrow">Current task set, v0.18.0</p>
-          <h2 id="current-title">431 tasks, including 20 tool-reflection tasks</h2>
-          <p>Completed, validated full runs measured 2026-10-02–11. The PROM matrix is still running;
+          <p class="eyebrow">Task-set v0.18.0</p>
+          <h2 id="current-title">Leaderboard · 431 tasks</h2>
+          <p>Tools and budgets vary across runs. Token counts are raw telemetry; 0 means unavailable.</p>
+        </div>
+        <details class="measurement-notes">
+          <summary>Measurement notes: models, budgets and audits</summary>
+          <div class="notes-body">
+          <p>Scores and ranks use tasks introduced in the selected versions. @mean3 remains a mean of three runs.
+            Revisions without added tasks contribute zero tasks. Scores use current v0.18.0 task definitions, not historical results. Steps and tokens below remain full-run totals.</p>
+<p>Completed, validated full runs measured 2026-10-02–11. The PROM matrix is still running;
             incomplete runs and infrastructure failures are excluded. The PROM matrix uses one run per configuration (k=1),
             eight task slots across the matrix, bwrap isolation. The separate maestro harness run used four task workers and bwrap.</p>
           <p>All listed PROM matrix runs scored 0/20 on the long-context wave. Reflection: GigaChat 2 Reasoning + mini-SWE-agent: 8/20; GigaChat 2 Reasoning + OpenCode: 1/20; GigaChat 2 Reasoning + deepagents (no profile): 1/20; GigaChat 2 Pro + mini-SWE-agent: 1/20; GigaChat 2 Reasoning + deepagents (GigaChat profile): 2/20; maestro harness: 1/20 (and 0/20 long); other listed runs 0/20.
@@ -112,7 +90,7 @@
             CLI counters await native-trace audit except for recorded mini-SWE-agent and maestro harness metrics.</p>
           <p><strong>maestro harness:</strong> <a href="https://github.com/AIRI-Institute/maestro-core/tree/9c2ac0d4aedb4bb8bfd53e9694bbbac05c4a725c">MAESTRO CARL</a> with a custom shell coding adapter and reasoning-history replay, not an upstream ready-made coding agent. Measured 2026-10-05, k=1; no compaction, self-critic or subagents. Ordinary 247/391 (63.2%), long 0/20, reflection 1/20; no infrastructure failures. Budget: 200 model turns / 900 s with native task-specific floors, max_tokens 16384. Steps count completed model responses; token totals were checked against native traces for all 431 tasks. Elapsed time 63.8 minutes. This result describes this adapter configuration; raw traces remain private.</p>
           <p>Earlier task-set versions are historical and cannot be compared directly with v0.18.0.</p>
-        </div>
+
           <p>One complete k=1 run on the full v0.18.0 set, including the long-context
             and tool-reflection waves. dsh 0.2.0-rc.2 headless, profile hbf,
             DeepSeek V4.1 Flash (<code>deepseek-v4.1-flash</code>), reasoning high,
@@ -190,6 +168,8 @@
             Native sessions confirm model and low effort. Tokens are raw runner telemetry,
             not independently audited. Network transport used end-to-end TLS through a Mac
             CONNECT/SSH tunnel; runner and task execution stayed on bench.</p>
+          </div>
+        </details>
         <div class="wave-filter" role="group" aria-label="Task-set version range">
           <label for="wave-from">From version <output id="wave-from-label">v0.1.0</output>
             <input type="range" id="wave-from" min="1" max="17" value="1" step="1">
@@ -199,8 +179,7 @@
           </label>
           <p id="wave-range-summary" aria-live="polite">v0.1.0–v0.18.0 · 431 tasks</p>
           <button type="button" class="chip" id="wave-reset">All versions</button>
-          <p>Scores and ranks use tasks introduced in the selected versions. @mean3 remains a mean of three runs.
-            Revisions without added tasks contribute zero tasks. Scores use current v0.18.0 task definitions, not historical results. Steps and tokens below remain full-run totals.</p>
+          <p>Scores use selected tasks from v0.18.0; steps and tokens are full-run totals.</p>
         </div>
         <div class="filter-bar" role="group" aria-label="Current results filters">
           <details class="model-picker" id="current-model-filter">
@@ -756,9 +735,14 @@
             <span class="history-title" id="history-title">Earlier results: task-set v0.17.0, 411 tasks</span>
           </summary>
         <div class="section-heading">
-          <p class="eyebrow">Historical results, task-set v0.17.0</p>
-          <h2>Earlier leaderboard: 411 tasks</h2>
-          <p>
+          <p>Full 411-task runs. Different task-set versions are not directly comparable.</p>
+          <p id="cowork-notes"><strong>cowork:</strong> Mimir local CLI · measured October 13.
+            GLM-5.3 high: 16,384 tokens / 80 tool calls; Haiku: 2,048 / 12.</p>
+        </div>
+        <details class="measurement-notes">
+          <summary>Measurement notes: v0.17 and cowork</summary>
+          <div class="notes-body">
+<p>
             Every run covers the full 411-task set, including the long-context
             wave (tasks 392–411). One full run per harness + model setup,
             measured 2026-09-29/30, except cowork (2026-10-13). DeepSeek V4.1 Flash, GPT-6 Luna and GLM-5.3
@@ -781,7 +765,7 @@
             a secret leak; see the
             <a href="https://github.com/ai-forever/harness-bench-fast#historical-results-task-set-v0170-411-tasks">README audit notes</a>.
           </p>
-          <p id="cowork-notes"><strong>cowork:</strong> local CLI adapter around Mimir's model loop,
+          <p><strong>cowork:</strong> local CLI adapter around Mimir's model loop,
             production prompt and reduced evaluation tools; excludes the full Yggdrasil/Restate/MCP/HITL stack.
             Measured 2026-10-13, k=1, frozen v0.17.0, TagMe, Linux bwrap, concurrency 8, temperature 0.2.
             GLM-5.3 high: 16,384 tokens per response / 80 tool calls; Haiku 4.5 default: 2,048 / 12.
@@ -790,7 +774,8 @@
             GLM task 397 received one technical retry after HTTP 400 of unresolved origin and a streaming
             replay returning 502; the retry failed at the tool limit, so the score is unchanged.
             Budgets differ; no repeat-based variance estimate. See the README for audit details.</p>
-        </div>
+          </div>
+        </details>
 
         <div class="leaderboard">
           <article class="result-row" data-harness="deepagents" data-group="other">
@@ -939,8 +924,10 @@
             <span class="history-title" id="history-v016-title">Earlier results: task-set v0.16.0, 391 tasks</span>
           </summary>
           <div id="leaderboard">
-        <div class="section-heading">
-          <p>
+        <details class="measurement-notes">
+          <summary>Measurement notes: v0.16</summary>
+          <div class="notes-body">
+<p>
             Results below use the full 391-task set (task-set v0.16.0). The
             current task set is v0.18.0 (431 tasks); these rows are not runs of
             it, and the v0.16.0 audit already made earlier scores incomparable.
@@ -958,7 +945,8 @@
             the result-affecting 0.0.4 pin change). One run per configuration does not establish repeatability or
             the significance of small score differences.
           </p>
-        </div>
+          </div>
+        </details>
 
         <div class="filter-bar" role="group" aria-label="Leaderboard filters">
           <div class="filter-chips" role="group" aria-label="Model group">
