@@ -141,6 +141,22 @@ audited; zero means absent.
 | OpenHands | GLM-5.3 (OpenRouter) (high) | 404/431 | 93.7% | 0 | 0 |
 | Hermes | GLM-5.3 (OpenRouter) (high) | 402/431 | 93.3% | 0 | 0 |
 | pi-mono | GLM-5.3 (OpenRouter) (high) | 396/431 | 91.9% | 0 | 0 |
+| cowork | GLM-5.3 (TagMe) (high) | 376/431 | 87.2% | ≥3,568 | ≥89,614,312 |
+
+The cowork row uses the same model ID (`z-ai/glm-5.3`) through TagMe, high effort,
+and the Mimir local CLI with reduced evaluation tools. Its k=1 coverage was
+completed in two disjoint batches: 367/411 on October 13 and 9/20
+reflection tasks on October 14. Legacy task definitions, verifiers and the CLI
+runner were checked unchanged before retaining the first batch. No quality
+failures were rerun for this extension. Settings: temperature 0.2, max_tokens
+16,384, 80 tool calls, request timeout 600 s, Linux bwrap, concurrency 8
+(first reflection task piloted alone), task timeout 900 s with native floors.
+Steps and tokens were checked against native traces, coverage 429/431.
+They are lower bounds: timed-out tasks without final telemetry remain scored as failures.
+Tools, budgets and serving routes differ across rows; this is one configuration
+run, not a controlled harness-only comparison. The original task-397 technical
+retry remains documented in the historical v0.17 notes. Raw results and traces
+remain on the servers; the 411-task historical row is preserved.
 
 Wave scores (ordinary / long / reflection): Universal Agent 388/16/19,
 OpenCode 386/12/15, deepagents 381/14/13, mini-SWE-agent 385/9/13,
