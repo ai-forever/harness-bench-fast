@@ -18,6 +18,7 @@
         </a>
         <div class="nav-links">
           <a href="#current">Leaderboard</a>
+          <a href="#secret-700-sft">In progress</a>
           <a href="#tasks">Task Set</a>
           <a href="#cowork-glm53">cowork</a>
           <a href="#history">History</a>
@@ -62,6 +63,32 @@
         <div><span class="strip-number">352–391</span><span>Terminal & CLI composition</span></div>
         <div><span class="strip-number">392–411</span><span>Long context</span></div>
         <div><span class="strip-number">412–431</span><span>Tool reflection</span></div>
+      </section>
+
+      <section class="section compact" id="secret-700-sft" aria-labelledby="secret-700-sft-title">
+        <div class="section-heading">
+          <p class="eyebrow">In progress · task-set v0.18.0 · not ranked</p>
+          <h2 id="secret-700-sft-title">Secret-700-SFT · deepagents</h2>
+          <p><strong>409/431 tasks completed: 368 passed, 41 failed, 22 pending.</strong></p>
+          <p><strong>90.0% among completed tasks (368/409).</strong>
+            Already solved: 85.4% of the full suite (368/431), a lower bound rather than a final score.
+            Pending tasks are not counted as failures.</p>
+          <p>Static checkpoint: <time datetime="2026-10-17T05:56:03Z">October 17, 2026, 05:56 UTC</time>.
+            Zero infrastructure failures recorded. Task order is not a random sample;
+            this partial percentage is not comparable to full-run leaderboard scores.</p>
+        </div>
+        <details class="measurement-notes">
+          <summary>Configuration and progress details</summary>
+          <div class="notes-body">
+            <p>One attempt per task; native deepagents 0.6.12; Linux bwrap; concurrency 2.
+              Reasoning enabled (effort default), with reasoning history forwarded.
+              Temperature 0.8, top_p 0.95, max output 81,920 tokens per response.</p>
+            <p>All 18 completed long-context tasks (392–409) reached the 7,200-second
+              task timeout and count as ordinary failures. Token metrics await audit.</p>
+            <p><a href="secret-700-sft-progress.json">Public aggregate snapshot</a>.
+              Raw traces remain private. This snapshot is excluded from the ranked leaderboard.</p>
+          </div>
+        </details>
       </section>
 
       <section class="section" id="current" aria-labelledby="current-title">

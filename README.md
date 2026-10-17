@@ -4,6 +4,24 @@
 
 Current task set: **431 tasks, `task-set v0.18.0`**. Tasks 392–411 are the long-context wave; tasks 412–431 are the tool-reflection wave. New full runs use this version.
 
+## In-progress measurement: Secret-700-SFT
+
+**Preliminary snapshot — 2026-10-17 05:56 UTC (08:56 MSK).**
+Native deepagents: **409/431 tasks completed, 368 passed, 41 failed, 22 pending**;
+zero infrastructure failures recorded. Success among completed tasks is
+**368/409 = 90.0%**. Already-solved tasks represent **368/431 = 85.4%** of the
+full suite; this is a lower bound, not the final score. Pending tasks are not
+counted as failures. This partial run is excluded from the completed leaderboard;
+task order is not a random sample, so 90.0% must not be compared to full-run scores.
+
+Task-set v0.18.0, one attempt per task, deepagents 0.6.12, Linux bwrap,
+concurrency 2. Reasoning enabled (effort default), reasoning history forwarded;
+temperature 0.8, top_p 0.95, max output 81,920 tokens per response.
+All 18 completed long-context tasks (392–409) reached the 7,200-second task timeout
+and count as ordinary failures. Token metrics await audit. This is a static
+checkpoint, not a live counter. [Public aggregate snapshot](docs/secret-700-sft-progress.json);
+raw traces remain private.
+
 ## Results (task-set v0.18.0, 431 tasks)
 
 ### MultiTool CLI (2026-10-14)
