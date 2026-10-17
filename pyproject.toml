@@ -66,6 +66,7 @@ include = [
     "/LICENSE",
     "/README.md",
     "/pyproject.toml",
+    "/scripts/openai_stream_proxy.py",
     "/tests",
 ]
 exclude = [
