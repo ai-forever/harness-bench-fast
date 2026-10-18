@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from harness_bench.core import Task
+from harness_bench.core import Task, effective_task_timeout
 from harness_bench.tasks import ALL_TASKS, get_task
 from harness_bench.versioning import TASK_SET_VERSION
 
@@ -45,12 +45,14 @@ def export_harbor_dataset(
     clean: bool = False,
 ) -> HarborExportResult:
     """Write a local Harbor dataset directory for the selected benchmark tasks."""
+    tasks = _select_tasks(task_ids)
+    if any(getattr(task, "requires_trusted_service", False) for task in tasks):
+        raise ValueError("Harbor export does not yet support the trusted host service; run these tasks with the CLI runner and --isolation bwrap")
     output_path = Path(output_dir)
     if clean and output_path.exists():
         shutil.rmtree(output_path)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    tasks = _select_tasks(task_ids)
     task_refs: list[tuple[str, str]] = []
     for task in tasks:
         task_name = f"{org}/{dataset}__{task.id}"
@@ -161,6 +163,10 @@ def _task_readme(task: Task) -> str:
 
 
 def _task_toml(task: Task, *, harbor_name: str, dataset: str) -> str:
+    # Preserve the historical 600s export for tasks without a hard ceiling.
+    agent_timeout = (effective_task_timeout(600.0, task.min_timeout_seconds,
+                                          task.max_timeout_seconds)
+                     if task.max_timeout_seconds is not None else 600.0)
     tags = list(task.tags)
     keywords = sorted({"harness-bench-fast", "agent", "benchmark", *tags})
     metadata = {
@@ -193,7 +199,7 @@ def _task_toml(task: Task, *, harbor_name: str, dataset: str) -> str:
             "[verifier.env]",
             "",
             "[agent]",
-            "timeout_sec = 600.0",
+            f"timeout_sec = {agent_timeout}",
             "",
             "[environment]",
             "build_timeout_sec = 600.0",
@@ -286,12 +292,18 @@ def _dockerfile() -> str:
 
 
 def _write_setup_tar(tar_path: Path, task: Task) -> None:
+    if getattr(task, "requires_trusted_service", False):
+        raise ValueError("Cannot export a trusted-service task without an isolated host service adapter")
     with TemporaryDirectory(prefix=f"hb_harbor_setup_{task.id}_") as tmp:
         workspace = Path(tmp)
-        task.setup(workspace)
-        with tarfile.open(tar_path, "w") as archive:
-            for path in sorted(workspace.rglob("*")):
-                archive.add(path, arcname=path.relative_to(workspace))
+        try:
+            task.setup(workspace)
+            with tarfile.open(tar_path, "w") as archive:
+                for path in sorted(workspace.rglob("*")):
+                    archive.add(path, arcname=path.relative_to(workspace))
+        finally:
+            if cleanup := getattr(task, "cleanup", None):
+                cleanup(workspace)
 
 
 def _copy_benchmark_runtime(target_dir: Path) -> None:

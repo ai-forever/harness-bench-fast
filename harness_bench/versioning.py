@@ -63,6 +63,7 @@ TASK_WAVES: tuple[TaskWave, ...] = (
     TaskWave("cli", 372, 391),
     TaskWave("long", 392, 411),
     TaskWave("reflect", 412, 431),
+    TaskWave("wave19-feasibility", 432, 471),
 )
 
 
@@ -365,6 +366,27 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "A full run of this revision is not comparable with 0.17.0."
         ),
     ),
+
+    TaskSetRevision(
+        version="0.19.0",
+        introduced="2026-10-16",
+        total_tasks=471,
+        added_task_numbers=(432, 471),
+        modules=("feasibility_tasks",),
+        notes=(
+            "Wave 19: forty tasks in twenty matched pairs. Agents must submit "
+            "a construction or a formal stopping certificate, or execute a search "
+            "strategy, within 120 seconds including final process exit. Individual "
+            "task scores and strict pair scores are separate. The current protocol "
+            "keeps service state and history in the trusted host; scored execution "
+            "requires CLI/bwrap, including the isolated OpenRouter worker. Earlier "
+            "wave 19 calibration used different prompts and a local service protocol; "
+            "those results do not measure this implementation. Runtime and task-contract "
+            "hashes prevent mixing protocol snapshots on resume. Not comparable with "
+            "task-set 0.18.0."
+        ),
+    ),
+
 )
 
 CURRENT_TASK_SET_REVISION = TASK_SET_REVISIONS[-1]

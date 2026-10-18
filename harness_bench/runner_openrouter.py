@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import base64
 import json
+import math
 import os
 import re
 import shlex
@@ -26,7 +27,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
 
-from harness_bench.core import Task
+from harness_bench.core import Task, effective_task_timeout
 from harness_bench.openrouter_agent import _point_gigachat_profile_at as _point_gigachat_profile_at
 from harness_bench.openrouter_agent import build_agent as _runtime_build_agent
 from harness_bench.openrouter_agent import is_transient_model_error as _is_transient_model_error
@@ -287,6 +288,8 @@ def run_task(
     responses_api: bool = False,
     rli: bool = False,
 ) -> TaskRun:
+    if getattr(task, "requires_trusted_service", False):
+        raise ValueError(f"{task.id} requires --isolation bwrap via run_all; native and RLI execution cannot isolate its trusted service")
     if transient_attempts < 1:
         raise ValueError("transient_attempts must be positive")
     recursion_limit = max(recursion_limit, getattr(task, "min_recursion_limit", None) or 0)
@@ -300,7 +303,10 @@ def run_task(
             if rli:
                 from harness_bench.rli_backend import RLIBackend
 
-                rli_backend = RLIBackend(task.id, timeout=int(_task_timeout_seconds()))
+                rli_backend = RLIBackend(task.id, timeout=math.ceil(effective_task_timeout(
+                    _task_timeout_seconds(), getattr(task, "min_timeout_seconds", None),
+                    getattr(task, "max_timeout_seconds", None),
+                )))
                 workspace_path = Path("/workspace")
             elif keep_workspace and attempt == transient_attempts:
                 workspace_path = Path(
@@ -329,11 +335,13 @@ def run_task(
                     responses_api=responses_api,
                     rli_backend=rli_backend,
                 )
+                started = time.monotonic()
                 invocation_result = invoke_agent_with_stats(
                     agent,
                     {"messages": [{"role": "user", "content": task.prompt}]},
                     stats,
                     min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
+                    max_timeout_seconds=getattr(task, "max_timeout_seconds", None),
                 )
                 if rli_backend is not None:
                     verified = rli_backend.verify()
@@ -427,6 +435,13 @@ def run_all(
         raise ValueError("--keep is unavailable for RLI: sessions are always closed after each attempt")
     if rli and isolation != "none":
         raise ValueError("--rli runs tools and verification in RLI and requires --isolation none")
+    # The isolated branch delegates task selection to run_all_cli; only native
+    # execution needs its own early guard before credential/model setup.
+    targets = []
+    if isolation != "bwrap" or rli:
+        targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
+        if any(getattr(task, "requires_trusted_service", False) for task in targets):
+            raise ValueError("Selected tasks require --isolation bwrap; native and RLI execution are unsupported")
     _load_env_from_dotenv()
     _ensure_openrouter_key()
     json_output = normalize_json_output_path(json_output)
@@ -465,7 +480,6 @@ def run_all(
     if attempts < 1:
         raise ValueError("attempts must be positive")
 
-    targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
     results = _resume_results(
         json_output,
         targets,
