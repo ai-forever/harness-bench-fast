@@ -4,25 +4,35 @@
 
 Current task set: **431 tasks, `task-set v0.18.0`**. Tasks 392–411 are the long-context wave; tasks 412–431 are the tool-reflection wave. New full runs use this version.
 
-## In-progress measurement: Secret-700-SFT
-
-**Preliminary snapshot — 2026-10-17 05:56 UTC (08:56 MSK).**
-Native deepagents: **409/431 tasks completed, 368 passed, 41 failed, 22 pending**;
-zero infrastructure failures recorded. Success among completed tasks is
-**368/409 = 90.0%**. Already-solved tasks represent **368/431 = 85.4%** of the
-full suite; this is a lower bound, not the final score. Pending tasks are not
-counted as failures. This partial run is excluded from the completed leaderboard;
-task order is not a random sample, so 90.0% must not be compared to full-run scores.
-
-Task-set v0.18.0, one attempt per task, deepagents 0.6.12, Linux bwrap,
-concurrency 2. Reasoning enabled (effort default), reasoning history forwarded;
-temperature 0.8, top_p 0.95, max output 81,920 tokens per response.
-All 18 completed long-context tasks (392–409) reached the 7,200-second task timeout
-and count as ordinary failures. Token metrics await audit. This is a static
-checkpoint, not a live counter. [Public aggregate snapshot](docs/secret-700-sft-progress.json);
-raw traces remain private.
-
 ## Results (task-set v0.18.0, 431 tasks)
+
+### Secret-700-SFT (2026-10-16/17)
+
+Completed native deepagents run on **all 431 tasks**: **377 passed, 54 failed
+(87.5%)**, with 431 unique task IDs and no unresolved infrastructure failures.
+This final result replaces the earlier 409-task progress snapshot and is included
+in the [main leaderboard](https://ai-forever.github.io/harness-bench-fast/#secret-700-sft).
+
+| harness | model | passed | score | steps | tokens |
+|---|---|---:|---:|---:|---:|
+| deepagents | Secret-700-SFT (reasoning default) | 377/431 | 87.5% | 6,321 | 149,806,005\* |
+
+Ordinary tasks: **368/391 (94.1%)**; long context: **0/20**; tool reflection:
+**9/20 (45.0%)**. Nineteen long-context tasks reached the 7,200-second timeout;
+the remaining task completed but failed its verifier. All count as normal failures.
+One attempt per task; deepagents 0.6.12; Linux bwrap; concurrency 2. Reasoning
+is enabled with effort default and history forwarded; temperature 0.8, top_p
+0.95, max output 81,920 tokens per response. Task timeout 900 s, with floors
+of 7,200 s for long context and 1,800 s for tool reflection. Interactive-client
+reasoning limits were not applied to this benchmark run.
+
+\* Steps and tokens are preserved raw runner counters: coverage 402/431 and
+409/431 tasks respectively. Token accounting contains duplicated usage fields
+and omits final telemetry from some interrupted tasks; native-trace and API
+usage totals have not yet been reconciled. These counters are not verified
+spend or cost; pass/fail validation is independent of this telemetry audit.
+[Public aggregate](docs/secret-700-sft-progress.json) (the existing URL now
+contains the completed result); raw traces and backend identifiers remain private.
 
 ### MultiTool CLI (2026-10-14)
 
