@@ -8,10 +8,10 @@ When reporting итоговую таблицу benchmark runs for this repositor
 |---|---|---:|---:|---:|---:|
 
 Rules:
-- Include only completed runs with exactly 431 tasks (current task-set v0.18.0) unless the user asks for partials.
+- Include only completed runs with exactly 471 tasks (current task-set v0.19.0) unless the user asks for partials.
 - Sort rows by `score` descending.
-- Use `passed` as `<passed>/431` and `score` as a percentage with one decimal place.
-- Do not mix task-set versions in one table. Earlier runs are not comparable: v0.14.0 scored 371 tasks, v0.16.0 corrected defects across the 391 of v0.15.0 without changing their number, v0.17.0 adds the long-context wave as tasks 392–411, and v0.18.0 adds the tool-reflection wave as tasks 412–431. If more than one version must appear, split the table and name the task-set version in each.
+- Use `passed` as `<passed>/471` and `score` as a percentage with one decimal place.
+- Do not mix task-set versions in one table. Earlier runs are not comparable: v0.14.0 scored 371 tasks, v0.16.0 corrected defects across the 391 of v0.15.0 without changing their number, v0.17.0 adds the long-context wave as tasks 392–411, v0.18.0 adds the tool-reflection wave as tasks 412–431, and v0.19.0 adds wave 19 (feasibility) as tasks 432–471. If more than one version must appear, split the table and name the task-set version in each.
 - Do not include artifact links or artifact paths in the main table unless explicitly requested.
 - Use the human-readable harness and model names, not only the JSON filename.
 - Include `steps` and `tokens` from the run JSON when present.
@@ -45,3 +45,7 @@ Rules:
 - Observed versions (as of 2026-06-22; re-check, they change):
   - `GigaChat-3-Ultra` — `32.3.18.5` (PROM and internal version)
   - `GigaChat-3-Lightning` — `32.4.16.3` (PROM and internal version)
+
+## Wave naming
+
+Name waves by their task-set version: the v0.19.0 addition is **wave 19**, never by its positional index in `TASK_WAVES`.

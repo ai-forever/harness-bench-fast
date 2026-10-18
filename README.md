@@ -2,9 +2,13 @@
 
 [Live leaderboard and benchmark results](https://ai-forever.github.io/harness-bench-fast/)
 
-Current task set: **431 tasks, `task-set v0.18.0`**. Tasks 392–411 are the long-context wave; tasks 412–431 are the tool-reflection wave. New full runs use this version.
+Current task set: **471 tasks, `task-set v0.19.0`**. Tasks 432–471 are **wave 19: feasibility** — 40 tasks in 20 matched pairs. Within 120 seconds, the agent must construct and submit a solution, execute a feasible search strategy, or prove that the formal conditions cannot be met. Format and protocol compliance are part of the score. This measures the complete agent configuration, not a separate ability to predict its own solving time. Individual task credit is the main metric; both halves must pass for additional pair credit. See [wave 19](docs/wave19-feasibility.md) for the contracts, runtime and validation limits.
 
-## Results (task-set v0.18.0, 431 tasks)
+**Wave 19 requires Linux/bubblewrap and a trusted host service.** Use `run-cli --isolation bwrap` or `run-openrouter --isolation bwrap` (the isolated CLI worker). Native `run` / `run-pure`, native OpenRouter execution, RLI and Harbor export reject selections containing these tasks before model execution. To use those paths on earlier tasks, select `--from-task 1 --to-task 431`.
+
+No full-suite (471-task) model results on v0.19.0 have been recorded yet. Wave 19 calibration used an earlier frozen protocol; it does not measure the current host-service implementation or updated prompts. The tables below describe historical task sets; their denominators and scores are unchanged.
+
+## Earlier results (task-set v0.18.0, 431 tasks)
 
 ### Secret-700-SFT (2026-10-16/17)
 
@@ -94,8 +98,9 @@ and task budgets as the DeepSeek matrix.
 | deepagents | GLM-5.3 Flash Uncensored FP8 (high) | 375/431 | 87.0% | 6,627 | 373,783,977 |
 
 The live leaderboard supports an inclusive task-set version range with two sliders.
-The range follows `TASK_SET_REVISIONS`, currently v0.1.0 through v0.18.0,
-and selects tasks introduced by those revisions, using current task definitions.
+The published result range covers v0.1.0 through v0.18.0 and uses the task
+definitions of that historical 431-task snapshot. The source registry now also
+contains v0.19.0, which has no full-suite published result.
 Revisions with no added tasks contribute zero tasks; an empty range has no score.
 Scores and ranks are recomputed from per-wave passed counts; @mean3 remains
 an arithmetic mean over all three runs. Steps/tokens remain full-run totals.
@@ -492,7 +497,7 @@ runs (317, 311, 308 passed), with Steps/Tokens as the mean of per-run sums.
 
 </details>
 
-A self-contained **431-task agent benchmark** (`task-set v0.18.0`) for evaluating LLM-backed
+A self-contained **471-task agent benchmark** (`task-set v0.19.0`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -529,27 +534,27 @@ uv venv && uv pip install -e ".[gigachat,openrouter]"
 # to the public profile.
 uv pip install -e ".[gigachat-profile]"
 
-# List all 431 tasks
+# List all 471 tasks
 uv run python -m harness_bench list
 
 # Any contiguous block of task numbers (inclusive; list, run*, verify-gold,
 # export-harbor), e.g. everything except the long-context wave:
 uv run python -m harness_bench run-openrouter --model deepseek/deepseek-v4-flash \
     --from-task 1 --to-task 391
-# A run over a subset is a partial run: it does not go into the 431-task table.
+# A run over a subset is a partial run: it does not go into the 471-task table.
 
 # Show the benchmark task-set version and revision history
 uv run python -m harness_bench version --check
 
-# Run the whole bench against GigaChat (needs GIGACHAT_USER /
+# Run tasks 1–431 against GigaChat (needs GIGACHAT_USER /
 # GIGACHAT_PASSWORD in .env or env, plus GIGACHAT_BASE_URL pointing at
-# the production gateway):
-uv run python -m harness_bench run --concurrency 5
+# the production gateway). Native execution does not support wave 19:
+uv run python -m harness_bench run --from-task 1 --to-task 431 --concurrency 5
 
 # Run against any OpenAI-compatible OpenRouter model (needs
-# OPENROUTER_API_KEY):
+# OPENROUTER_API_KEY and Linux bwrap). The isolated worker supports all 471 tasks:
 uv run python -m harness_bench run-openrouter \
-    --model deepseek/deepseek-v4-flash --concurrency 5
+    --model deepseek/deepseek-v4-flash --isolation bwrap --concurrency 5
 
 # Internal OpenAI-compatible gateways can use password auth instead of a
 # static API key. The runner fetches and refreshes a bearer token without
@@ -580,7 +585,7 @@ uv run python -m harness_bench run-openrouter \
 
 # Run stock deepagents + GigaChat while bypassing the GigaChat harness
 # profile even if deepagents-gigachat is installed.
-uv run python -m harness_bench run-pure --concurrency 5
+uv run python -m harness_bench run-pure --from-task 1 --to-task 431 --concurrency 5
 
 # Drive an external CLI agent (Claude Code, etc.). Example with
 # Anthropic's free-code CLI:
@@ -607,6 +612,9 @@ uv run python -m harness_bench run-cli \
 # Code, and Gemini CLI runs auto-enable JSON/stream-json output so those metrics
 # can be read from machine-readable events. The top-level JSON summary also
 # includes `steps` and `tokens` totals for README-style result tables.
+# Usage is counted once per model response, even when several metadata fields
+# contain copies. This corrects earlier DeepAgents overcounting for new runs;
+# historical JSON is not rewritten. Missing usage on timeouts remains missing.
 # JSON checkpointing is enabled by default for run commands. A fresh run writes
 # to `jobs/<timestamp>.json`; pass `--json-output results.json` to use
 # `jobs/results.json`, or pass an explicit path. If the JSON file already
@@ -617,6 +625,8 @@ uv run python -m harness_bench run-cli \
 # next continue when you rerun with the same JSON path. CLI per-task timeouts
 # are also marked `rerun_on_continue` and rerun from clean workspaces on the
 # next launch with the same `--json-output` file.
+# Wave 19 additionally checks runtime_protocol and a task-contract SHA256.
+# A different prompt/service protocol requires a fresh result JSON file.
 # Add `--rerun-on-fail` when continuing to rerun every saved task attempt whose
 # `passed` field is false. Passing attempts stay checkpointed. With `-k N`, only
 # the failed attempt numbers are rerun, once per invocation.
@@ -687,11 +697,16 @@ uv run python -m harness_bench run-cli \
 
 # Verify the gold solutions without calling any model. Useful when
 # adding a new task — confirms the verifier accepts a hand-written
-# "perfect" solution.
+# "perfect" solution. All 471 require Unix sockets for wave 19.
 uv run python -m harness_bench verify-gold
 
+# The CI wrapper explicitly skips unsupported wave 19 gold checks on Windows
+# and verifies the remaining 431 tasks. It reports skips separately:
+uv run python .github/scripts/verify_gold_with_annotations.py
+
 # Direct no-Docker workspace checks for one task. This is the same
-# verifier/oracle surface used by the Harbor export.
+# verifier/oracle surface used by the Harbor export for tasks 1–431.
+# Wave 19 replay additionally requires the host-owned evidence described below.
 uv run python -m harness_bench verify-task \
     --task task_06_toggle_debug --workspace /path/to/workspace
 uv run python -m harness_bench apply-gold \
@@ -702,7 +717,7 @@ uv run python -m harness_bench apply-gold \
 
 ## What's inside
 
-### Tasks (431 total, task-set v0.18.0)
+### Tasks (471 total, task-set v0.19.0)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -721,6 +736,7 @@ uv run python -m harness_bench apply-gold \
 | `tasks_cli.py` | 372–391 | CLI-composition wave. Thirteen tasks drive bespoke per-task tools (`logq`, `pktool`, `xtab`, `cfgctl`, `depwalk`, `slicer`) built so that reading `--help` is unavoidable: the surface is deliberately unconventional (a leading verb, `--src`/`--cap`/`--map`, mini-languages like `--span LO..HI` and `--pick level=ERROR,WARN`, `--shape` not `--format`), so a guessed invocation exits non-zero — and the semantics that decide the answer (exclusive bounds, nearest-rank percentiles, margins before normalisation, corrupt-record policy) appear only in the `--help` epilog. Two read binary or fixed-width payloads. Seven exercise POSIX tools (multi-key `sort`, `join -1/-2/-a/-e/-o`, `comm`, `grep -oE` with `uniq -c`, `find` predicates with `xargs -0`, `awk`, `sed` ranges): the agent writes `solve.sh` and the verifier deletes the artifact, runs the script, and rejects general-purpose interpreters. **Requires `bash` on `PATH`.*\* |
 | `long_tasks/` | 392–411 | Long-context wave. Twenty tasks that require reading a large body of material (a novel, an intranet, parish registers, mail, a codebase, git history, a text adventure, and so on) and that floor each run at 7200 s and 3000 steps, so a full-set run includes them. Select only this wave with `--suite long`. |
 | `reflect_tasks/` | 412–431 | Stateful tool-reflection wave: partial results, pagination, throttling, stale revisions, async deletion, inherited permissions, and mid-course changes visible in tool responses. Signed client journals are replayed by the verifier. Each task floors the runner at 1800 s and 400 steps. Select only this wave with `--suite reflect`. |
+| `feasibility_tasks/` | 432–471 | **Wave 19 / v0.19.0**: 20 matched pairs / 40 tasks: formal feasibility, diagnostics, explicit budgets and host-owned service history. 120 seconds per task, no LLM judge. Individual and strict both-halves scores. Select with `--suite feasibility`; requires CLI/bwrap, including the isolated OpenRouter worker. |
 
 Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
@@ -752,12 +768,13 @@ changes do not need a task-set bump.
 | `0.16.0` | 2026-07-28 | — | 391 | Audit pass over all 391 tasks: no tasks added or removed, but defects gold-verification cannot see were corrected — tasks winnable without work, prompts whose verifier rejected the work they described, requirements the verifier never checked (notably “do not edit the tests”), and platform/self-pollution issues. **Not score-comparable with v0.15.0.*\* |
 | `0.17.0` | 2026-09-26 | 392–411 | 411 | Long-context wave, promoted from the separate `--suite long` into the scored set. Registry ids are `task_392_*` … `task_411_*`; generator seeds and paraphrase fixtures stay on `long_NN_*`, so the tasks themselves did not change. Each task floors the runner at 7200 s and 3000 steps. **Not score-comparable with v0.16.0.*\* |
 | `0.18.0` | 2026-10-02 | 412–431 | 431 | Tool-reflection wave promoted into the scored set, with IAM command/policy and wiki append-position fixes. New ids are `task_412_*` … `task_431_*`; `reflect_NN_*` remain lookup aliases. Each task floors the runner at 1800 s and 400 steps. **Not score-comparable with v0.17.0 or pre-fix reflect calibration.*\* |
+| `0.19.0` | 2026-10-16 | 432–471 | 471 | **Wave 19**: 20 matched pairs (40 tasks): 14 engineering contract pairs and 6 search/diagnostic pairs; 120 seconds per task. The current protocol keeps service state outside the agent sandbox. Earlier wave 19 calibration used different prompts/protocol; it is not a result for this implementation. [Details and validation limits](docs/wave19-feasibility.md). Not score-comparable with v0.18.0. |
 
 ### Infrastructure
 
 | File | Purpose |
 | --- | --- |
-| `core.py` | `Task` (dataclass) and `VerifyResult`. Supports `setup_callback` / `gold_callback` hooks for binary fixtures (xlsx, sqlite, zip, tar). |
+| `core.py` | `Task` (dataclass) and `VerifyResult`. Supports setup/gold hooks for binary fixtures and `cleanup_callback` for host resources such as the wave 19 service. |
 | `verifiers.py` | Helpers for building verifiers: `file_exists`, `file_contains`, `file_lines_equal`, `file_matches_regex`, `json_file_has`, `python_runs`, `python_callable_returns`, `pytest_passes`, `xlsx_cell_equals`, `sqlite_query_returns`, `all_of`, etc. |
 | `runner.py` | Runs a task in an isolated `tempfile.TemporaryDirectory` with `LocalShellBackend(virtual_mode=True)` rooted at that directory. Drives GigaChat through `langchain-gigachat`. Optional `--concurrency` via a thread pool. Auto-loads the `deepagents-gigachat` harness profile if installed. |
 | `runner_cli.py` | Alternative driver that shells out to an external CLI agent (`free-code`, `claude`, etc.). Default: `free-code -p --model haiku --dangerously-skip-permissions`. Detects Claude-Code-style CLIs and auto-injects workspace `AGENTS.md` via `--append-system-prompt`. |
@@ -766,15 +783,56 @@ changes do not need a task-set bump.
 | `harbor_export.py` | Additive Harbor export layer. Generates local Harbor task directories from the same Python task registry; does not replace the no-Docker local runners. |
 | `__main__.py` | CLI: `list`, `version`, `run`, `run-pure`, `run-cli`, `run-openrouter`, `verify-gold`, `verify-task`, `apply-gold`, `export-harbor`. |
 
-Each task is independent: the runner creates a fresh
+Each task has its own execution context: the runner creates a fresh
 `tempfile.TemporaryDirectory`, writes `setup_files` (and optionally
 calls `setup_callback` for binary fixtures), then points
 `LocalShellBackend` at that directory as its `root_dir`. The agent
 file tools are rooted there by `virtual_mode=True`. This is not a
 security sandbox: `execute` still spawns a real shell on the host and
 the runners inherit environment variables. The benchmark is meant for a
-trusted local environment. After the agent stops, the per-task verifier
-inspects the workspace.
+trusted local environment. These native paths exclude wave 19. After the agent
+stops, the per-task verifier inspects the workspace; wave 19 also checks the
+trusted service's history. Separate contexts do not imply statistically
+independent fixtures: wave 19 reuses some mathematical components.
+
+### Wave 19 execution and replay
+
+The task's `tools/taskctl` is a public transport that may be read. The hidden
+target, mutable service state and call history stay in the host process. The
+agent receives only a read-only bind of the service socket and public
+`.svc/connection.json`. Direct socket calls use the same state machine and
+quotas; replacing workspace files cannot erase previous calls. The verifier
+checks the final public inputs/client/connection against their originals.
+
+Run only this wave with an already configured CLI agent:
+
+```bash
+CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 \
+uv run python -m harness_bench run-cli --suite feasibility --isolation bwrap \
+    --cli-command 'claude -p --dangerously-skip-permissions' \
+    --json-output wave19.json --keep
+```
+
+Keep the host artifact directory as well as the workspace. Rechecking a saved
+execution in a new process requires `trusted_service.json` and its companion
+`execution.json`, both from the trusted runner and outside the agent workspace:
+
+```bash
+uv run python -m harness_bench verify-task \
+    --task task_432_clock_contract --workspace /path/to/saved/workspace \
+    --trusted-evidence /path/to/host/execution/trusted_service.json
+```
+
+Use the actual task ID and paths from the result artifact. Replay checks the
+protocol, task-contract hash, evidence hash and execution outcome; a workspace
+copy alone cannot establish a scored service history or undo a timeout. The
+host runner and its artifacts are trusted, not adversarial input from the agent.
+
+`verify-gold --suite feasibility` is a host diagnostic, not a model score.
+Direct Python diagnostics may call `task.setup`, `task.apply_gold` and
+`task.verify` in the same host process, with `task.cleanup(workspace)` in a
+`finally` block. Loading raw service evidence into a Python verification context
+is also diagnostic; it does not replace the CLI's execution-metadata checks.
 
 ## Long-context wave (tasks 392–411)
 
@@ -939,8 +997,9 @@ benchmark flow:
 uv run python -m harness_bench export-harbor \
     --output harbor_dataset --task task_06_toggle_debug --clean
 
-# Full dataset export
-uv run python -m harness_bench export-harbor --output harbor_dataset --clean
+# Export the supported tasks; wave 19 has no Harbor host-service adapter yet
+uv run python -m harness_bench export-harbor --output harbor_dataset \
+    --from-task 1 --to-task 431 --clean
 ```
 
 Each exported Harbor task contains:
@@ -963,9 +1022,11 @@ Bubblewrap (`bwrap`) must be installed on the runner. `--isolation none` retains
 host execution for diagnostics. `run-openrouter --rli --isolation none` instead
 runs every tool and the verifier inside an RLI session (`harness_bench.rli_backend`);
 the image registered via `rli/register.py` must contain the same task-set version.
-The native GigaChat `run` / `run-pure` commands
-still execute on the host and are not isolated by this change. Docker is only
-needed when invoking Harbor's own local runner.
+The native GigaChat `run` / `run-pure` commands still execute on the host.
+Selections containing wave 19 are rejected by these native paths, by
+`--isolation none`, by RLI and by Harbor export before an agent is started.
+Use the isolated CLI/OpenRouter worker for wave 19, or explicitly select earlier
+tasks. Docker is only needed when invoking Harbor's own local runner.
 
 For custom CLI dependencies, pass `--sandbox-manifest runtime.json` containing
 `{"runtime_paths": ["/absolute/trusted/runtime"]}`. Allowlist package directories
@@ -1010,8 +1071,8 @@ with the isolated worker settings.
 ## Results
 
 The results tables are kept at the top of this README. The current task set is
-v0.18.0 (431 tasks); no full results are published yet. The v0.17.0 (411 tasks) and
-v0.16.0 (391 tasks) tables are historical and are not comparable with the current set. Only one run per harness + model setup is
+v0.19.0 (471 tasks); no full results are published yet. The v0.18.0 (431 tasks),
+v0.17.0 (411 tasks) and v0.16.0 (391 tasks) tables are historical and are not comparable with the current set. Only one run per harness + model setup is
 listed; superseded and older-task-set runs are not carried over (the last
 v0.13.0 table is kept in a collapsed section for reference only).
 

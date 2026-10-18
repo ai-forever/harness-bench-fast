@@ -98,6 +98,8 @@ def run_task(
     keep_workspace: bool = False,
     recursion_limit: int = 80,
 ) -> TaskRun:
+    if getattr(task, "requires_trusted_service", False):
+        raise ValueError(f"{task.id} requires the CLI runner with --isolation bwrap; native execution cannot isolate its trusted service")
     recursion_limit = max(recursion_limit, getattr(task, "min_recursion_limit", None) or 0)
     workspace_keepalive: TemporaryDirectory | None = None
     try:
@@ -114,11 +116,13 @@ def run_task(
         stats = AgentRunStatsCollector()
         try:
             agent = build_agent(workspace_path, recursion_limit=recursion_limit)
+            started = time.monotonic()
             invocation_result = invoke_agent_with_stats(
                 agent,
                 {"messages": [{"role": "user", "content": task.prompt}]},
                 stats,
                 min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
+                max_timeout_seconds=getattr(task, "max_timeout_seconds", None),
             )
         except Exception as exc:  # noqa: BLE001 — log and surface as task failure
             run = _agent_exception_task_run(
@@ -153,6 +157,9 @@ def run_all(
     json_output: str | Path | None = None,
     rerun_on_fail: bool = False,
 ) -> list[TaskRun]:
+    targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
+    if any(getattr(task, "requires_trusted_service", False) for task in targets):
+        raise ValueError("Selected tasks require the CLI runner with --isolation bwrap; native execution is unsupported")
     _load_env_from_dotenv()
     _ensure_credentials()
     json_output = normalize_json_output_path(json_output)
@@ -160,7 +167,6 @@ def run_all(
     if attempts < 1:
         raise ValueError("attempts must be positive")
 
-    targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
     results = _resume_results(
         json_output,
         targets,

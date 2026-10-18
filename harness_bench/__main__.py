@@ -18,12 +18,14 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shlex
 import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from harness_bench.core import VerifyResult
 from harness_bench.harbor_export import export_harbor_dataset
 from harness_bench.metrics import default_metric_ks
 from harness_bench.runner import (
@@ -35,7 +37,12 @@ from harness_bench.runner import (
     summarize,
     verify_gold,
 )
-from harness_bench.runner_cli import DEFAULT_CLI_COMMAND, DEFAULT_TIMEOUT_SECONDS, run_all_cli
+from harness_bench.runner_cli import (
+    DEFAULT_CLI_COMMAND,
+    DEFAULT_TIMEOUT_SECONDS,
+    _task_runtime_identity,
+    run_all_cli,
+)
 from harness_bench.runner_openrouter import DEFAULT_OPENROUTER_MODEL
 from harness_bench.runner_openrouter import run_all as run_all_openrouter
 from harness_bench.runner_pure import run_all as run_all_pure
@@ -342,6 +349,8 @@ def _cmd_verify_gold(args: argparse.Namespace) -> int:
 
 def _cmd_apply_gold(args: argparse.Namespace) -> int:
     task = get_task(args.task)
+    if getattr(task, "requires_trusted_service", False):
+        raise ValueError("This task needs an active trusted host service; use verify-gold for a reference check or the isolated CLI runner for an execution")
     workspace = Path(args.workspace)
     workspace.mkdir(parents=True, exist_ok=True)
     task.apply_gold(workspace)
@@ -352,7 +361,38 @@ def _cmd_apply_gold(args: argparse.Namespace) -> int:
 def _cmd_verify_task(args: argparse.Namespace) -> int:
     task = get_task(args.task)
     workspace = Path(args.workspace)
-    result = task.verify(workspace)
+    evidence = getattr(args, "trusted_evidence", None)
+    if getattr(task, "requires_trusted_service", False):
+        if evidence is None:
+            raise ValueError("This task requires --trusted-evidence from the isolated host execution; workspace files alone cannot establish its service history")
+        from harness_bench.feasibility_tasks.io_utils import _read_regular
+        from harness_bench.feasibility_tasks.trusted_service import (
+            MAX_EVIDENCE_BYTES,
+            evidence_context,
+        )
+
+        evidence = Path(evidence).resolve()
+        if evidence.is_relative_to(workspace.resolve()):
+            raise ValueError("Trusted evidence must be outside the agent workspace")
+        metadata = json.loads(_read_regular(evidence.parent / "execution.json", 2_000_000))
+        if (not isinstance(metadata, dict) or metadata.get("task_id") != task.id
+                or metadata.get("isolation") != "bwrap"
+                or any(metadata.get(key) != value for key, value in _task_runtime_identity(task).items())
+                or metadata.get("trusted_service_sha256") != hashlib.sha256(
+                    _read_regular(evidence, MAX_EVIDENCE_BYTES)).hexdigest()):
+            raise ValueError("Trusted evidence does not match the host execution metadata/task protocol")
+        if metadata.get("failure_kind") is not None or metadata.get("phase") != "verify":
+            result = VerifyResult(False, "host execution did not complete within the valid scoring protocol: "
+                                  + str(metadata.get("failure_kind") or metadata.get("phase")))
+        else:
+            with evidence_context(workspace, evidence):
+                result = task.verify(workspace)
+            if result.passed != metadata.get("passed"):
+                raise ValueError("Replayed score does not match the recorded host execution")
+    elif evidence is not None:
+        raise ValueError("--trusted-evidence applies only to tasks with a trusted host service")
+    else:
+        result = task.verify(workspace)
     if args.json:
         print(
             json.dumps(
@@ -726,6 +766,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="Workspace path to inspect (default: current directory)",
     )
     p_verify_task.add_argument("--json", action="store_true", help="Print result as JSON")
+    p_verify_task.add_argument(
+        "--trusted-evidence", type=Path,
+        help="Host-owned service evidence outside the workspace, required for wave 19 replay",
+    )
     p_verify_task.set_defaults(func=_cmd_verify_task)
 
     p_harbor = sub.add_parser(
@@ -813,9 +857,9 @@ def build_parser() -> argparse.ArgumentParser:
             default="default",
             help=(
                 "Task suite when no --task is given: 'default' is the scored "
-                "task set (431 tasks, v0.18.0), 'long' is only the long-context "
+                "task set (471 tasks, v0.19.0), 'long' is only the long-context "
                 "wave inside it (tasks 392-411), 'reflect' is the tool-reflection "
-                "wave inside it (tasks 412-431)."
+                "wave inside it (tasks 412-431), 'feasibility' is wave 19 (tasks 432-471)."
             ),
         )
     for command in ("list", "run", "run-openrouter", "run-pure", "run-cli", "verify-gold", "export-harbor"):

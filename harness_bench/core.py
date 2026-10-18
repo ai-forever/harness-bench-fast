@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -16,6 +17,30 @@ class VerifyResult:
 
 
 Verifier = Callable[[Path], VerifyResult]
+
+
+def effective_task_timeout(
+    configured_seconds: float,
+    min_timeout_seconds: float | None = None,
+    max_timeout_seconds: float | None = None,
+) -> float:
+    """Resolve a runner timeout with an optional task floor and hard ceiling.
+
+    Only host-side execution time is budgeted; setup and verification are
+    outside the agent budget. Workspace timestamps are never authoritative.
+    """
+    for name, value in (
+        ("configured_seconds", configured_seconds),
+        ("min_timeout_seconds", min_timeout_seconds),
+        ("max_timeout_seconds", max_timeout_seconds),
+    ):
+        if value is not None and (not math.isfinite(value) or value <= 0):
+            raise ValueError(f"{name} must be finite and positive")
+    if (min_timeout_seconds is not None and max_timeout_seconds is not None
+            and min_timeout_seconds > max_timeout_seconds):
+        raise ValueError("min_timeout_seconds cannot exceed max_timeout_seconds")
+    timeout = max(configured_seconds, min_timeout_seconds or 0.0)
+    return min(timeout, max_timeout_seconds) if max_timeout_seconds is not None else timeout
 
 
 @dataclass
@@ -45,6 +70,14 @@ class Task:
             the short default meant for the regular set.
         min_recursion_limit: Same kind of floor for the deepagents graph
             recursion limit.
+        max_timeout_seconds: Hard ceiling on host-measured agent execution
+            time, applied after the configured timeout and task floor.
+        requires_trusted_service: Measured runs require the isolated CLI so
+            the agent cannot inspect or replace host-owned service state.
+        runtime_protocol: Versioned execution protocol, included in resume
+            identity for tasks with a trusted host service.
+        cleanup_callback: Release task-owned host resources after verification
+            and artifact recording, including failed or timed-out executions.
     """
 
     id: str
@@ -58,6 +91,10 @@ class Task:
     tags: tuple[str, ...] = ()
     min_timeout_seconds: float | None = None
     min_recursion_limit: int | None = None
+    max_timeout_seconds: float | None = None
+    requires_trusted_service: bool = False
+    runtime_protocol: str = ""
+    cleanup_callback: Callable[[Path], None] | None = None
 
     def setup(self, workspace: Path) -> None:
         """Write the task's setup files into `workspace`.
@@ -106,3 +143,8 @@ class Task:
             return VerifyResult(False, f"verifier failed to decode text as UTF-8: {exc}")
         except Exception as exc:  # noqa: BLE001 — verifier robustness
             return VerifyResult(False, f"verifier raised: {type(exc).__name__}: {exc}")
+
+    def cleanup(self, workspace: Path) -> None:
+        """Release host resources; callers must invoke this even after failure."""
+        if self.cleanup_callback is not None:
+            self.cleanup_callback(workspace)

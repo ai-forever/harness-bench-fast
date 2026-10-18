@@ -52,5 +52,12 @@ def test_invalid_ranges_are_rejected_before_anything_runs(argv: list[str]) -> No
 
 def test_range_selects_the_reflect_wave_in_default_and_named_suites() -> None:
     expected = [t.id for t in ALL_TASKS[411:431]]
-    assert _ids("run-openrouter", "--from-task", "412") == expected
+    assert _ids("run-openrouter", "--from-task", "412", "--to-task", "431") == expected
     assert _ids("run", "--suite", "reflect", "--from-task", "412", "--to-task", "431") == expected
+
+
+def test_wave19_and_open_ended_ranges() -> None:
+    expected = [t.id for t in ALL_TASKS[431:]]
+    assert _ids("run", "--suite", "feasibility") == expected
+    assert _ids("run-openrouter", "--from-task", "432") == expected
+    assert _ids("run-openrouter", "--from-task", "412") == [t.id for t in ALL_TASKS[411:]]

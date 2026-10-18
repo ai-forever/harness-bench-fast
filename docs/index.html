@@ -6,7 +6,7 @@
     <title>harness-bench results</title>
     <meta
       name="description"
-      content="harness-bench task-set v0.18.0 (431 tasks), including the new tool-reflection wave; v0.17.0 and earlier results are history."
+      content="harness-bench task-set v0.19.0 (471 tasks), including wave 19: evidence-backed stopping. Published scores are from v0.18.0 and earlier."
     >
     <link rel="stylesheet" href="styles.css?v=zero-runs-20261014">
   </head>
@@ -30,10 +30,10 @@
     <main>
       <section class="hero" aria-labelledby="title">
         <div class="hero-copy">
-          <p class="eyebrow">Current task set: v0.18.0</p>
-          <h1 id="title">431 mechanically verified agent tasks</h1>
+          <p class="eyebrow">Current task set: v0.19.0 · Wave 19</p>
+          <h1 id="title">471 mechanically verified agent tasks</h1>
           <p class="lead">Compare agent harnesses on coding, tools, memory and long-context tasks.
-            Every result is checked mechanically.</p>
+            Every result is checked mechanically. Wave 19 adds 40 tasks: solve, diagnose or stop within 120 seconds. Individual task credit is the main score; matched-pair credit is an additional metric. Calibration of the released protocol is pending.</p>
           <p class="cowork-callout"><strong>cowork:</strong>
             <a href="#cowork-glm53">GLM-5.3 high <strong>87.2%</strong> · 431 tasks</a> ·
             <a href="#cowork-notes">Haiku 4.5 <strong>79.6%</strong> · 411 tasks</a></p>
@@ -47,12 +47,12 @@
 
         <div class="score-panel" aria-label="Current benchmark summary">
           <div class="summary-grid">
-            <div><span class="metric">431</span><span class="label">tasks</span></div>
-            <div><span class="metric">20</span><span class="label">new tool-reflection tasks</span></div>
+            <div><span class="metric">471</span><span class="label">tasks</span></div>
+            <div><span class="metric">40</span><span class="label">wave 19 tasks · 20 pairs</span></div>
             <div><span class="metric">80</span><span class="label">full v0.18.0 runs published</span></div>
-            <div><span class="metric">v0.18.0</span><span class="label">task-set version</span></div>
+            <div><span class="metric">v0.19.0</span><span class="label">task-set version</span></div>
           </div>
-          <p>Previous scores use 411 or fewer tasks. They are listed below as history.</p>
+          <p>No v0.19.0 model results yet. Published scores below use 431 or fewer tasks and are historical.</p>
         </div>
       </section>
 
@@ -62,13 +62,14 @@
         <div><span class="strip-number">314–351</span><span>Skills & adversarial tasks</span></div>
         <div><span class="strip-number">352–391</span><span>Terminal & CLI composition</span></div>
         <div><span class="strip-number">392–411</span><span>Long context</span></div>
-        <div><span class="strip-number">412–431</span><span>Tool reflection</span></div>
+        <div><span class="strip-number">412–431</span><span>Wave 18 · Tool reflection</span></div>
+        <div><span class="strip-number">432–471</span><span>Wave 19 · Feasibility</span></div>
       </section>
 
       <section class="section" id="current" aria-labelledby="current-title">
         <div class="section-heading">
           <p class="eyebrow">Task-set v0.18.0</p>
-          <h2 id="current-title">Leaderboard · 431 tasks</h2>
+          <h2 id="current-title">Historical leaderboard · v0.18.0 · 431 tasks</h2>
           <p>Tools and budgets vary across runs. Token counts are raw telemetry; 0 means unavailable.</p>
         </div>
         <details class="measurement-notes">
@@ -106,7 +107,7 @@
             Linux bwrap, temperature 0.2, max_tokens 16,384, 80 tool calls, timeout 900 s with task floors.
             Native-trace usage covers 429/431; steps and tokens are lower bounds when timed-out tasks have no final telemetry. The prior task-397 technical retry remains disclosed in the v0.17 notes.</p>
           <p>Scores and ranks use tasks introduced in the selected versions. @mean3 remains a mean of three runs.
-            Revisions without added tasks contribute zero tasks. Scores use current v0.18.0 task definitions, not historical results. Steps and tokens below remain full-run totals.</p>
+            Revisions without added tasks contribute zero tasks. Scores use the v0.18.0 definitions of this 431-task result snapshot; wave 19 is not included. Steps and tokens below remain full-run totals.</p>
 <p>Completed, validated full runs measured 2026-10-02–14. The PROM matrix is still running;
             incomplete runs and infrastructure failures are excluded. The PROM matrix uses one run per configuration (k=1),
             eight task slots across the matrix, bwrap isolation. The separate maestro harness run used four task workers and bwrap.</p>

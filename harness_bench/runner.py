@@ -17,7 +17,8 @@ from typing import Any
 from harness_bench.agent_stats import AgentRunStatsCollector as AgentRunStatsCollector
 from harness_bench.agent_stats import _add_usage_counts as _add_usage_counts
 from harness_bench.agent_stats import agent_stats_from_result as agent_stats_from_result
-from harness_bench.core import Task, VerifyResult
+from harness_bench.core import Task, VerifyResult, effective_task_timeout
+from harness_bench.feasibility_tasks.pair_metrics import compute_pair_metrics
 from harness_bench.metrics import PassMetric, compute_pass_metrics
 from harness_bench.tasks import ALL_TASKS, get_task
 from harness_bench.versioning import TASK_SET_VERSION, TASK_WAVES, TaskWave, task_number
@@ -94,6 +95,7 @@ def _agent_exception_task_run(
             message=str(exc),
             elapsed_seconds=elapsed_seconds,
             workspace=workspace,
+            failure_kind="timeout",
         )
     if _is_graph_recursion_error(exc):
         return TaskRun(
@@ -352,15 +354,18 @@ def invoke_agent_with_stats(
     stats: AgentRunStatsCollector,
     *,
     min_timeout_seconds: float | None = None,
+    max_timeout_seconds: float | None = None,
 ) -> Any:
     """Invoke the agent under the per-task wall-clock timeout.
 
-    The invocation runs in a daemon thread and is joined for at most
-    ``_task_timeout_seconds()``. On timeout the caller is freed and a
+    The invocation runs in a daemon thread and is joined for the configured
+    timeout clamped to the task floor and ceiling. On timeout the caller is freed and a
     ``TaskTimeoutError`` is raised (recorded as a normal task failure); the
     orphaned daemon thread cannot block process exit. This is what stops one
     hung request — e.g. a dead socket with no read-timeout — from freezing the
-    whole run, which is a benchmark requirement.
+    whole run, which is a benchmark requirement. The timed-out thread may still
+    run or write files; its result is never verified. Use the isolated CLI
+    runner when process-tree termination is required.
     """
     callbacks = [cb] if (cb := stats.as_callback()) is not None else None
 
@@ -374,7 +379,9 @@ def invoke_agent_with_stats(
                 raise
             return agent.invoke(payload)
 
-    timeout = max(_task_timeout_seconds(), min_timeout_seconds or 0.0)
+    timeout = effective_task_timeout(
+        _task_timeout_seconds(), min_timeout_seconds, max_timeout_seconds
+    )
     box: dict[str, Any] = {}
 
     def _worker() -> None:
@@ -382,11 +389,14 @@ def invoke_agent_with_stats(
             box["result"] = _call()
         except BaseException as exc:  # noqa: BLE001 — re-raised in the caller thread
             box["error"] = exc
+        finally:
+            box["finished"] = time.monotonic()
 
     thread = threading.Thread(target=_worker, name="hb-agent-invoke", daemon=True)
+    started = time.monotonic()
     thread.start()
     thread.join(timeout)
-    if thread.is_alive():
+    if thread.is_alive() or box["finished"] - started > timeout:
         raise TaskTimeoutError(f"task exceeded the {timeout:.0f}s per-task timeout")
     if "error" in box:
         raise box["error"]
@@ -519,6 +529,8 @@ def run_task(
             deleted after the run — handy for debugging a failure.
         recursion_limit: Cap on agent loop iterations.
     """
+    if getattr(task, "requires_trusted_service", False):
+        raise ValueError(f"{task.id} requires the CLI runner with --isolation bwrap; native execution cannot isolate its trusted service")
     recursion_limit = max(recursion_limit, getattr(task, "min_recursion_limit", None) or 0)
     workspace_keepalive: TemporaryDirectory | None = None
     try:
@@ -533,11 +545,13 @@ def run_task(
         stats = AgentRunStatsCollector()
         try:
             agent = build_agent(workspace_path, recursion_limit=recursion_limit)
+            started = time.monotonic()
             invocation_result = invoke_agent_with_stats(
                 agent,
                 {"messages": [{"role": "user", "content": task.prompt}]},
                 stats,
                 min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
+                max_timeout_seconds=getattr(task, "max_timeout_seconds", None),
             )
         except Exception as exc:  # noqa: BLE001 — log and surface as task failure
             run = _agent_exception_task_run(
@@ -582,6 +596,9 @@ def run_all(
     task in completion order. The returned list is sorted by task id so the
     summary block is deterministic regardless of completion order.
     """
+    targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
+    if any(getattr(task, "requires_trusted_service", False) for task in targets):
+        raise ValueError("Selected tasks require the CLI runner with --isolation bwrap; native execution is unsupported")
     _load_env_from_dotenv()
     _ensure_credentials()
     json_output = normalize_json_output_path(json_output)
@@ -589,7 +606,6 @@ def run_all(
     if attempts < 1:
         raise ValueError("attempts must be positive")
 
-    targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
     results = _resume_results(
         json_output,
         targets,
@@ -744,6 +760,18 @@ def summarize(
         print("Per-wave breakdown:")
         for line in wave_table:
             print(f"  {line}")
+    pair_metrics = compute_pair_metrics(results)
+    if pair_metrics is not None:
+        print()
+        print("Wave 19 strict pairs (both halves within the same attempt):")
+        for cohort in pair_metrics["cohorts"]:
+            score = cohort["score"]
+            percentage = "invalid" if score is None else f"{score:.1%}"
+            print(
+                f"  Attempt {cohort['attempt']}: "
+                f"{cohort['passed_pairs']}/{cohort['total_pairs']} ({percentage}); "
+                f"incomplete {cohort['incomplete_pairs']}"
+            )
     if include_failures and passed < total:
         print()
         print("Failures:")
@@ -883,6 +911,40 @@ def _sum_run_metric(results: list[TaskRun], field: str) -> int:
     return sum(value for run in results if isinstance(value := getattr(run, field), int))
 
 
+def _wave19_task_metrics(task_id: str, message: str) -> dict[str, Any] | None:
+    """Extract verifier telemetry without changing its message or task score."""
+    from harness_bench.feasibility_tasks import FEASIBILITY_PAIRS
+
+    if not any(task_id in halves for halves in FEASIBILITY_PAIRS.values()):
+        return None
+    if not isinstance(message, str) or len(message) > 262_144:
+        return None
+
+    def reject_constant(value: str) -> None:
+        raise ValueError(f"non-finite JSON value: {value}")
+
+    def unique_keys(items: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError("duplicate JSON key")
+            result[key] = value
+        return result
+
+    try:
+        text = message.lstrip()
+        decoded, end = json.JSONDecoder(
+            parse_constant=reject_constant, object_pairs_hook=unique_keys
+        ).raw_decode(text)
+        suffix = text[end:].strip()
+        if suffix and not suffix.startswith("| CLI exit="):
+            return None
+        metrics = decoded.get("wave19") if isinstance(decoded, dict) else None
+        return metrics if isinstance(metrics, dict) and metrics else None
+    except (ValueError, RecursionError):
+        return None
+
+
 def results_to_payload(
     results: list[TaskRun],
     *,
@@ -934,6 +996,8 @@ def results_to_payload(
             task_payload["executions"] = sum(not item.get("resume") for item in r.execution_history)
         if _task_run_reruns_on_continue(r):
             task_payload["rerun_on_continue"] = True
+        if (task_metrics := _wave19_task_metrics(r.task_id, r.message)) is not None:
+            task_payload["task_metrics"] = task_metrics
         tasks_payload.append(task_payload)
     infrastructure = sum(r.failure_kind == "infrastructure" for r in results)
     payload: dict[str, Any] = {"task_set_version": TASK_SET_VERSION}
@@ -958,6 +1022,9 @@ def results_to_payload(
         payload["run_status"] = "interrupted"
         payload["interrupted"] = True
         payload["interrupted_attempts"] = interrupted_attempts
+    pair_metrics = compute_pair_metrics(results)
+    if pair_metrics is not None:
+        payload["feasibility_pairs"] = pair_metrics
     return payload
 
 
@@ -1035,11 +1102,15 @@ def verify_gold(task_ids: list[str] | None = None) -> list[TaskRun]:
     for task in targets:
         with TemporaryDirectory(prefix=f"hb_gold_{task.id}_") as tmp:
             ws = Path(tmp)
-            task.setup(ws)
-            task.apply_gold(ws)
-            start = time.monotonic()
-            outcome: VerifyResult = task.verify(ws)
-            elapsed = time.monotonic() - start
+            try:
+                task.setup(ws)
+                task.apply_gold(ws)
+                start = time.monotonic()
+                outcome: VerifyResult = task.verify(ws)
+                elapsed = time.monotonic() - start
+            finally:
+                if cleanup := getattr(task, "cleanup", None):
+                    cleanup(ws)
         run = TaskRun(
             task_id=task.id,
             passed=outcome.passed,
