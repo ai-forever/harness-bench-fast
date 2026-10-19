@@ -6,6 +6,7 @@ restore reasoning only for an exact tool_call_id and tool name+arguments match.
 Persistent SQLite holds reasoning, bounded per request; no in-memory histories.
 """
 import hashlib
+from contextlib import contextmanager
 import json
 import os
 import sqlite3
@@ -21,10 +22,13 @@ DB=ROOT/'reasoning.sqlite'
 LOCK=threading.Lock()
 
 def digest(s):return hashlib.sha256(s.encode()).hexdigest()
+@contextmanager
 def connect():
  c=sqlite3.connect(DB,timeout=60)
  c.execute('CREATE TABLE IF NOT EXISTS calls (harness TEXT, call_id TEXT, signature TEXT, reasoning TEXT, PRIMARY KEY(harness,call_id))')
- return c
+ try:
+  with c:yield c
+ finally:c.close()
 with connect() as c:c.execute('PRAGMA journal_mode=WAL')
 
 def call_signature(call):

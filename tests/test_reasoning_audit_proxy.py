@@ -30,3 +30,22 @@ def test_no_cross_harness_or_tool_signature_injection(tmp_path,monkeypatch):
  body['messages'][0]['tool_calls'][0]['function']['name']='Different'
  assert p.prepare(body,'brain',True)==[]
  assert 'reasoning_content' not in body['messages'][0]
+
+
+def test_sqlite_connections_closed_across_many_requests(tmp_path,monkeypatch):
+ p=load(tmp_path,monkeypatch)
+ connections=[]
+ real=p.sqlite3.connect
+ class Tracked:
+  def __init__(self,c):self.c=c;self.closed=False
+  def execute(self,*a,**k):return self.c.execute(*a,**k)
+  def __enter__(self):self.c.__enter__();return self
+  def __exit__(self,*a):return self.c.__exit__(*a)
+  def close(self):self.closed=True;self.c.close()
+ def tracked(*a,**k):
+  c=Tracked(real(*a,**k));connections.append(c);return c
+ monkeypatch.setattr(p.sqlite3,'connect',tracked)
+ for i in range(100):
+  p.observe('test',{'reasoning_content':'thinking','tool_calls':[{'id':str(i),'function':{'name':'Bash','arguments':'{}'}}]})
+  p.prepare({'messages':[]},'test',False)
+ assert len(connections)==200 and all(c.closed for c in connections)
