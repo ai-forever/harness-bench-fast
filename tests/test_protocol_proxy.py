@@ -40,7 +40,7 @@ def test_claude_tool_roundtrip_and_usage():
 
 def test_unknown_blocks_and_thinking_fail_closed():
     for body in [dict(messages=[{'role': 'user', 'content': [{'type': 'image'}]}]),
-                 dict(messages=[], thinking={'type': 'enabled', 'budget_tokens': 100})]:
+                 dict(messages=[], thinking={'type': 'unsupported'})]:
         with pytest.raises(ValueError):
             p.messages_to_chat(dict(model='test', **body))
 
@@ -54,3 +54,23 @@ def test_reasoning_summary_preserved_without_duplicates():
     item = {'type': 'reasoning', 'summary': [{'type': 'summary_text', 'text': 'kept'}]}
     p.normalize_responses({'input': [item]})
     assert item['content'][0]['text'] == 'kept'
+
+
+def test_thinking_roundtrip_exact_and_stream_signature(monkeypatch):
+    monkeypatch.setenv('HBF_API_KEY', 'test-only')
+    text = 'Reasoning before a tool.\nТочное сохранение\n'
+    reply = p.chat_to_message({'choices': [{'message': {'reasoning_content': text, 'content': None,
+        'tool_calls': [{'id': 'call1', 'function': {'name': 'Bash', 'arguments': '{}'}}]},
+        'finish_reason': 'tool_calls'}]}, 'test')
+    events = list(p.message_events(reply))
+    assert events[2]['delta'] == {'type': 'thinking_delta', 'thinking': text}
+    assert events[3]['delta']['type'] == 'signature_delta'
+    request = {'model': 'test', 'thinking': {'type': 'enabled', 'budget_tokens': 16384}, 'messages': [
+        {'role': 'assistant', 'content': reply['content']},
+        {'role': 'user', 'content': [{'type': 'tool_result', 'tool_use_id': 'call1', 'content': 'ok'}]}]}
+    chat = p.messages_to_chat(request)
+    assert chat['messages'][0]['reasoning_content'] == text
+    assert chat['messages'][1]['tool_call_id'] == 'call1'
+    request['messages'][0]['content'][0]['thinking'] += 'tampered'
+    with pytest.raises(ValueError, match='signature'):
+        p.messages_to_chat(request)

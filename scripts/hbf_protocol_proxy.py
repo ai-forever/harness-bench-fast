@@ -6,6 +6,8 @@ Codex Responses stays streaming; reasoning summaries and text tool outputs norma
 Claude Messages translates to Chat Completions and emits Anthropic SSE events.
 """
 import json
+import hashlib
+import hmac
 import os
 import threading
 import uuid
@@ -45,6 +47,11 @@ def normalize_responses(body):
     return body
 
 
+def thinking_signature(text):
+    # Adapter-local integrity token, not an Anthropic model signature.
+    return "hbf-v1:" + hmac.new(os.environ['HBF_API_KEY'].encode(), text.encode(), hashlib.sha256).hexdigest()
+
+
 def messages_to_chat(body):
     messages = []
     if body.get('system'):
@@ -54,11 +61,15 @@ def messages_to_chat(body):
         if isinstance(content, str):
             messages.append({'role': msg['role'], 'content': content})
             continue
-        texts, calls, results = [], [], []
+        texts, calls, results, thinking = [], [], [], []
         for block in content:
             kind = block['type']
             if kind == 'text':
                 texts.append(block['text'])
+            elif kind == 'thinking':
+                if msg['role'] != 'assistant' or not hmac.compare_digest(block.get('signature', ''), thinking_signature(block['thinking'])):
+                    raise ValueError('Invalid adapter thinking signature')
+                thinking.append(block['thinking'])
             elif kind == 'tool_use':
                 calls.append({'id': block['id'], 'type': 'function', 'function': {
                     'name': block['name'], 'arguments': json.dumps(block['input'])}})
@@ -69,8 +80,10 @@ def messages_to_chat(body):
                 raise ValueError('Unsupported Messages content: ' + kind)
         # Tool results must precede the next user message.
         messages.extend(results)
-        if texts or calls:
+        if texts or calls or thinking:
             entry = {'role': msg['role'], 'content': '\n'.join(texts) or None}
+            if thinking:
+                entry['reasoning_content'] = ''.join(thinking)
             if calls:
                 entry['tool_calls'] = calls
             messages.append(entry)
@@ -91,8 +104,10 @@ def messages_to_chat(body):
             out['tool_choice'] = {'type': 'function', 'function': {'name': choice['name']}}
         if out['tool_choice'] is None:
             raise ValueError('Unsupported tool choice')
-    if body.get('thinking', {}).get('type') not in (None, 'disabled'):
-        raise ValueError('Explicit thinking is not supported by this adapter')
+    if body.get('thinking', {}).get('type') not in (None, 'disabled', 'enabled', 'adaptive'):
+        raise ValueError('Unsupported thinking mode')
+    # This model emits reasoning natively. Preserve it; do not pretend that the
+    # Anthropic budget_tokens parameter enforces a native-model thinking budget.
     return out
 
 
@@ -100,6 +115,9 @@ def chat_to_message(data, model):
     choice = data['choices'][0]
     msg = choice['message']
     content = []
+    if msg.get('reasoning_content'):
+        reasoning = msg['reasoning_content']
+        content.append({'type': 'thinking', 'thinking': reasoning, 'signature': thinking_signature(reasoning)})
     if msg.get('content'):
         content.append({'type': 'text', 'text': msg['content']})
     for call in msg.get('tool_calls') or []:
@@ -122,11 +140,16 @@ def message_events(message):
         if block['type'] == 'text':
             start = {'type': 'text', 'text': ''}
             delta = {'type': 'text_delta', 'text': block['text']}
+        elif block['type'] == 'thinking':
+            start = {'type': 'thinking', 'thinking': '', 'signature': ''}
+            delta = {'type': 'thinking_delta', 'thinking': block['thinking']}
         else:
             start = dict(block, input={})
             delta = {'type': 'input_json_delta', 'partial_json': json.dumps(block['input'])}
         yield {'type': 'content_block_start', 'index': i, 'content_block': start}
         yield {'type': 'content_block_delta', 'index': i, 'delta': delta}
+        if block['type'] == 'thinking':
+            yield {'type': 'content_block_delta', 'index': i, 'delta': {'type': 'signature_delta', 'signature': block['signature']}}
         yield {'type': 'content_block_stop', 'index': i}
     yield {'type': 'message_delta', 'delta': {'stop_reason': message['stop_reason'], 'stop_sequence': None},
            'usage': {'output_tokens': message['usage']['output_tokens']}}
@@ -184,10 +207,15 @@ class Handler(BaseHTTPRequestHandler):
                 return
             if path != '/v1/messages':
                 return self.send_json(404, {'error': {'message': 'Unsupported endpoint'}})
-            response = client.post(upstream + '/chat/completions', json=messages_to_chat(body), headers=headers)
+            chat_request = messages_to_chat(body)
+            response = client.post(upstream + '/chat/completions', json=chat_request, headers=headers)
             if response.status_code != 200:
                 return self.send_json(response.status_code, {'error': {'type': 'api_error', 'message': response.text[:1000]}})
             message = chat_to_message(response.json(), body['model'])
+            fingerprint = lambda text: {'sha256': hashlib.sha256(text.encode()).hexdigest(), 'chars': len(text)}
+            print(json.dumps({'event': 'thinking_roundtrip', 'id': message['id'], 'requested': body.get('thinking'),
+                              'input': [fingerprint(m['reasoning_content']) for m in chat_request['messages'] if m.get('reasoning_content')],
+                              'output': [fingerprint(b['thinking']) for b in message['content'] if b['type'] == 'thinking']}), flush=True)
             if not body.get('stream'):
                 return self.send_json(200, message)
             self.send_response(200)
