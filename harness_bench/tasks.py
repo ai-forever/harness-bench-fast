@@ -48,6 +48,7 @@ from harness_bench.verifiers import (
     python_callable_returns,
     python_runs,
 )
+from harness_bench.versioning import task_number
 
 # ---------------------------------------------------------------------------
 # 1. create_hello_py
@@ -846,8 +847,15 @@ _TASK_INDEX.update({
     for t in REFLECT_TASKS
 })
 
-# These suites select waves already included in the default scored set.
-SUITES: dict[str, list[Task]] = {"default": ALL_TASKS, "long": LONG_TASKS, "reflect": REFLECT_TASKS, "feasibility": FEASIBILITY_TASKS}
+# These suites select tasks already included in the default scored set.
+SUITES: dict[str, list[Task]] = {
+    "default": ALL_TASKS,
+    "light": [t for t in ALL_TASKS if task_number(t.id) <= 391],
+    "medium": [t for t in ALL_TASKS if task_number(t.id) > 391],
+    "long": LONG_TASKS,
+    "reflect": REFLECT_TASKS,
+    "feasibility": FEASIBILITY_TASKS,
+}
 
 
 def get_task(task_id: str) -> Task:
