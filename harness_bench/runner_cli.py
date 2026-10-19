@@ -41,6 +41,7 @@ from urllib.parse import quote, urlsplit
 from harness_bench.cli_artifacts import new_execution, record_execution
 from harness_bench.cli_isolation import bind_fds, sandbox_argv, validate_trusted_runtime_paths
 from harness_bench.core import Task, effective_task_timeout
+from harness_bench.native_capture import DiskOutput, output_lines
 from harness_bench.runner import (
     TaskRun,
     _add_usage_counts,
@@ -347,33 +348,29 @@ def _ensure_cli_json_events(argv: list[str]) -> list[str]:
     return _ensure_grok_json_events(argv)
 
 
-def _iter_json_payloads(stdout: str) -> list[dict[str, object]]:
-    payloads: list[dict[str, object]] = []
-    for line in stdout.splitlines():
-        line = line.strip()
-        if not line:
-            continue
+def _iter_json_payloads(stdout: str):
+    """Read events one at a time; never retain a list of the transcript."""
+    found = False
+    for line in output_lines(stdout):
         try:
             payload = json.loads(line)
         except json.JSONDecodeError:
             continue
         if isinstance(payload, dict):
-            payloads.append(payload)
-    if payloads:
-        return payloads
-
-    stripped = stdout.strip()
-    if not stripped:
-        return []
+            found = True
+            yield payload
+    if found:
+        return
+    # Pretty-printed single JSON objects remain supported within the bounded
+    # diagnostic window; JSONL is streamed from the complete artifact above.
     try:
-        payload = json.loads(stripped)
+        payload = json.loads(stdout.strip())
     except json.JSONDecodeError:
-        return []
+        return
     if isinstance(payload, dict):
-        return [payload]
-    if isinstance(payload, list):
-        return [item for item in payload if isinstance(item, dict)]
-    return []
+        yield payload
+    elif isinstance(payload, list):
+        yield from (item for item in payload if isinstance(item, dict))
 
 
 def _add_metric_count(stats: dict[str, int], key: str, value: object) -> None:
@@ -531,7 +528,7 @@ def _grok_json_event_stats(
         "error",
         "end",
     }
-    events = sum(1 for payload in payloads if payload.get("type") in grok_event_types)
+    events = sum(1 for payload in _iter_json_payloads(stdout) if payload.get("type") in grok_event_types)
     session_id = end_payload["sessionId"]
     assert isinstance(session_id, str)
     tool_calls, shell_commands = _grok_session_tool_stats(
@@ -772,7 +769,7 @@ def _codex_json_event_stats(stdout: str) -> dict[str, int] | None:
     total_tokens = 0
     saw_codex_event = False
 
-    for line in stdout.splitlines():
+    for line in output_lines(stdout):
         line = line.strip()
         if not line:
             continue
@@ -1238,10 +1235,16 @@ def _run_cli_subprocess(
         start_new_session = True
 
     with ExitStack() as capture:
-        stdout_sink = stderr_sink = subprocess.PIPE
-        if capture_directory is not None:
-            stdout_sink = capture.enter_context((capture_directory / "stdout.log").open("wb"))
-            stderr_sink = capture.enter_context((capture_directory / "stderr.log").open("wb"))
+        persistent_capture = capture_directory is not None
+        if capture_directory is None:
+            capture_directory = type(cwd)(capture.enter_context(TemporaryDirectory(prefix="hbf-output-")))
+        stdout_sink = capture.enter_context((capture_directory / "stdout.log").open("wb"))
+        stderr_sink = capture.enter_context((capture_directory / "stderr.log").open("wb"))
+
+        def collected():
+            out = DiskOutput(capture_directory / "stdout.log", native=True)
+            err = DiskOutput(capture_directory / "stderr.log")
+            return (out, err) if persistent_capture else (str(out), str(err))
         with bind_fds(argv) as (command, descriptors):
             proc = subprocess.Popen(  # noqa: S603 — trusted local benchmark command
                 command,
@@ -1267,17 +1270,17 @@ def _run_cli_subprocess(
             except subprocess.TimeoutExpired:
                 _kill_process_tree(proc)
                 stdout, stderr = proc.communicate()
-            exc.output, exc.stderr = stdout, stderr
+            exc.output, exc.stderr = collected()
             raise
         except BaseException:
             _terminate_process_tree(proc)
             raise
         finally:
             _unregister_active_process(proc)
-        if capture_directory is not None:
-            from harness_bench.native_capture import diagnostic_tail, terminal_output
-            stdout = terminal_output(capture_directory / "stdout.log")
-            stderr = diagnostic_tail(capture_directory / "stderr.log")
+        # Real Popen has file-backed streams and returns (None, None).
+        # Retain synthetic outputs supplied by subprocess test doubles.
+        if stdout is None and stderr is None:
+            stdout, stderr = collected()
         return subprocess.CompletedProcess(argv, proc.returncode, stdout, stderr)
 
 
@@ -1496,7 +1499,7 @@ def _infrastructure_error(result: subprocess.CompletedProcess[str]) -> str | Non
         return transient.group(0)
     # A structured top-level API failure (pi emits these on stdout) is safe to
     # inspect; nested tool results and ordinary assistant text are not.
-    for line in (result.stdout or "").splitlines():
+    for line in output_lines(result.stdout):
         try:
             event = json.loads(line)
         except (ValueError, TypeError):
@@ -1641,7 +1644,7 @@ def run_task_cli(
             phase = "cli"
             started = time.monotonic()
             result = _run_cli_subprocess(argv, cwd=workspace, timeout=timeout, env=env,
-                                         **({"capture_directory": execution} if extra_env and "HBF_WORKER_API_KEY" in extra_env else {}))
+                                         capture_directory=execution)
             agent_elapsed = time.monotonic() - started
             if trusted_session is not None:
                 trusted_session.freeze()
@@ -1730,8 +1733,7 @@ def run_task_cli(
                 record_execution(execution, stdout=result.stdout, stderr=result.stderr,
                     metadata={**entry, "task_id": task.id, "timeout": timeout, "runtime_paths": list(runtime_paths)},
                     trace_roots=(workspace,), state_roots=(scratch, home),
-                    preserve_output_files=bool(extra_env and "HBF_WORKER_API_KEY" in extra_env
-                                               and (execution / "stdout.log").exists()))
+                    preserve_output_files=(execution / "stdout.log").exists())
             except OSError as exc:
                 entry["artifact_error"] = str(exc)
                 entry["primary_failure_kind"] = kind

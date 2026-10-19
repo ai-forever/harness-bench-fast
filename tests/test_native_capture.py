@@ -80,3 +80,52 @@ def test_oversized_terminal_cannot_expand_parent_heap(tmp_path):
     path = tmp_path / 'stdout.log'
     path.write_text(json.dumps({**EVENT, 'message': 'x' * (MAX_TERMINAL_BYTES * 4)}) + '\n')
     assert terminal_output(path) == ''  # Runner rejects missing terminal as infrastructure.
+
+
+def test_all_cli_capture_is_disk_backed_with_streamed_metrics(tmp_path):
+    from harness_bench.runner_cli import _codex_json_event_stats, _claude_json_event_stats
+    from harness_bench.native_capture import DiskOutput
+    code = '''import json,sys
+for _ in range(12000):
+ print(json.dumps({"type":"item.completed","item":{"type":"command_execution","aggregated_output":"x"*4096}}))
+print(json.dumps({"type":"turn.completed","usage":{"input_tokens":123,"output_tokens":456}}))
+'''
+    tracemalloc.start()
+    try:
+        result = _run_cli_subprocess([sys.executable, '-c', code], cwd=tmp_path,
+                                    timeout=30, env=None, capture_directory=tmp_path)
+        assert isinstance(result.stdout, DiskOutput)
+        stats = _codex_json_event_stats(result.stdout)
+        assert stats['agent_steps'] == 12000
+        assert stats['agent_total_tokens'] == 579
+        # A second parser must not construct a list of all payloads either.
+        _claude_json_event_stats(result.stdout)
+        _, peak = tracemalloc.get_traced_memory()
+    finally:
+        tracemalloc.stop()
+    assert peak < 8 * 1024**2
+    assert (tmp_path / 'stdout.log').stat().st_size > 47 * 1024**2
+    assert len(result.stdout) <= DIAGNOSTIC_BYTES
+
+
+def test_huge_json_content_preserves_metrics_and_following_events(tmp_path):
+    from harness_bench.native_capture import DiskOutput, output_lines
+    from harness_bench.runner_cli import _claude_json_event_stats
+    p = tmp_path / 'stdout.log'
+    event = {'type':'assistant','message':{'content':[{'type':'text','text':'a\\b"ю'*500000},
+            {'type':'tool_use','name':'Bash'}], 'usage':{'input_tokens':23,'output_tokens':45}}}
+    p.write_text(json.dumps(event)+'\n'+json.dumps({'type':'result','num_turns':1})+'\n')
+    stats = _claude_json_event_stats(DiskOutput(p))
+    assert stats['agent_total_tokens'] == 68
+    assert stats['agent_tool_calls'] == 1
+    assert stats['agent_events'] == 2
+    assert len(list(output_lines(DiskOutput(p)))) == 2
+
+
+def test_non_native_timeout_retains_bounded_diagnostics_and_full_files(tmp_path):
+    code = "import sys,time; print('x'*8000000,flush=True); print('timeout-marker',flush=True); time.sleep(10)"
+    with pytest.raises(subprocess.TimeoutExpired) as exc:
+        _run_cli_subprocess([sys.executable,'-c',code],cwd=tmp_path,timeout=.5,env=None,capture_directory=tmp_path)
+    assert 'timeout-marker' in exc.value.stdout
+    assert len(exc.value.stdout) <= DIAGNOSTIC_BYTES
+    assert (tmp_path/'stdout.log').stat().st_size > 8000000
