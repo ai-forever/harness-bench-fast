@@ -171,3 +171,17 @@ def test_published_landing_scores_preserve_all_source_totals_and_missing_wave19(
     assert 'type="range"' not in (root / "docs/archive.html").read_text()
     archive = (root / "docs/archive.html").read_text()
     assert all(f'id="measurement-{row["id"]}"' in archive for row in historical)
+
+
+def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    build = runpy.run_path(str(root / "scripts/build_landing_data.py"))["build"]
+    expected = build()
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    for name in ("archive.html", "wave-results.js", "wave19-results.json"):
+        text = (root / "docs" / name).read_text(encoding="utf-8")
+        assert "\n" in text
+        (docs / name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
+    build.__globals__["ROOT"] = tmp_path
+    assert build() == expected

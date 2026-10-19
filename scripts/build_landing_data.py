@@ -94,8 +94,9 @@ def build():
         "provenance": {
             "method": "Historical v0.18.0 rescores plus four complete v0.19.0 measurements dated 2026-10-19",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
-            "wave_results_sha256": hashlib.sha256(waves.read_bytes()).hexdigest(),
-            "archive_sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
+            # Hash canonical UTF-8/LF text, independent of Git checkout CRLF.
+            "wave_results_sha256": hashlib.sha256(waves.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
+            "archive_sha256": hashlib.sha256(archive.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "limitation": "Historical Medium covers only 40/80; current measurements cover all 80. Single-run intervals do not estimate repeat variability.",
         },
         "rows": rows,
