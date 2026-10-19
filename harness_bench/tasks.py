@@ -20,6 +20,7 @@ import json
 from pathlib import Path
 
 from harness_bench.core import Task, VerifyResult
+from harness_bench.feasibility_tasks import FEASIBILITY_TASKS
 from harness_bench.long_tasks import LONG_TASKS
 from harness_bench.reflect_tasks import REFLECT_TASKS
 from harness_bench.tasks_adversarial import ADVERSARIAL_TASKS
@@ -47,6 +48,7 @@ from harness_bench.verifiers import (
     python_callable_returns,
     python_runs,
 )
+from harness_bench.versioning import task_number
 
 # ---------------------------------------------------------------------------
 # 1. create_hello_py
@@ -835,6 +837,7 @@ ALL_TASKS: list[Task] = [
     *CLI_TASKS,
     *LONG_TASKS,
     *REFLECT_TASKS,
+    *FEASIBILITY_TASKS,
 ]
 
 # Canonical scored ids; retain the pre-publication reflection names as aliases.
@@ -844,8 +847,15 @@ _TASK_INDEX.update({
     for t in REFLECT_TASKS
 })
 
-# These suites select waves already included in the default scored set.
-SUITES: dict[str, list[Task]] = {"default": ALL_TASKS, "long": LONG_TASKS, "reflect": REFLECT_TASKS}
+# These suites select tasks already included in the default scored set.
+SUITES: dict[str, list[Task]] = {
+    "default": ALL_TASKS,
+    "light": [t for t in ALL_TASKS if task_number(t.id) <= 391],
+    "medium": [t for t in ALL_TASKS if task_number(t.id) > 391],
+    "long": LONG_TASKS,
+    "reflect": REFLECT_TASKS,
+    "feasibility": FEASIBILITY_TASKS,
+}
 
 
 def get_task(task_id: str) -> Task:

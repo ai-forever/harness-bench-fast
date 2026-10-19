@@ -38,8 +38,8 @@ from tempfile import TemporaryDirectory, mkdtemp
 from urllib.parse import quote, urlsplit
 
 from harness_bench.cli_artifacts import new_execution, record_execution
-from harness_bench.cli_isolation import bind_fds, sandbox_argv
-from harness_bench.core import Task
+from harness_bench.cli_isolation import bind_fds, sandbox_argv, validate_trusted_runtime_paths
+from harness_bench.core import Task, effective_task_timeout
 from harness_bench.runner import (
     TaskRun,
     _add_usage_counts,
@@ -1497,6 +1497,24 @@ def _infrastructure_error(result: subprocess.CompletedProcess[str]) -> str | Non
     return None
 
 
+def _task_runtime_identity(task: Task) -> dict[str, str]:
+    """Bind resumable trusted-service results to their public task contract."""
+    if not getattr(task, "requires_trusted_service", False):
+        return {}
+    if not task.runtime_protocol:
+        raise ValueError(f"{task.id} requires a versioned trusted-service protocol")
+    contract = json.dumps({
+        "task_id": task.id,
+        "runtime_protocol": task.runtime_protocol,
+        "prompt": task.prompt,
+        "setup_files": task.setup_files,
+        "min_timeout_seconds": task.min_timeout_seconds,
+        "max_timeout_seconds": task.max_timeout_seconds,
+    }, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    return {"runtime_protocol": task.runtime_protocol,
+            "task_contract_sha256": hashlib.sha256(contract).hexdigest()}
+
+
 def run_task_cli(
     task: Task,
     *,
@@ -1514,17 +1532,23 @@ def run_task_cli(
     ``none`` is available to Python callers for compatibility and diagnostics;
     the public CLI defaults to the isolated Linux runner.
     """
-    timeout = max(timeout, int(getattr(task, "min_timeout_seconds", None) or 0))
+    if getattr(task, "requires_trusted_service", False) and isolation != "bwrap":
+        raise ValueError(f"{task.id} requires --isolation bwrap to protect its trusted service")
+    runtime_identity = _task_runtime_identity(task)
+    timeout = effective_task_timeout(timeout, getattr(task, "min_timeout_seconds", None),
+                                     getattr(task, "max_timeout_seconds", None))
     _load_env_from_dotenv()
     base_argv = _ensure_cli_json_events(shlex.split(cli_command))
     if not base_argv:
         raise ValueError("cli_command is empty")
+    if getattr(task, "requires_trusted_service", False):
+        validate_trusted_runtime_paths(runtime_paths, base_argv[0])
     if isolation not in {"none", "bwrap"}:
         raise ValueError(f"unknown isolation mode: {isolation}")
     is_strands = _is_strands_print_command(base_argv)
     artifacts_root = artifacts_root or Path("jobs/cli_artifacts").resolve()
     identity = {"isolation": isolation, "cli_command_sha256": hashlib.sha256(cli_command.encode()).hexdigest(),
-                "runtime_paths": list(runtime_paths), "timeout": timeout}
+                "runtime_paths": list(runtime_paths), "timeout": timeout, **runtime_identity}
     history = []
     started = time.monotonic()
     inject_agents_md = any("free-code" in arg or arg.endswith("/claude") or arg == "claude" for arg in base_argv[:2])
@@ -1569,8 +1593,13 @@ def run_task_cli(
         retryable = False
         phase = "setup"
         wire_session = None
+        trusted_session = None
         try:
             task.setup(workspace)
+            if getattr(task, "requires_trusted_service", False):
+                from harness_bench.feasibility_tasks.trusted_service import get_session
+
+                trusted_session = get_session(workspace)
             if _STOP_REQUESTED.is_set():
                 raise KeyboardInterrupt
             argv = _argv_for_workspace(base_argv, workspace)
@@ -1592,11 +1621,20 @@ def run_task_cli(
                 endpoint = f"{wire_base.rstrip('/')}/{wire_session}/v1"
                 env.update(HBF_API_BASE=endpoint, OPENROUTER_BASE_URL=endpoint)
             if isolation == "bwrap":
-                argv = sandbox_argv(argv, workspace=workspace, scratch=scratch, home=home, runtime_paths=runtime_paths)
+                service_args = ({"service_socket": trusted_session.socket_path, "protect_benchmark": True}
+                                if trusted_session is not None else {})
+                argv = sandbox_argv(argv, workspace=workspace, scratch=scratch, home=home,
+                                    runtime_paths=runtime_paths, **service_args)
             else:
                 env = {**(env or os.environ), "TMPDIR": str(scratch), "TMP": str(scratch), "TEMP": str(scratch)}
             phase = "cli"
+            started = time.monotonic()
             result = _run_cli_subprocess(argv, cwd=workspace, timeout=timeout, env=env)
+            agent_elapsed = time.monotonic() - started
+            if trusted_session is not None:
+                trusted_session.freeze()
+            if agent_elapsed > timeout:
+                raise subprocess.TimeoutExpired(argv, timeout, result.stdout, result.stderr)
             native = None if is_strands else _deepagents_worker_result(result.stdout or "")
             # Strands stdout is human-readable assistant/tool text, not the
             # structured error events supported by some other CLI runners.
@@ -1625,7 +1663,9 @@ def run_task_cli(
                         cli_stats=_strands_print_usage(result.stdout)[0])
             else:
                 phase = "verify"
-                if isolation == "bwrap":
+                # Trusted-service verifiers replay bounded host-owned state and
+                # require the in-process session; they never execute agent code.
+                if isolation == "bwrap" and trusted_session is None:
                     from harness_bench.verifier_process import verify_bwrap
                     outcome = verify_bwrap(task.id, workspace)
                 else:
@@ -1655,12 +1695,25 @@ def run_task_cli(
                      "phase": phase, "returncode": result.returncode, "error": error,
                      "passed": bool(run and run.passed), "isolation": isolation,
                      "cli_command_sha256": hashlib.sha256(cli_command.encode()).hexdigest(),
-                     "timeout": timeout, "runtime_paths": list(runtime_paths), "wire_session": wire_session}
+                     "timeout": timeout, "runtime_paths": list(runtime_paths), "wire_session": wire_session, **runtime_identity}
             if is_strands:
                 entry["strands_cli"] = {**_strands_cli_metadata(base_argv),
                                         "usage_scope": "cli_footer",
                                         "footer_usage_complete": _strands_print_usage(result.stdout)[1]}
             history.append(entry)
+            if trusted_session is not None:
+                try:
+                    trusted_session.freeze()
+                    evidence_path = execution / "trusted_service.json"
+                    trusted_session.export(evidence_path)
+                    entry["trusted_service_evidence"] = str(evidence_path)
+                    entry["trusted_service_sha256"] = hashlib.sha256(evidence_path.read_bytes()).hexdigest()
+                except Exception as exc:  # noqa: BLE001 — an unauditable score is invalid.
+                    entry["primary_failure_kind"] = kind
+                    entry["trusted_service_error"] = str(exc)
+                    error = f"{error + ' | ' if error else ''}Cannot preserve trusted service evidence: {exc}"
+                    kind, run, retryable = "infrastructure", None, False
+                    entry.update(failure_kind=kind, error=error, passed=False)
             try:
                 record_execution(execution, stdout=result.stdout, stderr=result.stderr,
                     metadata={**entry, "task_id": task.id, "timeout": timeout, "runtime_paths": list(runtime_paths)},
@@ -1671,6 +1724,12 @@ def run_task_cli(
                 error = f"{error + ' | ' if error else ''}Cannot save complete CLI evidence: {exc}"
                 kind, run, retryable = "infrastructure", None, False
                 entry.update(failure_kind=kind, error=error, passed=False)
+            try:
+                if cleanup := getattr(task, "cleanup", None):
+                    cleanup(workspace)
+            except Exception as exc:  # noqa: BLE001 — retain evidence and finish other cleanup.
+                entry["service_cleanup_warning"] = str(exc)
+                print(f"[WARN] {task.id}: task resource cleanup failed: {exc}", file=sys.stderr)
             if workspace_keepalive is not None:
                 leftover = _cleanup_workspace_keepalive(workspace_keepalive, task_id=task.id)
                 if leftover:
@@ -1719,7 +1778,6 @@ def run_all_cli(
     if artifacts_root is None:
         artifacts_root = Path(str(json_output) + ".artifacts").resolve() if json_output else Path("jobs/cli_artifacts").resolve()
     previous = {(r.task_id, r.attempt): r for r in load_results_json(json_output)} if json_output and json_output.exists() else {}
-
     if isolation == "bwrap":
         expected_command = hashlib.sha256(cli_command.encode()).hexdigest()
         for prior in previous.values():
@@ -1729,6 +1787,20 @@ def run_all_cli(
                     or actual[-1].get("runtime_paths") != list(runtime_paths)):
                 raise ValueError("Cannot mix legacy/different CLI settings with isolated results; use a new --json-output file")
 
+    targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
+    if any(getattr(task, "requires_trusted_service", False) for task in targets) and isolation != "bwrap":
+        raise ValueError("Selected tasks require --isolation bwrap to protect their trusted service")
+    for task in targets:
+        expected_runtime = _task_runtime_identity(task)
+        if not expected_runtime:
+            continue
+        for prior in (run for run in previous.values() if run.task_id == task.id):
+            executions = [item for item in (prior.execution_history or [])
+                          if item.get("cli_command_sha256")]
+            if not executions or any(executions[-1].get(key) != value
+                                     for key, value in expected_runtime.items()):
+                raise ValueError("Cannot resume results from a different task/service protocol; use a new --json-output file")
+
     def retain_history(run: TaskRun, attempt: int) -> TaskRun:
         prior = previous.get((run.task_id, attempt))
         if prior is not None:
@@ -1737,7 +1809,6 @@ def run_all_cli(
             return replace(run, execution_history=[*old, {"resume": True, "rerun_on_fail": rerun_on_fail}, *(run.execution_history or [])])
         return run
 
-    targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
     results = _resume_results(
         json_output,
         targets,

@@ -100,9 +100,15 @@ def test_long_wave_keeps_its_original_revision() -> None:
     assert revision_for_task_id("task_411_math_solutions_check").version == "0.17.0"
 
 
-def test_reflect_wave_is_the_current_revision() -> None:
-    assert TASK_SET_VERSION == "0.18.0"
-    assert CURRENT_TASK_SET_REVISION.total_tasks == 431
-    assert CURRENT_TASK_SET_REVISION.added_task_numbers == (412, 431)
+def test_reflect_wave_keeps_its_original_revision() -> None:
     assert revision_for_task_id("task_412_supplier_minimum").version == "0.18.0"
     assert revision_for_task_id("task_431_admin_elevation").version == "0.18.0"
+
+
+def test_wave19_is_the_current_revision() -> None:
+    assert TASK_SET_VERSION == "0.19.0"
+    assert CURRENT_TASK_SET_REVISION.total_tasks == 471
+    assert CURRENT_TASK_SET_REVISION.added_task_numbers == (432, 471)
+    assert revision_for_task_id(ALL_TASKS[431].id).version == "0.19.0"
+    assert revision_for_task_id(ALL_TASKS[-1].id).version == "0.19.0"
+    assert TASK_WAVES[-1].name == "wave19-feasibility"

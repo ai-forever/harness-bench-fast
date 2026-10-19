@@ -7,6 +7,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from harness_bench.core import VerifyResult
+from harness_bench.feasibility_tasks.trusted_service import trusted_service_available
 from harness_bench.runner import TaskRun
 from harness_bench.tasks import ALL_TASKS, get_task
 
@@ -37,8 +38,13 @@ def verify_gold_with_annotations(task_ids: list[str] | None = None) -> int:
     targets = [get_task(tid) for tid in task_ids] if task_ids else list(ALL_TASKS)
     results: list[TaskRun] = []
     skipped: list[str] = []
+    unsupported: list[str] = []
 
     for task in targets:
+        if getattr(task, "requires_trusted_service", False) and not trusted_service_available():
+            unsupported.append(task.id)
+            print(f"[SKIP] {task.id} — Unix-socket host service unavailable on this platform")
+            continue
         # Some tasks declare no gold solution (verifier-only deliverables such
         # as "generate a Dockerfile"). There is nothing to apply-and-verify, so
         # they are outside the gold-verification surface — skip rather than
@@ -52,9 +58,13 @@ def verify_gold_with_annotations(task_ids: list[str] | None = None) -> int:
         try:
             with TemporaryDirectory(prefix=f"hb_gold_{task.id}_") as tmp:
                 ws = Path(tmp)
-                task.setup(ws)
-                task.apply_gold(ws)
-                outcome: VerifyResult = task.verify(ws)
+                try:
+                    task.setup(ws)
+                    task.apply_gold(ws)
+                    outcome: VerifyResult = task.verify(ws)
+                finally:
+                    if cleanup := getattr(task, "cleanup", None):
+                        cleanup(ws)
             elapsed = time.monotonic() - started
             result = TaskRun(
                 task_id=task.id,
@@ -82,6 +92,8 @@ def verify_gold_with_annotations(task_ids: list[str] | None = None) -> int:
     print()
     print("=" * 64)
     skipped_note = f" ({len(skipped)} skipped, no gold)" if skipped else ""
+    if unsupported:
+        skipped_note += f" ({len(unsupported)} skipped, Unix-socket host service unavailable)"
     print(f"Gold-verification: {len(results) - len(failed)}/{len(results)} OK{skipped_note}")
     if failed:
         print()

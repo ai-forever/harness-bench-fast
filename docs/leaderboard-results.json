@@ -1,0 +1,1538 @@
+{
+  "task_set_version": "0.19.0",
+  "light_tasks": 391,
+  "medium_tasks": 80,
+  "provenance": {
+    "method": "Historical v0.18.0 rescores plus four complete v0.19.0 measurements dated 2026-10-19",
+    "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
+    "wave_results_sha256": "6dd03c599564c086bb8c0bf3f9c4a90c3edf27d9b4b7bb746bc5004e59f25683",
+    "archive_sha256": "448eb41a006bca486a21328f7e1799d1c1b7a05e52ee91a11f40fe9de0a8711f",
+    "limitation": "Historical Medium covers only 40/80; current measurements cover all 80. Single-run intervals do not estimate repeat variability."
+  },
+  "rows": [
+    {
+      "id": "run-0",
+      "harness": "pi-mono",
+      "model": "DeepSeek V4.1 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 391,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 32,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 423.0,
+      "telemetry_note": "@mean1 · Long wave 13/20 · Reflection 19/20 · Steps 0 · Tokens 0 (metrics absent)"
+    },
+    {
+      "id": "ua-glm53",
+      "harness": "GigaCode Universal Agent (gc-cli)",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "light": {
+        "passed": 388,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 35,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 423.0,
+      "telemetry_note": "@mean1 · Long wave 16/20 · Reflection 19/20 · Steps 4,581 · Tokens 271,316,552 (coverage 429/431)"
+    },
+    {
+      "id": "run-1",
+      "harness": "dsh headless",
+      "model": "DeepSeek V4.1 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 390,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 32,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 422.0,
+      "telemetry_note": "@mean1 · Long wave 14/20 · Reflection 18/20 · Steps 3,973 · Tokens 249,558,870"
+    },
+    {
+      "id": "run-2",
+      "harness": "Hermes",
+      "model": "DeepSeek V4.1 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 388,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 34,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 422.0,
+      "telemetry_note": "@mean1 · Long wave 14/20 · Reflection 20/20 · Steps 0 · Tokens 0 (metrics absent)"
+    },
+    {
+      "id": "run-3",
+      "harness": "OpenCode",
+      "model": "DeepSeek V4.1 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 388,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 33,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 421.0,
+      "telemetry_note": "@mean1 · Long wave 14/20 · Reflection 19/20 · Steps 3,818 · Tokens 0 (metric absent)"
+    },
+    {
+      "id": "codex-sol61-low",
+      "harness": "Codex CLI",
+      "model": "GPT-6.1 Sol (low)",
+      "runs": 1,
+      "light": {
+        "passed": 388,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 32,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 420.0,
+      "telemetry_note": "@mean1 · Long wave 19/20 · Reflection 13/20 · Steps 2,817 · Tokens 69,419,504 (raw)"
+    },
+    {
+      "id": "run-4",
+      "harness": "free-code",
+      "model": "DeepSeek V4.1 Flash Uncensored FP8 (high)",
+      "runs": 3,
+      "light": {
+        "passed": 389.3333333333333,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 29.666666666666664,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 419.0,
+      "telemetry_note": "@mean3 · SD 0.6 pp · Long mean 63.3% · Reflection mean 85.0% · Mean steps 4,311 · Mean tokens 631,963,525"
+    },
+    {
+      "id": "ua-ds41",
+      "harness": "GigaCode Universal Agent (gc-cli)",
+      "model": "DeepSeek V4.1 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 389,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 30,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 419.0,
+      "telemetry_note": "@mean1 · Long wave 12/20 · Reflection 18/20 · Steps 5,210 · Tokens 386,165,256"
+    },
+    {
+      "id": "run-5",
+      "harness": "mini-SWE-agent",
+      "model": "DeepSeek V4.1 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 388,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 30,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 418.0,
+      "telemetry_note": "@mean1 · Long wave 10/20 · Reflection 20/20 · Steps 5,846 · Tokens 967,731,127 (raw)"
+    },
+    {
+      "id": "ua-kimi",
+      "harness": "GigaCode Universal Agent (gc-cli)",
+      "model": "Kimi-K3 (OpenRouter) (high)",
+      "runs": 1,
+      "light": {
+        "passed": 387,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 30,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 417.0,
+      "telemetry_note": "@mean1 · Long wave 13/20 · Reflection 17/20 · Steps 3,402 · Tokens 171,347,666 (coverage 426/431)"
+    },
+    {
+      "id": "glm53-openrouter-opencode",
+      "harness": "OpenCode",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "light": {
+        "passed": 386,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 27,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 413.0,
+      "telemetry_note": "@mean1 · Long wave 12/20 · Reflection 15/20 · Steps 3,745 · Tokens 0 (metrics absent)"
+    },
+    {
+      "id": "run-6",
+      "harness": "deepagents",
+      "model": "DeepSeek V4.1 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 383,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 28,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 411.0,
+      "telemetry_note": "@mean1 · Long wave 10/20 · Reflection 18/20 · Steps 10,086 · Tokens 854,671,935 (raw)*"
+    },
+    {
+      "id": "multitool-glm53",
+      "harness": "MultiTool CLI",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "light": {
+        "passed": 386,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 25,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 411.0,
+      "telemetry_note": "@mean1 · Long wave 10/20 · Reflection 15/20 · Steps 3,600 · Tokens 155,371,241 (native audit, including child sessions)"
+    },
+    {
+      "id": "glm53-openrouter-deepagents",
+      "harness": "deepagents",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "light": {
+        "passed": 381,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 27,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 408.0,
+      "telemetry_note": "@mean1 · Long wave 14/20 · Reflection 13/20 · Steps 8,271 · Tokens 696,504,696* (coverage 429/431)"
+    },
+    {
+      "id": "glm53-openrouter-mini",
+      "harness": "mini-SWE-agent",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "light": {
+        "passed": 385,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 22,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 407.0,
+      "telemetry_note": "@mean1 · Long wave 9/20 · Reflection 13/20 · Steps 5,191 · Tokens 769,563,983 (coverage 428/431)"
+    },
+    {
+      "id": "glm-dsh",
+      "harness": "dsh headless",
+      "model": "GLM-5.3 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 383,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 22,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 405.0,
+      "telemetry_note": "@mean1 · Long wave 7/20 · Reflection 15/20 · Steps 3,833 · Tokens 234,756,961 (raw; 0 means absent)"
+    },
+    {
+      "id": "run-55",
+      "harness": "mini-SWE-agent",
+      "model": "GLM-5.3 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 384,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 20,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 404.0,
+      "telemetry_note": "@mean1 · Long wave 5/20 · Reflection 15/20 · Steps 5,109 · Tokens (raw) 375,324,319"
+    },
+    {
+      "id": "glm-free-code",
+      "harness": "free-code",
+      "model": "GLM-5.3 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 381,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 23,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 404.0,
+      "telemetry_note": "@mean1 · Long wave 12/20 · Reflection 11/20 · Steps 4,924 · Tokens 516,879,409 (raw; 0 means absent)"
+    },
+    {
+      "id": "glm53-openrouter-openhands",
+      "harness": "OpenHands",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "light": {
+        "passed": 384,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 20,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 404.0,
+      "telemetry_note": "@mean1 · Long wave 6/20 · Reflection 14/20 · Steps 0 · Tokens 0 (metrics absent)"
+    },
+    {
+      "id": "glm53-openrouter-hermes",
+      "harness": "Hermes",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "light": {
+        "passed": 387,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 15,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 402.0,
+      "telemetry_note": "@mean1 · Long wave 3/20 · Reflection 12/20 · Steps 0 · Tokens 0 (metrics absent)"
+    },
+    {
+      "id": "glm-hermes",
+      "harness": "Hermes",
+      "model": "GLM-5.3 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 384,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 15,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 399.0,
+      "telemetry_note": "@mean1 · Long wave 5/20 · Reflection 10/20 · Steps 0 · Tokens 0 (raw; 0 means absent)"
+    },
+    {
+      "id": "run-56",
+      "harness": "pi-mono",
+      "model": "GLM-5.3 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 380,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 17,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 397.0,
+      "telemetry_note": "@mean1 · Long wave 4/20 · Reflection 13/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-57",
+      "harness": "OpenCode",
+      "model": "GLM-5.3 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 378,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 19,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 397.0,
+      "telemetry_note": "@mean1 · Long wave 6/20 · Reflection 13/20 · Steps 2,911 · Tokens (raw) 0"
+    },
+    {
+      "id": "glm53-openrouter-pi",
+      "harness": "pi-mono",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "light": {
+        "passed": 376,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 20,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 396.0,
+      "telemetry_note": "@mean1 · Long wave 6/20 · Reflection 14/20 · Steps 0 · Tokens 0 (metrics absent)"
+    },
+    {
+      "id": "glm-openhands",
+      "harness": "OpenHands",
+      "model": "GLM-5.3 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 383,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 10,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 393.0,
+      "telemetry_note": "@mean1 · Long wave 2/20 · Reflection 8/20 · Steps 0 · Tokens 0 (raw; 0 means absent)"
+    },
+    {
+      "id": "ua-luna",
+      "harness": "GigaCode Universal Agent (gc-cli)",
+      "model": "GPT-6 Luna (OpenRouter) (reasoning none)",
+      "runs": 1,
+      "light": {
+        "passed": 376,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 12,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 388.0,
+      "telemetry_note": "@mean1 · Long wave 3/20 · Reflection 9/20 · Steps 8,716 · Tokens 762,784,868 (coverage 428/431)"
+    },
+    {
+      "id": "secret-700-sft",
+      "harness": "deepagents",
+      "model": "Secret-700-SFT (reasoning default)",
+      "runs": 1,
+      "light": {
+        "passed": 368,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 9,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 377.0,
+      "telemetry_note": "@mean1 · Long wave 0/20 · Reflection 9/20 · Steps 6,321 · Tokens (raw, unaudited)* 149,806,005 · Measurement notes"
+    },
+    {
+      "id": "multitool-haiku",
+      "harness": "MultiTool CLI",
+      "model": "Claude Haiku 4.5 (default)",
+      "runs": 1,
+      "light": {
+        "passed": 371,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 5,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 376.0,
+      "telemetry_note": "@mean1 · Long wave 1/20 · Reflection 4/20 · Steps 5,460 · Tokens 212,030,792 (native audit, including child sessions)"
+    },
+    {
+      "id": "cowork-glm53",
+      "harness": "cowork",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "light": {
+        "passed": 366,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 10,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 376.0,
+      "telemetry_note": "@mean1 · Long wave 1/20 · Reflection 9/20 · Steps ≥3,568 · Tokens ≥89,614,312 (coverage 429/431)"
+    },
+    {
+      "id": "run-58",
+      "harness": "deepagents",
+      "model": "GLM-5.3 Flash Uncensored FP8 (high)",
+      "runs": 1,
+      "light": {
+        "passed": 359,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 16,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 375.0,
+      "telemetry_note": "@mean1 · Long wave 3/20 · Reflection 13/20 · Steps 6,627 · Tokens (raw) 373,783,977"
+    },
+    {
+      "id": "run-7",
+      "harness": "mini-SWE-agent",
+      "model": "GigaChat 2 Reasoning (PROM) (medium)",
+      "runs": 1,
+      "light": {
+        "passed": 363,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 8,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 371.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 8/20 · Steps 6,233 · Tokens (raw) 72,482,990"
+    },
+    {
+      "id": "run-8",
+      "harness": "OpenCode",
+      "model": "GigaChat 3 Ultra (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 331,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 331.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,271 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-9",
+      "harness": "OpenCode",
+      "model": "GigaChat 2 Reasoning (PROM) (medium)",
+      "runs": 1,
+      "light": {
+        "passed": 328,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 1,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 329.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 3,612 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-10",
+      "harness": "OpenCode",
+      "model": "GigaChat 2 Max (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 327,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 327.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 4,693 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-11",
+      "harness": "deepagents (GigaChat profile)",
+      "model": "GigaChat 2 Max (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 322,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 322.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 4,976 · Tokens (raw) 267,982,386*"
+    },
+    {
+      "id": "run-12",
+      "harness": "deepagents (GigaChat profile)",
+      "model": "GigaChat 3.5 (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 322,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 322.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,329 · Tokens (raw) 317,335,707*"
+    },
+    {
+      "id": "run-13",
+      "harness": "deepagents (GigaChat profile)",
+      "model": "GigaChat 3 Ultra (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 322,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 322.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 4,447 · Tokens (raw) 366,492,603*"
+    },
+    {
+      "id": "run-14",
+      "harness": "deepagents",
+      "model": "GigaChat 3 Ultra (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 304,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 1,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 305.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 10,351 · Tokens (raw) 841,669,092*"
+    },
+    {
+      "id": "run-15",
+      "harness": "deepagents",
+      "model": "GigaChat 2 Max (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 302,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 302.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 10,433 · Tokens (raw) 1,004,755,677*"
+    },
+    {
+      "id": "run-16",
+      "harness": "deepagents",
+      "model": "GigaChat 3.5 (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 299,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 299.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 11,130 · Tokens (raw) 718,324,734*"
+    },
+    {
+      "id": "run-17",
+      "harness": "pi-mono",
+      "model": "GigaChat 2 Max (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 298,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 298.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-18",
+      "harness": "pi-mono",
+      "model": "GigaChat 3 Ultra (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 295,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 295.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-19",
+      "harness": "pi-mono",
+      "model": "GigaChat 3.5 (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 294,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 294.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-20",
+      "harness": "deepagents",
+      "model": "GigaChat 2 Reasoning (PROM) (medium)",
+      "runs": 1,
+      "light": {
+        "passed": 272,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 1,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 273.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 10,702 · Tokens (raw) 453,994,698*"
+    },
+    {
+      "id": "run-21",
+      "harness": "mini-SWE-agent",
+      "model": "GigaChat 2 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 265,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 1,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 266.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 11,451 · Tokens (raw) 231,616,980"
+    },
+    {
+      "id": "run-22",
+      "harness": "mini-SWE-agent",
+      "model": "GigaChat 3 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 252,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 1,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 253.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 9,169 · Tokens (raw) 172,168,626"
+    },
+    {
+      "id": "run-23",
+      "harness": "deepagents (GigaChat profile)",
+      "model": "GigaChat 2 Reasoning (PROM) (medium)",
+      "runs": 1,
+      "light": {
+        "passed": 250,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 2,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 252.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 2/20 · Steps 5,595 · Tokens (raw) 138,611,193*"
+    },
+    {
+      "id": "run-24",
+      "harness": "maestro harness",
+      "model": "GigaChat 2 Reasoning (PROM) (medium)",
+      "runs": 1,
+      "light": {
+        "passed": 247,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 1,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 248.0,
+      "telemetry_note": "@mean1 · Long wave 0/20 · Reflection 1/20 · Steps 2,214 · Tokens 6,210,278"
+    },
+    {
+      "id": "run-25",
+      "harness": "deepagents (GigaChat profile)",
+      "model": "GigaChat 2 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 224,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 224.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,159 · Tokens (raw) 368,044,770*"
+    },
+    {
+      "id": "run-26",
+      "harness": "Hermes",
+      "model": "GigaChat 2 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 220,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 220.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-27",
+      "harness": "Hermes",
+      "model": "GigaChat 3 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 217,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 217.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-28",
+      "harness": "pi-mono",
+      "model": "GigaChat 3 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 216,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 216.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-29",
+      "harness": "mini-SWE-agent",
+      "model": "GigaChat 3.5 (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 212,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 212.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 3,744 · Tokens (raw) 54,768,767"
+    },
+    {
+      "id": "run-30",
+      "harness": "deepagents (GigaChat profile)",
+      "model": "GigaChat 3 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 212,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 212.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 6,289 · Tokens (raw) 486,699,543*"
+    },
+    {
+      "id": "run-31",
+      "harness": "mini-SWE-agent",
+      "model": "GigaChat 3 Ultra (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 206,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 1,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 207.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 4,820 · Tokens (raw) 124,288,018"
+    },
+    {
+      "id": "run-32",
+      "harness": "pi-mono",
+      "model": "GigaChat 2 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 205,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 205.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-33",
+      "harness": "mini-SWE-agent",
+      "model": "GigaChat 2 Max (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 198,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 198.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 4,932 · Tokens (raw) 107,919,373"
+    },
+    {
+      "id": "run-34",
+      "harness": "deepagents",
+      "model": "GigaChat 3 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 191,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 191.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,711 · Tokens (raw) 295,423,833*"
+    },
+    {
+      "id": "run-35",
+      "harness": "deepagents",
+      "model": "GigaChat 2 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 188,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 188.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,749 · Tokens (raw) 349,701,240*"
+    },
+    {
+      "id": "run-36",
+      "harness": "OpenCode",
+      "model": "GigaChat 3 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 174,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 174.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 3,071 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-37",
+      "harness": "pi-mono",
+      "model": "GigaChat 3 Lightning (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 171,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 171.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-38",
+      "harness": "OpenCode",
+      "model": "GigaChat 2 Pro (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 169,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 169.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 3,001 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-39",
+      "harness": "pi-mono",
+      "model": "GigaChat 2 (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 164,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 164.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-40",
+      "harness": "OpenHands",
+      "model": "GigaChat 2 Reasoning (PROM) (medium)",
+      "runs": 1,
+      "light": {
+        "passed": 160,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 160.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-41",
+      "harness": "OpenHands",
+      "model": "GigaChat 2 (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 159,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 159.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-42",
+      "harness": "Hermes",
+      "model": "GigaChat 2 Reasoning (PROM) (medium)",
+      "runs": 1,
+      "light": {
+        "passed": 159,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 159.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-43",
+      "harness": "Hermes",
+      "model": "GigaChat 3 Lightning (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 156,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 156.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-44",
+      "harness": "OpenHands",
+      "model": "GigaChat 3 Lightning (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 146,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 146.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-45",
+      "harness": "deepagents (GigaChat profile)",
+      "model": "GigaChat 2 (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 144,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 144.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 2,817 · Tokens (raw) 136,240,902*"
+    },
+    {
+      "id": "run-46",
+      "harness": "Hermes",
+      "model": "GigaChat 2 (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 141,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 141.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-47",
+      "harness": "OpenCode",
+      "model": "GigaChat 2 (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 139,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 139.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 8,575 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-48",
+      "harness": "deepagents (GigaChat profile)",
+      "model": "GigaChat 3 Lightning (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 134,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 134.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 3,545 · Tokens (raw) 148,656,135*"
+    },
+    {
+      "id": "run-49",
+      "harness": "OpenCode",
+      "model": "GigaChat 3 Lightning (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 134,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 134.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 10,580 · Tokens (raw) 0"
+    },
+    {
+      "id": "run-50",
+      "harness": "deepagents",
+      "model": "GigaChat 3 Lightning (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 113,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 113.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,330 · Tokens (raw) 326,514,969*"
+    },
+    {
+      "id": "run-51",
+      "harness": "deepagents",
+      "model": "GigaChat 2 (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 111,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 111.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,336 · Tokens (raw) 288,537,210*"
+    },
+    {
+      "id": "run-52",
+      "harness": "mini-SWE-agent",
+      "model": "GigaChat 2 (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 21,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 21.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 1,786 · Tokens (raw) 4,976,949"
+    },
+    {
+      "id": "run-53",
+      "harness": "mini-SWE-agent",
+      "model": "GigaChat 3 Lightning (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 9,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 9.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 2,042 · Tokens (raw) 4,511,527"
+    },
+    {
+      "id": "run-54",
+      "harness": "Hermes",
+      "model": "GigaChat 2 Max (PROM)",
+      "runs": 1,
+      "light": {
+        "passed": 0,
+        "total": 391
+      },
+      "medium_historical": {
+        "passed": 0,
+        "total": 40
+      },
+      "medium": null,
+      "source_version": "0.18.0",
+      "source_passed": 0.0,
+      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+    },
+    {
+      "id": "wave19-giga35",
+      "model": "GigaChat 3.5 (PROM), build 32.9.16.9 (default)",
+      "harness": "deepagents (no profile)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "source_passed": 292,
+      "source_sha256": "f463374d9ad89be0c19320b1a485b09bf6d4eaedcd93069e8c12ef7e7db330d2",
+      "measurement_date": "2026-10-19",
+      "reasoning_effort": "default",
+      "thinking_enabled": null,
+      "medium_historical": null,
+      "light": {
+        "passed": 292,
+        "total": 391,
+        "wilson95": [
+          0.7014434557165126,
+          0.7873603304321084
+        ]
+      },
+      "medium": {
+        "passed": 0,
+        "total": 80,
+        "wilson95": [
+          3.469446951953614e-18,
+          0.04581812953552469
+        ]
+      },
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning default · 471/471 tasks · infrastructure failures: 0"
+    },
+    {
+      "id": "wave19-haiku",
+      "model": "Claude Haiku 5.5 (OpenRouter) (default)",
+      "harness": "deepagents (no profile)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "source_passed": 427,
+      "source_sha256": "7e7b26736b67122f73a1a13e5786d51774d803731742cdb404832c4d220e1ae9",
+      "measurement_date": "2026-10-19",
+      "reasoning_effort": "default",
+      "thinking_enabled": null,
+      "medium_historical": null,
+      "light": {
+        "passed": 377,
+        "total": 391,
+        "wilson95": [
+          0.9408027893848103,
+          0.9785535545113007
+        ]
+      },
+      "medium": {
+        "passed": 50,
+        "total": 80,
+        "wilson95": [
+          0.515487254631433,
+          0.7230582129846858
+        ]
+      },
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning default · 471/471 tasks · infrastructure failures: 0"
+    },
+    {
+      "id": "wave19-glm53",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "harness": "deepagents (no profile)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "source_passed": 414,
+      "source_sha256": "69d10ca1ec4be03f1a21c55b51c2092616857411d8a11ebae571d6cd2021adc3",
+      "measurement_date": "2026-10-19",
+      "reasoning_effort": "high",
+      "thinking_enabled": true,
+      "medium_historical": null,
+      "light": {
+        "passed": 378,
+        "total": 391,
+        "wilson95": [
+          0.9439532048798743,
+          0.9804684632250306
+        ]
+      },
+      "medium": {
+        "passed": 36,
+        "total": 80,
+        "wilson95": [
+          0.3457768918471149,
+          0.5588049211064375
+        ]
+      },
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning high · 471/471 tasks · infrastructure failures: 0"
+    },
+    {
+      "id": "wave19-deepseek41flash",
+      "model": "DeepSeek V4.1 Flash (OpenRouter) (high)",
+      "harness": "deepagents (no profile)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "source_passed": 444,
+      "source_sha256": "e9ab6233d7549ef3fceadde6ce76ad281241c8abc833414ea5a70c361476e6a4",
+      "measurement_date": "2026-10-19",
+      "reasoning_effort": "high",
+      "thinking_enabled": true,
+      "medium_historical": null,
+      "light": {
+        "passed": 385,
+        "total": 391,
+        "wilson95": [
+          0.9669302938675344,
+          0.9929486436989285
+        ]
+      },
+      "medium": {
+        "passed": 59,
+        "total": 80,
+        "wilson95": [
+          0.6318104033557214,
+          0.8214259851149045
+        ]
+      },
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning high · 471/471 tasks · infrastructure failures: 0"
+    }
+  ]
+}

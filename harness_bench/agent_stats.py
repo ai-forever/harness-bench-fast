@@ -15,15 +15,19 @@ def _coerce_int(value: Any) -> int | None:
     return None
 
 
+def _first_int(usage: dict[str, Any], *keys: str) -> int | None:
+    # Zero is a measured count, not a reason to try a different provider alias.
+    return next(
+        (value for key in keys if (value := _coerce_int(usage.get(key))) is not None),
+        None,
+    )
+
+
 def _usage_token_counts(usage: Any) -> tuple[int | None, int | None, int | None]:
     if not isinstance(usage, dict):
         return None, None, None
 
-    input_tokens = (
-        _coerce_int(usage.get("input_tokens"))
-        or _coerce_int(usage.get("prompt_tokens"))
-        or _coerce_int(usage.get("prompt_eval_count"))
-    )
+    input_tokens = _first_int(usage, "input_tokens", "prompt_tokens", "prompt_eval_count")
     # Anthropic (Claude Code) bills cached context under separate cache fields;
     # `input_tokens` is only the fresh, non-cached delta. Fold the cache reads
     # and cache creation back in so token totals reflect the real context size.
@@ -32,15 +36,19 @@ def _usage_token_counts(usage: Any) -> tuple[int | None, int | None, int | None]
     )
     if cache_tokens:
         input_tokens = (input_tokens or 0) + cache_tokens
-    output_tokens = (
-        _coerce_int(usage.get("output_tokens"))
-        or _coerce_int(usage.get("completion_tokens"))
-        or _coerce_int(usage.get("eval_count"))
-    )
+    output_tokens = _first_int(usage, "output_tokens", "completion_tokens", "eval_count")
     total_tokens = _coerce_int(usage.get("total_tokens"))
     if total_tokens is None and (input_tokens is not None or output_tokens is not None):
         total_tokens = (input_tokens or 0) + (output_tokens or 0)
     return input_tokens, output_tokens, total_tokens
+
+
+def _first_usage(usages: list[Any]) -> Any:
+    """Select one representation of a response's usage, in precedence order."""
+    return next(
+        (usage for usage in usages if any(n is not None for n in _usage_token_counts(usage))),
+        None,
+    )
 
 
 def _add_usage_counts(stats: dict[str, int], usage: Any) -> None:
@@ -121,8 +129,8 @@ def agent_stats_from_result(invocation_result: Any) -> dict[str, int]:
                     shell_commands += 1
         elif role in ("ai", "assistant"):
             llm_calls += 1
-        for usage in _message_usage(message):
-            _add_usage_counts(stats, usage)
+        # Standardized usage_metadata is preferred to its provider-specific copies.
+        _add_usage_counts(stats, _first_usage(_message_usage(message)))
 
     stats["agent_events"] = events
     stats["agent_steps"] = steps
@@ -154,16 +162,24 @@ class AgentRunStatsCollector:
                 usages: list[Any] = []
                 llm_output = getattr(response, "llm_output", None)
                 if isinstance(llm_output, dict):
-                    _add_usage_counts(outer.stats, llm_output.get("token_usage"))
-                    _add_usage_counts(outer.stats, llm_output.get("usage"))
-                    usages += [llm_output.get("token_usage"), llm_output.get("usage")]
+                    usages = [
+                        llm_output.get(key) for key in ("token_usage", "usage", "usage_metadata")
+                    ]
+                aggregate = _first_usage(usages)
+                prompt_usages: list[Any] = []
                 for generations in getattr(response, "generations", []) or []:
+                    candidates: list[Any] = []
                     for generation in generations:
                         message = getattr(generation, "message", None)
                         if message is not None:
-                            for usage in _message_usage(message):
-                                _add_usage_counts(outer.stats, usage)
-                                usages.append(usage)
+                            candidates.extend(_message_usage(message))
+                    usages.extend(candidates)
+                    # Candidates for one prompt carry copies of response-level usage.
+                    # Different prompts/callbacks remain separate even with equal counts.
+                    prompt_usages.append(_first_usage(candidates))
+                # llm_output may aggregate several prompts: do not add message copies.
+                for usage in [aggregate] if aggregate is not None else prompt_usages:
+                    _add_usage_counts(outer.stats, usage)
                 outer._observe_call(usages)
 
         return _Handler()
