@@ -2,6 +2,31 @@
 
 [Live leaderboard and benchmark results](https://ai-forever.github.io/harness-bench-fast/)
 
+The leaderboard has two independent views: **harness_bench_fast light** (tasks
+1–391) and **harness_bench_fast medium** (tasks 392–471, 80 tasks in v0.19.0).
+Light covers everyday workflows; Medium covers long context, tool reflection
+and feasibility. These are disjoint subsets of the same task set, not new task
+definitions. The 78 published configurations (80 underlying runs) have been
+rescored from the frozen v0.18.0 wave aggregates: Light has full 391-task coverage;
+historical Medium covers only tasks 392–431 (40/80). The remaining 40 tasks are
+unmeasured in those runs and do not count as failures. Four new wave 19 measurements now cover all 80 Medium tasks and all 391 Light tasks; see the [new measurement protocols](docs/wave19-measurements.html). Original
+full-run scores, protocols and budgets remain in the [measurement archive](docs/archive.html).
+
+Select a suite for a new run, or split an existing result without model calls:
+
+```bash
+uv run python -m harness_bench run-openrouter --suite light --model YOUR_MODEL --json-output light.json
+uv run python -m harness_bench run-openrouter --suite medium --model YOUR_MODEL --json-output medium.json
+uv run python -m harness_bench.suite_reports results.json --output-dir derived
+```
+
+Medium includes wave 19 and requires the Linux/bwrap trusted-service path
+described below. Offline reports preserve source definitions and task records,
+recompute steps/tokens with coverage, keep attempts separate and withhold scores
+for incomplete or infrastructure-invalid suites. Wilson intervals in complete
+reports describe a Bernoulli task model, not repeat variability on the fixed suite.
+To rebuild the landing data: `python scripts/build_landing_data.py` (Python 3.12+).
+
 Current task set: **471 tasks, `task-set v0.19.0`**. Tasks 432–471 are **wave 19: feasibility** — 40 tasks in 20 matched pairs. Within 120 seconds, the agent must construct and submit a solution, execute a feasible search strategy, or prove that the formal conditions cannot be met. Format and protocol compliance are part of the score. This measures the complete agent configuration, not a separate ability to predict its own solving time. Individual task credit is the main metric; both halves must pass for additional pair credit. See [wave 19](docs/wave19-feasibility.md) for the contracts, runtime and validation limits.
 
 **Wave 19 requires Linux/bubblewrap and a trusted host service.** Use `run-cli --isolation bwrap` or `run-openrouter --isolation bwrap` (the isolated CLI worker). Native `run` / `run-pure`, native OpenRouter execution, RLI and Harbor export reject selections containing these tasks before model execution. To use those paths on earlier tasks, select `--from-task 1 --to-task 431`.

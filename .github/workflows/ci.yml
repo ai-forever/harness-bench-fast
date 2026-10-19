@@ -32,6 +32,11 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Install dependencies
         run: uv sync --dev
 
@@ -40,6 +45,9 @@ jobs:
 
       - name: Run tests
         run: uv run pytest
+
+      - name: Check leaderboard selection
+        run: node tests/test_leaderboard.cjs
 
       - name: Verify harness gold solutions
         run: uv run python .github/scripts/verify_gold_with_annotations.py

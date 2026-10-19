@@ -1,0 +1,124 @@
+{
+  "rows": [
+    {
+      "id": "wave19-giga35",
+      "model": "GigaChat 3.5 (PROM), build 32.9.16.9 (default)",
+      "harness": "deepagents (no profile)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "source_passed": 292,
+      "source_sha256": "f463374d9ad89be0c19320b1a485b09bf6d4eaedcd93069e8c12ef7e7db330d2",
+      "measurement_date": "2026-10-19",
+      "reasoning_effort": "default",
+      "thinking_enabled": null,
+      "medium_historical": null,
+      "light": {
+        "passed": 292,
+        "total": 391,
+        "wilson95": [
+          0.7014434557165126,
+          0.7873603304321084
+        ]
+      },
+      "medium": {
+        "passed": 0,
+        "total": 80,
+        "wilson95": [
+          3.469446951953614e-18,
+          0.04581812953552469
+        ]
+      },
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning default · 471/471 tasks · infrastructure failures: 0"
+    },
+    {
+      "id": "wave19-haiku",
+      "model": "Claude Haiku 5.5 (OpenRouter) (default)",
+      "harness": "deepagents (no profile)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "source_passed": 427,
+      "source_sha256": "7e7b26736b67122f73a1a13e5786d51774d803731742cdb404832c4d220e1ae9",
+      "measurement_date": "2026-10-19",
+      "reasoning_effort": "default",
+      "thinking_enabled": null,
+      "medium_historical": null,
+      "light": {
+        "passed": 377,
+        "total": 391,
+        "wilson95": [
+          0.9408027893848103,
+          0.9785535545113007
+        ]
+      },
+      "medium": {
+        "passed": 50,
+        "total": 80,
+        "wilson95": [
+          0.515487254631433,
+          0.7230582129846858
+        ]
+      },
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning default · 471/471 tasks · infrastructure failures: 0"
+    },
+    {
+      "id": "wave19-glm53",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "harness": "deepagents (no profile)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "source_passed": 414,
+      "source_sha256": "69d10ca1ec4be03f1a21c55b51c2092616857411d8a11ebae571d6cd2021adc3",
+      "measurement_date": "2026-10-19",
+      "reasoning_effort": "high",
+      "thinking_enabled": true,
+      "medium_historical": null,
+      "light": {
+        "passed": 378,
+        "total": 391,
+        "wilson95": [
+          0.9439532048798743,
+          0.9804684632250306
+        ]
+      },
+      "medium": {
+        "passed": 36,
+        "total": 80,
+        "wilson95": [
+          0.3457768918471149,
+          0.5588049211064375
+        ]
+      },
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning high · 471/471 tasks · infrastructure failures: 0"
+    },
+    {
+      "id": "wave19-deepseek41flash",
+      "model": "DeepSeek V4.1 Flash (OpenRouter) (high)",
+      "harness": "deepagents (no profile)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "source_passed": 444,
+      "source_sha256": "e9ab6233d7549ef3fceadde6ce76ad281241c8abc833414ea5a70c361476e6a4",
+      "measurement_date": "2026-10-19",
+      "reasoning_effort": "high",
+      "thinking_enabled": true,
+      "medium_historical": null,
+      "light": {
+        "passed": 385,
+        "total": 391,
+        "wilson95": [
+          0.9669302938675344,
+          0.9929486436989285
+        ]
+      },
+      "medium": {
+        "passed": 59,
+        "total": 80,
+        "wilson95": [
+          0.6318104033557214,
+          0.8214259851149045
+        ]
+      },
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning high · 471/471 tasks · infrastructure failures: 0"
+    }
+  ]
+}

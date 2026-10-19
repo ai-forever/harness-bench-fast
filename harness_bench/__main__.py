@@ -857,8 +857,9 @@ def build_parser() -> argparse.ArgumentParser:
             default="default",
             help=(
                 "Task suite when no --task is given: 'default' is the scored "
-                "task set (471 tasks, v0.19.0), 'long' is only the long-context "
-                "wave inside it (tasks 392-411), 'reflect' is the tool-reflection "
+                "task set (471 tasks, v0.19.0); 'light' selects tasks 1-391, "
+                "'medium' selects tasks 392-471; 'long' is the long-context "
+                "wave (tasks 392-411), 'reflect' is the tool-reflection "
                 "wave inside it (tasks 412-431), 'feasibility' is wave 19 (tasks 432-471)."
             ),
         )
