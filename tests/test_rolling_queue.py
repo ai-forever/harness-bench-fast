@@ -101,3 +101,20 @@ def test_stale_complete_checkpoint_is_not_accepted(monkeypatch, tmp_path):
     queue.reconcile(state, [{'name': 'harness', 'result': str(result), 'expected_attempts': 1}])
     assert state['runs']['harness']['status'] == 'failed'
     assert state['blocked']
+
+
+def test_live_controls_preserve_defaults_and_reject_invalid(tmp_path):
+    import importlib.util
+    import json
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location('queue_controls', Path(__file__).parents[1] / 'scripts/hbf_rolling_queue.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    defaults = {'capacity': 128, 'max_active': 3, 'per_harness_cap': 64}
+    path = tmp_path / 'controls.json'
+    path.write_text(json.dumps({'capacity': 192, 'max_active': 4}))
+    assert module.read_controls(path, defaults) == {'capacity': 192, 'max_active': 4, 'per_harness_cap': 64}
+    path.write_text('{"capacity": 0}')
+    import pytest
+    with pytest.raises(ValueError):
+        module.read_controls(path, defaults)

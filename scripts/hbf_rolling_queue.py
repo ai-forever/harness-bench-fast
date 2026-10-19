@@ -96,6 +96,20 @@ def reconcile(state, manifest):
     return changed
 
 
+def read_controls(path, defaults):
+    values = dict(defaults)
+    if path is not None and path.exists():
+        configured = json.loads(path.read_text())
+        if set(configured) - set(values):
+            raise ValueError('Unknown queue controls')
+        values.update(configured)
+    if any(type(v) is not int or v < 1 for v in values.values()):
+        raise ValueError('Queue controls must be positive integers')
+    if values['per_harness_cap'] > values['capacity']:
+        raise ValueError('Per-harness cap exceeds total capacity')
+    return values
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--manifest', type=Path, required=True)
@@ -107,6 +121,7 @@ def main():
     parser.add_argument('--max-active', type=int, default=3)
     parser.add_argument('--min-available-gib', type=float, default=8)
     parser.add_argument('--poll', type=float, default=5)
+    parser.add_argument('--controls', type=Path, help='Live capacity/max_active/per_harness_cap JSON')
     args = parser.parse_args()
     if min(args.capacity, args.min_slots, args.max_active) < 1 or args.tail < 0:
         parser.error('invalid capacity/tail settings')
@@ -140,7 +155,15 @@ def main():
                               'concurrency': int(concurrency), 'log_offset': int(offset), 'adopted': True}
     save(args.state, state)
     children = {}
+    controls = {'capacity': args.capacity, 'max_active': args.max_active, 'per_harness_cap': args.capacity}
     while True:
+        try:
+            updated = read_controls(args.controls, controls)
+            if updated != controls:
+                print(json.dumps({'event': 'controls', **updated}), flush=True)
+            controls = updated
+        except (OSError, ValueError, TypeError) as exc:
+            print(json.dumps({'event': 'invalid_controls', 'error': str(exc)}), flush=True)
         for name, proc in list(children.items()):
             if proc.poll() is not None:
                 state['runs'][name]['exit_code'] = proc.returncode
@@ -155,12 +178,12 @@ def main():
         reserved = sum(reservation(state['runs'][item['name']],
                        progress(item['log'], state['runs'][item['name']]['log_offset'], item['expected_attempts']),
                        item['expected_attempts'], args.tail) for item in active)
-        slots = args.capacity - reserved
+        slots = controls['capacity'] - reserved
         available = next(int(line.split()[1]) for line in Path('/proc/meminfo').read_text().splitlines()
                          if line.startswith('MemAvailable:')) / 1024**2
-        if pending and not state.get('blocked') and len(active) < args.max_active and slots >= args.min_slots and available >= args.min_available_gib:
+        if pending and not state.get('blocked') and len(active) < controls['max_active'] and slots >= args.min_slots and available >= args.min_available_gib:
             item = pending[0]
-            slots = min(slots, item.get('max_concurrency', args.capacity), item['expected_attempts'])
+            slots = min(slots, controls['per_harness_cap'], item.get('max_concurrency', controls['capacity']), item['expected_attempts'])
             Path(item['log']).parent.mkdir(parents=True, exist_ok=True)
             Path(item['result']).parent.mkdir(parents=True, exist_ok=True)
             with Path(item['log']).open('ab') as log:

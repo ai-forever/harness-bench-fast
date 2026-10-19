@@ -201,7 +201,23 @@ class Handler(BaseHTTPRequestHandler):
                     self.send_header('Content-Type', response.headers.get('content-type', 'application/json'))
                     self.end_headers()
                     self.started = True
+                    audit_buffer = b''
+                    reasoning_input = [hashlib.sha256(block['text'].encode()).hexdigest()
+                        for item in body.get('input', []) if isinstance(item, dict) and item.get('type') == 'reasoning'
+                        for block in item.get('content', []) if block.get('text')]
                     for chunk in response.iter_bytes():
+                        audit_buffer += chunk
+                        while b'\n' in audit_buffer:
+                            line, audit_buffer = audit_buffer.split(b'\n', 1)
+                            if line.startswith(b'data: ') and line[6:].strip() != b'[DONE]':
+                                event = json.loads(line[6:])
+                                if event.get('type') == 'response.completed':
+                                    hashes = []
+                                    for item in event.get('response', {}).get('output', []):
+                                        if item.get('type') == 'reasoning':
+                                            blocks = item.get('content') or item.get('summary') or []
+                                            hashes.extend(hashlib.sha256(x['text'].encode()).hexdigest() for x in blocks if x.get('text'))
+                                    print(json.dumps({'event': 'codex_reasoning_roundtrip', 'input': reasoning_input, 'output': hashes}), flush=True)
                         self.wfile.write(chunk)
                         self.wfile.flush()
                 return
