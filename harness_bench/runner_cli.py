@@ -32,6 +32,7 @@ import threading
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import ExitStack
 from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory, mkdtemp
@@ -1226,6 +1227,7 @@ def _run_cli_subprocess(
     cwd: Path,
     timeout: int,
     env: dict[str, str] | None,
+    capture_directory: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """Run the CLI command with a hard per-task process-tree timeout."""
     creationflags = 0
@@ -1235,39 +1237,48 @@ def _run_cli_subprocess(
     else:
         start_new_session = True
 
-    with bind_fds(argv) as (command, descriptors):
-        proc = subprocess.Popen(  # noqa: S603 — trusted local benchmark command
-            command,
-            cwd=cwd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            stdin=subprocess.DEVNULL,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            env=env,
-            creationflags=creationflags,
-            start_new_session=start_new_session,
-        **({"pass_fds": descriptors} if descriptors else {}),
-        )
-    _register_active_process(proc)
-    try:
-        stdout, stderr = proc.communicate(timeout=timeout)
-    except subprocess.TimeoutExpired as exc:
-        _terminate_process_tree(proc)
+    with ExitStack() as capture:
+        stdout_sink = stderr_sink = subprocess.PIPE
+        if capture_directory is not None:
+            stdout_sink = capture.enter_context((capture_directory / "stdout.log").open("wb"))
+            stderr_sink = capture.enter_context((capture_directory / "stderr.log").open("wb"))
+        with bind_fds(argv) as (command, descriptors):
+            proc = subprocess.Popen(  # noqa: S603 — trusted local benchmark command
+                command,
+                cwd=cwd,
+                stdout=stdout_sink,
+                stderr=stderr_sink,
+                stdin=subprocess.DEVNULL,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                env=env,
+                creationflags=creationflags,
+                start_new_session=start_new_session,
+            **({"pass_fds": descriptors} if descriptors else {}),
+            )
+        _register_active_process(proc)
         try:
-            stdout, stderr = proc.communicate(timeout=_PROCESS_TREE_SHUTDOWN_TIMEOUT)
-        except subprocess.TimeoutExpired:
-            _kill_process_tree(proc)
-            stdout, stderr = proc.communicate()
-        exc.output, exc.stderr = stdout, stderr
-        raise
-    except BaseException:
-        _terminate_process_tree(proc)
-        raise
-    finally:
-        _unregister_active_process(proc)
-    return subprocess.CompletedProcess(argv, proc.returncode, stdout, stderr)
+            stdout, stderr = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired as exc:
+            _terminate_process_tree(proc)
+            try:
+                stdout, stderr = proc.communicate(timeout=_PROCESS_TREE_SHUTDOWN_TIMEOUT)
+            except subprocess.TimeoutExpired:
+                _kill_process_tree(proc)
+                stdout, stderr = proc.communicate()
+            exc.output, exc.stderr = stdout, stderr
+            raise
+        except BaseException:
+            _terminate_process_tree(proc)
+            raise
+        finally:
+            _unregister_active_process(proc)
+        if capture_directory is not None:
+            from harness_bench.native_capture import diagnostic_tail, terminal_output
+            stdout = terminal_output(capture_directory / "stdout.log")
+            stderr = diagnostic_tail(capture_directory / "stderr.log")
+        return subprocess.CompletedProcess(argv, proc.returncode, stdout, stderr)
 
 
 def _cleanup_workspace_keepalive(
@@ -1629,7 +1640,8 @@ def run_task_cli(
                 env = {**(env or os.environ), "TMPDIR": str(scratch), "TMP": str(scratch), "TEMP": str(scratch)}
             phase = "cli"
             started = time.monotonic()
-            result = _run_cli_subprocess(argv, cwd=workspace, timeout=timeout, env=env)
+            result = _run_cli_subprocess(argv, cwd=workspace, timeout=timeout, env=env,
+                                         **({"capture_directory": execution} if extra_env and "HBF_WORKER_API_KEY" in extra_env else {}))
             agent_elapsed = time.monotonic() - started
             if trusted_session is not None:
                 trusted_session.freeze()
@@ -1717,7 +1729,9 @@ def run_task_cli(
             try:
                 record_execution(execution, stdout=result.stdout, stderr=result.stderr,
                     metadata={**entry, "task_id": task.id, "timeout": timeout, "runtime_paths": list(runtime_paths)},
-                    trace_roots=(workspace,), state_roots=(scratch, home))
+                    trace_roots=(workspace,), state_roots=(scratch, home),
+                    preserve_output_files=bool(extra_env and "HBF_WORKER_API_KEY" in extra_env
+                                               and (execution / "stdout.log").exists()))
             except OSError as exc:
                 entry["artifact_error"] = str(exc)
                 entry["primary_failure_kind"] = kind
