@@ -63,6 +63,7 @@ RUNNER_SRC = r'''#!/usr/bin/env python3
 stdin пуст). Если модуль не импортируется, все тесты считаются непройденными.
 """
 
+import builtins
 import contextlib
 import copy
 import io
@@ -138,15 +139,27 @@ def _call(func, args, use_alarm):
             signal.setitimer(signal.ITIMER_REAL, 0)
 
 
-def evaluate_source(source, filename="solution.py", use_alarm=False):
+def evaluate_source(source, filename="solution.py", use_alarm=False, capture_stdio=True):
     """Return {1: [bool]*10, 2: [...], 3: [...]} and an import error text (or None)."""
     results = {num: [False] * len(cases) for num, _name, cases in PROBLEMS}
     namespace = {"__name__": "solution", "__file__": filename}
     sink = io.StringIO()
+    if not capture_stdio:
+        # Generated fixtures use bare print/input. Keep their effects local when
+        # evaluating them in the benchmark's parallel setup threads.
+        def quiet_print(*args, **kwargs):
+            kwargs["file"] = sink
+            return builtins.print(*args, **kwargs)
+        def empty_input(prompt=""):
+            raise EOFError("EOF when reading a line")
+        namespace["__builtins__"] = dict(vars(builtins), print=quiet_print, input=empty_input)
     old_stdin = sys.stdin
-    sys.stdin = io.StringIO("")
+    if capture_stdio:
+        sys.stdin = io.StringIO("")
     try:
-        with contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
+        stdout_context = contextlib.redirect_stdout(sink) if capture_stdio else contextlib.nullcontext()
+        stderr_context = contextlib.redirect_stderr(sink) if capture_stdio else contextlib.nullcontext()
+        with stdout_context, stderr_context:
             try:
                 exec(compile(source, filename, "exec"), namespace)
             except BaseException as exc:  # noqa: BLE001 - any failure means "not imported"
@@ -173,7 +186,8 @@ def evaluate_source(source, filename="solution.py", use_alarm=False):
                         ok = False  # входной список изменён
                     results[num][idx] = ok
     finally:
-        sys.stdin = old_stdin
+        if capture_stdio:
+            sys.stdin = old_stdin
     return results, None
 
 
@@ -219,7 +233,7 @@ def _runner() -> dict:
 
 
 def evaluate(source: str) -> dict[int, list[bool]]:
-    results, _err = _runner()["evaluate_source"](source)
+    results, _err = _runner()["evaluate_source"](source, capture_stdio=False)
     return results
 
 

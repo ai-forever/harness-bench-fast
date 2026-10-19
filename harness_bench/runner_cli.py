@@ -1625,7 +1625,11 @@ def run_task_cli(
                         cli_stats=_strands_print_usage(result.stdout)[0])
             else:
                 phase = "verify"
-                outcome = task.verify(workspace)
+                if isolation == "bwrap":
+                    from harness_bench.verifier_process import verify_bwrap
+                    outcome = verify_bwrap(task.id, workspace)
+                else:
+                    outcome = task.verify(workspace)
                 message = outcome.message
                 if result.returncode:
                     message += f" | CLI exit={result.returncode}: {(result.stderr or result.stdout).strip()[-300:]!r}"
