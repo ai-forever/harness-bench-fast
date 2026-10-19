@@ -71,7 +71,7 @@ class DiskOutput(str):
         return obj
 
 
-def _compact_json_line(first, stream):
+def _compact_json_line(first, stream, *, multiline=False, limit=MAX_EVENT_BYTES):
     """Keep metric structure while bounding verbose JSON string values.
 
     This projection is used only by metric readers. The original bytes are
@@ -111,11 +111,11 @@ def _compact_json_line(first, stream):
                 quoted = True
             else:
                 output.append(byte)
-            if len(output) > MAX_EVENT_BYTES:
-                raise ValueError("CLI JSON metric structure exceeds 1 MiB; full output preserved on disk")
-        if chunk.endswith(b"\n"):
+            if len(output) > limit:
+                raise ValueError("CLI JSON metric structure exceeds bounded reader limit; full output preserved on disk")
+        if not multiline and chunk.endswith(b"\n"):
             break
-        chunk = stream.readline(CHUNK_BYTES)
+        chunk = stream.read(CHUNK_BYTES) if multiline else stream.readline(CHUNK_BYTES)
     return output.decode("utf-8", errors="replace")
 
 
@@ -133,3 +133,11 @@ def output_lines(output):
                         line = stream.readline(CHUNK_BYTES)
                 continue
             yield line.decode("utf-8", errors="replace").rstrip("\r\n")
+
+
+def metric_document(path: Path):
+    """Read JSON trajectory metadata without retaining unbounded text values."""
+    with path.open("rb") as stream:
+        projected = _compact_json_line(stream.read(CHUNK_BYTES), stream,
+                                      multiline=True, limit=8 * MAX_EVENT_BYTES)
+    return json.loads(projected)

@@ -129,3 +129,17 @@ def test_non_native_timeout_retains_bounded_diagnostics_and_full_files(tmp_path)
     assert 'timeout-marker' in exc.value.stdout
     assert len(exc.value.stdout) <= DIAGNOSTIC_BYTES
     assert (tmp_path/'stdout.log').stat().st_size > 8000000
+
+
+def test_pretty_trajectory_projection_preserves_usage(tmp_path):
+    from harness_bench.native_capture import metric_document
+    from harness_bench.runner_cli import _mini_swe_agent_traj_stats
+    path = tmp_path / 'mini-swe-agent.traj.json'
+    path.write_text(json.dumps({'info':{'model_stats':{'api_calls':2}},'messages':[
+        {'role':'assistant','content':'x'*8000000,'extra':{'actions':[{'command':'echo hi'}],
+         'response':{'usage':{'input_tokens':12,'output_tokens':34}}}}]},indent=2))
+    assert len(metric_document(path)['messages'][0]['content']) == 4096
+    stats = _mini_swe_agent_traj_stats(tmp_path)
+    assert stats['agent_total_tokens'] == 46
+    assert stats['agent_steps'] == 1
+    assert stats['agent_llm_calls'] == 2

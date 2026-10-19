@@ -41,7 +41,7 @@ from urllib.parse import quote, urlsplit
 from harness_bench.cli_artifacts import new_execution, record_execution
 from harness_bench.cli_isolation import bind_fds, sandbox_argv, validate_trusted_runtime_paths
 from harness_bench.core import Task, effective_task_timeout
-from harness_bench.native_capture import DiskOutput, output_lines
+from harness_bench.native_capture import DiskOutput, output_lines, metric_document
 from harness_bench.runner import (
     TaskRun,
     _add_usage_counts,
@@ -459,7 +459,7 @@ def _grok_session_tool_stats(
         return 0, 0
 
     try:
-        payloads = _iter_json_payloads(updates_path.read_text(encoding="utf-8"))
+        payloads = _iter_json_payloads(DiskOutput(updates_path))
     except OSError:
         return 0, 0
 
@@ -862,7 +862,7 @@ def _mini_swe_agent_traj_stats(workspace: Path | None) -> dict[str, int] | None:
         if not path.exists():
             continue
         try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload = metric_document(path)
         except (OSError, json.JSONDecodeError):
             return None
         break
@@ -933,7 +933,7 @@ def _ouroboros_result_stats(workspace: Path | None) -> dict[str, int] | None:
     if not path.is_file():
         return None
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = metric_document(path)
     except (OSError, json.JSONDecodeError):
         return None
     if not isinstance(payload, dict):
@@ -1018,7 +1018,7 @@ def _pi_session_stats(workspace: Path | None) -> dict[str, int] | None:
 
     for path in candidates:
         try:
-            payloads = _iter_json_payloads(path.read_text(encoding="utf-8"))
+            payloads = _iter_json_payloads(DiskOutput(path))
         except OSError:
             continue
         for payload in payloads:
