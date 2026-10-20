@@ -74,7 +74,7 @@ def result_mtime(path):
         return None
 
 
-def reconcile(state, manifest):
+def reconcile(state, manifest, *, continue_on_failure=False):
     """Reattach live processes; ambiguous launches and bad exits fail closed."""
     changed = False
     for item in manifest:
@@ -91,7 +91,9 @@ def reconcile(state, manifest):
                  result_mtime(item['result']) != run['result_mtime_ns'])
         run['status'] = 'complete' if fresh and checkpoint_complete(item['result'], item['expected_attempts']) else 'failed'
         if run['status'] == 'failed':
-            state['blocked'] = f"{item['name']} exited with incomplete/infrastructure results"
+            run['error'] = f"{item['name']} exited with incomplete/infrastructure results"
+            if not continue_on_failure:
+                state['blocked'] = run['error']
         changed = True
     return changed
 
@@ -122,6 +124,8 @@ def main():
     parser.add_argument('--min-available-gib', type=float, default=8)
     parser.add_argument('--poll', type=float, default=5)
     parser.add_argument('--controls', type=Path, help='Live capacity/max_active/per_harness_cap JSON')
+    parser.add_argument('--continue-on-run-failure', action='store_true',
+                        help='Retain failed runs for repair but allow other harnesses to proceed')
     args = parser.parse_args()
     if min(args.capacity, args.min_slots, args.max_active) < 1 or args.tail < 0:
         parser.error('invalid capacity/tail settings')
@@ -168,13 +172,14 @@ def main():
             if proc.poll() is not None:
                 state['runs'][name]['exit_code'] = proc.returncode
                 del children[name]
-        reconcile(state, manifest)
+        reconcile(state, manifest, continue_on_failure=args.continue_on_run_failure)
         save(args.state, state)
         active = [item for item in manifest if state['runs'].get(item['name'], {}).get('status') == 'running']
         pending = [item for item in manifest if item['name'] not in state['runs']]
         if not active and (not pending or state.get('blocked')):
-            print(json.dumps({'event': 'finished', 'blocked': state.get('blocked')}), flush=True)
-            return 1 if state.get('blocked') else 0
+            failed = [name for name, run in state['runs'].items() if run['status'] == 'failed']
+            print(json.dumps({'event': 'finished', 'blocked': state.get('blocked'), 'failed': failed}), flush=True)
+            return 1 if state.get('blocked') or failed else 0
         reserved = sum(reservation(state['runs'][item['name']],
                        progress(item['log'], state['runs'][item['name']]['log_offset'], item['expected_attempts']),
                        item['expected_attempts'], args.tail) for item in active)

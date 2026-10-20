@@ -1486,6 +1486,11 @@ def _infrastructure_error(result: subprocess.CompletedProcess[str]) -> str | Non
     if result.returncode == 0:
         return None
     stderr = result.stderr or ""
+    if result.returncode == -9 or (
+        result.returncode == 137
+        and re.search(r"(?m)^HBF_CLI_PROCESS_SIGNAL:9$", stderr)
+    ):
+        return "CLI process killed by SIGKILL"
     startup = re.search(
         r"(?:^|\n)(?:head: cannot open '[^'\n]*/mini' for reading: No such file or directory"
         r"|Error: Unknown provider [^\n]+|[^\n]*: /dev/null: No such file or directory"
@@ -1670,7 +1675,8 @@ def run_task_cli(
                     workspace=workspace if keep_workspace else None, stats_workspace=workspace)
             elif error:
                 kind = "infrastructure"
-                retryable = bool(_TRANSIENT_ERROR_PATTERN.search(error))
+                retryable = (error == "CLI process killed by SIGKILL"
+                             or bool(_TRANSIENT_ERROR_PATTERN.search(error)))
                 if is_strands:
                     run = _task_run_with_cli_stats(task_id=task.id, passed=False, message=error,
                         elapsed_seconds=time.monotonic()-started, result=result, error=error,

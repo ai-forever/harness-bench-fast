@@ -65,6 +65,48 @@ def test_ambiguous_launch_blocks_new_work():
     assert 'Ambiguous' in state['blocked']
 
 
+def test_opt_in_failure_is_retained_without_blocking_successors(monkeypatch, tmp_path):
+    state = {'runs': {'failed': {'status': 'running', 'pid': 100, 'start_ticks': '123'}}}
+    monkeypatch.setattr(queue, 'pid_identity', lambda pid: None)
+    queue.reconcile(state, [{'name': 'failed', 'result': str(tmp_path/'missing'),
+                             'expected_attempts': 3}], continue_on_failure=True)
+    assert state['runs']['failed']['status'] == 'failed'
+    assert state['runs']['failed']['error']
+    assert not state.get('blocked')
+
+
+def test_continue_mode_still_blocks_ambiguous_launch():
+    state = {'runs': {'unknown': {'status': 'launching'}}}
+    queue.reconcile(state, [{'name': 'unknown'}], continue_on_failure=True)
+    assert 'Ambiguous' in state['blocked']
+
+
+def test_failed_job_does_not_prevent_next_job(tmp_path):
+    import subprocess
+    import sys
+    import pytest
+    if sys.platform != 'linux':
+        pytest.skip('queue uses Linux /proc')
+    manifest = []
+    for name in ('broken', 'next'):
+        result = tmp_path / (name + '.json')
+        code = ('raise SystemExit(2)' if name == 'broken' else
+                f'import json; open({str(result)!r}, "w").write(json.dumps({{"tasks": '
+                '[{"task_id":"smoke", "attempt":1, "passed":True, "error":None}]}))')
+        manifest.append({'name':name, 'expected_attempts':1, 'command':[sys.executable,'-c',code],
+                         'result':str(result), 'log':str(tmp_path/(name+'.log'))})
+    path = tmp_path/'manifest.json'; path.write_text(json.dumps(manifest))
+    state = tmp_path/'state.json'
+    result = subprocess.run([sys.executable, queue.__file__, '--manifest', str(path),
+                             '--state', str(state), '--capacity','1', '--min-slots','1',
+                             '--max-active','1', '--min-available-gib','0', '--poll','.01',
+                             '--continue-on-run-failure'], capture_output=True, timeout=10)
+    assert result.returncode == 1  # The first failure remains visible.
+    runs = json.loads(state.read_text())['runs']
+    assert runs['broken']['status'] == 'failed'
+    assert runs['next']['status'] == 'complete'
+
+
 def test_atomic_state_save(tmp_path):
     path = tmp_path / 'state.json'
     queue.save(path, {'runs': {}})
