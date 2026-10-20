@@ -3,12 +3,12 @@
   "light_tasks": 391,
   "medium_tasks": 80,
   "provenance": {
-    "method": "Historical rescores, four complete v0.19.0 runs and sixteen new wave19 harness configurations; composites and the operator-requested invalid Secret 700b snapshot explicitly labeled",
+    "method": "Historical rescores, four complete v0.19.0 runs and sixteen new wave19 harness configurations; composites explicitly labeled; Secret 700b accepted by the operator",
     "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
     "wave_results_sha256": "6dd03c599564c086bb8c0bf3f9c4a90c3edf27d9b4b7bb746bc5004e59f25683",
-    "secret_700b_sha256": "0d9336817c30ba911489fb4edcfe7faf164ed3bc969f5168778437996f89f30f",
+    "secret_700b_sha256": "91655e19442a20793283f5bc466284306e2fe5ed575c6291b92eefaf4c5db4d3",
     "archive_sha256": "448eb41a006bca486a21328f7e1799d1c1b7a05e52ee91a11f40fe9de0a8711f",
-    "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Secret 700b uses observed counts from an infrastructure-invalid run, not a validated quality score. Wilson intervals do not estimate repeat variability."
+    "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability."
   },
   "rows": [
     {
@@ -2024,10 +2024,9 @@
       "harness": "deepagents",
       "model": "Secret 700b",
       "runs": 1,
-      "measurement_type": "stopped_invalid",
-      "measurement_valid": false,
-      "status_label": "API errors · unvalidated",
-      "score_basis": "observed pass counts",
+      "measurement_type": "operator_accepted",
+      "measurement_valid": true,
+      "validation_basis": "operator_acceptance",
       "source_version": "0.19.0",
       "source_passed": 377,
       "medium_historical": null,

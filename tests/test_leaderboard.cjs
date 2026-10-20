@@ -41,7 +41,7 @@ assert.ok(landing.includes('id="wave19-results"'));
 const secret = selectResults(data, "light", "current", "Secret 700b");
 assert.equal(secret.length, 1);
 assert.equal(secret[0].result.passed, 370);
-assert.equal(secret[0].measurement_valid, false);
+assert.equal(secret[0].measurement_valid, true);
 assert.equal(secret[0].result.wilson95, undefined);
 assert.equal(selectResults(data, "medium", "current", "Secret 700b")[0].result.passed, 7);
 assert.equal(selectResults(data, "medium", "wave19", "Secret 700b")[0].result.passed, 0);
@@ -50,3 +50,6 @@ assert.ok(!landing.includes('class="run-snapshot"'));
 assert.ok(!landing.includes('Secret 700b · stopped run'));
 assert.equal(secret[0].details_url, "secret-700b.html");
 assert.ok(fs.existsSync(require("node:path").join(__dirname, "../docs/secret-700b.html")));
+
+assert.equal(secret[0].validation_basis, "operator_acceptance");
+assert.ok(!landing.includes("unvalidated"));

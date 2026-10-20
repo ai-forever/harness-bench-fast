@@ -162,12 +162,13 @@ def test_published_landing_scores_preserve_all_source_totals_and_missing_wave19(
     assert len(historical) == 78 and len(full) == 4
     assert len(new_only) == 13 and len(composites) == 3
     assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 97
-    invalid = [row for row in data["rows"] if row.get("measurement_valid") is False]
-    assert len(invalid) == 1 and invalid[0]["id"] == "secret-700b-v019"
-    assert invalid[0]["measurement_type"] == "stopped_invalid"
-    assert invalid[0]["light"] == {"passed": 370, "total": 391}
-    assert invalid[0]["medium"] == {"passed": 7, "total": 80}
-    assert invalid[0]["source_passed"] == 377
+    accepted = [row for row in data["rows"] if row.get("validation_basis") == "operator_acceptance"]
+    assert len(accepted) == 1 and accepted[0]["id"] == "secret-700b-v019"
+    assert accepted[0]["measurement_valid"] is True
+    assert accepted[0]["measurement_type"] == "operator_accepted"
+    assert accepted[0]["light"] == {"passed": 370, "total": 391}
+    assert accepted[0]["medium"] == {"passed": 7, "total": 80}
+    assert accepted[0]["source_passed"] == 377
     assert sum(row["runs"] for row in historical) == 80
     for row in full:
         assert row["light"]["total"] == 391 and row["medium"]["total"] == 80

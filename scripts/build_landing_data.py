@@ -110,7 +110,8 @@ def build():
             by_id[row["id"]] = row
     secret_path = ROOT / "docs/secret-700b-v019.json"
     secret = json.loads(secret_path.read_text(encoding="utf-8"))
-    assert secret["ranked"] is True and secret["measurement_valid"] is False
+    assert secret["ranked"] is True and secret["measurement_valid"] is True
+    assert secret["validation_basis"] == "operator_acceptance"
     assert secret["recorded_tasks"] == secret["total_tasks"] == 471
     passed_numbers = secret["passed_task_numbers"]
     assert len(set(passed_numbers)) == len(passed_numbers) == secret["passed_tasks"]
@@ -125,21 +126,21 @@ def build():
         subsets[name] = {"passed": count["passed"], "total": count["total"]}
     rows.append({
         "id": "secret-700b-v019", "harness": secret["harness"], "model": secret["model"],
-        "runs": 1, "measurement_type": "stopped_invalid", "measurement_valid": False,
-        "status_label": "API errors · unvalidated", "score_basis": "observed pass counts",
+        "runs": 1, "measurement_type": "operator_accepted", "measurement_valid": True,
+        "validation_basis": secret["validation_basis"],
         "source_version": secret["task_set_version"], "source_passed": secret["passed_tasks"],
         "medium_historical": None, "details_url": "secret-700b.html", **subsets,
     })
     return {
         "task_set_version": "0.19.0", "light_tasks": 391, "medium_tasks": 80,
         "provenance": {
-            "method": "Historical rescores, four complete v0.19.0 runs and sixteen new wave19 harness configurations; composites and the operator-requested invalid Secret 700b snapshot explicitly labeled",
+            "method": "Historical rescores, four complete v0.19.0 runs and sixteen new wave19 harness configurations; composites explicitly labeled; Secret 700b accepted by the operator",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
             # Hash canonical UTF-8/LF text, independent of Git checkout CRLF.
             "wave_results_sha256": hashlib.sha256(waves.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "secret_700b_sha256": hashlib.sha256(secret_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "archive_sha256": hashlib.sha256(archive.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
-            "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Secret 700b uses observed counts from an infrastructure-invalid run, not a validated quality score. Wilson intervals do not estimate repeat variability.",
+            "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability.",
         },
         "rows": rows,
     }

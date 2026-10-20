@@ -51,13 +51,6 @@ if (typeof document !== "undefined") {
         harness.textContent = row.harness + " · " + (compositeView ? "historical + wave 19" : row.runs + (row.runs === 1 ? " run" : " runs")) +
           (suite === "medium" && scope === "wave19" ? " · wave 19 only" : "");
         who.append(link, harness);
-        if (row.measurement_valid === false) {
-          tr.className = "invalid-measurement";
-          const status = document.createElement("span");
-          status.className = "measurement-status";
-          status.textContent = row.status_label;
-          who.append(status);
-        }
         const passed = document.createElement("td");
         passed.className = "numeric";
         passed.textContent = formatPassed(row.result.passed) + "/" + row.result.total;
@@ -81,12 +74,6 @@ if (typeof document !== "undefined") {
         fill.style.width = percent + "%";
         bar.append(fill);
         score.append(scoreLabel, bar);
-        if (row.measurement_valid === false) {
-          const basis = document.createElement("span");
-          basis.className = "average-label";
-          basis.textContent = "observed";
-          score.append(basis);
-        }
         tr.append(rank, who, passed, score);
         target.append(tr);
       });
