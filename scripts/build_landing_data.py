@@ -159,15 +159,34 @@ def build():
         "wave19": metric(sum(number >= 432 for number in passed_numbers), 40),
         "details_url": "sonnet55-medium.html",
     })
+    astra_path = ROOT / "docs/astra-medium.json"
+    astra = json.loads(astra_path.read_text(encoding="utf-8"))
+    assert astra["measurement_valid"] is True and astra["infrastructure_failures"] == 0
+    assert astra["task_set_version"] == "0.19.0" and astra["total"] == 80
+    assert astra["reasoning_effort"] == "medium"
+    passed_numbers = astra["passed_task_numbers"]
+    assert len(set(passed_numbers)) == len(passed_numbers) == astra["passed"]
+    assert all(392 <= number <= 471 for number in passed_numbers)
+    rows.append({
+        "id": "astra-pi-medium", "harness": astra["harness"], "model": astra["model"],
+        "runs": 1, "measurement_type": "medium_run", "measurement_valid": True,
+        "source_version": astra["task_set_version"], "source_passed": astra["passed"],
+        "source_sha256": astra["source_sha256"], "reasoning_effort": astra["reasoning_effort"],
+        "measurement_date": astra["measurement_date"], "light": None, "medium_historical": None,
+        "medium": metric(astra["passed"], 80),
+        "wave19": metric(sum(number >= 432 for number in passed_numbers), 40),
+        "details_url": "astra-medium.html",
+    })
     return {
         "task_set_version": "0.19.0", "light_tasks": 391, "medium_tasks": 80,
         "provenance": {
-            "method": "Historical rescores, four complete v0.19.0 runs, sixteen new wave19 harness configurations and a fresh Sonnet Medium run; composites explicitly labeled; secret sft accepted by the operator",
+            "method": "Historical rescores, four complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft accepted by the operator",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
             # Hash canonical UTF-8/LF text, independent of Git checkout CRLF.
             "wave_results_sha256": hashlib.sha256(waves.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "secret_700b_sha256": hashlib.sha256(secret_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "sonnet55_medium_sha256": hashlib.sha256(sonnet_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
+            "astra_medium_sha256": hashlib.sha256(astra_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "archive_sha256": hashlib.sha256(archive.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability.",
         },
