@@ -44,9 +44,9 @@ Current task set: **471 tasks, `task-set v0.19.0`**. Tasks 432–471 are **wave 
 
 No full-suite (471-task) model results on v0.19.0 have been recorded yet. Wave 19 calibration used an earlier frozen protocol; it does not measure the current host-service implementation or updated prompts. The tables below describe historical task sets; their denominators and scores are unchanged.
 
-## Secret 700b (2026-10-19/20)
+## secret sft (2026-10-19/20)
 
-[Secret 700b in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#secret-700b):
+[secret sft in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#secret-700b):
 **377/471 (80.0%)**, one run with deepagents and no profile.
 Light **370/391 (94.6%)**; Medium **7/80 (8.8%)** — long context 0/20,
 tool reflection 7/20, wave 19 feasibility 0/40. Task 405 was stopped by

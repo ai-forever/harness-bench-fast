@@ -134,7 +134,7 @@ def build():
     return {
         "task_set_version": "0.19.0", "light_tasks": 391, "medium_tasks": 80,
         "provenance": {
-            "method": "Historical rescores, four complete v0.19.0 runs and sixteen new wave19 harness configurations; composites explicitly labeled; Secret 700b accepted by the operator",
+            "method": "Historical rescores, four complete v0.19.0 runs and sixteen new wave19 harness configurations; composites explicitly labeled; secret sft accepted by the operator",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
             # Hash canonical UTF-8/LF text, independent of Git checkout CRLF.
             "wave_results_sha256": hashlib.sha256(waves.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
