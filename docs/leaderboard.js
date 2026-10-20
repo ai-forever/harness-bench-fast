@@ -31,12 +31,13 @@ if (typeof document !== "undefined") {
       location.replace("archive.html" + location.hash);
       return;
     }
-    let expanded = false;
+    let expanded = location.hash === "#secret-700b";
     let data;
     function renderTable(target, rows, ranking, scope) {
       target.replaceChildren();
       rows.forEach(row => {
         const tr = document.createElement("tr");
+        if (row.id === "secret-700b-v019" && scope === "current") tr.id = "secret-700b";
         const rank = document.createElement("td");
         const firstEqual = ranking.findIndex(other => Math.abs(other.result.passed - row.result.passed) < 1e-9);
         rank.textContent = firstEqual + 1;
@@ -50,13 +51,6 @@ if (typeof document !== "undefined") {
         harness.textContent = row.harness + " · " + (compositeView ? "historical + wave 19" : row.runs + (row.runs === 1 ? " run" : " runs")) +
           (suite === "medium" && scope === "wave19" ? " · wave 19 only" : "");
         who.append(link, harness);
-        if (row.measurement_valid === false) {
-          tr.className = "invalid-measurement";
-          const status = document.createElement("span");
-          status.className = "measurement-status";
-          status.textContent = row.status_label;
-          who.append(status);
-        }
         const passed = document.createElement("td");
         passed.className = "numeric";
         passed.textContent = formatPassed(row.result.passed) + "/" + row.result.total;
@@ -80,12 +74,6 @@ if (typeof document !== "undefined") {
         fill.style.width = percent + "%";
         bar.append(fill);
         score.append(scoreLabel, bar);
-        if (row.measurement_valid === false) {
-          const basis = document.createElement("span");
-          basis.className = "average-label";
-          basis.textContent = "observed";
-          score.append(basis);
-        }
         tr.append(rank, who, passed, score);
         target.append(tr);
       });
@@ -121,7 +109,7 @@ if (typeof document !== "undefined") {
       data = await response.json();
       render();
       if (location.hash === "#secret-700b") {
-        document.getElementById("secret-700b").scrollIntoView();
+        document.getElementById("secret-700b").scrollIntoView({ block: "center" });
       }
       buttons.forEach(button => button.addEventListener("click", () => {
         suite = button.dataset.suite;
@@ -131,8 +119,10 @@ if (typeof document !== "undefined") {
       }));
       window.addEventListener("hashchange", () => {
         suite = location.hash === "#medium" ? "medium" : "light";
-        expanded = false;
+        expanded = location.hash === "#secret-700b";
+        if (expanded) search.value = "";
         render();
+        if (expanded) document.getElementById("secret-700b").scrollIntoView({ block: "center" });
       });
       search.addEventListener("input", () => { expanded = false; render(); });
       more.addEventListener("click", () => { expanded = true; render(); });

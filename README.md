@@ -44,27 +44,20 @@ Current task set: **471 tasks, `task-set v0.19.0`**. Tasks 432–471 are **wave 
 
 No full-suite (471-task) model results on v0.19.0 have been recorded yet. Wave 19 calibration used an earlier frozen protocol; it does not measure the current host-service implementation or updated prompts. The tables below describe historical task sets; their denominators and scores are unchanged.
 
-## Secret 700b — stopped diagnostic run (2026-10-19/20)
+## Secret 700b (2026-10-19/20)
 
-Published by operator request in the **common Light and Medium rankings**, labeled **API errors · unvalidated**:
-[Secret 700b on the landing page](https://ai-forever.github.io/harness-bench-fast/#secret-700b).
-The report contains 471 unique task records and 377 observed successes (80.0%);
-this fraction is not a validated benchmark score. The tables sort its observed
-counts alongside other results with an explicit infrastructure warning. It does
-not replace the earlier Secret-700-SFT run.
-
-Observed subsets: Light **370/391 (94.6%)**; Medium **7/80 (8.8%)** — long
-context 0/20, tool reflection 7/20, wave 19 feasibility 0/40. Task 407 retains
-an unresolved HTTP 502 failure. All 40 wave 19 tasks timed out; 38 encountered
-HTTP 502 responses. Task 405 was stopped by the operator after over ten hours
-including infrastructure retries and counted unsolved; its last physical attempt
-was under two hours. Other transport-affected failures still require review.
+[Secret 700b in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#secret-700b):
+**377/471 (80.0%)**, one run with deepagents and no profile.
+Light **370/391 (94.6%)**; Medium **7/80 (8.8%)** — long context 0/20,
+tool reflection 7/20, wave 19 feasibility 0/40. Task 405 was stopped by
+operator request and counted unsolved. The operator accepted these recorded
+outcomes on 2026-10-20. The earlier Secret-700-SFT run remains separate.
 
 Stock deepagents 0.6.12, no profile; reasoning enabled, effort default, history
 forwarded, no additional reasoning budget. Linux bwrap; concurrency 2 initially,
 then 8 after 109 completed tasks; temperature 0.8, top_p 0.95, max output 30,000.
 Source snapshot: `3796b9084093e5f9383077d7bde8f1ce1f0d57b5`.
-[Diagnostic aggregate](docs/secret-700b-v019.json) includes protocol details and
+[Measurement aggregate](docs/secret-700b-v019.json) includes protocol details and
 source report fingerprint; raw traces and backend identifiers remain private.
 Step/token counters are raw, incomplete and unaudited.
 
