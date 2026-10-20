@@ -2,7 +2,6 @@
 """Follow present and future harness logs into one bounded-memory stream."""
 
 import argparse
-import fcntl
 import json
 import os
 import time
@@ -97,6 +96,9 @@ class Follower:
 
 
 def main():
+    # The POSIX CLI lock is not needed by the portable log reader.
+    import fcntl
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--directory", type=Path, required=True)
     args = parser.parse_args()
