@@ -31,12 +31,13 @@ if (typeof document !== "undefined") {
       location.replace("archive.html" + location.hash);
       return;
     }
-    let expanded = false;
+    let expanded = location.hash === "#secret-700b";
     let data;
     function renderTable(target, rows, ranking, scope) {
       target.replaceChildren();
       rows.forEach(row => {
         const tr = document.createElement("tr");
+        if (row.id === "secret-700b-v019" && scope === "current") tr.id = "secret-700b";
         const rank = document.createElement("td");
         const firstEqual = ranking.findIndex(other => Math.abs(other.result.passed - row.result.passed) < 1e-9);
         rank.textContent = firstEqual + 1;
@@ -121,7 +122,7 @@ if (typeof document !== "undefined") {
       data = await response.json();
       render();
       if (location.hash === "#secret-700b") {
-        document.getElementById("secret-700b").scrollIntoView();
+        document.getElementById("secret-700b").scrollIntoView({ block: "center" });
       }
       buttons.forEach(button => button.addEventListener("click", () => {
         suite = button.dataset.suite;
@@ -131,8 +132,10 @@ if (typeof document !== "undefined") {
       }));
       window.addEventListener("hashchange", () => {
         suite = location.hash === "#medium" ? "medium" : "light";
-        expanded = false;
+        expanded = location.hash === "#secret-700b";
+        if (expanded) search.value = "";
         render();
+        if (expanded) document.getElementById("secret-700b").scrollIntoView({ block: "center" });
       });
       search.addEventListener("input", () => { expanded = false; render(); });
       more.addEventListener("click", () => { expanded = true; render(); });

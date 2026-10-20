@@ -128,7 +128,7 @@ def build():
         "runs": 1, "measurement_type": "stopped_invalid", "measurement_valid": False,
         "status_label": "API errors · unvalidated", "score_basis": "observed pass counts",
         "source_version": secret["task_set_version"], "source_passed": secret["passed_tasks"],
-        "medium_historical": None, "details_url": "#secret-700b", **subsets,
+        "medium_historical": None, "details_url": "secret-700b.html", **subsets,
     })
     return {
         "task_set_version": "0.19.0", "light_tasks": 391, "medium_tasks": 80,
