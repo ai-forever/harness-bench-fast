@@ -61,6 +61,24 @@ Source snapshot: `3796b9084093e5f9383077d7bde8f1ce1f0d57b5`.
 source report fingerprint; raw traces and backend identifiers remain private.
 Step/token counters are raw, incomplete and unaudited.
 
+## secret sft · mini-SWE-agent (2026-10-20)
+
+[mini-SWE-agent in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#secret-sft-mini):
+**379/471 (80.5%)**, 95% Wilson interval 76.6–83.8%. Light **371/391 (94.9%)**;
+Medium **8/80 (10.0%)** — long context 0/20, tool reflection 8/20, wave 19 0/40.
+All 471 tasks completed; automated validation passed with zero unresolved
+infrastructure failures. Attempts affected by HTTP 502 were rerun; context
+overflows and timeouts count as failures.
+
+mini-SWE-agent 2.4.6 / LiteLLM 1.102.1; stock HBF CLI adapter, Linux bwrap,
+8 workers; reasoning enabled, effort default, history forwarded, max output
+30,000. Temperature and top_p omitted (native/server defaults), unlike the
+explicit 0.8/0.95 in the deepagents run. No additional reasoning, step or cost
+limit. Same frozen source and task timeouts as the run above.
+[Protocol](docs/secret-sft-mini.html) · [Measurement data](docs/secret-sft-mini-v019.json).
+Raw counters: 3,502 steps and 216,628,592 tokens, both covering 401/471 tasks;
+these are incomplete and not audited API spend.
+
 ## Earlier results (task-set v0.18.0, 431 tasks)
 
 ### Secret-700-SFT (2026-10-16/17)

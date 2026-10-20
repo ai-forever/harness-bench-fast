@@ -177,14 +177,41 @@ def build():
         "wave19": metric(sum(number >= 432 for number in passed_numbers), 40),
         "details_url": "astra-medium.html",
     })
+    mini_path = ROOT / "docs/secret-sft-mini-v019.json"
+    mini = json.loads(mini_path.read_text(encoding="utf-8"))
+    assert mini["measurement_valid"] is True and mini["infrastructure_failures"] == 0
+    assert mini["validation"]["valid"] is True and mini["validation"]["errors"] == []
+    assert mini["task_set_version"] == "0.19.0"
+    assert mini["recorded_tasks"] == mini["total_tasks"] == 471
+    passed_numbers = mini["passed_task_numbers"]
+    assert len(set(passed_numbers)) == len(passed_numbers) == mini["passed_tasks"]
+    assert all(1 <= number <= 471 for number in passed_numbers)
+    subsets = {}
+    for name, source, start, end in (
+        ("light", "light", 1, 391), ("medium", "medium", 392, 471),
+        ("wave19", "wave19_feasibility", 432, 471),
+    ):
+        count = mini["counts"][source]
+        assert count["total"] == end - start + 1
+        assert count["passed"] == sum(start <= number <= end for number in passed_numbers)
+        subsets[name] = metric(count["passed"], count["total"])
+    rows.append({
+        "id": "secret-sft-mini-v019", "harness": mini["harness"], "model": mini["model"],
+        "runs": 1, "measurement_type": "full_run", "measurement_valid": True,
+        "validation_basis": mini["validation_basis"], "reasoning_effort": "default",
+        "source_version": mini["task_set_version"], "source_passed": mini["passed_tasks"],
+        "source_sha256": mini["source_report_sha256"], "measurement_date": mini["run_dates"],
+        "medium_historical": None, "details_url": "secret-sft-mini.html", **subsets,
+    })
     return {
         "task_set_version": "0.19.0", "light_tasks": 391, "medium_tasks": 80,
         "provenance": {
-            "method": "Historical rescores, four complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft accepted by the operator",
+            "method": "Historical rescores, five complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
             # Hash canonical UTF-8/LF text, independent of Git checkout CRLF.
             "wave_results_sha256": hashlib.sha256(waves.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "secret_700b_sha256": hashlib.sha256(secret_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
+            "secret_sft_mini_sha256": hashlib.sha256(mini_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "sonnet55_medium_sha256": hashlib.sha256(sonnet_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "astra_medium_sha256": hashlib.sha256(astra_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "archive_sha256": hashlib.sha256(archive.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
