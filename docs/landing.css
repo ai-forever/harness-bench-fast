@@ -86,3 +86,7 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding-block
 .run-snapshot details { font-size: 13px; }
 @media (max-width: 620px) { .run-snapshot { padding: 18px; } .run-snapshot tbody th { font-size: 12px; } }
 .wave19-section { margin-top: 40px; }
+
+.invalid-measurement { background: #fff8ec; }
+.measurement-status { display: block; color: #765012; font-size: 11px; margin-top: 4px; }
+.invalid-measurement .score-bar > span { background: #ad7929; }

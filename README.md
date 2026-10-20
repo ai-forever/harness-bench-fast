@@ -46,11 +46,12 @@ No full-suite (471-task) model results on v0.19.0 have been recorded yet. Wave 1
 
 ## Secret 700b — stopped diagnostic run (2026-10-19/20)
 
-Published by operator request as an **unranked, infrastructure-invalid snapshot**:
+Published by operator request in the **common Light and Medium rankings**, labeled **API errors · unvalidated**:
 [Secret 700b on the landing page](https://ai-forever.github.io/harness-bench-fast/#secret-700b).
 The report contains 471 unique task records and 377 observed successes (80.0%);
-this fraction is not a validated benchmark score. It is excluded from the Light
-and Medium leaderboards and does not replace the earlier Secret-700-SFT run.
+this fraction is not a validated benchmark score. The tables sort its observed
+counts alongside other results with an explicit infrastructure warning. It does
+not replace the earlier Secret-700-SFT run.
 
 Observed subsets: Light **370/391 (94.6%)**; Medium **7/80 (8.8%)** — long
 context 0/20, tool reflection 7/20, wave 19 feasibility 0/40. Task 407 retains
