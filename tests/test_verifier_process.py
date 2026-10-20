@@ -1,4 +1,5 @@
 """Verification must not execute generated Python in the runner process."""
+
 import shutil
 import subprocess
 import sys
@@ -7,7 +8,6 @@ import pytest
 
 from harness_bench.tasks import get_task
 from harness_bench.verifier_process import verify_bwrap
-
 
 LINUX_BWRAP = sys.platform == "linux" and shutil.which("bwrap") is not None
 
@@ -30,7 +30,7 @@ def test_unbounded_allocation_is_task_failure(tmp_path):
         "    while True:\n"
         "        values.append('x' * 1000 + str(len(values)))\n"
     )
-    outcome = verify_bwrap(task.id, tmp_path, timeout=20, memory_bytes=256 * 1024 ** 2)
+    outcome = verify_bwrap(task.id, tmp_path, timeout=20, memory_bytes=256 * 1024**2)
     assert not outcome.passed
     assert "MemoryError" in outcome.message
     # Parent remains usable and can complete the subsequent task.
@@ -59,21 +59,35 @@ def test_runner_dispatches_bwrap_verification_without_parent_execution(tmp_path,
     task = Task("unit_bwrap", "test", "test", forbidden)
     calls = []
     monkeypatch.setattr(runner, "_resolved_isolation", lambda mode: mode, raising=False)
-    monkeypatch.setattr(runner, "_require_supported_task_isolation", lambda *args: None, raising=False)
+    monkeypatch.setattr(
+        runner, "_require_supported_task_isolation", lambda *args: None, raising=False
+    )
     monkeypatch.setattr(runner, "sandbox_argv", lambda argv, **kwargs: argv)
     monkeypatch.setattr(runner, "_subprocess_env_with_token", lambda: {})
-    monkeypatch.setattr(runner, "_run_cli_subprocess", lambda argv, **kwargs:
-                        subprocess.CompletedProcess(argv, 0, "", ""))
-    monkeypatch.setattr(worker, "verify_bwrap", lambda task_id, workspace:
-                        calls.append(task_id) or VerifyResult(True, "isolated"))
-    run = runner.run_task_cli(task, cli_command="true", isolation="bwrap",
-                              artifacts_root=tmp_path / "evidence", transient_retries=0)
+    monkeypatch.setattr(
+        runner,
+        "_run_cli_subprocess",
+        lambda argv, **kwargs: subprocess.CompletedProcess(argv, 0, "", ""),
+    )
+    monkeypatch.setattr(
+        worker,
+        "verify_bwrap",
+        lambda task_id, workspace: calls.append(task_id) or VerifyResult(True, "isolated"),
+    )
+    run = runner.run_task_cli(
+        task,
+        cli_command="true",
+        isolation="bwrap",
+        artifacts_root=tmp_path / "evidence",
+        transient_retries=0,
+    )
     assert run.passed
     assert calls == [task.id]
 
 
 def test_long_verifier_budget_uses_registry_not_id_prefix(tmp_path, monkeypatch):
     import harness_bench.verifier_process as worker
+
     calls = []
     monkeypatch.setattr(worker, "_verify_bwrap", lambda task_id, workspace, **kw: calls.append(kw))
     worker.verify_bwrap("task_401_review_comments", tmp_path)

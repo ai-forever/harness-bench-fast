@@ -1,76 +1,150 @@
 import importlib.util
 from pathlib import Path
+
 import pytest
 
-spec = importlib.util.spec_from_file_location('proxy', Path(__file__).parents[1] / 'scripts/hbf_protocol_proxy.py')
+spec = importlib.util.spec_from_file_location(
+    "proxy", Path(__file__).parents[1] / "scripts/hbf_protocol_proxy.py"
+)
 p = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(p)
 
 
 def test_codex_text_results_normalized_without_changing_calls():
-    body = {'input': [{'type': 'function_call', 'name': 'exec_command', 'arguments': '{}'},
-                      {'type': 'function_call_output', 'call_id': 'abc', 'output': [
-                          {'type': 'input_text', 'text': 'a'}, {'type': 'input_text', 'text': 'b'}]}]}
-    assert p.normalize_responses(body)['input'][1] == {'type': 'function_call_output', 'call_id': 'abc', 'output': 'a\nb'}
-    assert body['input'][0]['arguments'] == '{}'
+    body = {
+        "input": [
+            {"type": "function_call", "name": "exec_command", "arguments": "{}"},
+            {
+                "type": "function_call_output",
+                "call_id": "abc",
+                "output": [
+                    {"type": "input_text", "text": "a"},
+                    {"type": "input_text", "text": "b"},
+                ],
+            },
+        ]
+    }
+    assert p.normalize_responses(body)["input"][1] == {
+        "type": "function_call_output",
+        "call_id": "abc",
+        "output": "a\nb",
+    }
+    assert body["input"][0]["arguments"] == "{}"
 
 
 def test_reject_nontext_instead_of_silently_losing_content():
     with pytest.raises(ValueError):
-        p.text_blocks([{'type': 'image', 'source': {}}])
+        p.text_blocks([{"type": "image", "source": {}}])
 
 
 def test_claude_tool_roundtrip_and_usage():
-    response = p.chat_to_message({'choices': [{'message': {'content': None, 'tool_calls': [
-        {'id': 'a', 'function': {'name': 'Bash', 'arguments': '{"command":"pwd"}'}}]},
-        'finish_reason': 'tool_calls'}], 'usage': {'prompt_tokens': 20, 'completion_tokens': 7}}, 'test')
-    assert response['stop_reason'] == 'tool_use'
-    request = p.messages_to_chat({'model': 'test', 'system': [{'type': 'text', 'text': 'sys'}], 'messages': [
-        {'role': 'assistant', 'content': response['content']},
-        {'role': 'user', 'content': [{'type': 'tool_result', 'tool_use_id': 'a', 'content': '/workspace'},
-                                     {'type': 'text', 'text': 'continue'}]}]})
-    assert [x['role'] for x in request['messages']] == ['system', 'assistant', 'tool', 'user']
-    assert request['messages'][2]['tool_call_id'] == 'a'
+    response = p.chat_to_message(
+        {
+            "choices": [
+                {
+                    "message": {
+                        "content": None,
+                        "tool_calls": [
+                            {
+                                "id": "a",
+                                "function": {"name": "Bash", "arguments": '{"command":"pwd"}'},
+                            }
+                        ],
+                    },
+                    "finish_reason": "tool_calls",
+                }
+            ],
+            "usage": {"prompt_tokens": 20, "completion_tokens": 7},
+        },
+        "test",
+    )
+    assert response["stop_reason"] == "tool_use"
+    request = p.messages_to_chat(
+        {
+            "model": "test",
+            "system": [{"type": "text", "text": "sys"}],
+            "messages": [
+                {"role": "assistant", "content": response["content"]},
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "tool_result", "tool_use_id": "a", "content": "/workspace"},
+                        {"type": "text", "text": "continue"},
+                    ],
+                },
+            ],
+        }
+    )
+    assert [x["role"] for x in request["messages"]] == ["system", "assistant", "tool", "user"]
+    assert request["messages"][2]["tool_call_id"] == "a"
     events = list(p.message_events(response))
-    assert events[0]['message']['usage'] == {'input_tokens': 20, 'output_tokens': 0}
-    assert events[2]['delta']['partial_json'] == '{"command": "pwd"}'
-    assert events[-2]['usage']['output_tokens'] == 7
-    assert events[-1]['type'] == 'message_stop'
+    assert events[0]["message"]["usage"] == {"input_tokens": 20, "output_tokens": 0}
+    assert events[2]["delta"]["partial_json"] == '{"command": "pwd"}'
+    assert events[-2]["usage"]["output_tokens"] == 7
+    assert events[-1]["type"] == "message_stop"
 
 
 def test_unknown_blocks_and_thinking_fail_closed():
-    for body in [dict(messages=[{'role': 'user', 'content': [{'type': 'image'}]}]),
-                 dict(messages=[], thinking={'type': 'unsupported'})]:
+    for body in [
+        dict(messages=[{"role": "user", "content": [{"type": "image"}]}]),
+        dict(messages=[], thinking={"type": "unsupported"}),
+    ]:
         with pytest.raises(ValueError):
-            p.messages_to_chat(dict(model='test', **body))
+            p.messages_to_chat(dict(model="test", **body))
 
 
 def test_reasoning_summary_preserved_without_duplicates():
-    item = {'type': 'reasoning', 'summary': [{'type': 'summary_text', 'text': 'reason'}],
-            'content': [{'type': 'reasoning_text', 'text': 'reason'}]}
-    assert p.normalize_responses({'input': [item]})['input'][0]['content'] == [
-        {'type': 'reasoning_text', 'text': 'reason'}]
-    assert item['summary'] == []
-    item = {'type': 'reasoning', 'summary': [{'type': 'summary_text', 'text': 'kept'}]}
-    p.normalize_responses({'input': [item]})
-    assert item['content'][0]['text'] == 'kept'
+    item = {
+        "type": "reasoning",
+        "summary": [{"type": "summary_text", "text": "reason"}],
+        "content": [{"type": "reasoning_text", "text": "reason"}],
+    }
+    assert p.normalize_responses({"input": [item]})["input"][0]["content"] == [
+        {"type": "reasoning_text", "text": "reason"}
+    ]
+    assert item["summary"] == []
+    item = {"type": "reasoning", "summary": [{"type": "summary_text", "text": "kept"}]}
+    p.normalize_responses({"input": [item]})
+    assert item["content"][0]["text"] == "kept"
 
 
 def test_thinking_roundtrip_exact_and_stream_signature(monkeypatch):
-    monkeypatch.setenv('HBF_API_KEY', 'test-only')
-    text = 'Reasoning before a tool.\nТочное сохранение\n'
-    reply = p.chat_to_message({'choices': [{'message': {'reasoning_content': text, 'content': None,
-        'tool_calls': [{'id': 'call1', 'function': {'name': 'Bash', 'arguments': '{}'}}]},
-        'finish_reason': 'tool_calls'}]}, 'test')
+    monkeypatch.setenv("HBF_API_KEY", "test-only")
+    text = "Reasoning before a tool.\nТочное сохранение\n"
+    reply = p.chat_to_message(
+        {
+            "choices": [
+                {
+                    "message": {
+                        "reasoning_content": text,
+                        "content": None,
+                        "tool_calls": [
+                            {"id": "call1", "function": {"name": "Bash", "arguments": "{}"}}
+                        ],
+                    },
+                    "finish_reason": "tool_calls",
+                }
+            ]
+        },
+        "test",
+    )
     events = list(p.message_events(reply))
-    assert events[2]['delta'] == {'type': 'thinking_delta', 'thinking': text}
-    assert events[3]['delta']['type'] == 'signature_delta'
-    request = {'model': 'test', 'thinking': {'type': 'enabled', 'budget_tokens': 16384}, 'messages': [
-        {'role': 'assistant', 'content': reply['content']},
-        {'role': 'user', 'content': [{'type': 'tool_result', 'tool_use_id': 'call1', 'content': 'ok'}]}]}
+    assert events[2]["delta"] == {"type": "thinking_delta", "thinking": text}
+    assert events[3]["delta"]["type"] == "signature_delta"
+    request = {
+        "model": "test",
+        "thinking": {"type": "enabled", "budget_tokens": 16384},
+        "messages": [
+            {"role": "assistant", "content": reply["content"]},
+            {
+                "role": "user",
+                "content": [{"type": "tool_result", "tool_use_id": "call1", "content": "ok"}],
+            },
+        ],
+    }
     chat = p.messages_to_chat(request)
-    assert chat['messages'][0]['reasoning_content'] == text
-    assert chat['messages'][1]['tool_call_id'] == 'call1'
-    request['messages'][0]['content'][0]['thinking'] += 'tampered'
-    with pytest.raises(ValueError, match='signature'):
+    assert chat["messages"][0]["reasoning_content"] == text
+    assert chat["messages"][1]["tool_call_id"] == "call1"
+    request["messages"][0]["content"][0]["thinking"] += "tampered"
+    with pytest.raises(ValueError, match="signature"):
         p.messages_to_chat(request)

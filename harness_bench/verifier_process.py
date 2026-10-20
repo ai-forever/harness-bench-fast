@@ -3,19 +3,21 @@
 The verifier itself can import agent-written Python. It must never execute in
 an orchestrator thread, even when the agent CLI was already sandboxed.
 """
+
 from __future__ import annotations
 
+import contextlib
 import json
 import os
-from pathlib import Path
 import signal
 import stat
 import subprocess
 import sys
 import threading
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
-DEFAULT_MEMORY_BYTES = 1024 ** 3
+DEFAULT_MEMORY_BYTES = 1024**3
 DEFAULT_TIMEOUT = 120
 LONG_TASK_TIMEOUT = 900
 MAX_RESULT_BYTES = 16384
@@ -38,11 +40,17 @@ def _worker(task_id: str, workspace: str, result_path: str, memory: int) -> None
     Path(result_path).write_text(json.dumps(payload), encoding="utf-8")
 
 
-def verify_bwrap(task_id: str, workspace: Path, *, timeout: float | None = None,
-                 memory_bytes: int = DEFAULT_MEMORY_BYTES):
+def verify_bwrap(
+    task_id: str,
+    workspace: Path,
+    *,
+    timeout: float | None = None,
+    memory_bytes: int = DEFAULT_MEMORY_BYTES,
+):
     if timeout is None:
         # Some long verifiers run two independent 300-second test suites.
         from harness_bench.tasks import get_task
+
         task = get_task(task_id)
         timeout = LONG_TASK_TIMEOUT if "long" in task.tags else DEFAULT_TIMEOUT
     # CLI concurrency can be 128; limit verifier allocations separately so the
@@ -51,9 +59,8 @@ def verify_bwrap(task_id: str, workspace: Path, *, timeout: float | None = None,
         return _verify_bwrap(task_id, workspace, timeout=timeout, memory_bytes=memory_bytes)
 
 
-def _verify_bwrap(task_id: str, workspace: Path, *, timeout: float,
-                  memory_bytes: int):
-    from harness_bench.cli_isolation import sandbox_argv, bind_fds
+def _verify_bwrap(task_id: str, workspace: Path, *, timeout: float, memory_bytes: int):
+    from harness_bench.cli_isolation import bind_fds, sandbox_argv
     from harness_bench.core import VerifyResult
 
     if sys.platform != "linux":
@@ -69,20 +76,39 @@ def _verify_bwrap(task_id: str, workspace: Path, *, timeout: float,
         home.mkdir()
         result_path = scratch / "result.json"
         argv = sandbox_argv(
-            [sys.executable, "-I", str(Path(__file__).resolve()), task_id,
-             str(workspace.resolve()), "/tmp/result.json", str(memory_bytes)],
-            workspace=workspace.resolve(), scratch=scratch, home=home,
+            [
+                sys.executable,
+                "-I",
+                str(Path(__file__).resolve()),
+                task_id,
+                str(workspace.resolve()),
+                "/tmp/result.json",
+                str(memory_bytes),
+            ],
+            workspace=workspace.resolve(),
+            scratch=scratch,
+            home=home,
             runtime_paths=runtime,
         )
         # Verification needs no model or external network access.
         argv[1:1] = ["--unshare-net"]
-        env = {"PATH": f"{Path(sys.executable).parent}:/usr/bin:/bin",
-               "LANG": "C.UTF-8", "PYTHONDONTWRITEBYTECODE": "1",
-               "OPENBLAS_NUM_THREADS": "1", "OMP_NUM_THREADS": "1"}
+        env = {
+            "PATH": f"{Path(sys.executable).parent}:/usr/bin:/bin",
+            "LANG": "C.UTF-8",
+            "PYTHONDONTWRITEBYTECODE": "1",
+            "OPENBLAS_NUM_THREADS": "1",
+            "OMP_NUM_THREADS": "1",
+        }
         with bind_fds(argv) as (command, descriptors):
-            proc = subprocess.Popen(command, stdin=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                env=env, start_new_session=True, pass_fds=descriptors)
+            proc = subprocess.Popen(
+                command,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                env=env,
+                start_new_session=True,
+                pass_fds=descriptors,
+            )
         try:
             proc.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
@@ -92,15 +118,17 @@ def _verify_bwrap(task_id: str, workspace: Path, *, timeout: float,
         finally:
             # Also remove residual descendants; the bwrap PID namespace prevents
             # detached verifier children from surviving namespace init exit.
-            try:
+            with contextlib.suppress(ProcessLookupError):
                 os.killpg(proc.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
             proc.wait()
         if proc.returncode < 0 or proc.returncode in (137, 139):
-            return VerifyResult(False, f"Verifier exceeded resource limits or crashed (exit {proc.returncode})")
+            return VerifyResult(
+                False, f"Verifier exceeded resource limits or crashed (exit {proc.returncode})"
+            )
         if proc.returncode:
-            raise RuntimeError(f"Isolated verifier failed to start or finish (exit {proc.returncode})")
+            raise RuntimeError(
+                f"Isolated verifier failed to start or finish (exit {proc.returncode})"
+            )
         try:
             fd = os.open(result_path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
             with os.fdopen(fd, "rb") as stream:
@@ -108,7 +136,9 @@ def _verify_bwrap(task_id: str, workspace: Path, *, timeout: float,
                 if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_RESULT_BYTES:
                     raise ValueError("invalid verifier result file")
                 payload = json.loads(stream.read(MAX_RESULT_BYTES + 1))
-            if type(payload.get("passed")) is not bool or not isinstance(payload.get("message"), str):
+            if type(payload.get("passed")) is not bool or not isinstance(
+                payload.get("message"), str
+            ):
                 raise ValueError("invalid verifier result schema")
         except (OSError, ValueError, AttributeError) as exc:
             raise RuntimeError(f"Isolated verifier produced no valid result: {exc}") from exc

@@ -41,7 +41,7 @@ from urllib.parse import quote, urlsplit
 from harness_bench.cli_artifacts import new_execution, record_execution
 from harness_bench.cli_isolation import bind_fds, sandbox_argv, validate_trusted_runtime_paths
 from harness_bench.core import Task, effective_task_timeout
-from harness_bench.native_capture import DiskOutput, output_lines, metric_document
+from harness_bench.native_capture import DiskOutput, metric_document, output_lines
 from harness_bench.runner import (
     TaskRun,
     _add_usage_counts,
