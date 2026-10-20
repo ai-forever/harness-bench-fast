@@ -4,9 +4,9 @@ const { selectResults, formatPassed } = require("../docs/leaderboard.js");
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 84);
+assert.equal(light.length, 85);
 assert.equal(medium.length, 79);
-assert.equal(selectResults(data, "medium", "current", "").length, 10);
+assert.equal(selectResults(data, "medium", "current", "").length, 11);
 for (const rows of [light, medium]) {
   for (let i = 1; i < rows.length; i++) assert.ok(rows[i - 1].result.passed >= rows[i].result.passed);
 }
@@ -23,7 +23,7 @@ console.log("Leaderboard scope, ranking, missing-data and search checks passed."
 for (const row of data.rows.filter(r => r.measurement_type === "full_run")) { assert.equal(row.light.passed + row.medium.passed, row.source_passed); assert.equal(row.medium.total, 80); }
 
 const wave19 = selectResults(data, "medium", "wave19", "");
-assert.equal(wave19.length, 23);
+assert.equal(wave19.length, 24);
 assert.equal(selectResults(data, "light", "current", "GPT-6-Astra (OpenRouter) (medium)").length, 0);
 assert.equal(selectResults(data, "medium", "current", "GPT-6-Astra (OpenRouter) (medium)")[0].result.passed, 58);
 assert.equal(wave19.find(r => r.id === "astra-pi-medium").result.passed, 23);
@@ -44,12 +44,22 @@ assert.ok(!landing.includes("medium-coverage"));
 assert.ok(!landing.includes("Task coverage"));
 assert.ok(landing.includes('id="wave19-results"'));
 
-const secret = selectResults(data, "light", "current", "secret sft");
+const allSecret = selectResults(data, "light", "current", "secret sft");
+assert.equal(allSecret.length, 2);
+const mini = allSecret.find(row => row.id === "secret-sft-mini-v019");
+assert.equal(mini.result.passed, 371);
+assert.equal(mini.medium.passed, 8);
+assert.equal(mini.wave19.passed, 0);
+assert.equal(mini.source_passed, 379);
+assert.equal(mini.measurement_valid, true);
+assert.equal(mini.details_url, "secret-sft-mini.html");
+assert.equal(mini.result.wilson95.length, 2);
+const secret = allSecret.filter(row => row.id === "secret-700b-v019");
 assert.equal(secret.length, 1);
 assert.equal(secret[0].result.passed, 370);
 assert.equal(secret[0].measurement_valid, true);
 assert.equal(secret[0].result.wilson95, undefined);
-assert.equal(selectResults(data, "medium", "current", "secret sft")[0].result.passed, 7);
+assert.equal(selectResults(data, "medium", "current", "secret sft deepagents")[0].result.passed, 7);
 assert.equal(selectResults(data, "medium", "wave19", "secret sft")[0].result.passed, 0);
 
 assert.ok(!landing.includes('class="run-snapshot"'));

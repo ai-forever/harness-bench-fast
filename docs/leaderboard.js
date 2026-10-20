@@ -26,18 +26,20 @@ if (typeof document !== "undefined") {
     const empty = document.getElementById("empty");
     const buttons = [...document.querySelectorAll("[data-suite]")];
     let suite = location.hash === "#medium" ? "medium" : "light";
+    const rowAnchors = { "#secret-700b": "secret-700b-v019", "#secret-sft-mini": "secret-sft-mini-v019" };
     // Preserve incoming links to models and protocol notes from the old landing.
-    if (location.hash && !["#light", "#medium", "#secret-700b"].includes(location.hash)) {
+    if (location.hash && !["#light", "#medium", ...Object.keys(rowAnchors)].includes(location.hash)) {
       location.replace("archive.html" + location.hash);
       return;
     }
-    let expanded = location.hash === "#secret-700b";
+    let expanded = Object.hasOwn(rowAnchors, location.hash);
     let data;
     function renderTable(target, rows, ranking, scope) {
       target.replaceChildren();
       rows.forEach(row => {
         const tr = document.createElement("tr");
-        if (row.id === "secret-700b-v019" && scope === "current") tr.id = "secret-700b";
+        const anchor = Object.keys(rowAnchors).find(key => rowAnchors[key] === row.id);
+        if (anchor && scope === "current") tr.id = anchor.slice(1);
         const rank = document.createElement("td");
         const firstEqual = ranking.findIndex(other => Math.abs(other.result.passed - row.result.passed) < 1e-9);
         rank.textContent = firstEqual + 1;
@@ -109,8 +111,8 @@ if (typeof document !== "undefined") {
       if (!response.ok) throw new Error("HTTP " + response.status);
       data = await response.json();
       render();
-      if (location.hash === "#secret-700b") {
-        document.getElementById("secret-700b").scrollIntoView({ block: "center" });
+      if (Object.hasOwn(rowAnchors, location.hash)) {
+        document.getElementById(location.hash.slice(1)).scrollIntoView({ block: "center" });
       }
       buttons.forEach(button => button.addEventListener("click", () => {
         suite = button.dataset.suite;
@@ -120,10 +122,10 @@ if (typeof document !== "undefined") {
       }));
       window.addEventListener("hashchange", () => {
         suite = location.hash === "#medium" ? "medium" : "light";
-        expanded = location.hash === "#secret-700b";
+        expanded = Object.hasOwn(rowAnchors, location.hash);
         if (expanded) search.value = "";
         render();
-        if (expanded) document.getElementById("secret-700b").scrollIntoView({ block: "center" });
+        if (expanded) document.getElementById(location.hash.slice(1)).scrollIntoView({ block: "center" });
       });
       search.addEventListener("input", () => { expanded = false; render(); });
       more.addEventListener("click", () => { expanded = true; render(); });
