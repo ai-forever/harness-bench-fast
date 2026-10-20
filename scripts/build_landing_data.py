@@ -88,16 +88,35 @@ def build():
         assert row["source_version"] == "0.19.0"
         assert row["light"]["total"] == 391 and row["medium"]["total"] == 80
         assert row["light"]["passed"] + row["medium"]["passed"] == row["source_passed"]
+    matrix = json.loads((ROOT / "docs/wave19-harness-results.json").read_text(encoding="utf-8"))
+    for row in current:
+        row["measurement_type"] = "full_run"
+        row["wave19"] = matrix["baseline_wave19"][row["id"]]
     rows.extend(current)
+    by_id = {row["id"]: row for row in rows}
+    for row in matrix["rows"]:
+        assert row["wave19"]["total"] == 40
+        if row.get("medium"):
+            assert row["medium"]["total"] == 80
+            assert row["medium"]["passed"] == row["medium_historical"]["passed"] + row["wave19"]["passed"]
+        if row.get("extends_id"):
+            target = by_id[row["extends_id"]]
+            assert target["light"]["passed"] == row["light"]["passed"]
+            assert target["medium_historical"]["passed"] == row["medium_historical"]["passed"]
+            target.update({key: value for key, value in row.items() if key not in ("id", "extends_id")})
+        else:
+            assert row["id"] not in by_id
+            rows.append(row)
+            by_id[row["id"]] = row
     return {
         "task_set_version": "0.19.0", "light_tasks": 391, "medium_tasks": 80,
         "provenance": {
-            "method": "Historical v0.18.0 rescores plus four complete v0.19.0 measurements dated 2026-10-19",
+            "method": "Historical rescores, four complete v0.19.0 runs and sixteen new wave19 harness configurations; composites explicitly labeled",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
             # Hash canonical UTF-8/LF text, independent of Git checkout CRLF.
             "wave_results_sha256": hashlib.sha256(waves.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "archive_sha256": hashlib.sha256(archive.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
-            "limitation": "Historical Medium covers only 40/80; current measurements cover all 80. Single-run intervals do not estimate repeat variability.",
+            "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability.",
         },
         "rows": rows,
     }

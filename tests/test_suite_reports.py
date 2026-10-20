@@ -154,23 +154,36 @@ def test_published_landing_scores_preserve_all_source_totals_and_missing_wave19(
     root = Path(__file__).resolve().parents[1]
     data = json.loads((root / "docs/leaderboard-results.json").read_text())
     assert data == runpy.run_path(str(root / "scripts/build_landing_data.py"))["build"]()
-    historical = [row for row in data["rows"] if row["source_version"] == "0.18.0"]
-    current = [row for row in data["rows"] if row["source_version"] == "0.19.0"]
-    assert len(historical) == 78 and len(current) == 4
+    snapshot = json.loads((root / "docs/wave-results.js").read_text().split("=", 1)[1].strip().rstrip(";"))
+    historical = [row for row in data["rows"] if row["id"] in snapshot["rows"]]
+    full = [row for row in data["rows"] if row.get("measurement_type") == "full_run"]
+    new_only = [row for row in data["rows"] if row.get("measurement_type") == "wave19_only"]
+    composites = [row for row in data["rows"] if row.get("measurement_type") == "historical_plus_wave19"]
+    assert len(historical) == 78 and len(full) == 4
+    assert len(new_only) == 13 and len(composites) == 3
+    assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 96
     assert sum(row["runs"] for row in historical) == 80
-    for row in current:
+    for row in full:
         assert row["light"]["total"] == 391 and row["medium"]["total"] == 80
-        assert row["medium_historical"] is None
         assert row["light"]["passed"] + row["medium"]["passed"] == row["source_passed"]
     for row in historical:
         assert row["light"]["total"] == 391
         assert row["medium_historical"]["total"] == 40
-        assert row["medium"] is None
         assert abs(row["light"]["passed"] + row["medium_historical"]["passed"] - row["source_passed"]) <= .051
+    for row in new_only:
+        assert row["light"] is None and row["medium"] is None
+        assert row["medium_historical"] is None and row["source_passed"] is None
+        assert row["wave19"]["total"] == 40
+    for row in composites:
+        assert row["medium"]["total"] == 80
+        assert row["medium"]["passed"] == row["medium_historical"]["passed"] + row["wave19"]["passed"]
     assert 'type="range"' not in (root / "docs/index.html").read_text()
-    assert 'type="range"' not in (root / "docs/archive.html").read_text()
     archive = (root / "docs/archive.html").read_text()
     assert all(f'id="measurement-{row["id"]}"' in archive for row in historical)
+    protocol = (root / "docs/harness-wave19.html").read_text()
+    for row in [*new_only, *composites]:
+        assert row["details_url"].split("#")[0] == "harness-wave19.html"
+        assert 'id="' + row["details_url"].split("#")[1] + '"' in protocol
 
 
 def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
@@ -179,7 +192,7 @@ def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
     expected = build()
     docs = tmp_path / "docs"
     docs.mkdir()
-    for name in ("archive.html", "wave-results.js", "wave19-results.json"):
+    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json"):
         text = (root / "docs" / name).read_text(encoding="utf-8")
         assert "\n" in text
         (docs / name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))

@@ -76,3 +76,5 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding-block
   .score-bar { width: 72px; }
   footer { flex-direction: column; gap: 8px; }
 }
+
+.wave19-section { margin-top: 40px; }
