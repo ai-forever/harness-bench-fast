@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Compare agent harnesses on harness_bench_fast Light (391 tasks) and Medium (80 tasks). Mechanically verified, with explicit measurement coverage.">
   <title>harness_bench_fast · Light &amp; Medium</title>
-  <link rel="stylesheet" href="landing.css">
-  <script src="leaderboard.js" defer></script>
+  <link rel="stylesheet" href="landing.css?v=secret-700b-20261020">
+  <script src="leaderboard.js?v=secret-700b-20261020" defer></script>
 </head>
 <body>
   <header>
@@ -17,7 +17,7 @@
     <section class="intro">
       <p class="eyebrow">Agent benchmarks · v0.19.0</p>
       <h1>How well does your<br>agent get things done?</h1>
-      <p><a href="harness-wave19.html">New: four harnesses × four models · wave 19 results →</a></p>
+      <p><a href="harness-wave19.html">New: four harnesses × four models · wave 19 results →</a><br><a href="#secret-700b">Secret 700b · stopped run, 20 October 2026 →</a></p>
       <p class="lead">Files, code, tools and memory. Real tasks, mechanically verified.</p>
     </section>
     <section aria-label="Benchmark results">
@@ -35,7 +35,7 @@
       </div>
       <p id="empty" role="status" hidden></p>
       <button type="button" class="more" id="show-more" hidden>Show all results</button>
-      <p class="fine-print">Scores compare complete agent configurations; tools and budgets vary. mean@N is the mean of N runs, not pass@N. Rescored historical runs use v0.18.0 task definitions. <a href="archive.html#current">Protocols &amp; original results →</a></p>
+      <p class="fine-print">Rows marked “API errors · unvalidated” show observed counts from infrastructure-affected runs, not validated quality scores. Scores compare complete agent configurations; tools and budgets vary. mean@N is the mean of N runs, not pass@N. Rescored historical runs use v0.18.0 task definitions. <a href="archive.html#current">Protocols &amp; original results →</a></p>
       <noscript><p>Enable JavaScript to compare suites, or <a href="archive.html#current">read the static measurement archive</a>.</p></noscript>
       <section id="wave19-section" class="wave19-section" aria-labelledby="wave19-title" hidden>
         <div class="results-heading"><h2 id="wave19-title">Wave 19 · new Medium tasks</h2><span id="wave19-count"></span></div>
@@ -43,6 +43,25 @@
         <div class="table-wrap"><table><thead><tr><th scope="col">#</th><th scope="col">Model / harness</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">Score</th></tr></thead><tbody id="wave19-results"></tbody></table></div>
         <p id="wave19-empty" role="status" hidden>No new-task results match your search.</p>
       </section>
+    </section>
+    <section id="secret-700b" class="run-snapshot" aria-labelledby="secret-700b-title">
+      <p class="snapshot-label">Stopped run · measurement invalid · included in common rankings</p>
+      <h2 id="secret-700b-title">Secret 700b</h2>
+      <p class="snapshot-meta">deepagents 0.6.12 · no profile · reasoning default · task-set v0.19.0 · 19–20 October 2026</p>
+      <p><strong>377/471 recorded successes (80.0%).</strong> This is an observed count from a stopped run, not a valid benchmark score. It appears in the common Light and Medium rankings at the operator’s request, with its observed counts and an API-error warning.</p>
+      <div class="table-wrap">
+        <table aria-label="Secret 700b observed outcomes"><thead><tr><th scope="col">Task subset</th><th scope="col" class="numeric">Observed successes</th></tr></thead><tbody>
+          <tr><th scope="row">Light · 1–391</th><td class="numeric">370/391 (94.6%)</td></tr>
+          <tr><th scope="row">Medium · 392–471</th><td class="numeric">7/80 (8.8%)</td></tr>
+        </tbody></table>
+      </div>
+      <p>Medium breakdown: long context <strong>0/20</strong>, tool reflection <strong>7/20</strong>, wave 19 feasibility <strong>0/40</strong>.</p>
+      <p><strong>Why this run is marked unvalidated:</strong> task 407 retains an unresolved HTTP 502 failure. All 40 wave 19 tasks timed out at 120 seconds; 38 encountered HTTP 502 responses, so their outcomes are not a clean measure of model quality. Task 405 was stopped at the operator’s request after over ten hours including infrastructure retries and counted unsolved. Other transport-affected failures still require review.</p>
+      <details><summary>Run configuration and data</summary>
+        <p>Linux bwrap; 471 unique task records; one retained outcome per task, with infrastructure retries and no best-of selection. Concurrency increased from 2 to 8 after 109 completed tasks. Temperature 0.8, top_p 0.95, maximum output 30,000 tokens per response; reasoning enabled with default effort and history forwarded, without an additional reasoning budget.</p>
+        <p>Task limits: ordinary 900 seconds, long context 7,200 seconds per attempt, tool reflection 1,800 seconds, wave 19 120 seconds. The operator applied a cumulative time limit to task 405; its last physical attempt was under two hours. Raw step/token counters are incomplete and unaudited.</p>
+        <p><a href="secret-700b-v019.json">Download the diagnostic aggregate →</a> · The earlier <a href="archive.html#secret-700-sft">Secret-700-SFT measurement</a> remains a separate run.</p>
+      </details>
     </section>
     <details class="about"><summary>What is in each benchmark?</summary>
       <p><strong>Light · tasks 1–391:</strong> files, code, data, memory, agent workflows, Git and terminal tools.</p>
