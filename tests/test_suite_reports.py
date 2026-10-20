@@ -161,7 +161,14 @@ def test_published_landing_scores_preserve_all_source_totals_and_missing_wave19(
     composites = [row for row in data["rows"] if row.get("measurement_type") == "historical_plus_wave19"]
     assert len(historical) == 78 and len(full) == 4
     assert len(new_only) == 13 and len(composites) == 3
-    assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 97
+    assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 98
+    sonnet = next(row for row in data["rows"] if row["id"] == "sonnet55-pi-medium")
+    assert sonnet["light"] is None and sonnet["medium_historical"] is None
+    assert sonnet["medium"]["passed"] == 53 and sonnet["medium"]["total"] == 80
+    assert sonnet["wave19"]["passed"] == 32 and sonnet["wave19"]["total"] == 40
+    assert sonnet["reasoning_effort"] == "medium"
+    assert "2 provider content-filter failures" in sonnet["medium"]["note"]
+    assert (root / "docs" / sonnet["details_url"]).exists()
     accepted = [row for row in data["rows"] if row.get("validation_basis") == "operator_acceptance"]
     assert len(accepted) == 1 and accepted[0]["id"] == "secret-700b-v019"
     assert accepted[0]["measurement_valid"] is True
@@ -199,7 +206,7 @@ def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
     expected = build()
     docs = tmp_path / "docs"
     docs.mkdir()
-    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json"):
+    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json", "sonnet55-medium.json"):
         text = (root / "docs" / name).read_text(encoding="utf-8")
         assert "\n" in text
         (docs / name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))

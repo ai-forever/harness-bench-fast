@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sonnet 5.5 · Medium measurement</title><link rel="stylesheet" href="landing.css">
+</head>
+<body>
+<header><a class="brand" href="index.html">harness_bench_fast.</a><nav><a href="index.html#medium">Medium leaderboard →</a></nav></header>
+<main>
+<section class="intro">
+<p class="eyebrow">Task-set v0.19.0 · measured 20 October 2026</p>
+<h1>Sonnet 5.5.<br>Medium reasoning.</h1>
+<p class="lead">A fresh run of all 80 Medium tasks with pi-mono 0.73.1. Provider content-filter outcomes remain failures of the complete configuration.</p>
+</section>
+<h2>Results</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Subset</th><th>Passed</th><th>Score</th><th>95% Wilson interval</th></tr></thead>
+<tbody>
+<tr><td>Medium · tasks 392–471</td><td>53/80</td><td>66.3%</td><td>55.4–75.7%</td></tr>
+<tr><td>Earlier Medium · tasks 392–431</td><td>21/40</td><td>52.5%</td><td>37.5–67.1%</td></tr>
+<tr><td>Wave 19 · tasks 432–471</td><td>32/40</td><td>80.0%</td><td>65.2–89.5%</td></tr>
+</tbody></table></div>
+<p>These are subsets of the same single run. Intervals describe variation across task outcomes, not variability between repeated runs. Light was not measured.</p>
+<h2>Provider outcomes and failures</h2>
+<p><strong>Two provider content-filter failures are included in 53/80:</strong> tasks 411 and 431 ended with <code>finish_reason=content_filter</code>. Both belong to the earlier Medium half. They are failures of this model/provider/harness configuration; they are not evidence of incorrect reasoning on those tasks. There were no content-filter outcomes in the 40-task wave 19 subset.</p>
+<p>Four wave 19 tasks (433, 442, 447, 459) reached their 120-second limit and remain ordinary failures. The last task, review annotation (394), completed after about 68 minutes with 610/800 correct labels (76.3%), below its 92% requirement.</p>
+<p>The prior strongest published complete Medium result is DeepSeek V4.1 Flash high with DeepAgents: 59/80 (73.8%). Sonnet's observed difference is −7.5 percentage points. Both the model and harness differ, so this is a descriptive comparison rather than an isolated model or harness effect.</p>
+<h2>Protocol</h2>
+<p>Model ID <code>anthropic/claude-sonnet-5.5</code>, reasoning effort <strong>medium</strong>, thinking enabled, pi-mono 0.73.1. The upstream weight revision beyond the returned model ID is not disclosed. One attempt per task, four concurrent workers, max_tokens=16384, no temperature override. Native reasoning was observed and verified in the next request after tool results.</p>
+<p>Linux/bubblewrap isolation; source <code>3796b9084093e5f9383077d7bde8f1ce1f0d57b5</code>. Task-specific budgets were retained: long tasks up to 7200 seconds, reflection tasks up to 1800 seconds, wave 19 hard limit 120 seconds. The first scored task was the transport smoke test and was retained as a failure; it was not repeated for quality. No prior task outcomes were imported.</p>
+<h2>Validation and limits</h2>
+<p>All 80 unique Medium task IDs are present. Native measurement validity is true with zero native infrastructure failures. Four HTTP 502 responses were followed by successful requests on the same task. Terminal assistant-event screening found the two content-filter outcomes above, with no other terminal provider errors. One BrokenPipe capture had no terminal transport error in native events; its exact task attribution is ambiguous. The audit covers task coverage, protocol, API recovery and terminal events, not an exhaustive semantic review of every failed solution.</p>
+<p>Raw traces remain private. The aggregate source fingerprint is <code>1ad33ab48a4875143b7cfca90f794e9c0271440384a3b2dbe3890881e7a48b71</code>.</p>
+<p><a href="sonnet55-medium.json">Download counts and provenance</a> · <a href="index.html#medium">Medium results</a> · <a href="wave19-feasibility.md">Wave 19 task protocol</a></p>
+</main>
+</body>
+</html>
