@@ -12,6 +12,17 @@ historical Medium covers only tasks 392–431 (40/80). The remaining 40 tasks ar
 unmeasured in those runs and do not count as failures. Four new wave 19 measurements now cover all 80 Medium tasks and all 391 Light tasks; see the [new measurement protocols](docs/wave19-measurements.html). Original
 full-run scores, protocols and budgets remain in the [measurement archive](docs/archive.html).
 
+The [native harness wave 19 comparison](docs/harness-wave19.html) adds Codex,
+Claude Code, pi-mono and OpenClaw on GigaChat 3.5 PROM, Haiku 5.5, GLM-5.3 and
+DeepSeek V4.1 Flash. All sixteen configurations cover tasks 432–471 only.
+The Medium view shows complete 80-task results first and the matched new
+40-task wave separately below;
+missing earlier coverage stays unmeasured. Three full Medium entries combine
+historical and new disjoint subsets and are explicitly labeled. Claude Code +
+Haiku is corrected to 26/40 after three confirmed adapter/API-invalid attempts
+were replaced; the other 37 outcomes are unchanged. See the linked protocol for
+runtime versions, transport settings, provenance and validation limits.
+
 Select a suite for a new run, or split an existing result without model calls:
 
 ```bash
