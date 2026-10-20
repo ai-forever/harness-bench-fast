@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Compare agent harnesses on harness_bench_fast Light (391 tasks) and Medium (80 tasks). Mechanically verified, with explicit measurement coverage.">
   <title>harness_bench_fast · Light &amp; Medium</title>
-  <link rel="stylesheet" href="landing.css">
-  <script src="leaderboard.js" defer></script>
+  <link rel="stylesheet" href="landing.css?v=secret-700b-20261020">
+  <script src="leaderboard.js?v=secret-700b-20261020" defer></script>
 </head>
 <body>
   <header>
@@ -17,7 +17,7 @@
     <section class="intro">
       <p class="eyebrow">Agent benchmarks · v0.19.0</p>
       <h1>How well does your<br>agent get things done?</h1>
-      <p><a href="wave19-measurements.html">New wave 19 results · 19 October 2026 →</a><br><a href="#secret-700b">Secret 700b · stopped run, 20 October 2026 →</a></p>
+      <p><a href="harness-wave19.html">New: four harnesses × four models · wave 19 results →</a><br><a href="#secret-700b">Secret 700b · stopped run, 20 October 2026 →</a></p>
       <p class="lead">Files, code, tools and memory. Real tasks, mechanically verified.</p>
     </section>
     <section aria-label="Benchmark results">
@@ -29,7 +29,6 @@
       <p id="coverage-note" class="coverage-note" aria-live="polite">Tasks 1–391. Loading published measurements…</p>
       <div class="filters">
         <label class="search">Search model or harness<input id="search" type="search" placeholder="e.g. GigaChat, Codex, deepagents" autocomplete="off"></label>
-        <label id="medium-coverage-label" hidden>Task coverage<select id="medium-coverage"><option value="current">392–471 · all 80 tasks</option><option value="historical">392–431 · historical 40/80</option></select></label>
       </div>
       <div class="table-wrap">
         <table><thead><tr><th scope="col">#</th><th scope="col">Model / harness</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">Score</th></tr></thead><tbody id="results"></tbody></table>
@@ -38,6 +37,12 @@
       <button type="button" class="more" id="show-more" hidden>Show all results</button>
       <p class="fine-print">Scores compare complete agent configurations; tools and budgets vary. mean@N is the mean of N runs, not pass@N. Rescored historical runs use v0.18.0 task definitions. <a href="archive.html#current">Protocols &amp; original results →</a></p>
       <noscript><p>Enable JavaScript to compare suites, or <a href="archive.html#current">read the static measurement archive</a>.</p></noscript>
+      <section id="wave19-section" class="wave19-section" aria-labelledby="wave19-title" hidden>
+        <div class="results-heading"><h2 id="wave19-title">Wave 19 · new Medium tasks</h2><span id="wave19-count"></span></div>
+        <p class="coverage-note">Tasks 432–471 · 40 new tasks. These scores compare the same subset; they are ranked separately from the complete 80-task results above.</p>
+        <div class="table-wrap"><table><thead><tr><th scope="col">#</th><th scope="col">Model / harness</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">Score</th></tr></thead><tbody id="wave19-results"></tbody></table></div>
+        <p id="wave19-empty" role="status" hidden>No new-task results match your search.</p>
+      </section>
     </section>
     <section id="secret-700b" class="run-snapshot" aria-labelledby="secret-700b-title">
       <p class="snapshot-label">Stopped run · measurement invalid · not ranked</p>
@@ -60,8 +65,8 @@
     </section>
     <details class="about"><summary>What is in each benchmark?</summary>
       <p><strong>Light · tasks 1–391:</strong> files, code, data, memory, agent workflows, Git and terminal tools.</p>
-      <p><strong>Medium · tasks 392–471:</strong> long context (20), tool reflection (20), and wave 19 feasibility (40). The published v0.18.0 runs cover only the first 40 Medium tasks. The new wave 19 measurements cover all 80 Medium tasks.</p>
-      <p>All tasks use mechanical verification. Partial Medium results are ranked only against the same 40-task subset, separately from the current 80-task suite. Historical scores are offline rescores; the four wave 19 configurations are new complete runs. Repeat variability is unavailable for single runs.</p>
+      <p><strong>Medium · tasks 392–471:</strong> long context (20), tool reflection (20), and wave 19 feasibility (40). The published v0.18.0 runs cover only the first 40 Medium tasks. Medium shows complete 80-task results first, followed by the new 40-task wave 19 separately. Historical 40-task data stays in the archive. Missing old coverage is never scored as zero.</p>
+      <p>All tasks use mechanical verification. Partial Medium results are ranked only against the same 40-task subset, separately from the current 80-task suite. Historical scores are offline rescores; four DeepAgents configurations are full runs; the new harness matrix measures only wave 19. Historical + wave 19 rows combine disjoint measurements and are labeled. Repeat variability is unavailable for single runs.</p>
       <p><a href="https://github.com/ai-forever/harness-bench-fast#readme">Run the benchmark</a> · <a href="leaderboard-results.json">Download aggregate data</a> · <a href="wave19-feasibility.md">Wave 19 protocol</a></p>
     </details>
   </main>

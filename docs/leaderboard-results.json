@@ -3,11 +3,11 @@
   "light_tasks": 391,
   "medium_tasks": 80,
   "provenance": {
-    "method": "Historical v0.18.0 rescores plus four complete v0.19.0 measurements dated 2026-10-19",
+    "method": "Historical rescores, four complete v0.19.0 runs and sixteen new wave19 harness configurations; composites explicitly labeled",
     "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
     "wave_results_sha256": "6dd03c599564c086bb8c0bf3f9c4a90c3edf27d9b4b7bb746bc5004e59f25683",
     "archive_sha256": "448eb41a006bca486a21328f7e1799d1c1b7a05e52ee91a11f40fe9de0a8711f",
-    "limitation": "Historical Medium covers only 40/80; current measurements cover all 80. Single-run intervals do not estimate repeat variability."
+    "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability."
   },
   "rows": [
     {
@@ -426,21 +426,56 @@
     },
     {
       "id": "glm53-openrouter-pi",
-      "harness": "pi-mono",
+      "harness": "pi-mono 0.73.1",
       "model": "GLM-5.3 (OpenRouter) (high)",
       "runs": 1,
       "light": {
         "passed": 376,
-        "total": 391
+        "total": 391,
+        "wilson95": [
+          0.9376751972598407,
+          0.9766158224274761
+        ]
       },
       "medium_historical": {
         "passed": 20,
-        "total": 40
+        "total": 40,
+        "wilson95": [
+          0.3519952693346575,
+          0.6480047306653425
+        ]
       },
-      "medium": null,
+      "medium": {
+        "passed": 44,
+        "total": 80,
+        "wilson95": [
+          0.4411950788935626,
+          0.6542231081528851
+        ]
+      },
       "source_version": "0.18.0",
-      "source_passed": 396.0,
-      "telemetry_note": "@mean1 · Long wave 6/20 · Reflection 14/20 · Steps 0 · Tokens 0 (metrics absent)"
+      "source_passed": 396,
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures · historical431 + new40, not a fresh full run",
+      "measurement_type": "historical_plus_wave19",
+      "wave19": {
+        "passed": 24,
+        "total": 40,
+        "wilson95": [
+          0.44595893660346597,
+          0.7365167431570776
+        ]
+      },
+      "source_sha256": "fa550a21dc95c1873b93be198f1f3471075a123bfa0bdd1d3337c30c2a2ea061",
+      "reasoning_effort": "high",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-pi-glm53",
+      "historical_provenance": {
+        "source_version": "0.18.0",
+        "source_sha256": null,
+        "validation": "published_aggregate",
+        "light_passed": 376,
+        "medium40_passed": 20
+      }
     },
     {
       "id": "glm-openhands",
@@ -768,21 +803,56 @@
     },
     {
       "id": "run-19",
-      "harness": "pi-mono",
-      "model": "GigaChat 3.5 (PROM)",
+      "harness": "pi-mono 0.73.1",
+      "model": "GigaChat 3.5 (PROM), build 32.9.16.9 (default)",
       "runs": 1,
       "light": {
         "passed": 294,
-        "total": 391
+        "total": 391,
+        "wilson95": [
+          0.7067958007003114,
+          0.7921386338658973
+        ]
       },
       "medium_historical": {
         "passed": 0,
-        "total": 40
+        "total": 40,
+        "wilson95": [
+          6.938893903907228e-18,
+          0.08762160119728224
+        ]
       },
-      "medium": null,
+      "medium": {
+        "passed": 0,
+        "total": 80,
+        "wilson95": [
+          3.469446951953614e-18,
+          0.04581812953552469
+        ]
+      },
       "source_version": "0.18.0",
-      "source_passed": 294.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "source_passed": 294,
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures · historical431 + new40, not a fresh full run",
+      "measurement_type": "historical_plus_wave19",
+      "wave19": {
+        "passed": 0,
+        "total": 40,
+        "wilson95": [
+          6.938893903907228e-18,
+          0.08762160119728224
+        ]
+      },
+      "source_sha256": "c180d6747bc518c70fba134a5f46daba5d986ec98636aa492d0db510dcd4f0c0",
+      "reasoning_effort": "default",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-pi-giga35",
+      "historical_provenance": {
+        "source_version": "0.18.0",
+        "source_sha256": "67e5336c70fe40e65f31b05710e4fb08d24f71a33910908ad229e7fae2bd3c36",
+        "validation": "raw_431_verified",
+        "light_passed": 294,
+        "medium40_passed": 0
+      }
     },
     {
       "id": "run-20",
@@ -1442,7 +1512,16 @@
           0.04581812953552469
         ]
       },
-      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning default · 471/471 tasks · infrastructure failures: 0"
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning default · 471/471 tasks · infrastructure failures: 0",
+      "measurement_type": "full_run",
+      "wave19": {
+        "passed": 0,
+        "total": 40,
+        "wilson95": [
+          6.938893903907228e-18,
+          0.08762160119728224
+        ]
+      }
     },
     {
       "id": "wave19-haiku",
@@ -1472,7 +1551,16 @@
           0.7230582129846858
         ]
       },
-      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning default · 471/471 tasks · infrastructure failures: 0"
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning default · 471/471 tasks · infrastructure failures: 0",
+      "measurement_type": "full_run",
+      "wave19": {
+        "passed": 31,
+        "total": 40,
+        "wilson95": [
+          0.6249690325769044,
+          0.8768390867645905
+        ]
+      }
     },
     {
       "id": "wave19-glm53",
@@ -1502,7 +1590,16 @@
           0.5588049211064375
         ]
       },
-      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning high · 471/471 tasks · infrastructure failures: 0"
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning high · 471/471 tasks · infrastructure failures: 0",
+      "measurement_type": "full_run",
+      "wave19": {
+        "passed": 9,
+        "total": 40,
+        "wilson95": [
+          0.12316091323540954,
+          0.3750309674230957
+        ]
+      }
     },
     {
       "id": "wave19-deepseek41flash",
@@ -1532,7 +1629,394 @@
           0.8214259851149045
         ]
       },
-      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning high · 471/471 tasks · infrastructure failures: 0"
+      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning high · 471/471 tasks · infrastructure failures: 0",
+      "measurement_type": "full_run",
+      "wave19": {
+        "passed": 27,
+        "total": 40,
+        "wilson95": [
+          0.5201774618987811,
+          0.7991549776821703
+        ]
+      }
+    },
+    {
+      "id": "w19-codex-giga35",
+      "harness": "Codex CLI 0.160.1",
+      "model": "GigaChat 3.5 (PROM), build 32.9.16.9 (default)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 0,
+        "total": 40,
+        "wilson95": [
+          6.938893903907228e-18,
+          0.08762160119728224
+        ]
+      },
+      "source_sha256": "0fc6528cfb7f3dc59218854d74e49c364598bdb89ee889d0baa4b6d3146da64e",
+      "reasoning_effort": "default",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-codex-giga35",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-codex-haiku",
+      "harness": "Codex CLI 0.160.1",
+      "model": "Claude Haiku 5.5 (OpenRouter) (default)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 31,
+        "total": 40,
+        "wilson95": [
+          0.6249690325769044,
+          0.8768390867645905
+        ]
+      },
+      "source_sha256": "71e30121e573f90983ddbc9bcef3bf887b3dfb5b65d7e47252957a4bf407c0d3",
+      "reasoning_effort": "default",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-codex-haiku",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-codex-glm53",
+      "harness": "Codex CLI 0.160.1",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 14,
+        "total": 40,
+        "wilson95": [
+          0.22134528873176587,
+          0.5049411916274189
+        ]
+      },
+      "source_sha256": "bb02337d2b7ed2980d74893e78300217d165d51b80e840e2e1ff316e3e954e14",
+      "reasoning_effort": "high",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-codex-glm53",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-codex-deepseek41flash",
+      "harness": "Codex CLI 0.160.1",
+      "model": "DeepSeek V4.1 Flash (OpenRouter) (high)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 31,
+        "total": 40,
+        "wilson95": [
+          0.6249690325769044,
+          0.8768390867645905
+        ]
+      },
+      "source_sha256": "c08925f32471f8b8b50a0c3b11f530b49df62795d78a47c33e31da13ed60d297",
+      "reasoning_effort": "high",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-codex-deepseek41flash",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-claude-giga35",
+      "harness": "Claude Code 2.1.300",
+      "model": "GigaChat 3.5 (PROM), build 32.9.16.9 (default)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 2,
+        "total": 40,
+        "wilson95": [
+          0.013820667386148802,
+          0.16503877369140524
+        ]
+      },
+      "source_sha256": "1ad88b0a038f3527fa3775375e07e8f1ef410367b8e73592a95fa79c0203089f",
+      "reasoning_effort": "default",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-claude-giga35",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-claude-haiku",
+      "harness": "Claude Code 2.1.300",
+      "model": "Claude Haiku 5.5 (OpenRouter) (default)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 26,
+        "total": 40,
+        "wilson95": [
+          0.4950588083725812,
+          0.7786547112682342
+        ]
+      },
+      "source_sha256": "562ededc1c66362b0cc5672bc3e0aab90898acb8ceb6d4acf0627e163af3f8c2",
+      "reasoning_effort": "default",
+      "measurement_date": "2026-10-20",
+      "details_url": "harness-wave19.html#w19-claude-haiku",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-claude-glm53",
+      "harness": "Claude Code 2.1.300",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 17,
+        "total": 40,
+        "wilson95": [
+          0.2850939255995071,
+          0.5780493145800853
+        ]
+      },
+      "source_sha256": "b3bed91d409f76fc215d19c2b417ee5166d46d4ae1a3578fb164df78a5f3e9b7",
+      "reasoning_effort": "high",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-claude-glm53",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-claude-deepseek41flash",
+      "harness": "Claude Code 2.1.300",
+      "model": "DeepSeek V4.1 Flash (OpenRouter) (high)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 30,
+        "total": 40,
+        "wilson95": [
+          0.5980603857923241,
+          0.8581288136090348
+        ]
+      },
+      "source_sha256": "0795af44ce39fe693fd679dd25146336e967ef89be8a1f6ec3cdefd2f898690c",
+      "reasoning_effort": "high",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-claude-deepseek41flash",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-pi-haiku",
+      "harness": "pi-mono 0.73.1",
+      "model": "Claude Haiku 5.5 (OpenRouter) (default)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 29,
+        "total": 40,
+        "wilson95": [
+          0.5716504419378987,
+          0.8389198375233242
+        ]
+      },
+      "source_sha256": "f85833c14926faeed84c35f9aa748ab0418270f521a9cfa880ea6ea279b0a71d",
+      "reasoning_effort": "default",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-pi-haiku",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-pi-deepseek41flash",
+      "harness": "pi-mono 0.73.1",
+      "model": "DeepSeek V4.1 Flash (OpenRouter) (high)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 26,
+        "total": 40,
+        "wilson95": [
+          0.4950588083725812,
+          0.7786547112682342
+        ]
+      },
+      "source_sha256": "3db937aeb3d715e2d9a0348bab5d08a8a5c522bee730353fe4a00380920b83da",
+      "reasoning_effort": "high",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-pi-deepseek41flash",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-openclaw-giga35",
+      "harness": "OpenClaw 2026.9.6",
+      "model": "GigaChat 3.5 (PROM), build 32.9.16.9 (default)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 0,
+        "total": 40,
+        "wilson95": [
+          6.938893903907228e-18,
+          0.08762160119728224
+        ]
+      },
+      "source_sha256": "ab9c64f4130b90ad8b3dba4130efca199bf2390fa72decd9a21551dad20bc51c",
+      "reasoning_effort": "default",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-openclaw-giga35",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-openclaw-haiku",
+      "harness": "OpenClaw 2026.9.6",
+      "model": "Claude Haiku 5.5 (OpenRouter) (default)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 23,
+        "total": 40,
+        "wilson95": [
+          0.42195068541991465,
+          0.7149060744004929
+        ]
+      },
+      "source_sha256": "639e0aaad318d7e1c3cab7b4d5b66795a61e42c4414bc1be61d715a82bca8a3d",
+      "reasoning_effort": "default",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-openclaw-haiku",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
+    },
+    {
+      "id": "w19-openclaw-glm53",
+      "harness": "OpenClaw 2026.9.6",
+      "model": "GLM-5.3 (OpenRouter) (high)",
+      "runs": 1,
+      "source_version": "0.18.0",
+      "measurement_type": "historical_plus_wave19",
+      "source_passed": 408,
+      "light": {
+        "passed": 385,
+        "total": 391,
+        "wilson95": [
+          0.9669302938675344,
+          0.9929486436989285
+        ]
+      },
+      "medium": {
+        "passed": 41,
+        "total": 80,
+        "wilson95": [
+          0.40493334216542537,
+          0.6189212045961865
+        ]
+      },
+      "medium_historical": {
+        "passed": 23,
+        "total": 40,
+        "wilson95": [
+          0.42195068541991465,
+          0.7149060744004929
+        ]
+      },
+      "wave19": {
+        "passed": 18,
+        "total": 40,
+        "wilson95": [
+          0.30705307810905275,
+          0.6017090820106756
+        ]
+      },
+      "source_sha256": "4c35e9cf435d6f53a0d768870b34007c234c102d5436563277c9d9afeaca8a49",
+      "reasoning_effort": "high",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-openclaw-glm53",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures · historical431 + new40, not a fresh full run",
+      "historical_provenance": {
+        "source_version": "0.18.0",
+        "source_sha256": "0f8edf1e9af3e9423e982a7a4c74a1aa0d0f92c9ed1bbcac89592127ad731936",
+        "validation": "raw_431_verified",
+        "light_passed": 385,
+        "medium40_passed": 23
+      }
+    },
+    {
+      "id": "w19-openclaw-deepseek41flash",
+      "harness": "OpenClaw 2026.9.6",
+      "model": "DeepSeek V4.1 Flash (OpenRouter) (high)",
+      "runs": 1,
+      "source_version": "0.19.0",
+      "measurement_type": "wave19_only",
+      "source_passed": null,
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": {
+        "passed": 28,
+        "total": 40,
+        "wilson95": [
+          0.545699811818555,
+          0.8192515477025322
+        ]
+      },
+      "source_sha256": "ff342b61d477f048db68e78756c5bd076b8ea75657db5e845e5d574ea4b88494",
+      "reasoning_effort": "high",
+      "measurement_date": "2026-10-19",
+      "details_url": "harness-wave19.html#w19-openclaw-deepseek41flash",
+      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures"
     }
   ]
 }

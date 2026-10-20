@@ -3,7 +3,7 @@
 // Every view has one explicit denominator. Missing scores never fall back to a
 // full-run score, and unmeasured wave 19 is never treated as forty failures.
 function selectResults(data, suite, coverage, search) {
-  const key = suite === "light" ? "light" : coverage === "current" ? "medium" : "medium_historical";
+  const key = suite === "light" ? "light" : coverage === "current" ? "medium" : coverage === "wave19" ? "wave19" : "medium_historical";
   const query = search.trim().toLocaleLowerCase();
   return data.rows.filter(row => row[key] !== null && row[key] !== undefined)
     .filter(row => (row.model + " " + row.harness).toLocaleLowerCase().includes(query))
@@ -22,7 +22,6 @@ if (typeof document !== "undefined") {
   (async function () {
     const body = document.getElementById("results");
     const search = document.getElementById("search");
-    const coverage = document.getElementById("medium-coverage");
     const more = document.getElementById("show-more");
     const empty = document.getElementById("empty");
     const buttons = [...document.querySelectorAll("[data-suite]")];
@@ -34,31 +33,22 @@ if (typeof document !== "undefined") {
     }
     let expanded = false;
     let data;
-    function render() {
-      buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.suite === suite)));
-      document.getElementById("medium-coverage-label").hidden = suite !== "medium";
-      document.getElementById("suite-title").textContent = "harness_bench_fast " + suite;
-      document.getElementById("coverage-note").textContent = suite === "light"
-        ? "Tasks 1–391 · complete Light coverage · v0.19.0 measurements and historical v0.18.0 rescores."
-        : coverage.value === "current"
-          ? "Tasks 392–471 · current Medium, 80 tasks · complete wave 19 measurements."
-          : "Tasks 392–431 · historical subset: 40 of 80 Medium tasks measured. Wave 19 (432–471) unmeasured; scores below use only these 40 tasks.";
-      const rows = selectResults(data, suite, coverage.value, search.value);
-      const ranking = selectResults(data, suite, coverage.value, "");
-      body.replaceChildren();
-      const visible = expanded ? rows : rows.slice(0, 12);
-      visible.forEach(row => {
+    function renderTable(target, rows, ranking, scope) {
+      target.replaceChildren();
+      rows.forEach(row => {
         const tr = document.createElement("tr");
         const rank = document.createElement("td");
         const firstEqual = ranking.findIndex(other => Math.abs(other.result.passed - row.result.passed) < 1e-9);
         rank.textContent = firstEqual + 1;
         const who = document.createElement("td");
         const link = document.createElement("a");
-        link.href = row.source_version === "0.19.0" ? "wave19-measurements.html#" + row.id : "archive.html#measurement-" + row.id;
+        link.href = row.details_url || (row.source_version === "0.19.0" ? "wave19-measurements.html#" + row.id : "archive.html#measurement-" + row.id);
         link.textContent = row.model;
         const harness = document.createElement("span");
         harness.className = "harness";
-        harness.textContent = row.harness + " · " + row.runs + (row.runs === 1 ? " run" : " runs");
+        const compositeView = row.measurement_type === "historical_plus_wave19" && suite === "medium" && scope === "current";
+        harness.textContent = row.harness + " · " + (compositeView ? "historical + wave 19" : row.runs + (row.runs === 1 ? " run" : " runs")) +
+          (suite === "medium" && scope === "wave19" ? " · wave 19 only" : "");
         who.append(link, harness);
         const passed = document.createElement("td");
         passed.className = "numeric";
@@ -84,14 +74,32 @@ if (typeof document !== "undefined") {
         bar.append(fill);
         score.append(scoreLabel, bar);
         tr.append(rank, who, passed, score);
-        body.append(tr);
+        target.append(tr);
       });
+    }
+    function render() {
+      buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.suite === suite)));
+      document.getElementById("suite-title").textContent = "harness_bench_fast " + suite;
+      document.getElementById("coverage-note").textContent = suite === "light"
+        ? "Tasks 1–391 · complete Light coverage · v0.19.0 measurements and historical v0.18.0 rescores."
+        : "Tasks 392–471 · all 80 Medium tasks · historical + wave 19 composites are labeled. New-task results follow below.";
+      const rows = selectResults(data, suite, "current", search.value);
+      const ranking = selectResults(data, suite, "current", "");
+      renderTable(body, expanded ? rows : rows.slice(0, 12), ranking, "current");
       document.getElementById("run-count").textContent = rows.length + " configurations";
       more.hidden = expanded || rows.length <= 12;
       more.textContent = "Show all " + rows.length + " results";
+      const waveSection = document.getElementById("wave19-section");
+      waveSection.hidden = suite !== "medium";
+      const waveRows = suite === "medium" ? selectResults(data, "medium", "wave19", search.value) : [];
+      if (suite === "medium") {
+        renderTable(document.getElementById("wave19-results"), waveRows, selectResults(data, "medium", "wave19", ""), "wave19");
+        document.getElementById("wave19-count").textContent = waveRows.length + " configurations";
+        document.getElementById("wave19-empty").hidden = waveRows.length > 0;
+      }
       empty.hidden = rows.length > 0;
-      empty.textContent = suite === "medium" && coverage.value === "current"
-        ? "No complete 80-task Medium results published. Select the historical 40-task coverage to see existing measurements."
+      empty.textContent = waveRows.length > 0
+        ? "No complete 80-task results match this search. New-task results are listed below."
         : "No results match your search.";
     }
     try {
@@ -113,7 +121,7 @@ if (typeof document !== "undefined") {
         expanded = false;
         render();
       });
-      [search, coverage].forEach(input => input.addEventListener("input", () => { expanded = false; render(); }));
+      search.addEventListener("input", () => { expanded = false; render(); });
       more.addEventListener("click", () => { expanded = true; render(); });
     } catch (error) {
       empty.hidden = false;

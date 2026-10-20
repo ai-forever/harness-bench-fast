@@ -85,3 +85,4 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding-block
 .run-snapshot tbody th { color: var(--ink); font-size: 14px; text-transform: none; letter-spacing: 0; }
 .run-snapshot details { font-size: 13px; }
 @media (max-width: 620px) { .run-snapshot { padding: 18px; } .run-snapshot tbody th { font-size: 12px; } }
+.wave19-section { margin-top: 40px; }
