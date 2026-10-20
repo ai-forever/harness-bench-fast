@@ -28,7 +28,7 @@ if (typeof document !== "undefined") {
     const buttons = [...document.querySelectorAll("[data-suite]")];
     let suite = location.hash === "#medium" ? "medium" : "light";
     // Preserve incoming links to models and protocol notes from the old landing.
-    if (location.hash && !["#light", "#medium"].includes(location.hash)) {
+    if (location.hash && !["#light", "#medium", "#secret-700b"].includes(location.hash)) {
       location.replace("archive.html" + location.hash);
       return;
     }
@@ -99,6 +99,9 @@ if (typeof document !== "undefined") {
       if (!response.ok) throw new Error("HTTP " + response.status);
       data = await response.json();
       render();
+      if (location.hash === "#secret-700b") {
+        document.getElementById("secret-700b").scrollIntoView();
+      }
       buttons.forEach(button => button.addEventListener("click", () => {
         suite = button.dataset.suite;
         history.replaceState(null, "", "#" + suite);

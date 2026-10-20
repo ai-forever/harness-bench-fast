@@ -76,3 +76,12 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding-block
   .score-bar { width: 72px; }
   footer { flex-direction: column; gap: 8px; }
 }
+
+.run-snapshot { margin: 8px 0 32px; padding: 24px; border: 1px solid #c9a569; border-radius: 12px; background: #fff8ec; scroll-margin-top: 24px; }
+.run-snapshot p { font-size: 14px; max-width: 900px; }
+.run-snapshot .snapshot-label { margin: 0 0 10px; color: #765012; font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .7px; }
+.run-snapshot .snapshot-meta { color: var(--muted); font-size: 12px; }
+.run-snapshot th:first-child { width: auto; font: inherit; }
+.run-snapshot tbody th { color: var(--ink); font-size: 14px; text-transform: none; letter-spacing: 0; }
+.run-snapshot details { font-size: 13px; }
+@media (max-width: 620px) { .run-snapshot { padding: 18px; } .run-snapshot tbody th { font-size: 12px; } }
