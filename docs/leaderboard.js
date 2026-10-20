@@ -49,7 +49,8 @@ if (typeof document !== "undefined") {
         harness.className = "harness";
         const compositeView = row.measurement_type === "historical_plus_wave19" && suite === "medium" && scope === "current";
         harness.textContent = row.harness + " · " + (compositeView ? "historical + wave 19" : row.runs + (row.runs === 1 ? " run" : " runs")) +
-          (suite === "medium" && scope === "wave19" ? " · wave 19 only" : "");
+          (suite === "medium" && scope === "wave19" ? " · wave 19 only" : "") +
+          (row.result.note ? " · " + row.result.note : "");
         who.append(link, harness);
         const passed = document.createElement("td");
         passed.className = "numeric";

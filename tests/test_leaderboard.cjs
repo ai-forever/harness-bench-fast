@@ -6,7 +6,7 @@ const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
 assert.equal(light.length, 84);
 assert.equal(medium.length, 79);
-assert.equal(selectResults(data, "medium", "current", "").length, 8);
+assert.equal(selectResults(data, "medium", "current", "").length, 9);
 for (const rows of [light, medium]) {
   for (let i = 1; i < rows.length; i++) assert.ok(rows[i - 1].result.passed >= rows[i].result.passed);
 }
@@ -23,7 +23,10 @@ console.log("Leaderboard scope, ranking, missing-data and search checks passed."
 for (const row of data.rows.filter(r => r.measurement_type === "full_run")) { assert.equal(row.light.passed + row.medium.passed, row.source_passed); assert.equal(row.medium.total, 80); }
 
 const wave19 = selectResults(data, "medium", "wave19", "");
-assert.equal(wave19.length, 21);
+assert.equal(wave19.length, 22);
+assert.equal(selectResults(data, "light", "current", "Sonnet 5.5 (OpenRouter) (medium)").length, 0);
+assert.equal(selectResults(data, "medium", "current", "Sonnet 5.5 (OpenRouter) (medium)")[0].result.passed, 53);
+assert.equal(wave19.find(r => r.id === "sonnet55-pi-medium").result.passed, 32);
 assert.equal(wave19.find(r => r.id === "w19-claude-haiku").result.passed, 26);
 assert.equal(selectResults(data, "medium", "current", "Claude Code").length, 0);
 assert.equal(selectResults(data, "medium", "wave19", "Claude Code").length, 4);

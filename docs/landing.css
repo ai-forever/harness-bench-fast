@@ -33,6 +33,7 @@ table { width: 100%; border-collapse: collapse; }
 th { text-align: left; color: var(--muted); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .7px; }
 th, td { padding: 13px 12px; border-bottom: 1px solid var(--line); }
 th:first-child, td:first-child { padding-left: 4px; width: 42px; color: var(--muted); font: 12px ui-monospace, monospace; }
+.measurement-results th:first-child, .measurement-results td:first-child { width: 34%; color: inherit; font: inherit; }
 td { font-size: 14px; }
 td a { text-decoration: none; }
 td a:hover { text-decoration: underline; }
