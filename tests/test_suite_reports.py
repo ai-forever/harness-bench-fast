@@ -212,7 +212,7 @@ def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
     expected = build()
     docs = tmp_path / "docs"
     docs.mkdir()
-    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json", "secret-sft-mini-v019.json", "sonnet55-medium.json", "astra-medium.json"):
+    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json", "secret-sft-mini-v019.json", "sonnet55-medium.json", "astra-medium.json", "leaderboard-telemetry.json"):
         text = (root / "docs" / name).read_text(encoding="utf-8")
         assert "\n" in text
         (docs / name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))

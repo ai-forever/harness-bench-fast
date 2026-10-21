@@ -7,7 +7,7 @@ function selectResults(data, suite, coverage, search) {
   const query = search.trim().toLocaleLowerCase();
   return data.rows.filter(row => row[key] !== null && row[key] !== undefined)
     .filter(row => (row.model + " " + row.harness).toLocaleLowerCase().includes(query))
-    .map(row => ({ ...row, result: row[key] }))
+    .map(row => ({ ...row, result: row[key], usage: row.telemetry?.[key] || null }))
     .sort((a, b) => b.result.passed / b.result.total - a.result.passed / a.result.total ||
       a.model.localeCompare(b.model) || a.harness.localeCompare(b.harness));
 }
@@ -16,7 +16,25 @@ function formatPassed(value) {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
-if (typeof module !== "undefined") module.exports = { selectResults, formatPassed };
+function formatUsage(usage, metric) {
+  const item = usage?.[metric];
+  const label = metric === "steps" ? "Steps" : "Tokens";
+  if (!item || item.status === "unavailable" || !Number.isFinite(item.value)) {
+    return { text: "—", note: "Unavailable", detail: label + ": unavailable for this task subset." };
+  }
+  const text = item.value >= 1000000
+    ? new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 2 }).format(item.value)
+    : new Intl.NumberFormat("en-US").format(item.value);
+  const coverage = item.covered_tasks + "/" + usage.tasks + " tasks";
+  const status = { complete: "Recorded", partial: "Partial", raw: "Raw" }[item.status];
+  const note = item.status === "complete" ? "" : status + " · " + coverage;
+  const detail = label + ": " + new Intl.NumberFormat("en-US").format(item.value) +
+    (item.unit ? " " + item.unit.replaceAll("_", " ") : "") + ". " + status + "; " + coverage + ". " +
+    (usage.notes || []).join(" ");
+  return { text, note, detail };
+}
+
+if (typeof module !== "undefined") module.exports = { selectResults, formatPassed, formatUsage };
 
 if (typeof document !== "undefined") {
   (async function () {
@@ -56,6 +74,7 @@ if (typeof document !== "undefined") {
         who.append(link, harness);
         const passed = document.createElement("td");
         passed.className = "numeric";
+        passed.dataset.label = "Passed";
         passed.textContent = formatPassed(row.result.passed) + "/" + row.result.total;
         if (row.runs > 1) {
           const average = document.createElement("span");
@@ -66,6 +85,7 @@ if (typeof document !== "undefined") {
         }
         const score = document.createElement("td");
         score.className = "numeric score-cell";
+        score.dataset.label = "Score";
         const percent = 100 * row.result.passed / row.result.total;
         const scoreLabel = document.createElement("span");
         scoreLabel.textContent = percent.toFixed(1) + "%";
@@ -78,6 +98,26 @@ if (typeof document !== "undefined") {
         bar.append(fill);
         score.append(scoreLabel, bar);
         tr.append(rank, who, passed, score);
+        for (const metric of ["steps", "tokens"]) {
+          const cell = document.createElement("td");
+          cell.className = "numeric usage-cell";
+          cell.dataset.label = metric === "steps" ? "Steps" : "Tokens";
+          const formatted = formatUsage(row.usage, metric);
+          const value = document.createElement("span");
+          value.className = "usage-value";
+          value.textContent = formatted.text;
+          value.title = formatted.detail;
+          value.setAttribute("aria-label", formatted.detail);
+          value.tabIndex = 0;
+          cell.append(value);
+          if (formatted.note) {
+            const note = document.createElement("span");
+            note.className = "usage-note";
+            note.textContent = formatted.note;
+            cell.append(note);
+          }
+          tr.append(cell);
+        }
         target.append(tr);
       });
     }
@@ -90,7 +130,7 @@ if (typeof document !== "undefined") {
       const rows = selectResults(data, suite, "current", search.value);
       const ranking = selectResults(data, suite, "current", "");
       renderTable(body, expanded ? rows : rows.slice(0, 12), ranking, "current");
-      document.getElementById("run-count").textContent = rows.length + " configurations";
+      document.getElementById("run-count").textContent = rows.length + (rows.length === 1 ? " configuration" : " configurations");
       more.hidden = expanded || rows.length <= 12;
       more.textContent = "Show all " + rows.length + " results";
       const waveSection = document.getElementById("wave19-section");
@@ -98,7 +138,7 @@ if (typeof document !== "undefined") {
       const waveRows = suite === "medium" ? selectResults(data, "medium", "wave19", search.value) : [];
       if (suite === "medium") {
         renderTable(document.getElementById("wave19-results"), waveRows, selectResults(data, "medium", "wave19", ""), "wave19");
-        document.getElementById("wave19-count").textContent = waveRows.length + " configurations";
+        document.getElementById("wave19-count").textContent = waveRows.length + (waveRows.length === 1 ? " configuration" : " configurations");
         document.getElementById("wave19-empty").hidden = waveRows.length > 0;
       }
       empty.hidden = rows.length > 0;

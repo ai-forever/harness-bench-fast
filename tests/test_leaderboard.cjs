@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const { selectResults, formatPassed } = require("../docs/leaderboard.js");
+const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboard.js");
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
@@ -69,3 +69,24 @@ assert.ok(fs.existsSync(require("node:path").join(__dirname, "../docs/secret-700
 
 assert.equal(secret[0].validation_basis, "operator_acceptance");
 assert.ok(!landing.includes("unvalidated"));
+
+// Totals follow the selected task subset, never a whole-run fallback.
+const astraMedium = selectResults(data, "medium", "current", "GPT-6-Astra")[0];
+const astraWave = selectResults(data, "medium", "wave19", "GPT-6-Astra")[0];
+assert.equal(astraMedium.usage.steps.value, 1328);
+assert.equal(astraMedium.usage.tokens.value, 49216848);
+assert.equal(astraWave.usage.steps.value, 283);
+assert.equal(astraWave.usage.tokens.value, 4270108);
+assert.equal(formatUsage(astraMedium.usage, "tokens").text, "49.22M");
+assert.equal(formatUsage(astraMedium.usage, "tokens").note, "Partial · 80/80 tasks");
+assert.ok(formatUsage(astraMedium.usage, "tokens").detail.includes("49,216,848"));
+assert.equal(formatUsage(astraMedium.usage, "steps").text, "1,328");
+assert.equal(formatUsage(null, "tokens").text, "—");
+assert.equal(formatUsage({ tasks: 40, steps: { value: null, status: "unavailable" } }, "steps").text, "—");
+assert.equal(formatUsage({ tasks: 40, steps: { value: 0, covered_tasks: 40, status: "complete" } }, "steps").text, "0");
+assert.equal(formatUsage({ tasks: 80, steps: { value: 17, covered_tasks: 3, status: "raw" } }, "steps").note, "Raw · 3/80 tasks");
+assert.equal(selectResults(data, "medium", "current", "").find(r => r.id === "run-19").usage.steps.value, null);
+assert.equal(selectResults(data, "light", "current", "Codex")[0].usage, null);
+assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 2);
+assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 2);
+console.log("Subset usage, exact totals, incomplete counters and real zero checks passed.");

@@ -38,6 +38,13 @@ for incomplete or infrastructure-invalid suites. Wilson intervals in complete
 reports describe a Bernoulli task model, not repeat variability on the fixed suite.
 To rebuild the landing data: `python scripts/build_landing_data.py` (Python 3.12+).
 
+The leaderboard shows **Steps** and **Tokens** for each displayed task subset.
+The public `docs/leaderboard-telemetry.json` snapshot binds these counters to
+the source result hashes. Native tool calls and recorded input/output usage are
+recovered where available; partial or unaudited counters are labeled, and missing
+subset totals appear as a dash. Full-run usage is never substituted for Light,
+Medium or wave 19 usage. Historical scores and measurement protocols are unchanged.
+
 Current task set: **471 tasks, `task-set v0.19.1`**. Tasks 432–471 remain **wave 19: feasibility** — 40 tasks in 20 matched pairs; this revision adds no tasks. The agent must construct and submit a solution, execute a feasible search strategy, or prove that the formal conditions cannot be met. The runtime has a 3,600-second sanitary guard against hangs; formal resource budgets inside tasks are unchanged. A timely host-recorded `submit`/`finish` that passes the full verifier earns credit even if the subsequent final reply or process times out. Format and protocol compliance are part of the score. This measures the complete agent configuration, not a separate ability to predict its own solving time. Individual task credit is the main metric; both halves must pass for additional pair credit. See [wave 19](docs/wave19-feasibility.md) for the contracts, runtime and validation limits.
 
 **Wave 19 requires Linux/bubblewrap and a trusted host service.** Use `run-cli --isolation bwrap` or `run-openrouter --isolation bwrap` (the isolated CLI worker). Native `run` / `run-pure`, native OpenRouter execution, RLI and Harbor export reject selections containing these tasks before model execution. To use those paths on earlier tasks, select `--from-task 1 --to-task 431`.
