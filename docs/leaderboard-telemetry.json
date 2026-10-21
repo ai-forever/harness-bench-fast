@@ -1,0 +1,1266 @@
+{
+  "schema_version": 1,
+  "rows": {
+    "wave19-giga35": {
+      "light": {
+        "observed_tasks": 391,
+        "steps": {
+          "value": 1867,
+          "covered_tasks": 370,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 22695451,
+          "input_tokens": 22399314,
+          "output_tokens": 296137,
+          "covered_tasks": 391,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 0,
+        "tasks": 391,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "f463374d9ad89be0c19320b1a485b09bf6d4eaedcd93069e8c12ef7e7db330d2"
+        ]
+      },
+      "medium": {
+        "observed_tasks": 80,
+        "steps": {
+          "value": 2973,
+          "covered_tasks": 47,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 293100390,
+          "input_tokens": 291388528,
+          "output_tokens": 1711862,
+          "covered_tasks": 74,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 6,
+        "tasks": 80,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "f463374d9ad89be0c19320b1a485b09bf6d4eaedcd93069e8c12ef7e7db330d2"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 104,
+          "covered_tasks": 12,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 19092411,
+          "input_tokens": 19040155,
+          "output_tokens": 52256,
+          "covered_tasks": 36,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 4,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "f463374d9ad89be0c19320b1a485b09bf6d4eaedcd93069e8c12ef7e7db330d2"
+        ]
+      }
+    },
+    "wave19-haiku": {
+      "light": {
+        "observed_tasks": 391,
+        "steps": {
+          "value": 1693,
+          "covered_tasks": 391,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 18772122,
+          "input_tokens": 18312827,
+          "output_tokens": 459295,
+          "covered_tasks": 391,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 0,
+        "tasks": 391,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "7e7b26736b67122f73a1a13e5786d51774d803731742cdb404832c4d220e1ae9"
+        ]
+      },
+      "medium": {
+        "observed_tasks": 80,
+        "steps": {
+          "value": 1736,
+          "covered_tasks": 73,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 222945339,
+          "input_tokens": 211787182,
+          "output_tokens": 11158157,
+          "covered_tasks": 73,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 7,
+        "tasks": 80,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "7e7b26736b67122f73a1a13e5786d51774d803731742cdb404832c4d220e1ae9"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 394,
+          "covered_tasks": 33,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 7413396,
+          "input_tokens": 7130003,
+          "output_tokens": 283393,
+          "covered_tasks": 33,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 7,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "7e7b26736b67122f73a1a13e5786d51774d803731742cdb404832c4d220e1ae9"
+        ]
+      }
+    },
+    "wave19-glm53": {
+      "light": {
+        "observed_tasks": 391,
+        "steps": {
+          "value": 2069,
+          "covered_tasks": 390,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 15495905,
+          "input_tokens": 15281519,
+          "output_tokens": 214386,
+          "covered_tasks": 391,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 0,
+        "tasks": 391,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "69d10ca1ec4be03f1a21c55b51c2092616857411d8a11ebae571d6cd2021adc3"
+        ]
+      },
+      "medium": {
+        "observed_tasks": 80,
+        "steps": {
+          "value": 2366,
+          "covered_tasks": 52,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 221297120,
+          "input_tokens": 217717714,
+          "output_tokens": 3579406,
+          "covered_tasks": 52,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 28,
+        "tasks": 80,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "69d10ca1ec4be03f1a21c55b51c2092616857411d8a11ebae571d6cd2021adc3"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 169,
+          "covered_tasks": 13,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 2258463,
+          "input_tokens": 2205469,
+          "output_tokens": 52994,
+          "covered_tasks": 13,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 27,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "69d10ca1ec4be03f1a21c55b51c2092616857411d8a11ebae571d6cd2021adc3"
+        ]
+      }
+    },
+    "wave19-deepseek41flash": {
+      "light": {
+        "observed_tasks": 391,
+        "steps": {
+          "value": 2625,
+          "covered_tasks": 391,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 21139195,
+          "input_tokens": 20694903,
+          "output_tokens": 444292,
+          "covered_tasks": 391,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 0,
+        "tasks": 391,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "e9ab6233d7549ef3fceadde6ce76ad281241c8abc833414ea5a70c361476e6a4"
+        ]
+      },
+      "medium": {
+        "observed_tasks": 80,
+        "steps": {
+          "value": 3612,
+          "covered_tasks": 71,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 371546456,
+          "input_tokens": 364862050,
+          "output_tokens": 6684406,
+          "covered_tasks": 71,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 9,
+        "tasks": 80,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "e9ab6233d7549ef3fceadde6ce76ad281241c8abc833414ea5a70c361476e6a4"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 455,
+          "covered_tasks": 31,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 6516624,
+          "input_tokens": 6336712,
+          "output_tokens": 179912,
+          "covered_tasks": 31,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 9,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "e9ab6233d7549ef3fceadde6ce76ad281241c8abc833414ea5a70c361476e6a4"
+        ]
+      }
+    },
+    "w19-codex-giga35": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 32,
+          "covered_tasks": 32,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 2565951,
+          "input_tokens": 2519482,
+          "output_tokens": 46469,
+          "covered_tasks": 32,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 8,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "0fc6528cfb7f3dc59218854d74e49c364598bdb89ee889d0baa4b6d3146da64e"
+        ]
+      }
+    },
+    "w19-codex-haiku": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 35,
+          "covered_tasks": 35,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 6001082,
+          "input_tokens": 5749776,
+          "output_tokens": 251306,
+          "covered_tasks": 35,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 5,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "71e30121e573f90983ddbc9bcef3bf887b3dfb5b65d7e47252957a4bf407c0d3"
+        ]
+      }
+    },
+    "w19-codex-glm53": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 193,
+          "covered_tasks": 25,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 2993038,
+          "input_tokens": 2920204,
+          "output_tokens": 72834,
+          "covered_tasks": 25,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 15,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "bb02337d2b7ed2980d74893e78300217d165d51b80e840e2e1ff316e3e954e14"
+        ]
+      }
+    },
+    "w19-codex-deepseek41flash": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 332,
+          "covered_tasks": 33,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 5805387,
+          "input_tokens": 5596169,
+          "output_tokens": 209218,
+          "covered_tasks": 33,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 7,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "c08925f32471f8b8b50a0c3b11f530b49df62795d78a47c33e31da13ed60d297"
+        ]
+      }
+    },
+    "w19-claude-giga35": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 134,
+          "covered_tasks": 17,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 4043593,
+          "input_tokens": null,
+          "output_tokens": null,
+          "covered_tasks": 17,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 23,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero.",
+          "Raw token total and component counters disagree; component breakdown is unavailable."
+        ],
+        "sources_sha256": [
+          "1ad88b0a038f3527fa3775375e07e8f1ef410367b8e73592a95fa79c0203089f"
+        ]
+      }
+    },
+    "w19-claude-haiku": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 287,
+          "covered_tasks": 36,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 13532650,
+          "input_tokens": null,
+          "output_tokens": null,
+          "covered_tasks": 36,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 4,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero.",
+          "Raw token total and component counters disagree; component breakdown is unavailable."
+        ],
+        "sources_sha256": [
+          "562ededc1c66362b0cc5672bc3e0aab90898acb8ceb6d4acf0627e163af3f8c2"
+        ]
+      }
+    },
+    "w19-claude-glm53": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 144,
+          "covered_tasks": 18,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 6266724,
+          "input_tokens": 6266724,
+          "output_tokens": 0,
+          "covered_tasks": 18,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 22,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "b3bed91d409f76fc215d19c2b417ee5166d46d4ae1a3578fb164df78a5f3e9b7"
+        ]
+      }
+    },
+    "w19-claude-deepseek41flash": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 314,
+          "covered_tasks": 31,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 12797229,
+          "input_tokens": 12797229,
+          "output_tokens": 0,
+          "covered_tasks": 31,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 9,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "0795af44ce39fe693fd679dd25146336e967ef89be8a1f6ec3cdefd2f898690c"
+        ]
+      }
+    },
+    "run-19": {
+      "light": {
+        "observed_tasks": 391,
+        "steps": {
+          "value": null,
+          "covered_tasks": 0,
+          "status": "unavailable",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "covered_tasks": 0,
+          "status": "unavailable",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 0,
+        "tasks": 391,
+        "notes": [
+          "Historical and wave 19 attempts are a composite, not one fresh full run.",
+          "Steps count unique native tool_execution_start events in the final retained execution. Native message_end usage is counted once; cache input is folded in once, reasoning is already in output."
+        ],
+        "sources_sha256": [
+          "c180d6747bc518c70fba134a5f46daba5d986ec98636aa492d0db510dcd4f0c0",
+          "67e5336c70fe40e65f31b05710e4fb08d24f71a33910908ad229e7fae2bd3c36",
+          "4755fa60b25dc273b157160f9c3970b6daab1796006fc99615b98876bde73dbf"
+        ]
+      },
+      "medium": {
+        "observed_tasks": 80,
+        "steps": {
+          "value": null,
+          "covered_tasks": 0,
+          "status": "unavailable",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "covered_tasks": 0,
+          "status": "unavailable"
+        },
+        "timeouts": 4,
+        "tasks": 80,
+        "notes": [
+          "Historical and wave 19 attempts are a composite, not one fresh full run.",
+          "Steps count unique native tool_execution_start events in the final retained execution. Native message_end usage is counted once; cache input is folded in once, reasoning is already in output.",
+          "Historical 40-task Medium telemetry is unavailable; the new 40-task component is reported only under wave 19."
+        ],
+        "sources_sha256": [
+          "c180d6747bc518c70fba134a5f46daba5d986ec98636aa492d0db510dcd4f0c0",
+          "67e5336c70fe40e65f31b05710e4fb08d24f71a33910908ad229e7fae2bd3c36",
+          "4755fa60b25dc273b157160f9c3970b6daab1796006fc99615b98876bde73dbf"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 199,
+          "covered_tasks": 40,
+          "status": "complete",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 4565789,
+          "input_tokens": 4524406,
+          "output_tokens": 41383,
+          "covered_tasks": 40,
+          "status": "partial",
+          "completed_responses": 238,
+          "unmetered_requests": null
+        },
+        "timeouts": 1,
+        "tasks": 40,
+        "notes": [
+          "Historical and wave 19 attempts are a composite, not one fresh full run.",
+          "Steps count unique native tool_execution_start events in the final retained execution. Native message_end usage is counted once; cache input is folded in once, reasoning is already in output."
+        ],
+        "sources_sha256": [
+          "c180d6747bc518c70fba134a5f46daba5d986ec98636aa492d0db510dcd4f0c0",
+          "67e5336c70fe40e65f31b05710e4fb08d24f71a33910908ad229e7fae2bd3c36",
+          "4755fa60b25dc273b157160f9c3970b6daab1796006fc99615b98876bde73dbf"
+        ]
+      }
+    },
+    "w19-pi-haiku": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 323,
+          "covered_tasks": 40,
+          "status": "complete",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 7436402,
+          "input_tokens": 7108231,
+          "output_tokens": 328171,
+          "covered_tasks": 40,
+          "status": "partial",
+          "completed_responses": 353,
+          "unmetered_requests": null
+        },
+        "timeouts": 7,
+        "tasks": 40,
+        "notes": [
+          "Steps count unique native tool_execution_start events in the final retained execution. Native message_end usage is counted once; cache input is folded in once, reasoning is already in output."
+        ],
+        "sources_sha256": [
+          "f85833c14926faeed84c35f9aa748ab0418270f521a9cfa880ea6ea279b0a71d",
+          "9e05d228eb9e6f8db928198b8a9e152f1de5249b574b3bce6875206979fd206c"
+        ]
+      }
+    },
+    "glm53-openrouter-pi": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 340,
+          "covered_tasks": 40,
+          "status": "complete",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 4766673,
+          "input_tokens": 4566913,
+          "output_tokens": 199760,
+          "covered_tasks": 40,
+          "status": "partial",
+          "completed_responses": 323,
+          "unmetered_requests": null
+        },
+        "timeouts": 15,
+        "tasks": 40,
+        "notes": [
+          "Historical result is a published score aggregate; raw per-task telemetry is unavailable.",
+          "Steps count unique native tool_execution_start events in the final retained execution. Native message_end usage is counted once; cache input is folded in once, reasoning is already in output."
+        ],
+        "sources_sha256": [
+          "fa550a21dc95c1873b93be198f1f3471075a123bfa0bdd1d3337c30c2a2ea061",
+          "ee0886a2149798c234b3bcbb687051c625913c5abb24726fe37cd36f3d176ffb"
+        ]
+      }
+    },
+    "w19-pi-deepseek41flash": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 375,
+          "covered_tasks": 40,
+          "status": "complete",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 6747840,
+          "input_tokens": 6516940,
+          "output_tokens": 230900,
+          "covered_tasks": 40,
+          "status": "partial",
+          "completed_responses": 359,
+          "unmetered_requests": null
+        },
+        "timeouts": 13,
+        "tasks": 40,
+        "notes": [
+          "Steps count unique native tool_execution_start events in the final retained execution. Native message_end usage is counted once; cache input is folded in once, reasoning is already in output."
+        ],
+        "sources_sha256": [
+          "3db937aeb3d715e2d9a0348bab5d08a8a5c522bee730353fe4a00380920b83da",
+          "0e2536e724e475696d017fdef91fddc4d5f102efa399d17c1fd40e4dbddfd121"
+        ]
+      }
+    },
+    "w19-openclaw-giga35": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 242,
+          "covered_tasks": 37,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 7435870,
+          "input_tokens": 7399910,
+          "output_tokens": 35960,
+          "covered_tasks": 37,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 3,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "ab9c64f4130b90ad8b3dba4130efca199bf2390fa72decd9a21551dad20bc51c"
+        ]
+      }
+    },
+    "w19-openclaw-haiku": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 208,
+          "covered_tasks": 35,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 5959305,
+          "input_tokens": 5675515,
+          "output_tokens": 283790,
+          "covered_tasks": 35,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 5,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "639e0aaad318d7e1c3cab7b4d5b66795a61e42c4414bc1be61d715a82bca8a3d"
+        ]
+      }
+    },
+    "w19-openclaw-glm53": {
+      "light": {
+        "observed_tasks": 391,
+        "steps": {
+          "value": 1578,
+          "covered_tasks": 391,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 1491137,
+          "input_tokens": 1205593,
+          "output_tokens": 285544,
+          "covered_tasks": 391,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 0,
+        "tasks": 391,
+        "notes": [
+          "Historical and wave 19 attempts are a composite, not one fresh full run.",
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "4c35e9cf435d6f53a0d768870b34007c234c102d5436563277c9d9afeaca8a49",
+          "0f8edf1e9af3e9423e982a7a4c74a1aa0d0f92c9ed1bbcac89592127ad731936"
+        ]
+      },
+      "medium": {
+        "observed_tasks": 80,
+        "steps": {
+          "value": 1285,
+          "covered_tasks": 58,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 4681398,
+          "input_tokens": 3423201,
+          "output_tokens": 1258197,
+          "covered_tasks": 58,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 22,
+        "tasks": 80,
+        "notes": [
+          "Historical and wave 19 attempts are a composite, not one fresh full run.",
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "4c35e9cf435d6f53a0d768870b34007c234c102d5436563277c9d9afeaca8a49",
+          "0f8edf1e9af3e9423e982a7a4c74a1aa0d0f92c9ed1bbcac89592127ad731936"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 132,
+          "covered_tasks": 18,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 368210,
+          "input_tokens": 278499,
+          "output_tokens": 89711,
+          "covered_tasks": 18,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 22,
+        "tasks": 40,
+        "notes": [
+          "Historical and wave 19 attempts are a composite, not one fresh full run.",
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "4c35e9cf435d6f53a0d768870b34007c234c102d5436563277c9d9afeaca8a49",
+          "0f8edf1e9af3e9423e982a7a4c74a1aa0d0f92c9ed1bbcac89592127ad731936"
+        ]
+      }
+    },
+    "w19-openclaw-deepseek41flash": {
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 223,
+          "covered_tasks": 30,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 920067,
+          "input_tokens": 757805,
+          "output_tokens": 162262,
+          "covered_tasks": 30,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 10,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "ff342b61d477f048db68e78756c5bd076b8ea75657db5e845e5d574ea4b88494"
+        ]
+      }
+    },
+    "astra-pi-medium": {
+      "medium": {
+        "observed_tasks": 80,
+        "steps": {
+          "value": 1328,
+          "covered_tasks": 80,
+          "status": "complete",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 49216848,
+          "input_tokens": 48956637,
+          "output_tokens": 260211,
+          "covered_tasks": 80,
+          "status": "partial",
+          "completed_responses": 1330,
+          "unmetered_requests": 7
+        },
+        "timeouts": 15,
+        "tasks": 80,
+        "notes": [
+          "Tokens sum unique completed API responses including responses received after a task cancellation. Failed requests without usage and unreturned generations cannot be measured; this is recorded token usage, not a billing statement.",
+          "Steps count unique native tool_execution_start events in the final retained execution. Native message_end usage is counted once; cache input is folded in once, reasoning is already in output.",
+          "7 failed API requests have no token usage; recorded tokens are a lower bound."
+        ],
+        "sources_sha256": [
+          "edd65d3fc76449b3a1392f562b2908e38ef2621315d90b6100e72aa0ac18211a",
+          "f729efa839a2bb2c6c4f9f687745605289bc187d98df7aae68045efaf6000ddb",
+          "87d5030f9a8042ac5772a24394c06491abd9aeeb61db5fccb1888527a839a51e"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 283,
+          "covered_tasks": 40,
+          "status": "complete",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 4270108,
+          "input_tokens": 4223492,
+          "output_tokens": 46616,
+          "covered_tasks": 40,
+          "status": "partial",
+          "completed_responses": 317,
+          "unmetered_requests": 1
+        },
+        "timeouts": 15,
+        "tasks": 40,
+        "notes": [
+          "Tokens sum unique completed API responses including responses received after a task cancellation. Failed requests without usage and unreturned generations cannot be measured; this is recorded token usage, not a billing statement.",
+          "Steps count unique native tool_execution_start events in the final retained execution. Native message_end usage is counted once; cache input is folded in once, reasoning is already in output.",
+          "1 failed API requests have no token usage; recorded tokens are a lower bound."
+        ],
+        "sources_sha256": [
+          "edd65d3fc76449b3a1392f562b2908e38ef2621315d90b6100e72aa0ac18211a",
+          "f729efa839a2bb2c6c4f9f687745605289bc187d98df7aae68045efaf6000ddb",
+          "87d5030f9a8042ac5772a24394c06491abd9aeeb61db5fccb1888527a839a51e"
+        ]
+      }
+    },
+    "sonnet55-pi-medium": {
+      "medium": {
+        "observed_tasks": 80,
+        "steps": {
+          "value": 1281,
+          "covered_tasks": 80,
+          "status": "complete",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 118517782,
+          "input_tokens": 116231987,
+          "output_tokens": 2285795,
+          "covered_tasks": 80,
+          "status": "partial",
+          "completed_responses": 1311,
+          "unmetered_requests": 4
+        },
+        "timeouts": 4,
+        "tasks": 80,
+        "notes": [
+          "Tokens sum unique completed API responses including responses received after a task cancellation. Failed requests without usage and unreturned generations cannot be measured; this is recorded token usage, not a billing statement.",
+          "Steps count unique native tool_execution_start events in the final retained execution. Native message_end usage is counted once; cache input is folded in once, reasoning is already in output.",
+          "4 failed API requests have no token usage; recorded tokens are a lower bound."
+        ],
+        "sources_sha256": [
+          "1ad33ab48a4875143b7cfca90f794e9c0271440384a3b2dbe3890881e7a48b71",
+          "56e3f5361af1f162b9ef5e21845151e1df867b0f0a8f053cc253aa6f9d5a4ab8",
+          "a241d399c3520ebb75109575a71eb0b729f1ef6c39b098898eec95aa0d6bd185"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": 238,
+          "covered_tasks": 40,
+          "status": "complete",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 4484004,
+          "input_tokens": 4354136,
+          "output_tokens": 129868,
+          "covered_tasks": 40,
+          "status": "complete",
+          "completed_responses": 268,
+          "unmetered_requests": 0
+        },
+        "timeouts": 4,
+        "tasks": 40,
+        "notes": [
+          "Tokens sum unique completed API responses including responses received after a task cancellation. Failed requests without usage and unreturned generations cannot be measured; this is recorded token usage, not a billing statement.",
+          "Steps count unique native tool_execution_start events in the final retained execution. Native message_end usage is counted once; cache input is folded in once, reasoning is already in output."
+        ],
+        "sources_sha256": [
+          "1ad33ab48a4875143b7cfca90f794e9c0271440384a3b2dbe3890881e7a48b71",
+          "56e3f5361af1f162b9ef5e21845151e1df867b0f0a8f053cc253aa6f9d5a4ab8",
+          "a241d399c3520ebb75109575a71eb0b729f1ef6c39b098898eec95aa0d6bd185"
+        ]
+      }
+    },
+    "secret-700b-v019": {
+      "light": {
+        "observed_tasks": 391,
+        "steps": {
+          "value": 2419,
+          "covered_tasks": 383,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 23376390,
+          "input_tokens": 22833233,
+          "output_tokens": 543157,
+          "covered_tasks": 391,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 0,
+        "tasks": 391,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "232d92c02b6f04ac4fd5e3a5d17825800168530ab7c7fb70ad6bd99976f7bff6"
+        ]
+      },
+      "medium": {
+        "observed_tasks": 80,
+        "steps": {
+          "value": 851,
+          "covered_tasks": 19,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 51563200,
+          "input_tokens": 51281321,
+          "output_tokens": 281879,
+          "covered_tasks": 20,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 59,
+        "tasks": 80,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "232d92c02b6f04ac4fd5e3a5d17825800168530ab7c7fb70ad6bd99976f7bff6"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": null,
+          "covered_tasks": 0,
+          "status": "unavailable",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "covered_tasks": 0,
+          "status": "unavailable",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 40,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "232d92c02b6f04ac4fd5e3a5d17825800168530ab7c7fb70ad6bd99976f7bff6"
+        ]
+      }
+    },
+    "secret-sft-mini-v019": {
+      "light": {
+        "observed_tasks": 391,
+        "steps": {
+          "value": 2543,
+          "covered_tasks": 377,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 10483742,
+          "input_tokens": 9738295,
+          "output_tokens": 745447,
+          "covered_tasks": 377,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 14,
+        "tasks": 391,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "d08c13d94724849741076aec91045026632eb6a49668076a7cea7d3a0b8e808e"
+        ]
+      },
+      "medium": {
+        "observed_tasks": 80,
+        "steps": {
+          "value": 959,
+          "covered_tasks": 24,
+          "status": "raw",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": 206144850,
+          "input_tokens": 205651697,
+          "output_tokens": 493153,
+          "covered_tasks": 24,
+          "status": "raw",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 56,
+        "tasks": 80,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "d08c13d94724849741076aec91045026632eb6a49668076a7cea7d3a0b8e808e"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "steps": {
+          "value": null,
+          "covered_tasks": 0,
+          "status": "unavailable",
+          "unit": "tool_calls"
+        },
+        "tokens": {
+          "value": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "covered_tasks": 0,
+          "status": "unavailable",
+          "completed_responses": null,
+          "unmetered_requests": null
+        },
+        "timeouts": 40,
+        "tasks": 40,
+        "notes": [
+          "Saved runner counters only; not independently audited against native usage. Steps use agent_tool_calls, not graph supersteps. Missing counters are omitted, never imputed as zero."
+        ],
+        "sources_sha256": [
+          "d08c13d94724849741076aec91045026632eb6a49668076a7cea7d3a0b8e808e"
+        ]
+      }
+    },
+    "secret-sft-codex-v019": {
+      "light": {
+        "observed_tasks": 391,
+        "tasks": 391,
+        "steps": {
+          "value": 1441,
+          "covered_tasks": 373,
+          "status": "raw",
+          "unit": "agent_steps"
+        },
+        "tokens": {
+          "value": 8998150,
+          "input_tokens": 8405920,
+          "output_tokens": 592230,
+          "covered_tasks": 391,
+          "status": "partial",
+          "lower_bound": true,
+          "completed_responses": 2116,
+          "unmetered_requests": 18
+        },
+        "timeouts": 18,
+        "notes": [
+          "API usage for final retained task attempts: 2116/2134 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
+          "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+        ],
+        "sources_sha256": [
+          "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
+        ]
+      },
+      "medium": {
+        "observed_tasks": 80,
+        "tasks": 80,
+        "steps": {
+          "value": 774,
+          "covered_tasks": 24,
+          "status": "raw",
+          "unit": "agent_steps"
+        },
+        "tokens": {
+          "value": 103032947,
+          "input_tokens": 102086268,
+          "output_tokens": 946679,
+          "covered_tasks": 80,
+          "status": "partial",
+          "lower_bound": true,
+          "completed_responses": 1660,
+          "unmetered_requests": 71
+        },
+        "timeouts": 56,
+        "notes": [
+          "API usage for final retained task attempts: 1660/1731 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
+          "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+        ],
+        "sources_sha256": [
+          "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "tasks": 40,
+        "steps": {
+          "value": 1,
+          "covered_tasks": 1,
+          "status": "raw",
+          "unit": "agent_steps"
+        },
+        "tokens": {
+          "value": 360166,
+          "input_tokens": 345317,
+          "output_tokens": 14849,
+          "covered_tasks": 40,
+          "status": "partial",
+          "lower_bound": true,
+          "completed_responses": 73,
+          "unmetered_requests": 39
+        },
+        "timeouts": 39,
+        "notes": [
+          "API usage for final retained task attempts: 73/112 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
+          "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+        ],
+        "sources_sha256": [
+          "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
+        ]
+      }
+    }
+  }
+}

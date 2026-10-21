@@ -159,9 +159,9 @@ def test_published_landing_scores_preserve_all_source_totals_and_missing_wave19(
     full = [row for row in data["rows"] if row.get("measurement_type") == "full_run"]
     new_only = [row for row in data["rows"] if row.get("measurement_type") == "wave19_only"]
     composites = [row for row in data["rows"] if row.get("measurement_type") == "historical_plus_wave19"]
-    assert len(historical) == 78 and len(full) == 7
+    assert len(historical) == 78 and len(full) == 8
     assert len(new_only) == 13 and len(composites) == 3
-    assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 102
+    assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 103
     astra = next(row for row in data["rows"] if row["id"] == "astra-pi-medium")
     assert astra["light"] is None and astra["medium_historical"] is None
     assert astra["medium"]["passed"] == 58 and astra["medium"]["total"] == 80
@@ -212,7 +212,7 @@ def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
     expected = build()
     docs = tmp_path / "docs"
     docs.mkdir()
-    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json", "secret-sft-mini-v019.json", "secret-sft-codex-v019.json", "sonnet55-medium.json", "astra-medium.json", "universal-agent-haiku.json", "giga35-ultra-reasoning-v019.json"):
+    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json", "secret-sft-mini-v019.json", "sonnet55-medium.json", "astra-medium.json", "universal-agent-haiku.json", "giga35-ultra-reasoning-v019.json", "leaderboard-telemetry.json", "secret-sft-codex-v019.json"):
         text = (root / "docs" / name).read_text(encoding="utf-8")
         assert "\n" in text
         (docs / name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
@@ -220,18 +220,29 @@ def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
     assert build() == expected
 
 
-def test_codex_wire_audit_holds_infrastructure_snapshot_and_checks_token_sums():
+def test_codex_final_wire_audit_and_subset_token_sums():
     root = Path(__file__).resolve().parents[1]
     data = json.loads((root / "docs/leaderboard-results.json").read_text())
     codex = json.loads((root / "docs/secret-sft-codex-v019.json").read_text())
-    assert codex["pending_task_numbers"] == [399]
-    assert not codex["measurement_valid"] and not codex["ranked"]
-    assert not any(row["id"] == "secret-sft-codex-v019" for row in data["rows"])
+    assert codex["pending_task_numbers"] == []
+    assert codex["measurement_valid"] and codex["ranked"]
+    assert any(row["id"] == "secret-sft-codex-v019" for row in data["rows"])
     usage = codex["telemetry"]["selected_api"]
-    assert usage["total_tokens"] == 107751556
-    assert usage["requests_with_usage"] == 3735
-    assert usage["requests_missing_usage"] == 94
+    assert usage["total_tokens"] == 112031097
+    assert usage["requests_with_usage"] == 3776
+    assert usage["requests_missing_usage"] == 89
     assert usage["lower_bound"] is True
     for key in ("input_tokens", "output_tokens", "total_tokens", "requests", "requests_with_usage", "requests_missing_usage"):
         assert usage[key] == sum(codex["counts"][name]["tokens"][key] for name in ("light", "medium"))
     assert codex["counts"]["wave19_feasibility"]["tokens"]["total_tokens"] <= codex["counts"]["medium"]["tokens"]["total_tokens"]
+
+    row = next(row for row in data["rows"] if row["id"] == "secret-sft-codex-v019")
+    for scope, source in (("light", "light"), ("medium", "medium"), ("wave19", "wave19_feasibility")):
+        public = row["telemetry"][scope]
+        audited = codex["counts"][source]["tokens"]
+        assert public["sources_sha256"] == [codex["source_report_sha256"]]
+        assert public["tokens"]["value"] == audited["total_tokens"]
+        assert public["tokens"]["unmetered_requests"] == audited["requests_missing_usage"]
+        assert public["tokens"]["status"] == "partial"
+    assert codex["telemetry"]["all_attempts_api"]["total_tokens"] == 113666663
+    assert codex["telemetry"]["all_attempts_api"]["total_tokens"] > usage["total_tokens"]

@@ -106,9 +106,9 @@ def test_reflect_wave_keeps_its_original_revision() -> None:
 
 
 def test_wave19_is_the_current_revision() -> None:
-    assert TASK_SET_VERSION == "0.19.0"
+    assert TASK_SET_VERSION == "0.19.1"
     assert CURRENT_TASK_SET_REVISION.total_tasks == 471
-    assert CURRENT_TASK_SET_REVISION.added_task_numbers == (432, 471)
+    assert CURRENT_TASK_SET_REVISION.added_task_numbers == (0, 0)
     assert revision_for_task_id(ALL_TASKS[431].id).version == "0.19.0"
     assert revision_for_task_id(ALL_TASKS[-1].id).version == "0.19.0"
     assert TASK_WAVES[-1].name == "wave19-feasibility"

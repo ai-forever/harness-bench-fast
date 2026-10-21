@@ -7,6 +7,8 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 from harness_bench import runner_openrouter
 
 
@@ -48,12 +50,17 @@ def test_isolated_route_preserves_model_configuration_and_exposes_only_runtime(m
     assert captured["transient_retries"] == 4
     paths = captured["runtime_paths"]
     package = Path(runner_openrouter.__file__).parent
+    from harness_bench.cli_isolation import validate_trusted_runtime_paths
+
+    assert str(package / "runtime_limits.py") in paths
+    validate_trusted_runtime_paths(paths)
     assert str(package) not in paths and str(package.parent) not in paths
     assert not any(Path(p).name.startswith(("tasks", "runner", "verifiers")) for p in paths)
     assert captured["extra_env_factory"]() == {"HBF_WORKER_API_KEY": "offline"}
 
 
-def test_worker_invokes_same_builder_without_task_registry(monkeypatch, tmp_path, capsys):
+@pytest.mark.parametrize("flags,expected", [([], 0), (["--recursion-limit", "80"], 90), (["--recursion-limit", "100"], 100)])
+def test_worker_invokes_same_builder_without_task_registry(monkeypatch, tmp_path, capsys, flags, expected):
     package = Path(runner_openrouter.__file__).parent
     monkeypatch.syspath_prepend(str(package))
     spec = importlib.util.spec_from_file_location(
@@ -87,11 +94,12 @@ def test_worker_invokes_same_builder_without_task_registry(monkeypatch, tmp_path
             "--max-tokens",
             "16384",
             "--forward-reasoning-history",
+            *flags,
             "fixture",
         ],
     )
     assert module.main() == 0
-    assert captured["forward_reasoning_history"] is True and captured["recursion_limit"] == 90
+    assert captured["forward_reasoning_history"] is True and captured["recursion_limit"] == expected
     assert captured["payload"] == {"messages": [{"role": "user", "content": "fixture"}]}
     events = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
     assert events[-1]["type"] == "hbf_deepagents_result"
@@ -108,7 +116,6 @@ def test_explicit_reasoning_effort_reaches_native_model(monkeypatch, tmp_path):
         raise ModelBuilt
     monkeypatch.setattr(chat_openai, "ReasoningAwareChatOpenAI", model)
     monkeypatch.setenv("OPENROUTER_REASONING_EFFORT", "medium")
-    import pytest
     with pytest.raises(ModelBuilt):
         openrouter_agent.build_agent(tmp_path, api_key="offline", forward_reasoning_history=True)
     assert captured["reasoning_effort"] == "medium"

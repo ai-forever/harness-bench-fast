@@ -7,6 +7,11 @@ import threading
 from pathlib import Path
 from typing import Any
 
+if __package__:
+    from .runtime_limits import DEFAULT_TASK_TIMEOUT_SECONDS, langgraph_recursion_limit
+else:
+    from runtime_limits import DEFAULT_TASK_TIMEOUT_SECONDS, langgraph_recursion_limit
+
 DEFAULT_OPENROUTER_MODEL = "qwen/qwen3.6-plus"
 DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 _TRANSIENT_STATUS_CODES = {408, 409, 429, 500, 502, 503, 504}
@@ -202,7 +207,7 @@ def build_agent(
     *,
     api_key: str,
     model_name: str = DEFAULT_OPENROUTER_MODEL,
-    recursion_limit: int = 80,
+    recursion_limit: int = 0,
     max_tokens: int | None = None,
     harness_profile: str | None = None,
     forward_reasoning_history: bool = False,
@@ -234,6 +239,7 @@ def build_agent(
             root_dir=workspace,
             virtual_mode=True,
             inherit_env=True,
+            timeout=float(os.getenv("HBF_TASK_TIMEOUT_SECONDS", str(DEFAULT_TASK_TIMEOUT_SECONDS))),
         )
         has_memory = (workspace / "AGENTS.md").exists()
         has_skills = (workspace / ".agents" / "skills").is_dir()
@@ -271,7 +277,7 @@ def build_agent(
         model=model_name,
         base_url=os.getenv("OPENROUTER_BASE_URL", DEFAULT_BASE_URL),
         api_key=api_key,
-        timeout=float(os.getenv("HARNESS_BENCH_REQUEST_TIMEOUT", "600")),
+        timeout=float(os.getenv("HARNESS_BENCH_REQUEST_TIMEOUT", os.getenv("HBF_TASK_TIMEOUT_SECONDS", str(DEFAULT_TASK_TIMEOUT_SECONDS)))),
         # Per-request retries (openai client backoff) for 429/5xx; a failure that
         # survives them restarts the whole task via `transient_attempts`.
         max_retries=int(os.getenv("OPENROUTER_MAX_RETRIES", "2")),
@@ -298,7 +304,7 @@ def build_agent(
     agent = create_deep_agent(
         model=model, backend=backend, memory=memory_sources, skills=skill_sources
     )
-    return agent.with_config({"recursion_limit": recursion_limit})
+    return agent.with_config({"recursion_limit": langgraph_recursion_limit(recursion_limit)})
 
 
 def is_transient_model_error(exc: BaseException) -> bool:

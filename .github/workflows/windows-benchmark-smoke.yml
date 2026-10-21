@@ -19,9 +19,9 @@ on:
         type: string
         default: "task_111_xlsx_extract_b2, task_112_xlsx_sum_column, task_113_xlsx_update_cell, task_123_sqlite_count, task_124_sqlite_sum, task_148_csv_to_xlsx, task_149_sqlite_to_json, task_152_sqlite_join_to_json, task_153_xlsx_to_markdown_report, task_154_jsonl_into_sqlite, task_158_xlsx_split_sheets, task_191_sqlite_revenue_report, task_196_xlsx_to_csv_and_json, task_199_sqlite_filtered_export, task_203_sqlite_team_markdown_report, task_207_inventory_anomaly_report, task_219_sql_paid_leaderboard"
       recursion_limit:
-        description: "Agent recursion limit for in-process deepagents runners"
+        description: "Agent recursion limit (0 = unlimited; finite caps are diagnostic overrides)"
         required: true
-        default: "80"
+        default: "0"
         type: string
       openrouter_model:
         description: "Model id for run-openrouter"
@@ -34,9 +34,9 @@ on:
         default: "cmd /c npx -y opencode-ai@latest run --model openrouter/qwen/qwen3.6-plus"
         type: string
       cli_timeout:
-        description: "Per-task timeout in seconds for run-cli"
+        description: "Per-task sanitary timeout in seconds for run-cli (task floors still apply)"
         required: true
-        default: "900"
+        default: "3600"
         type: string
 
 permissions:

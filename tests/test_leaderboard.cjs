@@ -1,18 +1,18 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const { selectResults, formatPassed } = require("../docs/leaderboard.js");
+const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboard.js");
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 87);
+assert.equal(light.length, 88);
 assert.equal(medium.length, 79);
-assert.equal(selectResults(data, "medium", "current", "").length, 13);
+assert.equal(selectResults(data, "medium", "current", "").length, 14);
 for (const rows of [light, medium]) {
   for (let i = 1; i < rows.length; i++) assert.ok(rows[i - 1].result.passed >= rows[i].result.passed);
 }
 assert.equal(light.find(r => r.id === "secret-700-sft").result.passed, 368);
 assert.equal(medium.find(r => r.id === "secret-700-sft").result.passed, 9);
-assert.equal(selectResults(data, "light", "historical", "  CODEX ").length, 1);
+assert.equal(selectResults(data, "light", "historical", "  CODEX ").length, 2);
 assert.equal(selectResults(data, "light", "historical", "no-such-model").length, 0);
 assert.equal(formatPassed(390), "390");
 assert.equal(formatPassed(389 + 1 / 3), "389.3");
@@ -23,7 +23,7 @@ console.log("Leaderboard scope, ranking, missing-data and search checks passed."
 for (const row of data.rows.filter(r => r.measurement_type === "full_run")) { assert.equal(row.light.passed + row.medium.passed, row.source_passed); assert.equal(row.medium.total, 80); }
 
 const wave19 = selectResults(data, "medium", "wave19", "");
-assert.equal(wave19.length, 26);
+assert.equal(wave19.length, 27);
 const ua = selectResults(data, "light", "current", "Universal Agent").filter(r => r.id === "universal-agent-haiku");
 assert.equal(ua.length, 1);
 assert.equal(ua[0].result.passed, 384);
@@ -60,7 +60,7 @@ assert.ok(!landing.includes("Task coverage"));
 assert.ok(landing.includes('id="wave19-results"'));
 
 const allSecret = selectResults(data, "light", "current", "secret sft");
-assert.equal(allSecret.length, 2);
+assert.equal(allSecret.length, 3);
 const mini = allSecret.find(row => row.id === "secret-sft-mini-v019");
 assert.equal(mini.result.passed, 371);
 assert.equal(mini.medium.passed, 8);
@@ -84,3 +84,31 @@ assert.ok(fs.existsSync(require("node:path").join(__dirname, "../docs/secret-700
 
 assert.equal(secret[0].validation_basis, "operator_acceptance");
 assert.ok(!landing.includes("unvalidated"));
+
+// Totals follow the selected task subset, never a whole-run fallback.
+const astraMedium = selectResults(data, "medium", "current", "GPT-6-Astra")[0];
+const astraWave = selectResults(data, "medium", "wave19", "GPT-6-Astra")[0];
+assert.equal(astraMedium.usage.steps.value, 1328);
+assert.equal(astraMedium.usage.tokens.value, 49216848);
+assert.equal(astraWave.usage.steps.value, 283);
+assert.equal(astraWave.usage.tokens.value, 4270108);
+assert.equal(formatUsage(astraMedium.usage, "tokens").text, "49.22M");
+assert.equal(formatUsage(astraMedium.usage, "tokens").note, "Partial · 80/80 tasks");
+assert.ok(formatUsage(astraMedium.usage, "tokens").detail.includes("49,216,848"));
+assert.equal(formatUsage(astraMedium.usage, "steps").text, "1,328");
+assert.equal(formatUsage(null, "tokens").text, "—");
+assert.equal(formatUsage({ tasks: 40, steps: { value: null, status: "unavailable" } }, "steps").text, "—");
+assert.equal(formatUsage({ tasks: 40, steps: { value: 0, covered_tasks: 40, status: "complete" } }, "steps").text, "0");
+assert.equal(formatUsage({ tasks: 80, steps: { value: 17, covered_tasks: 3, status: "raw" } }, "steps").note, "Raw · 3/80 tasks");
+assert.equal(selectResults(data, "medium", "current", "").find(r => r.id === "run-19").usage.steps.value, null);
+assert.equal(selectResults(data, "light", "current", "Codex").find(r => r.id !== "secret-sft-codex-v019").usage, null);
+assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 2);
+assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 2);
+console.log("Subset usage, exact totals, incomplete counters and real zero checks passed.");
+
+const codex = selectResults(data, "light", "current", "secret sft Codex")[0];
+assert.equal(codex.result.passed, 365);
+assert.equal(codex.usage.tokens.value, 8998150);
+assert.equal(formatUsage(codex.usage, "tokens").text, "≥ 9M");
+assert.equal(selectResults(data, "medium", "current", "secret sft Codex")[0].usage.tokens.value, 103032947);
+assert.equal(selectResults(data, "medium", "wave19", "secret sft Codex")[0].usage.tokens.value, 360166);

@@ -233,9 +233,10 @@ def test_rli_receives_task_ceiling(monkeypatch, late):
 
 
 @pytest.mark.parametrize("floor,ceiling,expected", [
-    (None, None, 600), (1800, None, 600), (120, 120, 120), (None, 90, 90),
+    (None, None, 3600), (1800, None, 3600), (7200, None, 7200),
+    (120, 120, 120), (None, 90, 90),
 ])
-def test_harbor_agent_ceiling_preserves_legacy_export(floor, ceiling, expected):
+def test_harbor_agent_timeout_preserves_task_floors_and_ceilings(floor, ceiling, expected):
     task = budget_task(min_timeout_seconds=floor, max_timeout_seconds=ceiling)
     config = tomllib.loads(_task_toml(task, harbor_name="budget", dataset="hbf"))
     assert config["agent"]["timeout_sec"] == expected

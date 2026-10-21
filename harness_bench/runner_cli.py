@@ -57,6 +57,7 @@ from harness_bench.runner import (
     normalize_json_output_path,
     summarize,
 )
+from harness_bench.runtime_limits import DEFAULT_TASK_TIMEOUT_SECONDS
 from harness_bench.tasks import ALL_TASKS, get_task
 
 DEFAULT_CLI_COMMAND = (
@@ -64,8 +65,8 @@ DEFAULT_CLI_COMMAND = (
 )
 """Default CLI invocation. The prompt is appended as the final argument."""
 
-DEFAULT_TIMEOUT_SECONDS = 600
-"""Per-task timeout in seconds. Some tasks need pytest + multiple file edits."""
+DEFAULT_TIMEOUT_SECONDS = DEFAULT_TASK_TIMEOUT_SECONDS
+"""Sanitary per-task timeout in seconds; longer task floors still apply."""
 
 _TRANSIENT_ERROR_PATTERN = re.compile(
     r"(?:"
@@ -1516,6 +1517,8 @@ def run_task_cli(
         phase = "setup"
         wire_session = None
         trusted_session = None
+        completion_receipt = None
+        agent_timed_out = False
         try:
             task.setup(workspace)
             if getattr(task, "requires_trusted_service", False):
@@ -1530,7 +1533,8 @@ def run_task_cli(
                 argv += ["--append-system-prompt", agents_md.read_text(encoding="utf-8")]
             argv += [task.prompt]
             env = {**(os.environ if extra_env and "HBF_WORKER_API_KEY" in extra_env else (_subprocess_env_with_token() or os.environ)), **(extra_env or {}),
-                   "HBF_TASK_MIN_RECURSION_LIMIT": str(getattr(task, "min_recursion_limit", None) or 0)}
+                   "HBF_TASK_MIN_RECURSION_LIMIT": str(getattr(task, "min_recursion_limit", None) or 0),
+                   "HBF_TASK_TIMEOUT_SECONDS": str(timeout)}
             if wire_base := env.get("HBF_WIRE_BASE_URL"):
                 wire_url = urlsplit(wire_base)
                 if (wire_url.scheme != "http" or wire_url.hostname not in {"127.0.0.1", "::1"}
@@ -1549,6 +1553,8 @@ def run_task_cli(
                 env = {**(env or os.environ), "TMPDIR": str(scratch), "TMP": str(scratch), "TEMP": str(scratch)}
             phase = "cli"
             started = time.monotonic()
+            if trusted_session is not None:
+                trusted_session.start_attempt(timeout, started_at=started)
             result = _run_cli_subprocess(argv, cwd=workspace, timeout=timeout, env=env)
             agent_elapsed = time.monotonic() - started
             if trusted_session is not None:
@@ -1581,8 +1587,30 @@ def run_task_cli(
                     elapsed_seconds=time.monotonic()-started, result=result,
                     workspace=workspace if keep_workspace else None, stats_workspace=workspace)
         except subprocess.TimeoutExpired as exc:
+            agent_timed_out = True
             kind, error = "timeout", f"CLI timed out after {timeout}s"
             result = subprocess.CompletedProcess(base_argv, -1, exc.stdout, exc.stderr)
+            # A host-recorded terminal submission ends a service task. A slow
+            # final assistant reply must not discard an already correct result.
+            # Generic workspaces have no trusted receipt: never accept a late
+            # file or an agent-supplied timestamp as evidence of completion.
+            if trusted_session is not None:
+                try:
+                    trusted_session.freeze()
+                    completion_receipt = trusted_session.completion_receipt()
+                    if completion_receipt is not None:
+                        phase = "verify"
+                        outcome = task.verify(workspace)
+                        if outcome.passed:
+                            kind, error = None, None
+                            run = _task_run_with_cli_stats(
+                                task_id=task.id, passed=True, message=outcome.message,
+                                elapsed_seconds=time.monotonic()-started, result=result,
+                                workspace=workspace if keep_workspace else None,
+                                stats_workspace=workspace,
+                            )
+                except Exception:  # noqa: BLE001 — untrusted evidence cannot earn credit.
+                    kind, error = "infrastructure", traceback.format_exc()
         except Exception:  # noqa: BLE001 — preserve setup/launcher/verifier evidence
             kind, error = "infrastructure", traceback.format_exc()
         except KeyboardInterrupt:
@@ -1594,11 +1622,14 @@ def run_task_cli(
                      "passed": bool(run and run.passed), "isolation": isolation,
                      "cli_command_sha256": hashlib.sha256(cli_command.encode()).hexdigest(),
                      "timeout": timeout, "runtime_paths": list(runtime_paths), "wire_session": wire_session,
+                     "agent_timed_out": agent_timed_out,
                      **runtime_identity}
             history.append(entry)
             if trusted_session is not None:
                 try:
                     trusted_session.freeze()
+                    completion_receipt = trusted_session.completion_receipt()
+                    entry["completion_receipt"] = completion_receipt
                     evidence_path = execution / "trusted_service.json"
                     trusted_session.export(evidence_path)
                     entry["trusted_service_evidence"] = str(evidence_path)
@@ -1672,7 +1703,7 @@ def run_all_cli(
 
     if artifacts_root is None:
         artifacts_root = Path(str(json_output) + ".artifacts").resolve() if json_output else Path("jobs/cli_artifacts").resolve()
-    previous = {(r.task_id, r.attempt): r for r in load_results_json(json_output)} if json_output and json_output.exists() else {}
+    previous = {(r.task_id, r.attempt): r for r in load_results_json(json_output, require_current_version=True)} if json_output and json_output.exists() else {}
     if isolation == "bwrap":
         expected_command = hashlib.sha256(cli_command.encode()).hexdigest()
         for prior in previous.values():
@@ -1686,6 +1717,15 @@ def run_all_cli(
     if any(getattr(task, "requires_trusted_service", False) for task in targets) and isolation != "bwrap":
         raise ValueError("Selected tasks require --isolation bwrap to protect their trusted service")
     for task in targets:
+        expected_timeout = effective_task_timeout(
+            timeout, getattr(task, "min_timeout_seconds", None),
+            getattr(task, "max_timeout_seconds", None)
+        )
+        for prior in (run for run in previous.values() if run.task_id == task.id):
+            executions = [item for item in (prior.execution_history or [])
+                          if item.get("cli_command_sha256")]
+            if executions and executions[-1].get("timeout") != expected_timeout:
+                raise ValueError("Cannot resume results with a different task timeout; use a new --json-output file")
         expected_runtime = _task_runtime_identity(task)
         if not expected_runtime:
             continue

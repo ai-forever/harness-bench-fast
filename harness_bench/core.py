@@ -67,9 +67,9 @@ class Task:
         tags: Free-form labels (e.g. `("create", "easy")`).
         min_timeout_seconds: Per-task wall-clock floor. Runners use
             `max(configured timeout, this)`, so long tasks are not cut off by
-            the short default meant for the regular set.
+            the default sanitary guard for the regular set.
         min_recursion_limit: Same kind of floor for the deepagents graph
-            recursion limit.
+            recursion limit, applied only when a finite limit is configured.
         max_timeout_seconds: Hard ceiling on host-measured agent execution
             time, applied after the configured timeout and task floor.
         requires_trusted_service: Measured runs require the isolated CLI so

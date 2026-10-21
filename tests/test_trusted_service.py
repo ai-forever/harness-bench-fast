@@ -15,10 +15,12 @@ import socket
 import time
 import zlib
 from contextlib import suppress
+from types import SimpleNamespace
 
 import pytest
 
 from harness_bench.feasibility_tasks import FEASIBILITY_CASES, FEASIBILITY_TASKS, hard_search
+from harness_bench.feasibility_tasks import trusted_service as trusted
 from harness_bench.feasibility_tasks.service import contract_service
 from harness_bench.feasibility_tasks.trusted_service import (
     MAX_EVIDENCE_BYTES,
@@ -367,3 +369,136 @@ def test_export_refuses_to_place_authoritative_history_in_the_workspace(tmp_path
     with pytest.raises(ValueError, match="outside"):
         get_session(tmp_path).export(tmp_path / "history.json")
     assert not (tmp_path / "history.json").exists()
+
+
+def host_clock(monkeypatch):
+    now = [100.0]
+    monkeypatch.setattr(trusted, "time", SimpleNamespace(monotonic=lambda: now[0]))
+    return now
+
+
+@pytest.mark.parametrize("number", [432, 443])
+def test_timely_terminal_receipt_survives_late_finalization_and_offline_replay(
+    monkeypatch, tmp_path, number,
+):
+    now = host_clock(monkeypatch)
+    task = task_number(number)
+    ws = tmp_path / "workspace"
+    task.setup(ws)
+    session = get_session(ws)
+    session.start_attempt(3600, started_at=100.0)
+    now[0] = 3700.0  # An accepted call exactly at the deadline is timely.
+    task.apply_gold(ws)
+    receipt = session.completion_receipt()
+    assert receipt == {
+        "record_index": len(session.records) - 1,
+        "elapsed_seconds": 3600.0,
+        "timeout_seconds": 3600,
+    }
+    now[0] = 7300.0  # The agent's final reply/export does not determine task completion.
+    assert task.verify(ws).passed
+    evidence = tmp_path / "evidence.json"
+    session.export(evidence)
+    close_session(ws)
+    with evidence_context(ws, evidence):
+        assert task.verify(ws).passed
+        assert get_session(ws).completion_receipt() == receipt
+
+
+def test_existing_answer_and_agent_mtime_do_not_replace_timely_submission(monkeypatch, tmp_path):
+    now = host_clock(monkeypatch)
+    task = task_number(432)
+    task.setup(tmp_path)
+    session = get_session(tmp_path)
+    session.start_attempt(3600, started_at=100.0)
+    answer = tmp_path / "answer.json"
+    answer.write_text('{"status":"solved","solution":{}}')
+    os.utime(answer, (1, 1))
+    assert session.completion_receipt() is None
+    now[0] = 3700.001
+    response = rpc(tmp_path, ["submit", "--file", "answer.json"])
+    assert response["code"] != 0
+    assert "timeout" in response["response"]["message"]
+    assert session.records == []  # No late file is opened or admitted to the history.
+    assert session.completion_receipt() is None
+    assert not task.verify(tmp_path).passed
+
+
+def test_submission_that_finishes_reading_after_deadline_has_no_receipt(monkeypatch, tmp_path):
+    now = host_clock(monkeypatch)
+    task = task_number(432)
+    task.setup(tmp_path)
+    session = get_session(tmp_path)
+    session.start_attempt(3600, started_at=100.0)
+    dispatch = session.namespace["_dispatch"]
+
+    def slow_dispatch(*args):
+        response = dispatch(*args)
+        now[0] = 3700.001
+        return response
+
+    session.namespace["_dispatch"] = slow_dispatch
+    now[0] = 3699.0
+    task.apply_gold(tmp_path)
+    assert session.records[0]["elapsed_seconds"] > 3600
+    assert session.completion_receipt() is None
+    assert not task.verify(tmp_path).passed
+
+
+@pytest.mark.parametrize("invalid", ["wrong_answer", "earlier_invalid_call"])
+def test_terminal_receipt_does_not_bypass_answer_or_history_verification(
+    monkeypatch, tmp_path, invalid,
+):
+    host_clock(monkeypatch)
+    task = task_number(432)
+    task.setup(tmp_path)
+    session = get_session(tmp_path)
+    session.start_attempt(3600)
+    if invalid == "wrong_answer":
+        response, code = send_payload(tmp_path, task, "submit", {"status": "solved"})
+        assert code == 0, response  # The service records without revealing correctness.
+    else:
+        assert rpc(tmp_path, ["bogus"])["code"] != 0
+        task.apply_gold(tmp_path)
+    assert session.completion_receipt() is not None
+    assert not task.verify(tmp_path).passed
+
+
+def test_host_clock_cannot_be_reset_or_added_after_service_calls(monkeypatch, tmp_path):
+    host_clock(monkeypatch)
+    task = task_number(432)
+    armed, used = tmp_path / "armed", tmp_path / "used"
+    task.setup(armed)
+    get_session(armed).start_attempt(3600)
+    with pytest.raises(RuntimeError, match="once before requests"):
+        get_session(armed).start_attempt(3600)
+    task.setup(used)
+    task.apply_gold(used)
+    assert get_session(used).completion_receipt() is None  # Unarmed gold is diagnostic only.
+    with pytest.raises(RuntimeError, match="once before requests"):
+        get_session(used).start_attempt(3600)
+
+
+@pytest.mark.parametrize("mutation", ["negative", "nonfinite", "late", "terminal", "old_protocol"])
+def test_replay_rejects_changed_trusted_timing_or_terminal_metadata(monkeypatch, tmp_path, mutation):
+    host_clock(monkeypatch)
+    task = task_number(432)
+    ws = tmp_path / "workspace"
+    task.setup(ws)
+    get_session(ws).start_attempt(3600)
+    task.apply_gold(ws)
+    evidence = tmp_path / "evidence.json"
+    get_session(ws).export(evidence)
+    close_session(ws)
+    payload = json.loads(evidence.read_text())
+    if mutation == "terminal":
+        payload["records"][0]["terminal"] = False
+    elif mutation == "old_protocol":
+        payload["protocol"] = "wave19-host-service-v1"
+    else:
+        payload["records"][0]["elapsed_seconds"] = {
+            "negative": -1, "nonfinite": float("inf"), "late": 3600.001,
+        }[mutation]
+    evidence.write_text(json.dumps(payload))
+    with evidence_context(ws, evidence):
+        assert not task.verify(ws).passed

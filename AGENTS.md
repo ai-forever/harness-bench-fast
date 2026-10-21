@@ -8,10 +8,11 @@ When reporting итоговую таблицу benchmark runs for this repositor
 |---|---|---:|---:|---:|---:|
 
 Rules:
-- Include only completed runs with exactly 471 tasks (current task-set v0.19.0) unless the user asks for partials.
+- Include only completed runs with exactly 471 tasks (current task-set v0.19.1) unless the user asks for partials.
 - Sort rows by `score` descending.
 - Use `passed` as `<passed>/471` and `score` as a percentage with one decimal place.
 - Do not mix task-set versions in one table. Earlier runs are not comparable: v0.14.0 scored 371 tasks, v0.16.0 corrected defects across the 391 of v0.15.0 without changing their number, v0.17.0 adds the long-context wave as tasks 392–411, v0.18.0 adds the tool-reflection wave as tasks 412–431, and v0.19.0 adds wave 19 (feasibility) as tasks 432–471. If more than one version must appear, split the table and name the task-set version in each.
+- v0.19.1 changes execution/scoring protocol and clarifies task 410 without adding tasks. Preserve historical v0.19.0 scores and protocols; do not relabel them as v0.19.1. Use a fresh result JSON: resume rejects a different task-set version and wave 19 runtime/contract hash.
 - Do not include artifact links or artifact paths in the main table unless explicitly requested.
 - Use the human-readable harness and model names, not only the JSON filename.
 - Include `steps` and `tokens` from the run JSON when present.
@@ -21,12 +22,25 @@ Rules:
 
 - A task interrupted by the per-task timeout or an agent hang counts as a
   normal fail (kept in the full denominator, no "partial/interrupted" note).
+  Exception in v0.19.1 wave 19: a timely host-recorded `submit`/`finish` plus
+  a passing full verifier earns credit despite a subsequent final-reply/process
+  timeout. A workspace file without submission, a late submission or an
+  incorrect answer still fails. Do not rescore historical v0.19.0 outcomes.
 - Transient infrastructure errors (network failures, HTTP 5xx / 429 /
   `529 Overloaded`, connection resets, gateway timeouts) are not model
   failures. A task that died on such an error must be rerun before the run
   is reported; the retried result replaces the errored one. In-flight
   auto-retries of transient errors by runners are allowed and do not need
   to be disclosed per task.
+
+## Current runtime defaults
+
+- Ordinary, reflection and wave 19 tasks use a 3600-second sanitary guard;
+  long-context tasks retain the 7200-second floor. Setup and verification are
+  outside the agent execution budget. Formal problem resource budgets are unchanged.
+- Agent graph steps have no benchmark-imposed cap by default
+  (`--recursion-limit 0`). Explicit finite diagnostic overrides are allowed;
+  task-specific floors still raise finite caps. Record these nondefault settings.
 
 ## Model Identification
 
@@ -48,4 +62,4 @@ Rules:
 
 ## Wave naming
 
-Name waves by their task-set version: the v0.19.0 addition is **wave 19**, never by its positional index in `TASK_WAVES`.
+Name waves by their task-set version: the v0.19.0 addition is **wave 19**, never by its positional index in `TASK_WAVES`. The v0.19.1 protocol revision adds no tasks and remains **wave 19**.

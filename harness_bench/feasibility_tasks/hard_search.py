@@ -435,8 +435,8 @@ def make_task(number, pair, spec):
         '"success_probability":[числитель,знаменатель]} с точной максимальной вероятностью '
         "при остатке обеих квот. Выполни python3 tools/taskctl plan --file plan.json. "
         'Не выполняй probe. Создай result.json с содержимым {"found_id":null} и выполни '
-        "python3 tools/taskctl finish --file result.json, затем сразу заверши диалог "
-        "кратким объяснением. Одного текстового отказа или файлов без plan/finish "
+        "python3 tools/taskctl finish --file result.json. При желании поясни результат "
+        "краткой финальной репликой. Одного текстового отказа или файлов без plan/finish "
         "недостаточно. Неверный формат или нарушение этого протокола остановки — ошибка."
     )
     return _task(

@@ -10,12 +10,14 @@ from __future__ import annotations
 import atexit
 import hashlib
 import json
+import math
 import os
 import socket
 import socketserver
 import stat
 import tempfile
 import threading
+import time
 from contextlib import contextmanager, suppress
 from contextvars import ContextVar
 from pathlib import Path
@@ -23,7 +25,7 @@ from pathlib import Path
 from harness_bench.feasibility_tasks.io_utils import _read_regular
 from harness_bench.reflect_tasks.common import Replay, Service
 
-PROTOCOL = "wave19-host-service-v1"
+PROTOCOL = "wave19-host-service-v2-completion"
 MAX_REQUEST_BYTES = 65_536
 MAX_REQUESTS = 4096
 MAX_FILE_BYTES = 2_000_000
@@ -82,6 +84,53 @@ def _decode(raw):
 def service_fingerprint(service: Service, task_id: str, fixed: dict[str, str]) -> str:
     payload = {"protocol": PROTOCOL, "task_id": task_id, "source": service.source, "fixed": fixed}
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+
+
+def _positive_seconds(value):
+    return type(value) in (int, float) and math.isfinite(value) and value > 0
+
+
+def _terminal_record(namespace, argv, code):
+    words, _ = namespace["_parse"](argv)
+    return code == 0 and words in (["submit"], ["finish"])
+
+
+def _completion_receipt(payload):
+    """Read host timing, never workspace mtimes or agent-reported timestamps.
+
+    A receipt proves a timely terminal service call, not that its answer is
+    correct. The task verifier must still validate the entire trusted history.
+    """
+    attempt = payload.get("attempt")
+    if attempt is None:
+        return None  # Unarmed sessions are gold/diagnostic checks only.
+    if (
+        not isinstance(attempt, dict)
+        or set(attempt) != {"timeout_seconds"}
+        or not _positive_seconds(attempt["timeout_seconds"])
+    ):
+        raise ValueError("invalid trusted attempt timing")
+    timeout = attempt["timeout_seconds"]
+    previous = 0.0
+    receipt = None
+    for index, record in enumerate(payload["records"]):
+        elapsed = record["elapsed_seconds"]
+        if (
+            type(elapsed) not in (int, float)
+            or not math.isfinite(elapsed)
+            or elapsed < previous
+        ):
+            raise ValueError("invalid trusted request timing")
+        previous = elapsed
+        if type(record["terminal"]) is not bool:
+            raise ValueError("invalid trusted completion marker")
+        if record["terminal"] and record["code"] == 0 and elapsed <= timeout:
+            receipt = {
+                "record_index": index,
+                "elapsed_seconds": elapsed,
+                "timeout_seconds": timeout,
+            }
+    return receipt
 
 
 class WorkspaceIO:
@@ -184,6 +233,8 @@ class HostSession:
         self.request_bytes = 0
         self.file_bytes = 0
         self.history_bytes = 0
+        self._started_at = None
+        self._timeout_seconds = None
         self.frozen = False
         self._closed = False
         self._lock = threading.RLock()
@@ -200,6 +251,28 @@ class HostSession:
         )
         self._thread.start()
 
+    def start_attempt(self, timeout_seconds, *, started_at=None):
+        """Arm once from the host runner at its exact process-start clock."""
+        now = time.monotonic()
+        if started_at is None:
+            started_at = now
+        if (
+            not _positive_seconds(timeout_seconds)
+            or type(started_at) not in (int, float)
+            or not math.isfinite(started_at)
+            or started_at > now
+        ):
+            raise ValueError("invalid trusted attempt clock")
+        with self._lock:
+            if self.frozen or self._started_at is not None or self.requests_seen:
+                raise RuntimeError("trusted attempt clock must be armed once before requests")
+            self._started_at = started_at
+            self._timeout_seconds = timeout_seconds
+
+    def completion_receipt(self):
+        with self._lock:
+            return _completion_receipt(self._payload())
+
     def protocol_error(self, reason, *, count_request=True):
         with self._lock:
             if self.frozen:
@@ -214,6 +287,11 @@ class HostSession:
         with self._lock:
             if self.frozen:
                 return {"response": {"status": "error", "message": "session closed"}, "code": 2}
+            if (
+                self._started_at is not None
+                and time.monotonic() - self._started_at > self._timeout_seconds
+            ):
+                return self.protocol_error("sanitary task timeout elapsed")
             self.requests_seen += 1
             self.request_bytes += size
             if self.requests_seen > MAX_REQUESTS or self.request_bytes > MAX_TOTAL_REQUEST_BYTES:
@@ -230,6 +308,10 @@ class HostSession:
                 "files": dict(io.files),
                 "response": response,
                 "code": code,
+                "terminal": _terminal_record(self.namespace, argv, code),
+                "elapsed_seconds": (
+                    None if self._started_at is None else time.monotonic() - self._started_at
+                ),
             }
             self.file_bytes += sum(len(text.encode()) for text in io.files.values())
             size = len(json.dumps(record, ensure_ascii=False).encode())
@@ -254,6 +336,10 @@ class HostSession:
             "request_bytes": self.request_bytes,
             "file_bytes": self.file_bytes,
             "history_bytes": self.history_bytes,
+            "attempt": (
+                None if self._started_at is None
+                else {"timeout_seconds": self._timeout_seconds}
+            ),
         }
 
     def replay(self, *, service=None, task_id=None, fingerprint=None):
@@ -308,11 +394,20 @@ def _replay(payload, service, task_id, fingerprint):
     records = payload["records"]
     if not isinstance(records, list) or len(records) > MAX_REQUESTS:
         raise ValueError("invalid trusted history")
+    _completion_receipt(payload)  # Validate host timing, even when no terminal call succeeded.
     for record in records:
         argv, files = record["argv"], record["files"]
         response, code = ns["_dispatch"](state, argv, ns["_IO"](recorded=files))
         if response != record["response"] or code != record["code"]:
             raise ValueError("trusted replay mismatch")
+        if record["terminal"] is not _terminal_record(ns, argv, code):
+            raise ValueError("trusted completion marker mismatch")
+        attempt = payload.get("attempt")
+        if attempt is None:
+            if record["elapsed_seconds"] is not None:
+                raise ValueError("unarmed trusted session has timed requests")
+        elif record["elapsed_seconds"] > attempt["timeout_seconds"]:
+            raise ValueError("service request completed after sanitary timeout")
         calls.append((argv, response, code))
     for error in payload["protocol_errors"]:
         calls.append((["<transport>"], {"status": "error", "message": error}, 2))
@@ -331,6 +426,9 @@ class _Evidence:
 
     def replay(self, *, service, task_id, fingerprint):
         return _replay(self.payload, service, task_id, fingerprint)
+
+    def completion_receipt(self):
+        return _completion_receipt(self.payload)
 
 
 _sessions: dict[Path, HostSession] = {}

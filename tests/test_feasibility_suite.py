@@ -150,12 +150,15 @@ def test_gold_and_idle_workspace(task, tmp_path):
     task.apply_gold(tmp_path)
     result = task.verify(tmp_path)
     assert result.passed, result.message
-    assert "120 секунд" in task.prompt
+    assert "3600 секунд" in task.prompt
+    assert "Отдельного лимита на число шагов агента нет" in task.prompt
+    assert "финальная реплика не нужна для зачёта" in task.prompt
+    assert "Общий лимит анализа" not in task.prompt
     for visible in (task.prompt, (tmp_path / "docs/taskctl.md").read_text()):
         assert "Файлы для --file должны находиться внутри рабочего каталога задачи" in visible
         assert "/tmp/answer.json" in visible
         assert "лишает зачёта даже после исправления" in visible
-    assert task.min_timeout_seconds == task.max_timeout_seconds == 120
+    assert task.min_timeout_seconds == task.max_timeout_seconds == 3600
     source = json.loads((tmp_path / "contract.json").read_text())
     assert "status" not in source and "kind" not in source
     metrics = json.loads(result.message)["wave19"]

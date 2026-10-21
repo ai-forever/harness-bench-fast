@@ -49,6 +49,49 @@ class PublishedRows(HTMLParser):
             self.field = None
 
 
+def attach_telemetry(rows, telemetry):
+    """Join only counters for the same published run and task subset."""
+    if telemetry["schema_version"] != 1:
+        raise ValueError("unsupported telemetry schema")
+    by_id = {row["id"]: row for row in rows}
+    for row_id, scopes in telemetry["rows"].items():
+        if row_id not in by_id:
+            raise ValueError("unknown telemetry row: " + row_id)
+        row = by_id[row_id]
+        for scope, usage in scopes.items():
+            if scope not in ("light", "medium", "wave19", "medium_historical"):
+                raise ValueError("unknown telemetry scope: " + scope)
+            result = row.get(scope)
+            if result is None or usage["tasks"] != result["total"]:
+                raise ValueError("telemetry task subset mismatch: " + row_id + "/" + scope)
+            if not 0 <= usage["observed_tasks"] <= usage["tasks"]:
+                raise ValueError("invalid telemetry task count: " + row_id)
+            sources = usage["sources_sha256"]
+            if not sources or any(not re.fullmatch(r"[0-9a-f]{64}", sha) for sha in sources):
+                raise ValueError("invalid telemetry provenance: " + row_id)
+            if row.get("source_sha256") and row["source_sha256"] not in sources:
+                raise ValueError("telemetry source mismatch: " + row_id)
+            for name in ("steps", "tokens"):
+                metric = usage[name]
+                value, covered, status = metric["value"], metric["covered_tasks"], metric["status"]
+                if status not in ("complete", "partial", "raw", "unavailable"):
+                    raise ValueError("invalid telemetry status: " + row_id)
+                if type(covered) is not int or not 0 <= covered <= usage["observed_tasks"]:
+                    raise ValueError("invalid telemetry coverage: " + row_id)
+                if status == "unavailable":
+                    if value is not None:
+                        raise ValueError("unavailable telemetry must be null: " + row_id)
+                elif type(value) is not int or value < 0 or covered == 0:
+                    raise ValueError("invalid telemetry value: " + row_id)
+                if status == "complete" and covered != usage["tasks"]:
+                    raise ValueError("incomplete telemetry labeled complete: " + row_id)
+            tokens = usage["tokens"]
+            if (tokens.get("input_tokens") is not None and tokens.get("output_tokens") is not None
+                    and tokens["input_tokens"] + tokens["output_tokens"] != tokens["value"]):
+                raise ValueError("token components do not match total: " + row_id)
+        row["telemetry"] = scopes
+
+
 def build():
     archive = ROOT / "docs/archive.html"
     waves = ROOT / "docs/wave-results.js"
@@ -129,6 +172,7 @@ def build():
         "runs": 1, "measurement_type": "operator_accepted", "measurement_valid": True,
         "validation_basis": secret["validation_basis"],
         "source_version": secret["task_set_version"], "source_passed": secret["passed_tasks"],
+        "source_sha256": secret["source_report_sha256"],
         "medium_historical": None, "details_url": "secret-700b.html", **subsets,
     })
     sonnet_path = ROOT / "docs/sonnet55-medium.json"
@@ -290,10 +334,12 @@ def build():
         })
     else:
         assert codex["ranked"] is False and codex["pending_task_numbers"]
+    telemetry_path = ROOT / "docs/leaderboard-telemetry.json"
+    attach_telemetry(rows, json.loads(telemetry_path.read_text(encoding="utf-8")))
     return {
         "task_set_version": "0.19.0", "light_tasks": 391, "medium_tasks": 80,
         "provenance": {
-            "method": "Historical rescores, seven complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
+            "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
             # Hash canonical UTF-8/LF text, independent of Git checkout CRLF.
             "wave_results_sha256": hashlib.sha256(waves.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
@@ -305,6 +351,7 @@ def build():
             "universal_agent_haiku_sha256": hashlib.sha256(ua_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "giga35_ultra_reasoning_sha256": hashlib.sha256(ultra_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "archive_sha256": hashlib.sha256(archive.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
+            "telemetry_sha256": hashlib.sha256(telemetry_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability.",
         },
         "rows": rows,

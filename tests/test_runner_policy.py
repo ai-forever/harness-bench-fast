@@ -692,6 +692,51 @@ def test_run_all_continues_from_existing_json(monkeypatch, tmp_path: Path, capsy
     assert [task["message"] for task in payload["tasks"]] == ["already done", "newly done"]
 
 
+@pytest.mark.parametrize("version", [None, "0.18.0", "0.19.0"])
+@pytest.mark.parametrize("module_name,method,extra_kwargs", [
+    ("runner", "run_all", {}),
+    ("runner_pure", "run_all", {}),
+    ("runner_openrouter", "run_all", {"isolation": "none"}),
+    ("runner_openrouter", "run_all", {"isolation": "bwrap"}),
+    ("runner_cli", "run_all_cli", {}),
+])
+def test_resume_rejects_legacy_protocol_before_model_or_rewrite(
+    monkeypatch, tmp_path, version, module_name, method, extra_kwargs,
+):
+    import importlib
+    import json
+
+    from harness_bench import runner_cli
+    from harness_bench.versioning import TASK_SET_VERSION
+
+    assert version != TASK_SET_VERSION
+    module = importlib.import_module(f"harness_bench.{module_name}")
+    task = Task("task_01_fake", "Fake", "Solve", lambda path: VerifyResult(True))
+    out = tmp_path / "legacy.json"
+    payload = {"tasks": [{"task_id": task.id, "passed": True, "message": "old", "elapsed_seconds": 1}]}
+    if version is not None:
+        payload["task_set_version"] = version
+    original = json.dumps(payload).encode()
+    out.write_bytes(original)
+    for current in {module, runner_cli}:
+        monkeypatch.setattr(current, "_load_env_from_dotenv", lambda: None)
+        monkeypatch.setattr(current, "get_task", lambda tid: task)
+        for name in ("_ensure_credentials", "_ensure_openrouter_key"):
+            if hasattr(current, name):
+                monkeypatch.setattr(current, name, lambda: None)
+        for name in ("run_task", "run_task_cli", "_write_partial_results_json"):
+            if hasattr(current, name):
+                monkeypatch.setattr(current, name,
+                                    lambda *a, **kw: pytest.fail("must reject before model execution or output rewrite"))
+    with pytest.raises(ValueError, match="task_set_version.*current task-set protocol"):
+        getattr(module, method)([task.id], json_output=out, **extra_kwargs)
+    assert out.read_bytes() == original
+    # Historical analysis remains available, without a silent version rewrite.
+    rows = runner.load_results_json(out)
+    assert len(rows) == 1 and rows[0].message == "old"
+    assert out.read_bytes() == original
+
+
 def test_cli_timeout_is_scored_and_not_retried_on_continue(tmp_path: Path) -> None:
     import json
 

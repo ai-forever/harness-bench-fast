@@ -118,7 +118,10 @@ def main() -> int:
             },
             "environment": {
                 "environment_class": os.getenv("MSWEA_ENVIRONMENT_CLASS", "local"),
-                "timeout": _as_int(os.getenv("MSWEA_COMMAND_TIMEOUT"), default=30),
+                "timeout": _as_float(
+                    os.getenv("MSWEA_COMMAND_TIMEOUT"),
+                    default=_as_float(os.getenv("HBF_TASK_TIMEOUT_SECONDS"), default=3600),
+                ),
             },
             "model": _model_config(),
         },
