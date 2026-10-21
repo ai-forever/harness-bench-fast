@@ -8,7 +8,7 @@
   "temperature": "default; no override",
   "task_set_version": "0.19.0",
   "protocol": "experimental mixed protocol; five tasks use 7200s instead of120s",
-  "status": "completed experimental outcomes; unresolved transport errors; not leaderboard eligible",
+  "status": "completed experimental outcomes; unresolved transport errors; general-table inclusion requested by operator",
   "total": 471,
   "passed": 444,
   "score": 0.9426751592356688,

@@ -334,8 +334,45 @@ def build():
         })
     else:
         assert codex["ranked"] is False and codex["pending_task_numbers"]
+    brain_path = ROOT / "docs/brain-haiku-experiment.json"
+    brain = json.loads(brain_path.read_text(encoding="utf-8"))
+    tasks = brain["tasks"]
+    assert len(tasks) == len({task["task_id"] for task in tasks}) == 471
+    assert sum(task["passed"] for task in tasks) == brain["passed"] == 444
+    subsets = {}
+    usage = {}
+    for scope, start, end in (("light", 1, 391), ("medium", 392, 471), ("wave19", 432, 471)):
+        selected = [task for task in tasks if start <= int(task["task_id"].split("_")[1]) <= end]
+        assert len(selected) == end - start + 1
+        subsets[scope] = {
+            "passed": sum(task["passed"] for task in selected), "total": len(selected),
+            "note": "experimental · selected retries · changed deadline · transport errors unresolved",
+        }
+        usage[scope] = {
+            "tasks": len(selected), "observed_tasks": len(selected),
+            "sources_sha256": list(brain["source_sha256"].values()),
+            "steps": {"value": sum(task["steps"] for task in selected),
+                      "covered_tasks": len(selected), "status": "raw", "unit": "tool_calls"},
+            "tokens": {"value": sum(task["tokens"] for task in selected),
+                       "input_tokens": sum(task["input_tokens"] for task in selected),
+                       "output_tokens": sum(task["output_tokens"] for task in selected),
+                       "covered_tasks": len(selected), "status": "raw"},
+            "notes": [brain["accounting"]],
+        }
+    assert subsets["light"]["passed"] + subsets["medium"]["passed"] == brain["passed"]
+    rows.append({
+        "id": "brain-haiku-experiment", "harness": "Brain (experimental)",
+        "model": "Haiku 5.5 (OpenRouter) (default)", "runs": 1,
+        "measurement_type": "selected_retries_changed_protocol", "measurement_valid": False,
+        "validation_basis": "operator_requested_experimental_table_inclusion",
+        "reasoning_effort": "default", "source_version": "0.19.0",
+        "source_passed": brain["passed"], "measurement_date": brain["measurement_date"],
+        "medium_historical": None, "details_url": "brain-haiku-experiment.html", **subsets,
+    })
     telemetry_path = ROOT / "docs/leaderboard-telemetry.json"
-    attach_telemetry(rows, json.loads(telemetry_path.read_text(encoding="utf-8")))
+    telemetry = json.loads(telemetry_path.read_text(encoding="utf-8"))
+    telemetry["rows"]["brain-haiku-experiment"] = usage
+    attach_telemetry(rows, telemetry)
     return {
         "task_set_version": "0.19.0", "light_tasks": 391, "medium_tasks": 80,
         "provenance": {
@@ -351,6 +388,7 @@ def build():
             "universal_agent_haiku_sha256": hashlib.sha256(ua_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "giga35_ultra_reasoning_sha256": hashlib.sha256(ultra_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "archive_sha256": hashlib.sha256(archive.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
+            "brain_haiku_experiment_sha256": hashlib.sha256(brain_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "telemetry_sha256": hashlib.sha256(telemetry_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability.",
         },

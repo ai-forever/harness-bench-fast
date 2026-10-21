@@ -4,9 +4,9 @@ const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboar
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 88);
+assert.equal(light.length, 89);
 assert.equal(medium.length, 79);
-assert.equal(selectResults(data, "medium", "current", "").length, 14);
+assert.equal(selectResults(data, "medium", "current", "").length, 15);
 for (const rows of [light, medium]) {
   for (let i = 1; i < rows.length; i++) assert.ok(rows[i - 1].result.passed >= rows[i].result.passed);
 }
@@ -23,7 +23,7 @@ console.log("Leaderboard scope, ranking, missing-data and search checks passed."
 for (const row of data.rows.filter(r => r.measurement_type === "full_run")) { assert.equal(row.light.passed + row.medium.passed, row.source_passed); assert.equal(row.medium.total, 80); }
 
 const wave19 = selectResults(data, "medium", "wave19", "");
-assert.equal(wave19.length, 27);
+assert.equal(wave19.length, 28);
 const ua = selectResults(data, "light", "current", "Universal Agent").filter(r => r.id === "universal-agent-haiku");
 assert.equal(ua.length, 1);
 assert.equal(ua[0].result.passed, 384);
@@ -112,3 +112,12 @@ assert.equal(codex.usage.tokens.value, 8998150);
 assert.equal(formatUsage(codex.usage, "tokens").text, "≥ 9M");
 assert.equal(selectResults(data, "medium", "current", "secret sft Codex")[0].usage.tokens.value, 103032947);
 assert.equal(selectResults(data, "medium", "wave19", "secret sft Codex")[0].usage.tokens.value, 360166);
+
+const brain = data.rows.find(row => row.id === "brain-haiku-experiment");
+assert.equal(brain.light.passed + brain.medium.passed, 444);
+assert.equal(brain.telemetry.light.tokens.value + brain.telemetry.medium.tokens.value, 191781602);
+assert.equal(brain.measurement_valid, false);
+assert.match(brain.medium.note, /changed deadline.*transport errors unresolved/);
+assert.equal(brain.telemetry.wave19.tasks, 40);
+assert.equal(brain.telemetry.wave19.tokens.covered_tasks, 40);
+assert.equal(selectResults(data, "medium", "current", "Brain").length, 1);

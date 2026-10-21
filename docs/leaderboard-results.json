@@ -14,6 +14,7 @@
     "universal_agent_haiku_sha256": "5680801cb7a3efd9eb8e0fac92484f2ac8eeb96d2805fbc3aa465adbd94bcb57",
     "giga35_ultra_reasoning_sha256": "611fd53c116e51cbe2b772b909034cf7db6ccb4547adede3e145a186e1df5fc9",
     "archive_sha256": "448eb41a006bca486a21328f7e1799d1c1b7a05e52ee91a11f40fe9de0a8711f",
+    "brain_haiku_experiment_sha256": "d2eeb500c752c07a71f15f58474334298e590370edd42f0e39f2511130db8cca",
     "telemetry_sha256": "2058f482d9cc941a8a453c7b9003ee4b3d6525643ff61037001e58dc1b6d8773",
     "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability."
   },
@@ -3569,6 +3570,113 @@
           ],
           "sources_sha256": [
             "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
+          ]
+        }
+      }
+    },
+    {
+      "id": "brain-haiku-experiment",
+      "harness": "Brain (experimental)",
+      "model": "Haiku 5.5 (OpenRouter) (default)",
+      "runs": 1,
+      "measurement_type": "selected_retries_changed_protocol",
+      "measurement_valid": false,
+      "validation_basis": "operator_requested_experimental_table_inclusion",
+      "reasoning_effort": "default",
+      "source_version": "0.19.0",
+      "source_passed": 444,
+      "measurement_date": "2026-10-21",
+      "medium_historical": null,
+      "details_url": "brain-haiku-experiment.html",
+      "light": {
+        "passed": 385,
+        "total": 391,
+        "note": "experimental · selected retries · changed deadline · transport errors unresolved"
+      },
+      "medium": {
+        "passed": 59,
+        "total": 80,
+        "note": "experimental · selected retries · changed deadline · transport errors unresolved"
+      },
+      "wave19": {
+        "passed": 36,
+        "total": 40,
+        "note": "experimental · selected retries · changed deadline · transport errors unresolved"
+      },
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "sources_sha256": [
+            "66e84a46846e1a462d9ce0f654c3c8b41b483511e9df52fe1a5aee765702bfce",
+            "c31885135fd27c49e2620ac61c7dc46f41aef72168c17a4f43033b1891f6101a",
+            "5e983dfac344d784353db9a2d9650a38024a7a022b8699b562bc7cb8a26c08f1"
+          ],
+          "steps": {
+            "value": 1079,
+            "covered_tasks": 391,
+            "status": "raw",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 17082677,
+            "input_tokens": 16668158,
+            "output_tokens": 414519,
+            "covered_tasks": 391,
+            "status": "raw"
+          },
+          "notes": [
+            "Only final retained attempt per task, passed or failed. Superseded attempts excluded. Token counter presence is not an audit of failed-request usage completeness."
+          ]
+        },
+        "medium": {
+          "tasks": 80,
+          "observed_tasks": 80,
+          "sources_sha256": [
+            "66e84a46846e1a462d9ce0f654c3c8b41b483511e9df52fe1a5aee765702bfce",
+            "c31885135fd27c49e2620ac61c7dc46f41aef72168c17a4f43033b1891f6101a",
+            "5e983dfac344d784353db9a2d9650a38024a7a022b8699b562bc7cb8a26c08f1"
+          ],
+          "steps": {
+            "value": 1724,
+            "covered_tasks": 80,
+            "status": "raw",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 174698925,
+            "input_tokens": 168239390,
+            "output_tokens": 6459535,
+            "covered_tasks": 80,
+            "status": "raw"
+          },
+          "notes": [
+            "Only final retained attempt per task, passed or failed. Superseded attempts excluded. Token counter presence is not an audit of failed-request usage completeness."
+          ]
+        },
+        "wave19": {
+          "tasks": 40,
+          "observed_tasks": 40,
+          "sources_sha256": [
+            "66e84a46846e1a462d9ce0f654c3c8b41b483511e9df52fe1a5aee765702bfce",
+            "c31885135fd27c49e2620ac61c7dc46f41aef72168c17a4f43033b1891f6101a",
+            "5e983dfac344d784353db9a2d9650a38024a7a022b8699b562bc7cb8a26c08f1"
+          ],
+          "steps": {
+            "value": 295,
+            "covered_tasks": 40,
+            "status": "raw",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 15338490,
+            "input_tokens": 14971054,
+            "output_tokens": 367436,
+            "covered_tasks": 40,
+            "status": "raw"
+          },
+          "notes": [
+            "Only final retained attempt per task, passed or failed. Superseded attempts excluded. Token counter presence is not an audit of failed-request usage completeness."
           ]
         }
       }
