@@ -159,9 +159,9 @@ def test_published_landing_scores_preserve_all_source_totals_and_missing_wave19(
     full = [row for row in data["rows"] if row.get("measurement_type") == "full_run"]
     new_only = [row for row in data["rows"] if row.get("measurement_type") == "wave19_only"]
     composites = [row for row in data["rows"] if row.get("measurement_type") == "historical_plus_wave19"]
-    assert len(historical) == 78 and len(full) == 6
+    assert len(historical) == 78 and len(full) == 7
     assert len(new_only) == 13 and len(composites) == 3
-    assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 101
+    assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 102
     astra = next(row for row in data["rows"] if row["id"] == "astra-pi-medium")
     assert astra["light"] is None and astra["medium_historical"] is None
     assert astra["medium"]["passed"] == 58 and astra["medium"]["total"] == 80
@@ -212,7 +212,7 @@ def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
     expected = build()
     docs = tmp_path / "docs"
     docs.mkdir()
-    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json", "secret-sft-mini-v019.json", "sonnet55-medium.json", "astra-medium.json", "universal-agent-haiku.json"):
+    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json", "secret-sft-mini-v019.json", "sonnet55-medium.json", "astra-medium.json", "universal-agent-haiku.json", "giga35-ultra-reasoning-v019.json"):
         text = (root / "docs" / name).read_text(encoding="utf-8")
         assert "\n" in text
         (docs / name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
