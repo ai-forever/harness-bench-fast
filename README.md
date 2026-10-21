@@ -51,6 +51,44 @@ Current task set: **471 tasks, `task-set v0.19.1`**. Tasks 432–471 remain **wa
 
 No model results on v0.19.1 have been recorded yet. Published v0.19.0 results and earlier wave 19 calibration retain their original protocols, budgets, denominators and scores; they are not measurements of v0.19.1. The result sections below and linked measurement pages remain historical records.
 
+## GigaChat 3.5 Ultra Reasoning (PROM) (2026-10-21)
+
+[GigaChat 3.5 Ultra Reasoning in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#giga35-ultra-reasoning):
+**277/471 (58.8%)**, 95% Wilson interval **54.3–63.2%**.
+Light **273/391 (69.8%)**; Medium **4/80 (5.0%)** — long context 0/20,
+tool reflection 3/20, wave 19 feasibility 1/40.
+
+Stock deepagents 0.6.12, no profile; production GigaChat API; reasoning
+medium, history forwarded, max output 16,384. Linux bwrap, four workers,
+temperature omitted. Three long-context `CONTEXT_TOO_LONG` 422s count as
+failures; one HTTP 500 and one HTTP 502 were retried. Timeouts and
+recursion-limit hits remain failures.
+
+The same-harness GigaChat 3.5 PROM default-effort run scored 292/471
+(62.0%). The model and reasoning effort differ. [Protocol](docs/giga35-ultra-reasoning.html)
+· [Measurement data](docs/giga35-ultra-reasoning-v019.json). Raw traces remain private.
+
+## Universal Agent + Claude Haiku 5.5 (2026-10-20/21)
+
+[Universal Agent in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#universal-agent-haiku):
+**437/471 (92.8%)**, 95% Wilson interval **90.1–94.8%**.
+Light **384/391 (98.2%)**; Medium **53/80 (66.3%)** — long context 8/20,
+tool reflection 13/20, wave 19 feasibility 32/40.
+
+Universal Agent gc-cli/core 0.4.0, user profile with finish gate and token
+compaction; subagents, skills and MCP disabled. OpenRouter; default temperature
+and reasoning effort. Thinking requested but application unconfirmed.
+Linux bwrap, four workers, one retained outcome per task. All 14 tasks affected
+by HTTP 502 were replaced by their first transport-clean retry, regardless of
+score. Native output truncation, finish-gate limit acceptance and nine task
+timeouts remain part of the measured behavior.
+
+The same-model DeepAgents baseline scored 427/471 (90.7%): **+2.1 pp**, with a
+descriptive paired task-bootstrap interval of 0.0 to +4.5 pp. Configuration and
+output budgets differ; this is not an isolated harness-effect estimate or repeat
+variance. [Full protocol, telemetry and comparison](docs/universal-agent-haiku.html)
+and [public aggregate](docs/universal-agent-haiku.json). Raw traces remain private.
+
 ## secret sft (2026-10-19/20)
 
 [secret sft in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#secret-700b):

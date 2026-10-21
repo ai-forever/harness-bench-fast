@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Universal Agent · Claude Haiku 5.5</title><link rel="stylesheet" href="landing.css"></head><body><main>
+<p><a href="index.html#universal-agent-haiku">← Universal Agent in the common leaderboard</a></p>
+<section class="measurement-protocol" aria-labelledby="title">
+  <p class="snapshot-label">Full suite · 471 tasks · one retained outcome per task</p>
+  <h1 id="title">Universal Agent · Claude Haiku 5.5</h1>
+  <p class="snapshot-meta">gc-cli / gc-core 0.4.0 · OpenRouter · reasoning effort default · task-set v0.19.0 · 20–21 October 2026</p>
+  <p><strong>437/471 passed (92.8%).</strong> 95% Wilson interval: 90.1–94.8%.</p>
+  <div class="table-wrap"><table aria-label="Universal Agent and DeepAgents on Haiku">
+    <thead><tr><th scope="col">Task subset</th><th scope="col" class="numeric">Universal Agent</th><th scope="col" class="numeric">DeepAgents baseline</th><th scope="col" class="numeric">Difference</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Full suite · 1–471</th><td class="numeric">437/471 (92.8%)</td><td class="numeric">427/471 (90.7%)</td><td class="numeric">+2.1 pp</td></tr>
+      <tr><th scope="row">Light · 1–391</th><td class="numeric">384/391 (98.2%)</td><td class="numeric">377/391 (96.4%)</td><td class="numeric">+1.8 pp</td></tr>
+      <tr><th scope="row">Medium · 392–471</th><td class="numeric">53/80 (66.3%)</td><td class="numeric">50/80 (62.5%)</td><td class="numeric">+3.8 pp</td></tr>
+    </tbody>
+  </table></div>
+  <p>Medium breakdown: long context <strong>8/20</strong>, tool reflection <strong>13/20</strong>, wave 19 feasibility <strong>32/40</strong>. Light Wilson95: 96.4–99.1%; Medium: 55.4–75.7%.</p>
+  <p>The <a href="wave19-measurements.html#wave19-haiku">DeepAgents 0.6.12 baseline</a> uses the same model and task contracts, with different tools, output limits and reasoning settings. These results compare complete configurations and do not isolate the harness effect. Paired task-bootstrap 95% intervals for the differences: overall 0.0 to +4.5 pp, Light −0.3 to +3.8 pp, Medium −5.0 to +13.8 pp (10,000 samples, seed 20261021). Neither these intervals nor Wilson95 estimate variability across repeated runs.</p>
+  <details open><summary>Configuration and validation</summary>
+    <p>Linux bwrap with trusted host services; four workers. Task timeouts: ordinary 900 seconds, long context 7,200 seconds, tool reflection 1,800 seconds, wave 19 120 seconds. Nine task timeouts remain failures. One outcome per task; no best-of selection.</p>
+    <p>User-supplied Universal Agent profile: subagents, skills and MCP disabled; finish gate enabled with a maximum of ten iterations; up to 1,000 steps. Token compaction trigger 200,000, turn-end trigger 160,000. Maximum main output 32,768 tokens; auxiliary 8,192 and judge 10,000. Temperature omitted from every audited request.</p>
+    <p>Main calls requested reasoning enabled, auxiliary calls disabled, with default effort. The API returned no reasoning fields: actual thinking application is unconfirmed. The response model ID matched <code>anthropic/claude-haiku-5.5</code>; an upstream build identifier was not disclosed.</p>
+    <p>Fourteen tasks encountered HTTP 502 and were replaced by their first retry without HTTP errors, regardless of score. Recovery required five rounds and 28 additional task executions. Original artifacts were retained; the selected 471 attempts have no HTTP errors. The four-task setup smoke is excluded.</p>
+    <p>Native “Empty messages list” errors on eight long-context tasks followed main responses truncated at the 32,768-token output limit. They remain part of the measured harness behavior. Eleven finish-gate acceptances at its configured iteration limit are also retained; none resulted from a judge error. Compaction ran 43 summary batches.</p>
+    <p>Frozen benchmark source <code>bda46b1f8b08b8416e7d59bfecf55fc822572022</code>; Universal Agent source <code>8c76e8b0c767cabd9d9122c354df632ef15cc22e</code>. Source/runtime hashes, exact task coverage, isolation, model identity, default temperature and first-clean retry selection were checked. Failed outcomes and trusted-service results were reviewed.</p>
+  </details>
+  <details><summary>Steps, tokens and recovery cost</summary>
+    <p>Native terminal counters cover 462/471 tasks: <strong>4,882 main steps and 361,609,811 tokens</strong>. All 462 token totals match API usage. Nine timed-out tasks have no terminal usage event.</p>
+    <p>Including those interrupted tasks, saved traces contain <strong>5,447 main response steps</strong>, and API usage totals <strong>408,049,292 tokens</strong> for the selected attempts. Across the original run and all recovery attempts, reported usage is <strong>889,696,808 tokens</strong>, excluding the setup smoke. Input tokens include repeatedly sent context; these are not unique corpus tokens or a dollar-cost estimate.</p>
+    <p>API totals include both main and auxiliary calls. Interrupted responses that never returned usage may be missing, so API tokens and trace steps are lower bounds. Raw traces and private endpoint details stay on the benchmark server.</p>
+  </details>
+  <p><a href="universal-agent-haiku.json">Download aggregate, intervals, protocol and source fingerprints →</a></p>
+</section>
+</main></body></html>
