@@ -26,7 +26,7 @@ if (typeof document !== "undefined") {
     const empty = document.getElementById("empty");
     const buttons = [...document.querySelectorAll("[data-suite]")];
     let suite = location.hash === "#medium" ? "medium" : "light";
-    const rowAnchors = { "#secret-700b": "secret-700b-v019", "#secret-sft-mini": "secret-sft-mini-v019", "#universal-agent-haiku": "universal-agent-haiku", "#giga35-ultra-reasoning": "giga35-ultra-reasoning-v019" };
+    const rowAnchors = { "#secret-sft-codex": "secret-sft-codex-v019", "#secret-700b": "secret-700b-v019", "#secret-sft-mini": "secret-sft-mini-v019", "#universal-agent-haiku": "universal-agent-haiku", "#giga35-ultra-reasoning": "giga35-ultra-reasoning-v019" };
     // Preserve incoming links to models and protocol notes from the old landing.
     if (location.hash && !["#light", "#medium", ...Object.keys(rowAnchors)].includes(location.hash)) {
       location.replace("archive.html" + location.hash);
@@ -54,6 +54,15 @@ if (typeof document !== "undefined") {
           (suite === "medium" && scope === "wave19" ? " · wave 19 only" : "") +
           (row.result.note ? " · " + row.result.note : "");
         who.append(link, harness);
+        if (row.result.token_usage) {
+          const usage = row.result.token_usage;
+          const tokens = document.createElement("span");
+          tokens.className = "harness";
+          tokens.textContent = "API tokens: " + (usage.lower_bound ? "≥ " : "") + usage.total_tokens.toLocaleString("en-US");
+          tokens.title = "Input " + usage.input_tokens.toLocaleString("en-US") + "; output " + usage.output_tokens.toLocaleString("en-US") +
+            ". Usage returned for " + usage.requests_with_usage + "/" + usage.requests + " requests in this subset. Reasoning is included in output, not added again.";
+          who.append(tokens);
+        }
         const passed = document.createElement("td");
         passed.className = "numeric";
         passed.textContent = formatPassed(row.result.passed) + "/" + row.result.total;
@@ -112,7 +121,7 @@ if (typeof document !== "undefined") {
       data = await response.json();
       render();
       if (Object.hasOwn(rowAnchors, location.hash)) {
-        document.getElementById(location.hash.slice(1)).scrollIntoView({ block: "center" });
+        document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: "center" });
       }
       buttons.forEach(button => button.addEventListener("click", () => {
         suite = button.dataset.suite;
@@ -125,7 +134,7 @@ if (typeof document !== "undefined") {
         expanded = Object.hasOwn(rowAnchors, location.hash);
         if (expanded) search.value = "";
         render();
-        if (expanded) document.getElementById(location.hash.slice(1)).scrollIntoView({ block: "center" });
+        if (expanded) document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: "center" });
       });
       search.addEventListener("input", () => { expanded = false; render(); });
       more.addEventListener("click", () => { expanded = true; render(); });

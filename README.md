@@ -99,6 +99,21 @@ Source snapshot: `3796b9084093e5f9383077d7bde8f1ce1f0d57b5`.
 source report fingerprint; raw traces and backend identifiers remain private.
 Step/token counters are raw, incomplete and unaudited.
 
+## secret sft · Codex (2026-10-21, publication pending)
+
+The completed task snapshot is held out of the ranking while task 399 is
+rerun: a post-run wire audit found a connection timeout missed by the original
+infrastructure classifier. The other 470 outcomes remain unchanged.
+
+The pre-recovery API usage is **at least 107,751,556 tokens**: 106,243,026 input
+and 1,508,530 output, with usage on 3,735/3,829 requests across all 471 tasks.
+Light accounts for 8,998,150 and Medium for 98,753,406 tokens. These counts
+include repeated context, exclude setup probes, and do not add reasoning twice.
+The recovery cost is not included yet. Native terminal usage (55,347,206 tokens,
+398/471 task coverage) is retained separately, not presented as total API spend.
+[Audit and protocol](docs/secret-sft-codex.html) ·
+[Snapshot with token coverage](docs/secret-sft-codex-v019.json).
+
 ## secret sft · mini-SWE-agent (2026-10-20)
 
 [mini-SWE-agent in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#secret-sft-mini):

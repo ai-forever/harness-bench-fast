@@ -212,9 +212,26 @@ def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
     expected = build()
     docs = tmp_path / "docs"
     docs.mkdir()
-    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json", "secret-sft-mini-v019.json", "sonnet55-medium.json", "astra-medium.json", "universal-agent-haiku.json", "giga35-ultra-reasoning-v019.json"):
+    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json", "secret-sft-mini-v019.json", "secret-sft-codex-v019.json", "sonnet55-medium.json", "astra-medium.json", "universal-agent-haiku.json", "giga35-ultra-reasoning-v019.json"):
         text = (root / "docs" / name).read_text(encoding="utf-8")
         assert "\n" in text
         (docs / name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
     build.__globals__["ROOT"] = tmp_path
     assert build() == expected
+
+
+def test_codex_wire_audit_holds_infrastructure_snapshot_and_checks_token_sums():
+    root = Path(__file__).resolve().parents[1]
+    data = json.loads((root / "docs/leaderboard-results.json").read_text())
+    codex = json.loads((root / "docs/secret-sft-codex-v019.json").read_text())
+    assert codex["pending_task_numbers"] == [399]
+    assert not codex["measurement_valid"] and not codex["ranked"]
+    assert not any(row["id"] == "secret-sft-codex-v019" for row in data["rows"])
+    usage = codex["telemetry"]["selected_api"]
+    assert usage["total_tokens"] == 107751556
+    assert usage["requests_with_usage"] == 3735
+    assert usage["requests_missing_usage"] == 94
+    assert usage["lower_bound"] is True
+    for key in ("input_tokens", "output_tokens", "total_tokens", "requests", "requests_with_usage", "requests_missing_usage"):
+        assert usage[key] == sum(codex["counts"][name]["tokens"][key] for name in ("light", "medium"))
+    assert codex["counts"]["wave19_feasibility"]["tokens"]["total_tokens"] <= codex["counts"]["medium"]["tokens"]["total_tokens"]
