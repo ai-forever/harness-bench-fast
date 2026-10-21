@@ -32,6 +32,7 @@ import threading
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import ExitStack
 from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory, mkdtemp
@@ -40,6 +41,7 @@ from urllib.parse import quote, urlsplit
 from harness_bench.cli_artifacts import new_execution, record_execution
 from harness_bench.cli_isolation import bind_fds, sandbox_argv, validate_trusted_runtime_paths
 from harness_bench.core import Task, effective_task_timeout
+from harness_bench.native_capture import DiskOutput, metric_document, output_lines
 from harness_bench.runner import (
     TaskRun,
     _add_usage_counts,
@@ -136,6 +138,82 @@ _AGENT_METRIC_KEYS = (
     "agent_total_tokens",
 )
 """Per-task effort metrics written to result JSON when a parser recognizes a run."""
+
+
+def _is_strands_print_command(argv: list[str]) -> bool:
+    """Recognize the official CLI, not agent text mentioning its name."""
+    return bool(argv and Path(argv[0]).name in {"strands", "strands.cmd"}
+                and any(arg in {"-p", "--print"} for arg in argv[1:]))
+
+
+def _strands_print_usage(stdout: str | bytes | None) -> tuple[dict[str, int], bool]:
+    """Read only the final usage footer emitted by official CLI print mode.
+
+    CLI 0.1.4 prints no reliable aggregate step/tool counts or response model
+    identity. Keep these metrics absent rather than counting transcript text.
+    """
+    if isinstance(stdout, bytes):
+        stdout = stdout.decode("utf-8", errors="replace")
+    lines = (stdout or "").rstrip().splitlines()
+    match = re.fullmatch(
+        r"(?P<total>\d+) tokens(?P<incomplete> so far; background usage incomplete)?  "
+        r"\((?:(?P<input>\d+) in / (?P<output>\d+) out|input/output split unavailable)"
+        r"(?: / \d+ cached: \d+w \d+r)?\)",
+        lines[-1] if lines else "",
+    )
+    if not match:
+        return {}, False
+    stats = {"agent_total_tokens": int(match["total"])}
+    if match["input"] is not None:
+        stats.update(agent_input_tokens=int(match["input"]), agent_output_tokens=int(match["output"]))
+    return stats, match["incomplete"] is None
+
+
+def _strands_cli_metadata(argv: list[str]) -> dict:
+    """Record explicit CLI identity; saved-profile defaults remain unresolved."""
+    flags, assigned = {}, {}
+    index = 1
+    while index < len(argv):
+        arg = argv[index]
+        if arg == "--":
+            break
+        key, separator, value = arg.partition("=")
+        if key in {"--model", "--effort", "--set"}:
+            if not separator:
+                index += 1
+                value = argv[index] if index < len(argv) else ""
+            if key == "--set":
+                field, equal, raw = value.partition("=")
+                if equal and field in {"model", "effort"}:
+                    try:
+                        setting = json.loads(raw)
+                    except ValueError:
+                        setting = raw
+                    assigned[field] = setting if isinstance(setting, str) else None
+            else:
+                flags[key[2:]] = value
+        index += 1
+    # Dedicated flags override --set, regardless of their argument order.
+    model = flags.get("model", assigned.get("model"))
+    effort = flags.get("effort", assigned.get("effort"))
+    return {"requested_model": model, "reasoning_effort": effort or "default",
+            "identity_source": "cli_arguments", "response_model": None}
+
+
+def _strands_provider_error(result: subprocess.CompletedProcess[str]) -> str | None:
+    """Normalize the official CLI's top-level SDK errors for existing retries."""
+    if result.returncode == 0:
+        return None
+    match = re.search(r"^error: (\d{3})\b", result.stderr or "", re.MULTILINE)
+    if match and 400 <= int(match[1]) <= 599:
+        return f"HTTP status {match[1]}"
+    if re.search(r"^error: Connection error\.", result.stderr or "", re.MULTILINE):
+        return "network error"
+    if re.search(r"^error: Request timed out\.", result.stderr or "", re.MULTILINE):
+        return "request timeout"
+    if re.search(r"^error: Stream ended without completing a message\s*$", result.stderr or "", re.MULTILINE):
+        return "streaming request failed: Stream ended without completing a message"
+    return None
 
 
 def _is_opencode_run_command(argv: list[str]) -> bool:
@@ -270,33 +348,29 @@ def _ensure_cli_json_events(argv: list[str]) -> list[str]:
     return _ensure_grok_json_events(argv)
 
 
-def _iter_json_payloads(stdout: str) -> list[dict[str, object]]:
-    payloads: list[dict[str, object]] = []
-    for line in stdout.splitlines():
-        line = line.strip()
-        if not line:
-            continue
+def _iter_json_payloads(stdout: str):
+    """Read events one at a time; never retain a list of the transcript."""
+    found = False
+    for line in output_lines(stdout):
         try:
             payload = json.loads(line)
         except json.JSONDecodeError:
             continue
         if isinstance(payload, dict):
-            payloads.append(payload)
-    if payloads:
-        return payloads
-
-    stripped = stdout.strip()
-    if not stripped:
-        return []
+            found = True
+            yield payload
+    if found:
+        return
+    # Pretty-printed single JSON objects remain supported within the bounded
+    # diagnostic window; JSONL is streamed from the complete artifact above.
     try:
-        payload = json.loads(stripped)
+        payload = json.loads(stdout.strip())
     except json.JSONDecodeError:
-        return []
+        return
     if isinstance(payload, dict):
-        return [payload]
-    if isinstance(payload, list):
-        return [item for item in payload if isinstance(item, dict)]
-    return []
+        yield payload
+    elif isinstance(payload, list):
+        yield from (item for item in payload if isinstance(item, dict))
 
 
 def _add_metric_count(stats: dict[str, int], key: str, value: object) -> None:
@@ -385,7 +459,7 @@ def _grok_session_tool_stats(
         return 0, 0
 
     try:
-        payloads = _iter_json_payloads(updates_path.read_text(encoding="utf-8"))
+        payloads = _iter_json_payloads(DiskOutput(updates_path))
     except OSError:
         return 0, 0
 
@@ -454,7 +528,7 @@ def _grok_json_event_stats(
         "error",
         "end",
     }
-    events = sum(1 for payload in payloads if payload.get("type") in grok_event_types)
+    events = sum(1 for payload in _iter_json_payloads(stdout) if payload.get("type") in grok_event_types)
     session_id = end_payload["sessionId"]
     assert isinstance(session_id, str)
     tool_calls, shell_commands = _grok_session_tool_stats(
@@ -695,7 +769,7 @@ def _codex_json_event_stats(stdout: str) -> dict[str, int] | None:
     total_tokens = 0
     saw_codex_event = False
 
-    for line in stdout.splitlines():
+    for line in output_lines(stdout):
         line = line.strip()
         if not line:
             continue
@@ -788,7 +862,7 @@ def _mini_swe_agent_traj_stats(workspace: Path | None) -> dict[str, int] | None:
         if not path.exists():
             continue
         try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload = metric_document(path)
         except (OSError, json.JSONDecodeError):
             return None
         break
@@ -859,7 +933,7 @@ def _ouroboros_result_stats(workspace: Path | None) -> dict[str, int] | None:
     if not path.is_file():
         return None
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = metric_document(path)
     except (OSError, json.JSONDecodeError):
         return None
     if not isinstance(payload, dict):
@@ -944,7 +1018,7 @@ def _pi_session_stats(workspace: Path | None) -> dict[str, int] | None:
 
     for path in candidates:
         try:
-            payloads = _iter_json_payloads(path.read_text(encoding="utf-8"))
+            payloads = _iter_json_payloads(DiskOutput(path))
         except OSError:
             continue
         for payload in payloads:
@@ -1022,9 +1096,10 @@ def _task_run_with_cli_stats(
     error: str | None = None,
     workspace: Path | None = None,
     stats_workspace: Path | None = None,
+    cli_stats: dict | None = None,
 ) -> TaskRun:
     native = _deepagents_worker_result(result.stdout or "") if result is not None else None
-    stats = {key: value for key, value in native.get("stats", {}).items() if key.startswith("agent_") and key in TaskRun.__dataclass_fields__} if native else None
+    stats = cli_stats if cli_stats is not None else ({key: value for key, value in native.get("stats", {}).items() if key.startswith("agent_") and key in TaskRun.__dataclass_fields__} if native else None)
     if stats is None:
         stats = _codex_json_event_stats(result.stdout or "") if result is not None else None
     if stats is None and result is not None:
@@ -1149,6 +1224,7 @@ def _run_cli_subprocess(
     cwd: Path,
     timeout: int,
     env: dict[str, str] | None,
+    capture_directory: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """Run the CLI command with a hard per-task process-tree timeout."""
     creationflags = 0
@@ -1158,39 +1234,54 @@ def _run_cli_subprocess(
     else:
         start_new_session = True
 
-    with bind_fds(argv) as (command, descriptors):
-        proc = subprocess.Popen(  # noqa: S603 — trusted local benchmark command
-            command,
-            cwd=cwd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            stdin=subprocess.DEVNULL,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            env=env,
-            creationflags=creationflags,
-            start_new_session=start_new_session,
-        **({"pass_fds": descriptors} if descriptors else {}),
-        )
-    _register_active_process(proc)
-    try:
-        stdout, stderr = proc.communicate(timeout=timeout)
-    except subprocess.TimeoutExpired as exc:
-        _terminate_process_tree(proc)
+    with ExitStack() as capture:
+        persistent_capture = capture_directory is not None
+        if capture_directory is None:
+            capture_directory = type(cwd)(capture.enter_context(TemporaryDirectory(prefix="hbf-output-")))
+        stdout_sink = capture.enter_context((capture_directory / "stdout.log").open("wb"))
+        stderr_sink = capture.enter_context((capture_directory / "stderr.log").open("wb"))
+
+        def collected():
+            out = DiskOutput(capture_directory / "stdout.log", native=True)
+            err = DiskOutput(capture_directory / "stderr.log")
+            return (out, err) if persistent_capture else (str(out), str(err))
+        with bind_fds(argv) as (command, descriptors):
+            proc = subprocess.Popen(  # noqa: S603 — trusted local benchmark command
+                command,
+                cwd=cwd,
+                stdout=stdout_sink,
+                stderr=stderr_sink,
+                stdin=subprocess.DEVNULL,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                env=env,
+                creationflags=creationflags,
+                start_new_session=start_new_session,
+            **({"pass_fds": descriptors} if descriptors else {}),
+            )
+        _register_active_process(proc)
         try:
-            stdout, stderr = proc.communicate(timeout=_PROCESS_TREE_SHUTDOWN_TIMEOUT)
-        except subprocess.TimeoutExpired:
-            _kill_process_tree(proc)
-            stdout, stderr = proc.communicate()
-        exc.output, exc.stderr = stdout, stderr
-        raise
-    except BaseException:
-        _terminate_process_tree(proc)
-        raise
-    finally:
-        _unregister_active_process(proc)
-    return subprocess.CompletedProcess(argv, proc.returncode, stdout, stderr)
+            stdout, stderr = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired as exc:
+            _terminate_process_tree(proc)
+            try:
+                stdout, stderr = proc.communicate(timeout=_PROCESS_TREE_SHUTDOWN_TIMEOUT)
+            except subprocess.TimeoutExpired:
+                _kill_process_tree(proc)
+                stdout, stderr = proc.communicate()
+            exc.output, exc.stderr = collected()
+            raise
+        except BaseException:
+            _terminate_process_tree(proc)
+            raise
+        finally:
+            _unregister_active_process(proc)
+        # Real Popen has file-backed streams and returns (None, None).
+        # Retain synthetic outputs supplied by subprocess test doubles.
+        if stdout is None and stderr is None:
+            stdout, stderr = collected()
+        return subprocess.CompletedProcess(argv, proc.returncode, stdout, stderr)
 
 
 def _cleanup_workspace_keepalive(
@@ -1395,6 +1486,11 @@ def _infrastructure_error(result: subprocess.CompletedProcess[str]) -> str | Non
     if result.returncode == 0:
         return None
     stderr = result.stderr or ""
+    if result.returncode == -9 or (
+        result.returncode == 137
+        and re.search(r"(?m)^HBF_CLI_PROCESS_SIGNAL:9$", stderr)
+    ):
+        return "CLI process killed by SIGKILL"
     startup = re.search(
         r"(?:^|\n)(?:head: cannot open '[^'\n]*/mini' for reading: No such file or directory"
         r"|Error: Unknown provider [^\n]+|[^\n]*: /dev/null: No such file or directory"
@@ -1408,7 +1504,7 @@ def _infrastructure_error(result: subprocess.CompletedProcess[str]) -> str | Non
         return transient.group(0)
     # A structured top-level API failure (pi emits these on stdout) is safe to
     # inspect; nested tool results and ordinary assistant text are not.
-    for line in (result.stdout or "").splitlines():
+    for line in output_lines(result.stdout):
         try:
             event = json.loads(line)
         except (ValueError, TypeError):
@@ -1468,6 +1564,7 @@ def run_task_cli(
         validate_trusted_runtime_paths(runtime_paths, base_argv[0])
     if isolation not in {"none", "bwrap"}:
         raise ValueError(f"unknown isolation mode: {isolation}")
+    is_strands = _is_strands_print_command(base_argv)
     artifacts_root = artifacts_root or Path("jobs/cli_artifacts").resolve()
     identity = {"isolation": isolation, "cli_command_sha256": hashlib.sha256(cli_command.encode()).hexdigest(),
                 "runtime_paths": list(runtime_paths), "timeout": timeout, **runtime_identity}
@@ -1529,7 +1626,9 @@ def run_task_cli(
             if inject_agents_md and agents_md.exists():
                 argv += ["--append-system-prompt", agents_md.read_text(encoding="utf-8")]
             argv += [task.prompt]
-            env = {**(os.environ if extra_env and "HBF_WORKER_API_KEY" in extra_env else (_subprocess_env_with_token() or os.environ)), **(extra_env or {}),
+            # The official Strands CLI manages its own provider credentials.
+            own_credentials = is_strands or (extra_env and "HBF_WORKER_API_KEY" in extra_env)
+            env = {**(os.environ if own_credentials else (_subprocess_env_with_token() or os.environ)), **(extra_env or {}),
                    "HBF_TASK_MIN_RECURSION_LIMIT": str(getattr(task, "min_recursion_limit", None) or 0)}
             if wire_base := env.get("HBF_WIRE_BASE_URL"):
                 wire_url = urlsplit(wire_base)
@@ -1549,15 +1648,21 @@ def run_task_cli(
                 env = {**(env or os.environ), "TMPDIR": str(scratch), "TMP": str(scratch), "TEMP": str(scratch)}
             phase = "cli"
             started = time.monotonic()
-            result = _run_cli_subprocess(argv, cwd=workspace, timeout=timeout, env=env)
+            result = _run_cli_subprocess(argv, cwd=workspace, timeout=timeout, env=env,
+                                         capture_directory=execution)
             agent_elapsed = time.monotonic() - started
             if trusted_session is not None:
                 trusted_session.freeze()
             if agent_elapsed > timeout:
                 raise subprocess.TimeoutExpired(argv, timeout, result.stdout, result.stderr)
-            native = _deepagents_worker_result(result.stdout or "")
-            error = _infrastructure_error(result)
-            if extra_env and "HBF_WORKER_API_KEY" in extra_env:
+            native = None if is_strands else _deepagents_worker_result(result.stdout or "")
+            # Strands stdout is human-readable assistant/tool text, not the
+            # structured error events supported by some other CLI runners.
+            error_source = subprocess.CompletedProcess(result.args, result.returncode, "", result.stderr) if is_strands else result
+            error = _infrastructure_error(error_source)
+            if is_strands:
+                error = _strands_provider_error(result) or error
+            if not is_strands and extra_env and "HBF_WORKER_API_KEY" in extra_env:
                 terminal_count = sum(1 for line in (result.stdout or "").splitlines() if _deepagents_worker_result(line))
                 if terminal_count != 1 or not native or not isinstance(native.get("stats"), dict) or (result.returncode and not native.get("failure_kind")):
                     native = {"failure_kind": "infrastructure", "message": "Deepagents worker did not produce exactly one valid terminal event", "retryable": False, "stats": {}}
@@ -1570,19 +1675,37 @@ def run_task_cli(
                     workspace=workspace if keep_workspace else None, stats_workspace=workspace)
             elif error:
                 kind = "infrastructure"
-                retryable = bool(_TRANSIENT_ERROR_PATTERN.search(error))
+                retryable = (error == "CLI process killed by SIGKILL"
+                             or bool(_TRANSIENT_ERROR_PATTERN.search(error)))
+                if is_strands:
+                    run = _task_run_with_cli_stats(task_id=task.id, passed=False, message=error,
+                        elapsed_seconds=time.monotonic()-started, result=result, error=error,
+                        workspace=workspace if keep_workspace else None,
+                        cli_stats=_strands_print_usage(result.stdout)[0])
             else:
                 phase = "verify"
-                outcome = task.verify(workspace)
+                # Trusted-service verifiers replay bounded host-owned state and
+                # require the in-process session; they never execute agent code.
+                if isolation == "bwrap" and trusted_session is None:
+                    from harness_bench.verifier_process import verify_bwrap
+                    outcome = verify_bwrap(task.id, workspace)
+                else:
+                    outcome = task.verify(workspace)
                 message = outcome.message
                 if result.returncode:
                     message += f" | CLI exit={result.returncode}: {(result.stderr or result.stdout).strip()[-300:]!r}"
                 run = _task_run_with_cli_stats(task_id=task.id, passed=outcome.passed, message=message,
                     elapsed_seconds=time.monotonic()-started, result=result,
-                    workspace=workspace if keep_workspace else None, stats_workspace=workspace)
+                    workspace=workspace if keep_workspace else None, stats_workspace=workspace,
+                    cli_stats=_strands_print_usage(result.stdout)[0] if is_strands else None)
         except subprocess.TimeoutExpired as exc:
             kind, error = "timeout", f"CLI timed out after {timeout}s"
             result = subprocess.CompletedProcess(base_argv, -1, exc.stdout, exc.stderr)
+            if is_strands:
+                run = _task_run_with_cli_stats(task_id=task.id, passed=False, message=error,
+                    elapsed_seconds=time.monotonic()-started, result=result, error=error,
+                    workspace=workspace if keep_workspace else None,
+                    cli_stats=_strands_print_usage(exc.stdout)[0])
         except Exception:  # noqa: BLE001 — preserve setup/launcher/verifier evidence
             kind, error = "infrastructure", traceback.format_exc()
         except KeyboardInterrupt:
@@ -1593,8 +1716,11 @@ def run_task_cli(
                      "phase": phase, "returncode": result.returncode, "error": error,
                      "passed": bool(run and run.passed), "isolation": isolation,
                      "cli_command_sha256": hashlib.sha256(cli_command.encode()).hexdigest(),
-                     "timeout": timeout, "runtime_paths": list(runtime_paths), "wire_session": wire_session,
-                     **runtime_identity}
+                     "timeout": timeout, "runtime_paths": list(runtime_paths), "wire_session": wire_session, **runtime_identity}
+            if is_strands:
+                entry["strands_cli"] = {**_strands_cli_metadata(base_argv),
+                                        "usage_scope": "cli_footer",
+                                        "footer_usage_complete": _strands_print_usage(result.stdout)[1]}
             history.append(entry)
             if trusted_session is not None:
                 try:
@@ -1612,7 +1738,8 @@ def run_task_cli(
             try:
                 record_execution(execution, stdout=result.stdout, stderr=result.stderr,
                     metadata={**entry, "task_id": task.id, "timeout": timeout, "runtime_paths": list(runtime_paths)},
-                    trace_roots=(workspace,), state_roots=(scratch, home))
+                    trace_roots=(workspace,), state_roots=(scratch, home),
+                    preserve_output_files=(execution / "stdout.log").exists())
             except OSError as exc:
                 entry["artifact_error"] = str(exc)
                 entry["primary_failure_kind"] = kind

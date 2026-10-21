@@ -168,9 +168,10 @@ def test_cli_monotonic_budget_excludes_setup(offline_cli, monkeypatch, tmp_path,
 
 
 def test_isolated_deepagents_dispatch_applies_task_ceiling(offline_cli, monkeypatch, tmp_path):
-    from harness_bench import runner_openrouter
+    from harness_bench import runner_openrouter, verifier_process
 
     task = budget_task(min_timeout_seconds=120, max_timeout_seconds=120)
+    monkeypatch.setattr(verifier_process, "verify_bwrap", lambda task_id, workspace: task.verify(workspace))
     monkeypatch.setenv("HARNESS_BENCH_TASK_TIMEOUT", "600")
     monkeypatch.setattr(runner_openrouter, "_load_env_from_dotenv", lambda: None)
     monkeypatch.setattr(runner_openrouter, "_ensure_openrouter_key", lambda: None)

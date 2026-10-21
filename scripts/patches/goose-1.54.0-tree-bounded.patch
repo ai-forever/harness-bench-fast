@@ -1,0 +1,72 @@
+--- a/crates/goose/src/agents/platform_extensions/developer/tree.rs
++++ b/crates/goose/src/agents/platform_extensions/developer/tree.rs
+@@ -2,0 +3 @@
++use std::io::Read;
+@@ -158,0 +160,4 @@
++    // Virtual kernel files are not project sources (pagemap can be terabytes).
++    builder.filter_entry(|entry| {
++        !["/proc", "/sys", "/dev"].iter().any(|root| entry.path().starts_with(root))
++    });
+@@ -208,4 +213,36 @@
+-    match fs::read_to_string(path) {
+-        Ok(content) => content.lines().count(),
+-        Err(_) => 0,
+-    }
++    #[cfg(unix)]
++    use std::os::unix::fs::OpenOptionsExt;
++    let mut options = fs::OpenOptions::new();
++    options.read(true);
++    #[cfg(unix)]
++    options.custom_flags(libc::O_NONBLOCK | libc::O_NOFOLLOW);
++    let Ok(file) = options.open(path) else { return 0; };
++    let Ok(metadata) = file.metadata() else { return 0; };
++    if !metadata.is_file() || metadata.len() == 0 { return 0; }
++    // Bound reads to the initial file size, including files growing concurrently.
++    count_utf8_lines(file.take(metadata.len())).unwrap_or(0)
++}
++
++fn count_utf8_lines(mut reader: impl Read) -> std::io::Result<usize> {
++    let mut buffer = [0u8; 65540];
++    let mut pending = 0;
++    let mut lines = 0;
++    let mut nonempty = false;
++    let mut last = 0;
++    loop {
++        let n = reader.read(&mut buffer[pending..65536])?;
++        if n == 0 { break; }
++        nonempty = true;
++        last = buffer[pending + n - 1];
++        lines += buffer[pending..pending+n].iter().filter(|&&b| b == b'\n').count();
++        let used = pending + n;
++        let valid = match std::str::from_utf8(&buffer[..used]) {
++            Ok(_) => used,
++            Err(error) if error.error_len().is_none() => error.valid_up_to(),
++            Err(_) => return Ok(0),
++        };
++        buffer.copy_within(valid..used, 0);
++        pending = used - valid;
++    }
++    if pending != 0 { return Ok(0); }
++    Ok(lines + usize::from(nonempty && last != b'\n'))
+@@ -299,0 +337,21 @@
++
++#[cfg(test)]
++mod bounded_count_tests {
++    use super::*;
++    #[test]
++    fn huge_single_line_is_streamed() {
++        assert_eq!(count_utf8_lines(std::io::repeat(b'x').take(64 * 1024 * 1024)).unwrap(), 1);
++    }
++    #[test]
++    fn utf8_and_line_semantics_are_preserved() {
++        for value in ["", "a", "a\n", "a\n\n", "привет\r\nмир", &"é".repeat(65537)] {
++            assert_eq!(count_utf8_lines(value.as_bytes()).unwrap(), value.lines().count());
++        }
++        assert_eq!(count_utf8_lines(&b"a\n\xff"[..]).unwrap(), 0);
++    }
++    #[cfg(target_os = "linux")]
++    #[test]
++    fn pagemap_is_not_read() {
++        assert_eq!(count_file_lines(Path::new("/proc/self/pagemap")), 0);
++    }
++}

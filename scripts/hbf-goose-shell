@@ -1,0 +1,72 @@
+#!/usr/bin/python3
+"""File-backed shell capture for Goose 1.54's unbounded output collector.
+
+GOOSE_SHELL points here. Commands, exit codes and full output are preserved;
+large tool output is presented as a tail plus the path to its complete file.
+No memory or execution budget is imposed on task code.
+"""
+import os
+from pathlib import Path
+import signal
+import subprocess
+import sys
+import tempfile
+
+INLINE_BYTES = 50_000
+INLINE_LINES = 2_000
+TAIL_BYTES = 10_000
+
+
+def emit(path, destination):
+    size = path.stat().st_size
+    with path.open('rb') as source:
+        small = source.read(INLINE_BYTES + 1)
+        if size <= INLINE_BYTES and small.count(b'\n') < INLINE_LINES:
+            destination.write(small)
+            return
+        source.seek(max(0, size - TAIL_BYTES))
+        tail = source.read(TAIL_BYTES)
+    tail = b'\n'.join(tail.split(b'\n')[-50:])
+    destination.write(tail)
+    destination.write((f'\n[Output preview truncated; full output ({size} bytes) saved to {path}. '
+                       'Read bounded portions with head, tail or sed.]\n').encode())
+
+
+def main():
+    directory = Path(tempfile.mkdtemp(prefix='hbf-goose-shell-'))
+    paths = [directory / 'stdout.log', directory / 'stderr.log']
+    spawn_options = {}
+    if sys.platform == 'linux':
+        import ctypes
+        libc = ctypes.CDLL(None, use_errno=True)
+        parent_pid = os.getpid()
+        def parent_death_signal():
+            # Goose cancels shells with SIGKILL. Do not leave the extra bash
+            # process alive when this capture wrapper is killed.
+            if libc.prctl(1, signal.SIGKILL, 0, 0, 0) != 0:
+                raise OSError(ctypes.get_errno(), 'PR_SET_PDEATHSIG')
+            if os.getppid() != parent_pid:
+                os.kill(os.getpid(), signal.SIGKILL)
+        # This wrapper is single-threaded; no inherited thread locks are used.
+        spawn_options['preexec_fn'] = parent_death_signal
+    with paths[0].open('wb') as out, paths[1].open('wb') as err:
+        proc = subprocess.Popen(['/bin/bash', *sys.argv[1:]], stdout=out, stderr=err,
+                                **spawn_options)
+        def terminate(signum, frame):
+            proc.terminate()
+            try:
+                proc.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                proc.wait()
+            raise SystemExit(128 + signum)
+        signal.signal(signal.SIGTERM, terminate)
+        signal.signal(signal.SIGINT, terminate)
+        code = proc.wait()
+    emit(paths[0], sys.stdout.buffer)
+    emit(paths[1], sys.stderr.buffer)
+    return code if code >= 0 else 128 - code
+
+
+if __name__ == '__main__':
+    sys.exit(main())

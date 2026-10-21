@@ -90,9 +90,11 @@ def record_execution(
     metadata: dict,
     trace_roots: tuple[Path, ...],
     state_roots: tuple[Path, ...] = (),
+    preserve_output_files: bool = False,
 ) -> None:
-    (target / "stdout.log").write_text(text_output(stdout), encoding="utf-8")
-    (target / "stderr.log").write_text(text_output(stderr), encoding="utf-8")
+    if not preserve_output_files:
+        (target / "stdout.log").write_text(text_output(stdout), encoding="utf-8")
+        (target / "stderr.log").write_text(text_output(stderr), encoding="utf-8")
     metadata = {**metadata, "recorded_at": datetime.now(UTC).isoformat()}
     (target / "execution.json").write_text(
         json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8"
