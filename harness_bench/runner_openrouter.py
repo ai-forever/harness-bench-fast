@@ -50,6 +50,7 @@ from harness_bench.runner import (
     invoke_agent_with_stats,
     normalize_json_output_path,
 )
+from harness_bench.runtime_limits import effective_recursion_limit
 from harness_bench.tasks import ALL_TASKS, get_task
 
 DEFAULT_OPENROUTER_MODEL = "qwen/qwen3.6-plus"
@@ -253,7 +254,7 @@ def build_agent(
     workspace: Path,
     *,
     model_name: str = DEFAULT_OPENROUTER_MODEL,
-    recursion_limit: int = 80,
+    recursion_limit: int = 0,
     max_tokens: int | None = None,
     harness_profile: str | None = None,
     forward_reasoning_history: bool = False,
@@ -277,7 +278,7 @@ def run_task(
     *,
     model_name: str = DEFAULT_OPENROUTER_MODEL,
     keep_workspace: bool = False,
-    recursion_limit: int = 80,
+    recursion_limit: int = 0,
     max_tokens: int | None = None,
     harness_profile: str | None = None,
     transient_attempts: int = DEFAULT_TRANSIENT_ATTEMPTS,
@@ -292,7 +293,7 @@ def run_task(
         raise ValueError(f"{task.id} requires --isolation bwrap via run_all; native and RLI execution cannot isolate its trusted service")
     if transient_attempts < 1:
         raise ValueError("transient_attempts must be positive")
-    recursion_limit = max(recursion_limit, getattr(task, "min_recursion_limit", None) or 0)
+    recursion_limit = effective_recursion_limit(recursion_limit, getattr(task, "min_recursion_limit", None))
 
     started = time.monotonic()
     last_run: TaskRun | None = None
@@ -412,7 +413,7 @@ def run_all(
     *,
     model_name: str = DEFAULT_OPENROUTER_MODEL,
     keep_workspace: bool = False,
-    recursion_limit: int = 80,
+    recursion_limit: int = 0,
     max_tokens: int | None = None,
     concurrency: int = 1,
     harness_profile: str | None = None,
@@ -466,7 +467,7 @@ def run_all(
         # Exact worker source files only, plus interpreter/site-packages. No
         # task registry, verifier, benchmark repo or historical artifacts mount.
         runtime = tuple(dict.fromkeys((*runtime_paths, sys.prefix, sys.base_prefix,
-            *(str(package / name) for name in ("deepagents_worker.py", "openrouter_agent.py", "chat_openai.py", "agent_stats.py")))))
+            *(str(package / name) for name in ("deepagents_worker.py", "openrouter_agent.py", "chat_openai.py", "agent_stats.py", "runtime_limits.py")))))
         return run_all_cli(task_ids, cli_command=shlex.join(command),
             timeout=int(_task_timeout_seconds()), keep_workspace=keep_workspace,
             concurrency=concurrency, attempts=attempts, json_output=json_output,

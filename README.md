@@ -3,7 +3,7 @@
 [Live leaderboard and benchmark results](https://ai-forever.github.io/harness-bench-fast/)
 
 The leaderboard has two independent views: **harness_bench_fast light** (tasks
-1–391) and **harness_bench_fast medium** (tasks 392–471, 80 tasks in v0.19.0).
+1–391) and **harness_bench_fast medium** (tasks 392–471, 80 tasks).
 Light covers everyday workflows; Medium covers long context, tool reflection
 and feasibility. These are disjoint subsets of the same task set, not new task
 definitions. The 78 published configurations (80 underlying runs) have been
@@ -38,11 +38,18 @@ for incomplete or infrastructure-invalid suites. Wilson intervals in complete
 reports describe a Bernoulli task model, not repeat variability on the fixed suite.
 To rebuild the landing data: `python scripts/build_landing_data.py` (Python 3.12+).
 
-Current task set: **471 tasks, `task-set v0.19.0`**. Tasks 432–471 are **wave 19: feasibility** — 40 tasks in 20 matched pairs. Within 120 seconds, the agent must construct and submit a solution, execute a feasible search strategy, or prove that the formal conditions cannot be met. Format and protocol compliance are part of the score. This measures the complete agent configuration, not a separate ability to predict its own solving time. Individual task credit is the main metric; both halves must pass for additional pair credit. See [wave 19](docs/wave19-feasibility.md) for the contracts, runtime and validation limits.
+The leaderboard shows **Steps** and **Tokens** for each displayed task subset.
+The public `docs/leaderboard-telemetry.json` snapshot binds these counters to
+the source result hashes. Native tool calls and recorded input/output usage are
+recovered where available; partial or unaudited counters are labeled, and missing
+subset totals appear as a dash. Full-run usage is never substituted for Light,
+Medium or wave 19 usage. Historical scores and measurement protocols are unchanged.
+
+Current task set: **471 tasks, `task-set v0.19.1`**. Tasks 432–471 remain **wave 19: feasibility** — 40 tasks in 20 matched pairs; this revision adds no tasks. The agent must construct and submit a solution, execute a feasible search strategy, or prove that the formal conditions cannot be met. The runtime has a 3,600-second sanitary guard against hangs; formal resource budgets inside tasks are unchanged. A timely host-recorded `submit`/`finish` that passes the full verifier earns credit even if the subsequent final reply or process times out. Format and protocol compliance are part of the score. This measures the complete agent configuration, not a separate ability to predict its own solving time. Individual task credit is the main metric; both halves must pass for additional pair credit. See [wave 19](docs/wave19-feasibility.md) for the contracts, runtime and validation limits.
 
 **Wave 19 requires Linux/bubblewrap and a trusted host service.** Use `run-cli --isolation bwrap` or `run-openrouter --isolation bwrap` (the isolated CLI worker). Native `run` / `run-pure`, native OpenRouter execution, RLI and Harbor export reject selections containing these tasks before model execution. To use those paths on earlier tasks, select `--from-task 1 --to-task 431`.
 
-Full-suite v0.19.0 measurements are available in the live leaderboard and the measurement sections below. Wave 19 calibration used an earlier frozen protocol; it does not measure the current host-service implementation or updated prompts. The earlier-results tables retain their original task sets, denominators and scores.
+No model results on v0.19.1 have been recorded yet. Published v0.19.0 results and earlier wave 19 calibration retain their original protocols, budgets, denominators and scores; they are not measurements of v0.19.1. The result sections below and linked measurement pages remain historical records.
 
 ## GigaChat 3.5 Ultra Reasoning (PROM) (2026-10-21)
 
@@ -207,9 +214,9 @@ and task budgets as the DeepSeek matrix.
 | deepagents | GLM-5.3 Flash Uncensored FP8 (high) | 375/431 | 87.0% | 6,627 | 373,783,977 |
 
 The live leaderboard supports an inclusive task-set version range with two sliders.
-The published result range covers v0.1.0 through v0.18.0 and uses the task
-definitions of that historical 431-task snapshot. The source registry now also
-contains v0.19.0, which has no full-suite published result.
+The historical 431-task results cover v0.1.0 through v0.18.0 and use the task
+definitions of that snapshot. Later v0.19.0 results are linked above. The source
+registry is now v0.19.1; historical rows are not relabeled as this new protocol.
 Revisions with no added tasks contribute zero tasks; an empty range has no score.
 Scores and ranks are recomputed from per-wave passed counts; @mean3 remains
 an arithmetic mean over all three runs. Steps/tokens remain full-run totals.
@@ -606,7 +613,7 @@ runs (317, 311, 308 passed), with Steps/Tokens as the mean of per-run sums.
 
 </details>
 
-A self-contained **471-task agent benchmark** (`task-set v0.19.0`) for evaluating LLM-backed
+A self-contained **471-task agent benchmark** (`task-set v0.19.1`) for evaluating LLM-backed
 coding agents on file-operation work: create / edit / refactor source
 files, transform CSV / JSON / JSONL / XLSX, run pytest, search across a
 project tree, write and use `MEMORY.md` per repo conventions, and chain
@@ -629,6 +636,14 @@ remain). It started life as `harness_bench/` inside
 and was extracted into its own repo once it matured.
 
 ## Quick start
+
+Current defaults are **3,600 seconds per task** for ordinary, reflection and
+wave 19 tasks; long-context tasks retain their **7,200-second floor**. Setup
+and verification are outside the agent execution budget. Agent graph steps
+have no benchmark-imposed cap by default (`--recursion-limit 0`). Explicit
+finite caps are supported for diagnostic runs and must be reported as
+nondefault settings; task-specific floors still raise those finite caps.
+Formal resource budgets in the task statements are unchanged.
 
 ```bash
 # Install the bench in a fresh venv. The `[gigachat]` extra adds the
@@ -731,9 +746,13 @@ uv run python -m harness_bench run-cli \
 # continues from the checkpoint. JSON reports also include the command that
 # launched the run. Ctrl-C writes `run_status: "interrupted"` plus
 # `interrupted_attempts`; those attempts are rerun from clean workspaces on the
-# next continue when you rerun with the same JSON path. CLI per-task timeouts
+# next continue when you rerun with the same JSON path. CLI timeout failures
 # are also marked `rerun_on_continue` and rerun from clean workspaces on the
-# next launch with the same `--json-output` file.
+# next launch with the same `--json-output` file. A wave 19 success supported
+# by a timely host receipt and full verification stays a success even when
+# the subsequent final reply/process times out.
+# Resume requires the same task-set version. Start v0.19.1 with a fresh JSON;
+# historical v0.19.0 results must not be rewritten or relabeled.
 # Wave 19 additionally checks runtime_protocol and a task-contract SHA256.
 # A different prompt/service protocol requires a fresh result JSON file.
 # Add `--rerun-on-fail` when continuing to rerun every saved task attempt whose
@@ -758,7 +777,7 @@ MSWEA_MODEL_NAME='openai/GigaChat-3-Ultra' \
 MSWEA_COST_TRACKING=ignore_errors \
 uv run python -m harness_bench run-cli \
     --cli-command "$HB_MINI_SWE_AGENT" \
-    --timeout 900 --concurrency 5 \
+    --timeout 3600 --concurrency 5 \
     --json-output mini_swe_agent_gigachat_3_ultra.json
 # Smoke-test one task first by adding:
 #     --task task_01_create_hello --keep
@@ -791,7 +810,7 @@ uv run python -m harness_bench summarize-json jobs/results.json
 OPENCODE_CONFIG=/path/to/opencode-vllm.json \
 uv run python -m harness_bench run-cli \
     --cli-command 'opencode run -m vllm/qwen3.6-27b' \
-    --timeout 900 --concurrency 5
+    --timeout 3600 --concurrency 5
 
 # Windows/Git Bash + cmd.exe CLIs with non-ASCII prompts/artifacts: force UTF-8
 # in both the outer shell and the Windows console before launching the runner.
@@ -800,7 +819,7 @@ uv run python -m harness_bench run-cli \
 cmd.exe //c "chcp 65001 >nul" && \
 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 LANG=C.UTF-8 LC_ALL=C.UTF-8 \
 uv run python -m harness_bench run-cli \
-    --timeout 600 \
+    --timeout 3600 \
     --cli-command 'cmd /c gigacode --approval-mode=auto-edit' \
     --task task_05_greet --task task_35_remove_blank_lines
 
@@ -826,7 +845,7 @@ uv run python -m harness_bench apply-gold \
 
 ## What's inside
 
-### Tasks (471 total, task-set v0.19.0)
+### Tasks (471 total, task-set v0.19.1)
 
 | Module | Range | Wave |
 | --- | --- | --- |
@@ -843,9 +862,9 @@ uv run python -m harness_bench apply-gold \
 | `tasks_adversarial.py` | 331–351 | adversarial/robustness wave: the agent must diagnose and work around a hostile environment — broken Python versions and imports, unreadable/mis-encoded/permission-locked files, instructions that contradict the environment, broken build commands and skills, and a ~100 MB log that must be streamed rather than read whole. |
 | `tasks_tbench_lite.py` | 352–371 | calibrated Terminal-Bench-inspired workflows: multi-source joins, event reconstruction, parsers, config precedence, conflict resolution, package refactors, SQLite migration, deterministic manifests, and retry-aware aggregation. |
 | `tasks_cli.py` | 372–391 | CLI-composition wave. Thirteen tasks drive bespoke per-task tools (`logq`, `pktool`, `xtab`, `cfgctl`, `depwalk`, `slicer`) built so that reading `--help` is unavoidable: the surface is deliberately unconventional (a leading verb, `--src`/`--cap`/`--map`, mini-languages like `--span LO..HI` and `--pick level=ERROR,WARN`, `--shape` not `--format`), so a guessed invocation exits non-zero — and the semantics that decide the answer (exclusive bounds, nearest-rank percentiles, margins before normalisation, corrupt-record policy) appear only in the `--help` epilog. Two read binary or fixed-width payloads. Seven exercise POSIX tools (multi-key `sort`, `join -1/-2/-a/-e/-o`, `comm`, `grep -oE` with `uniq -c`, `find` predicates with `xargs -0`, `awk`, `sed` ranges): the agent writes `solve.sh` and the verifier deletes the artifact, runs the script, and rejects general-purpose interpreters. **Requires `bash` on `PATH`.*\* |
-| `long_tasks/` | 392–411 | Long-context wave. Twenty tasks that require reading a large body of material (a novel, an intranet, parish registers, mail, a codebase, git history, a text adventure, and so on) and that floor each run at 7200 s and 3000 steps, so a full-set run includes them. Select only this wave with `--suite long`. |
-| `reflect_tasks/` | 412–431 | Stateful tool-reflection wave: partial results, pagination, throttling, stale revisions, async deletion, inherited permissions, and mid-course changes visible in tool responses. Signed client journals are replayed by the verifier. Each task floors the runner at 1800 s and 400 steps. Select only this wave with `--suite reflect`. |
-| `feasibility_tasks/` | 432–471 | **Wave 19 / v0.19.0**: 20 matched pairs / 40 tasks: formal feasibility, diagnostics, explicit budgets and host-owned service history. 120 seconds per task, no LLM judge. Individual and strict both-halves scores. Select with `--suite feasibility`; requires CLI/bwrap, including the isolated OpenRouter worker. |
+| `long_tasks/` | 392–411 | Long-context wave. Twenty tasks that require reading a large body of material (a novel, an intranet, parish registers, mail, a codebase, git history, a text adventure, and so on). Each run has a 7200 s floor and no default agent step cap; an explicitly finite recursion limit is raised to at least 3000. Select only this wave with `--suite long`. |
+| `reflect_tasks/` | 412–431 | Stateful tool-reflection wave: partial results, pagination, throttling, stale revisions, async deletion, inherited permissions, and mid-course changes visible in tool responses. Signed client journals are replayed by the verifier. Default runtime guard: 3600 s, no agent step cap. The existing 1800 s floor and 400-step floor apply to explicit finite overrides. Select only this wave with `--suite reflect`. |
+| `feasibility_tasks/` | 432–471 | **Wave 19**, current protocol **v0.19.1**: 20 matched pairs / 40 tasks: formal feasibility, diagnostics, explicit resource budgets and host-owned service history. A 3600 s sanitary guard, with timely valid host-recorded submission counting even if the final reply/process times out; no LLM judge. Individual and strict both-halves scores. Select with `--suite feasibility`; requires CLI/bwrap, including the isolated OpenRouter worker. |
 
 Task prompts are in **Russian** — the bench is deliberately bilingual
 to keep models honest. The verifiers and gold answers are English / data
@@ -878,6 +897,7 @@ changes do not need a task-set bump.
 | `0.17.0` | 2026-09-26 | 392–411 | 411 | Long-context wave, promoted from the separate `--suite long` into the scored set. Registry ids are `task_392_*` … `task_411_*`; generator seeds and paraphrase fixtures stay on `long_NN_*`, so the tasks themselves did not change. Each task floors the runner at 7200 s and 3000 steps. **Not score-comparable with v0.16.0.*\* |
 | `0.18.0` | 2026-10-02 | 412–431 | 431 | Tool-reflection wave promoted into the scored set, with IAM command/policy and wiki append-position fixes. New ids are `task_412_*` … `task_431_*`; `reflect_NN_*` remain lookup aliases. Each task floors the runner at 1800 s and 400 steps. **Not score-comparable with v0.17.0 or pre-fix reflect calibration.*\* |
 | `0.19.0` | 2026-10-16 | 432–471 | 471 | **Wave 19**: 20 matched pairs (40 tasks): 14 engineering contract pairs and 6 search/diagnostic pairs; 120 seconds per task. The current protocol keeps service state outside the agent sandbox. Earlier wave 19 calibration used different prompts/protocol; it is not a result for this implementation. [Details and validation limits](docs/wave19-feasibility.md). Not score-comparable with v0.18.0. |
+| `0.19.1` | 2026-10-21 | — | 471 | **Wave 19 remains wave 19**; no added tasks. A 3600 s sanitary guard replaces the 120 s wave 19 deadline; timely host-recorded submission plus full verification can pass despite a later final-reply/process timeout. Default agent step caps are disabled, ordinary/reflection defaults are 3600 s, and the long-task floor remains 7200 s. Formal problem budgets are unchanged. Task 410 clarifies mandatory extra sugar and the potato synonym without changing nutrition targets. Start a fresh result JSON; historical v0.19.0 scores do not measure this protocol. |
 
 ### Infrastructure
 
@@ -933,9 +953,13 @@ uv run python -m harness_bench verify-task \
 ```
 
 Use the actual task ID and paths from the result artifact. Replay checks the
-protocol, task-contract hash, evidence hash and execution outcome; a workspace
-copy alone cannot establish a scored service history or undo a timeout. The
-host runner and its artifacts are trusted, not adversarial input from the agent.
+protocol, task-contract hash, evidence hash and execution outcome. In v0.19.1,
+a host receipt proves that `submit`/`finish` completed within the execution
+budget; the full verifier must also accept the answer and trusted history.
+That combination can pass after a final-reply/process timeout. A workspace
+file alone, an agent-supplied timestamp, a late submission or an incorrect
+answer cannot earn this credit. The host runner and its artifacts are trusted,
+not adversarial input from the agent.
 
 `verify-gold --suite feasibility` is a host diagnostic, not a model score.
 Direct Python diagnostics may call `task.setup`, `task.apply_gold` and
@@ -952,8 +976,9 @@ compaction**: each task needs tens to hundreds of agent steps and reading
 threads, code bases, git history, binary logs, a text adventure…). They are
 part of `ALL_TASKS` as of task-set v0.17.0. `--suite long` (`list`, `run*`,
 `verify-gold`) selects only this wave. Every task has a minimum timeout
-(7200 s) and recursion limit (3000) that runners apply on top of their own
-settings, and is mechanically verified like the rest of the bench. Generator
+of 7200 s. The default agent recursion limit is 0 (unlimited); only an explicitly
+finite cap is raised to at least 3000. Tasks are mechanically verified like the
+rest of the bench. Generator
 seeds and the paraphrase fixtures in `_texts/` keep the earlier `long_NN_*`
 names, so promoting the wave did not regenerate the workspaces.
 
@@ -1052,8 +1077,9 @@ The client journals every call with an HMAC chain; the verifier replays the jour
 through the same service from its initial state and checks the result, so editing the
 service's state files gains nothing. The suite is selected with `--suite reflect` (or by
 id) and is part of `ALL_TASKS` as of task-set v0.18.0. The earlier `reflect_NN_*`
-ids remain aliases that resolve to the new scored ids. Each task floors the run at
-1800 s and 400 steps. Use `--to-task 411` to select only the previous task range;
+ids remain aliases that resolve to the new scored ids. The default runtime guard
+is 3600 s, with no agent step cap. Explicit finite settings retain the 1800 s
+timeout floor and 400-step recursion floor. Use `--to-task 411` to select only the previous task range;
 that is a partial run under the current task-set version.
 
 ```bash
@@ -1122,6 +1148,8 @@ Each exported Harbor task contains:
 The Docker image contains only task setup and runtime dependencies. The
 benchmark registry / gold data is copied into Harbor `solution/` and `tests/`
 payloads, so normal agents do not get the gold answers baked into the image.
+The exported agent timeout also respects task floors: 3600 s for ordinary and
+reflection tasks, and 7200 s for long-context tasks.
 
 `run-cli` and `run-openrouter` default to a separate Linux bubblewrap sandbox
 for each task agent. Fixture setup and verification stay in the host parent;
@@ -1140,8 +1168,10 @@ tasks. Docker is only needed when invoking Harbor's own local runner.
 For custom CLI dependencies, pass `--sandbox-manifest runtime.json` containing
 `{"runtime_paths": ["/absolute/trusted/runtime"]}`. Allowlist package directories
 or exact launcher/config files; do not mount benchmark/data roots. The native
-OpenRouter worker automatically mounts its Python environment and four runtime
-source files, with installed `harness_bench` task packages masked. Editable
+OpenRouter worker automatically mounts its Python environment and exactly five
+runtime source files: `deepagents_worker.py`, `openrouter_agent.py`,
+`chat_openai.py`, `agent_stats.py` and `runtime_limits.py`. Installed
+`harness_bench` task packages are masked. Editable
 runtime dependencies outside the environment need an explicit manifest entry.
 Network access remains available for the configured model endpoint. Set
 `OPENROUTER_REASONING_EFFORT=medium` (or another model-supported level) to
@@ -1168,20 +1198,26 @@ gets its own `.../EXECUTION/v1` endpoint in `HBF_API_BASE` and
 The recorder must forward that route to the original model endpoint without
 changing request or response bodies. Wire recording is opt-in.
 
-Timeouts remain scored failures when a JSON run resumes. Infrastructure failures
+A timeout is a scored failure for its execution, even when a later resume
+reruns the task. Wave 19's timely, fully verified host submission
+remains a pass even if its final reply/process timed out. Infrastructure failures
 are separately marked and may be retried on the same model; every retry and
 explicit `--rerun-on-fail` keeps execution history. There is no automatic PROM
 model fallback. Any infrastructure failure makes `measurement_valid=false`,
 `pass_rate=null` and a nonzero exit even with `--allow-task-failures`. Token/step
 coverage fields distinguish missing telemetry from measured zero. Use a fresh
 JSON filename when migrating old unisolated runs; resume refuses to mix them
-with the isolated worker settings.
+with the isolated worker settings. Resume also rejects a different task-set
+version or wave 19 runtime/contract hash. Use a fresh JSON for v0.19.1 and retain
+old v0.19.0 results with their original protocol and score.
 
 ## Results
 
 The results tables are kept at the top of this README. The current task set is
-v0.19.0 (471 tasks); no full results are published yet. The v0.18.0 (431 tasks),
-v0.17.0 (411 tasks) and v0.16.0 (391 tasks) tables are historical and are not comparable with the current set. Only one run per harness + model setup is
+v0.19.1 (471 tasks); no model results for this revision are published yet.
+Published v0.19.0 results and the v0.18.0 (431 tasks), v0.17.0 (411 tasks) and
+v0.16.0 (391 tasks) tables remain historical, with their original protocols and
+scores; they are not measurements of the current revision. Only one run per harness + model setup is
 listed; superseded and older-task-set runs are not carried over (the last
 v0.13.0 table is kept in a collapsed section for reference only).
 
@@ -1189,6 +1225,10 @@ v0.13.0 table is kept in a collapsed section for reference only).
 
 - A task that hits the per-task wall-clock timeout or hangs counts as a
   normal fail: it stays in the denominator and gets no partial credit.
+  In v0.19.1 wave 19, a timely host-recorded `submit`/`finish` that passes the
+  full verifier earns credit even if the subsequent final reply/process times
+  out. A file without submission, a late submission or a wrong answer still
+  fails. Historical v0.19.0 timeout outcomes are not rescored under this rule.
 - Transient infrastructure errors are **not** model failures. If a task dies
   on a network failure or an API infrastructure response (HTTP 5xx, 429,
   `529 Overloaded`, connection reset, gateway timeout) rather than on the

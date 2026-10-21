@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Compare agent harnesses on harness_bench_fast Light (391 tasks) and Medium (80 tasks). Mechanically verified, with explicit measurement coverage.">
   <title>harness_bench_fast · Light &amp; Medium</title>
-  <link rel="stylesheet" href="landing.css?v=secret-700b-table-20261020">
-  <script src="leaderboard.js?v=universal-agent-haiku-20261021" defer></script>
+  <link rel="stylesheet" href="landing.css?v=usage-20261021">
+  <script src="leaderboard.js?v=usage-20261021" defer></script>
 </head>
 <body>
   <header>
@@ -31,16 +31,17 @@
         <label class="search">Search model or harness<input id="search" type="search" placeholder="e.g. GigaChat, Codex, deepagents" autocomplete="off"></label>
       </div>
       <div class="table-wrap">
-        <table><thead><tr><th scope="col">#</th><th scope="col">Model / harness</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">Score</th></tr></thead><tbody id="results"></tbody></table>
+        <table class="leaderboard-table"><thead><tr><th scope="col">#</th><th scope="col">Model / harness</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">Score</th><th scope="col" class="numeric">Steps</th><th scope="col" class="numeric">Tokens</th></tr></thead><tbody id="results"></tbody></table>
       </div>
       <p id="empty" role="status" hidden></p>
       <button type="button" class="more" id="show-more" hidden>Show all results</button>
       <p class="fine-print">Scores compare complete agent configurations; tools and budgets vary. mean@N is the mean of N runs, not pass@N. Rescored historical runs use v0.18.0 task definitions. <a href="archive.html#current">Protocols &amp; original results →</a></p>
+      <details class="usage-guide"><summary>About steps and tokens</summary><p>Totals cover the tasks in each table, including failed tasks. Steps are tool calls where native traces are available; raw counters follow the harness's own accounting. Tokens are recorded input + output usage, including reported cache usage; reasoning is not added twice. These are token counts, not a monetary bill.</p><p><strong>Partial</strong> means some usage is missing; <strong>Raw</strong> means the counters have not been audited and may include accounting errors. Task counts show where metrics were recorded, not whether every request was captured. A dash means no usable total for this subset. Hover or focus a value for its exact total and notes. Historical full-run totals are not reused for smaller subsets.</p></details>
       <noscript><p>Enable JavaScript to compare suites, or <a href="archive.html#current">read the static measurement archive</a>.</p></noscript>
       <section id="wave19-section" class="wave19-section" aria-labelledby="wave19-title" hidden>
         <div class="results-heading"><h2 id="wave19-title">Wave 19 · new Medium tasks</h2><span id="wave19-count"></span></div>
         <p class="coverage-note">Tasks 432–471 · 40 new tasks. These scores compare the same subset; they are ranked separately from the complete 80-task results above.</p>
-        <div class="table-wrap"><table><thead><tr><th scope="col">#</th><th scope="col">Model / harness</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">Score</th></tr></thead><tbody id="wave19-results"></tbody></table></div>
+        <div class="table-wrap"><table class="leaderboard-table"><thead><tr><th scope="col">#</th><th scope="col">Model / harness</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">Score</th><th scope="col" class="numeric">Steps</th><th scope="col" class="numeric">Tokens</th></tr></thead><tbody id="wave19-results"></tbody></table></div>
         <p id="wave19-empty" role="status" hidden>No new-task results match your search.</p>
       </section>
     </section>

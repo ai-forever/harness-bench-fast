@@ -1,4 +1,4 @@
-"""Wave 19 / v0.19.0: twenty matched pairs, forty independently run tasks."""
+"""Wave 19: twenty matched pairs, forty independently run tasks."""
 
 from __future__ import annotations
 

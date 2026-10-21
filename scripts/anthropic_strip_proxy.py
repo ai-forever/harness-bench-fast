@@ -178,11 +178,13 @@ def main() -> int:
     ap.add_argument("--port", type=int, default=8092)
     ap.add_argument("--upstream", default="http://127.0.0.1:8090")
     ap.add_argument("--debug", action="store_true")
+    ap.add_argument("--request-timeout", type=float, default=3600,
+                    help="Upstream response timeout in seconds (default: 3600).")
     args = ap.parse_args()
 
     UPSTREAM = args.upstream.rstrip("/")
     DEBUG = args.debug
-    _client = httpx.Client(base_url=UPSTREAM, timeout=httpx.Timeout(600.0, connect=15.0))
+    _client = httpx.Client(base_url=UPSTREAM, timeout=httpx.Timeout(args.request_timeout, connect=15.0))
 
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
     print(

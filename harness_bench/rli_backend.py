@@ -38,7 +38,7 @@ class RLIBackend(SandboxBackendProtocol):
         self.timeout = timeout
         self.client = RLIClient(
             verify=os.getenv("RLI_VERIFY_SSL", "true").lower() != "false",
-            timeout=120,
+            timeout=self.timeout + 60,
         )
         self.session_id: str | None = None
         self.closed = False
@@ -127,7 +127,7 @@ class RLIBackend(SandboxBackendProtocol):
                                     args=StepActionArgs(cmd=command),
                                 )
                             ],
-                            limits=RequestLimits(deadline_ms=min(self.timeout + 60, 1500) * 1000),
+                            limits=RequestLimits(deadline_ms=(self.timeout + 60) * 1000),
                         )
                     )
                 )
@@ -152,7 +152,7 @@ class RLIBackend(SandboxBackendProtocol):
             **self._call(
                 "execute",
                 command=command,
-                timeout=min(timeout or 120, self.timeout),
+                timeout=min(timeout if timeout is not None else self.timeout, self.timeout),
             )
         )
 
