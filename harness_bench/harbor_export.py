@@ -17,6 +17,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from harness_bench.core import Task, effective_task_timeout
+from harness_bench.runtime_limits import DEFAULT_TASK_TIMEOUT_SECONDS
 from harness_bench.tasks import ALL_TASKS, get_task
 from harness_bench.versioning import TASK_SET_VERSION
 
@@ -163,10 +164,9 @@ def _task_readme(task: Task) -> str:
 
 
 def _task_toml(task: Task, *, harbor_name: str, dataset: str) -> str:
-    # Preserve the historical 600s export for tasks without a hard ceiling.
-    agent_timeout = (effective_task_timeout(600.0, task.min_timeout_seconds,
-                                          task.max_timeout_seconds)
-                     if task.max_timeout_seconds is not None else 600.0)
+    agent_timeout = effective_task_timeout(
+        float(DEFAULT_TASK_TIMEOUT_SECONDS), task.min_timeout_seconds, task.max_timeout_seconds
+    )
     tags = list(task.tags)
     keywords = sorted({"harness-bench-fast", "agent", "benchmark", *tags})
     metadata = {

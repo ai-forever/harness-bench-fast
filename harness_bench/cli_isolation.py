@@ -31,13 +31,13 @@ SYSTEM_RUNTIME = (
     "/etc/os-release",
 )
 FORBIDDEN_RUNTIME = {"/", "/root", "/home", "/tmp", "/var", "/var/tmp", "/data", "/workspace"}
-SAFE_WORKER_FILES = ("deepagents_worker.py", "openrouter_agent.py", "chat_openai.py", "agent_stats.py")
+SAFE_WORKER_FILES = ("deepagents_worker.py", "openrouter_agent.py", "chat_openai.py", "agent_stats.py", "runtime_limits.py")
 
 
 def validate_trusted_runtime_paths(runtime_paths: tuple[str, ...], executable: str | None = None) -> None:
     """Reject mounts that would expose the benchmark or its reference answers.
 
-    Four standalone worker files contain only agent/runtime code. Environment
+    Standalone worker files contain only agent/runtime code. Environment
     roots remain usable; installed benchmark packages are masked separately.
     """
     package = Path(__file__).resolve().parent
@@ -178,7 +178,7 @@ def sandbox_argv(
     for package in sorted(hidden):
         command += ["--tmpfs", str(package)]
     # Installed deployments can place the standalone worker in a package that
-    # was just masked. Re-expose only the four audited runtime files, not tasks.
+    # was just masked. Re-expose only the approved runtime files, not tasks.
     approved = {(Path(__file__).resolve().parent / name).resolve() for name in SAFE_WORKER_FILES}
     for root in roots:
         if root.resolve() in approved and any(root.is_relative_to(package) for package in hidden):

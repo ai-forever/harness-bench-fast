@@ -20,6 +20,11 @@ from harness_bench.agent_stats import agent_stats_from_result as agent_stats_fro
 from harness_bench.core import Task, VerifyResult, effective_task_timeout
 from harness_bench.feasibility_tasks.pair_metrics import compute_pair_metrics
 from harness_bench.metrics import PassMetric, compute_pass_metrics
+from harness_bench.runtime_limits import (
+    DEFAULT_TASK_TIMEOUT_SECONDS,
+    effective_recursion_limit,
+    langgraph_recursion_limit,
+)
 from harness_bench.tasks import ALL_TASKS, get_task
 from harness_bench.versioning import TASK_SET_VERSION, TASK_WAVES, TaskWave, task_number
 
@@ -46,11 +51,8 @@ _AGENT_METRIC_FIELDS = (
 
 _RESULTS_JSON_COMMAND: str | None = None
 
-# Per-task wall-clock cap. The benchmark requires that no single task run longer
-# than this; a model whose request hangs on a dead socket, or that loops just
-# under the recursion cap, must not be able to freeze the whole run. Override
-# with the ``HARNESS_BENCH_TASK_TIMEOUT`` env var (seconds).
-DEFAULT_TASK_TIMEOUT_SECONDS = 600.0
+# Sanitary wall-clock guard against a hung request or an endless agent loop.
+# Override with ``HARNESS_BENCH_TASK_TIMEOUT`` (seconds); task floors still apply.
 
 
 class TaskTimeoutError(Exception):
@@ -58,7 +60,7 @@ class TaskTimeoutError(Exception):
 
 
 def _task_timeout_seconds() -> float:
-    """Per-task wall-clock timeout in seconds (env override, else 10 minutes)."""
+    """Per-task wall-clock timeout in seconds (env override, else one hour)."""
     raw = os.getenv("HARNESS_BENCH_TASK_TIMEOUT")
     if raw:
         try:
@@ -255,8 +257,13 @@ def load_results_json(
     *,
     attempts: int | None = None,
     include_rerun_on_continue: bool = True,
+    require_current_version: bool = False,
 ) -> list[TaskRun]:
-    """Load a previously written benchmark JSON report back into ``TaskRun`` rows."""
+    """Load report rows; resuming requires the current task-set protocol.
+
+    Read-only analysis may still load historical or unversioned reports. A
+    runner must opt into the version check before retaining or rewriting rows.
+    """
     result_path = Path(path)
     try:
         payload = json.loads(result_path.read_text(encoding="utf-8"))
@@ -264,6 +271,13 @@ def load_results_json(
         raise ValueError(f"{result_path} is not valid JSON: {exc}") from exc
     if not isinstance(payload, dict) or not isinstance(payload.get("tasks"), list):
         raise ValueError(f"{result_path} does not look like a harness-bench results JSON")
+    if require_current_version and payload.get("task_set_version") != TASK_SET_VERSION:
+        version = payload.get("task_set_version")
+        raise ValueError(
+            f"Cannot resume {result_path}: task_set_version is {version!r}, "
+            f"but the current task-set protocol is {TASK_SET_VERSION!r}. "
+            "Use a new --json-output file; historical results must not be relabeled."
+        )
     runs = []
     for item in payload["tasks"]:
         if not isinstance(item, dict):
@@ -290,6 +304,7 @@ def _resume_results(
         json_output_path,
         attempts=attempts,
         include_rerun_on_continue=False,
+        require_current_version=True,
     )
     by_key: dict[tuple[str, int], TaskRun] = {}
     for run in loaded:
@@ -452,7 +467,7 @@ def _ensure_harness_profile(workspace: Path) -> None:
     set_workspace_path(workspace)
 
 
-def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
+def build_agent(workspace: Path, *, recursion_limit: int = 0) -> Any:
     """Build a deep agent backed by GigaChat and rooted at `workspace`.
 
     Imports happen here so `--gold` / `list` modes can run without GigaChat
@@ -468,6 +483,7 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
         root_dir=workspace,
         virtual_mode=True,
         inherit_env=True,
+        timeout=DEFAULT_TASK_TIMEOUT_SECONDS,
     )
     model = GigaChat(
         model=os.getenv("GIGACHAT_MODEL", "GigaChat-3-Ultra"),
@@ -478,7 +494,7 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
         verify_ssl_certs=os.getenv("GIGACHAT_VERIFY_SSL_CERTS", "false").lower()
         not in ("false", "0", "no"),
         profanity_check=False,
-        timeout=600,
+        timeout=float(os.getenv("HARNESS_BENCH_REQUEST_TIMEOUT", str(DEFAULT_TASK_TIMEOUT_SECONDS))),
         # Transient backend errors (403/429/5xx from IFT endpoint under
         # concurrency) are not "the model misbehaving" — they're rate-limit /
         # connectivity blips. Retry transparently so the agent trace survives.
@@ -501,7 +517,7 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     agent = create_deep_agent(
         model=model, backend=backend, memory=memory_sources, skills=skill_sources
     )
-    return agent.with_config({"recursion_limit": recursion_limit})
+    return agent.with_config({"recursion_limit": langgraph_recursion_limit(recursion_limit)})
 
 
 def _ensure_credentials() -> None:
@@ -519,7 +535,7 @@ def run_task(
     task: Task,
     *,
     keep_workspace: bool = False,
-    recursion_limit: int = 80,
+    recursion_limit: int = 0,
 ) -> TaskRun:
     """Run a single task end-to-end and return its outcome.
 
@@ -527,11 +543,11 @@ def run_task(
         task: The benchmark task to execute.
         keep_workspace: When `True`, the temp workspace directory is not
             deleted after the run — handy for debugging a failure.
-        recursion_limit: Cap on agent loop iterations.
+        recursion_limit: Optional cap on agent loop iterations; 0 means unlimited.
     """
     if getattr(task, "requires_trusted_service", False):
         raise ValueError(f"{task.id} requires the CLI runner with --isolation bwrap; native execution cannot isolate its trusted service")
-    recursion_limit = max(recursion_limit, getattr(task, "min_recursion_limit", None) or 0)
+    recursion_limit = effective_recursion_limit(recursion_limit, getattr(task, "min_recursion_limit", None))
     workspace_keepalive: TemporaryDirectory | None = None
     try:
         if keep_workspace:
@@ -580,7 +596,7 @@ def run_all(
     task_ids: list[str] | None = None,
     *,
     keep_workspace: bool = False,
-    recursion_limit: int = 80,
+    recursion_limit: int = 0,
     concurrency: int = 1,
     attempts: int = 1,
     json_output: str | Path | None = None,

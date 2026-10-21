@@ -30,6 +30,11 @@ from harness_bench.runner import (
     invoke_agent_with_stats,
     normalize_json_output_path,
 )
+from harness_bench.runtime_limits import (
+    DEFAULT_TASK_TIMEOUT_SECONDS,
+    effective_recursion_limit,
+    langgraph_recursion_limit,
+)
 from harness_bench.tasks import ALL_TASKS, get_task
 
 
@@ -44,7 +49,7 @@ def _ensure_credentials() -> None:
     )
 
 
-def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
+def build_agent(workspace: Path, *, recursion_limit: int = 0) -> Any:
     """Build stock deepagents agent without the deepagents-gigachat profile.
 
     `deepagents` discovers harness profiles through entry points. If
@@ -64,6 +69,7 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
         root_dir=workspace,
         virtual_mode=True,
         inherit_env=True,
+        timeout=DEFAULT_TASK_TIMEOUT_SECONDS,
     )
     model = ProfilelessGigaChat(
         model=os.getenv("GIGACHAT_MODEL", "GigaChat-3-Ultra"),
@@ -74,7 +80,7 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
         verify_ssl_certs=os.getenv("GIGACHAT_VERIFY_SSL_CERTS", "false").lower()
         not in ("false", "0", "no"),
         profanity_check=False,
-        timeout=600,
+        timeout=float(os.getenv("HARNESS_BENCH_REQUEST_TIMEOUT", str(DEFAULT_TASK_TIMEOUT_SECONDS))),
         max_retries=20,
         retry_backoff_factor=1.0,
         retry_on_status_codes=(403, 429, 500, 502, 503, 504),
@@ -89,18 +95,18 @@ def build_agent(workspace: Path, *, recursion_limit: int = 80) -> Any:
     agent = create_deep_agent(
         model=model, backend=backend, memory=memory_sources, skills=skill_sources
     )
-    return agent.with_config({"recursion_limit": recursion_limit})
+    return agent.with_config({"recursion_limit": langgraph_recursion_limit(recursion_limit)})
 
 
 def run_task(
     task: Task,
     *,
     keep_workspace: bool = False,
-    recursion_limit: int = 80,
+    recursion_limit: int = 0,
 ) -> TaskRun:
     if getattr(task, "requires_trusted_service", False):
         raise ValueError(f"{task.id} requires the CLI runner with --isolation bwrap; native execution cannot isolate its trusted service")
-    recursion_limit = max(recursion_limit, getattr(task, "min_recursion_limit", None) or 0)
+    recursion_limit = effective_recursion_limit(recursion_limit, getattr(task, "min_recursion_limit", None))
     workspace_keepalive: TemporaryDirectory | None = None
     try:
         if keep_workspace:
@@ -151,7 +157,7 @@ def run_all(
     task_ids: list[str] | None = None,
     *,
     keep_workspace: bool = False,
-    recursion_limit: int = 80,
+    recursion_limit: int = 0,
     concurrency: int = 1,
     attempts: int = 1,
     json_output: str | Path | None = None,

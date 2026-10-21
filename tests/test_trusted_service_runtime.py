@@ -42,6 +42,12 @@ def test_cli_freezes_before_verification_and_exports_outside_workspace(
     class Session:
         socket_path = tmp_path / "host-only" / "task.sock"
 
+        def start_attempt(self, timeout, *, started_at):
+            events.append("start_attempt")
+
+        def completion_receipt(self):
+            return None
+
         def freeze(self):
             events.append("freeze")
 
@@ -91,6 +97,7 @@ def test_cli_freezes_before_verification_and_exports_outside_workspace(
     assert events[0] == "setup"
     assert events[-1] == "cleanup"
     assert events.index("export") > events.index("execute")
+    assert events.index("start_attempt") < events.index("execute")
     if completion == "success":
         assert result.passed
         assert result.failure_kind is None
@@ -186,7 +193,8 @@ def test_secure_resume_rejects_incompatible_task_contract(
         task.setup_files["input.json"] = '{"changed":true}'
     run = runner.TaskRun(task.id, True, "", 0.1,
                          execution_history=[{"cli_command_sha256": hashlib.sha256(b"fixture").hexdigest(),
-                                             "isolation": "bwrap", "runtime_paths": [], **identity}])
+                                             "isolation": "bwrap", "runtime_paths": [],
+                                             "timeout": runner_cli.DEFAULT_TIMEOUT_SECONDS, **identity}])
     output = tmp_path / "results.json"
     runner.write_results_json([run], output)
     monkeypatch.setattr(runner_cli, "get_task", lambda identity: task)
@@ -261,6 +269,7 @@ def test_verify_cli_uses_host_execution_not_just_correct_contents(monkeypatch, t
     monkeypatch.setitem(sys.modules, "harness_bench.feasibility_tasks.trusted_service",
                         SimpleNamespace(MAX_EVIDENCE_BYTES=16_000_000,
                                         evidence_context=evidence_context,
+                                        get_session=lambda ws: None,
                                         close_all_sessions=lambda: None))
     args = SimpleNamespace(task=task.id, workspace=workspace, trusted_evidence=evidence, json=True)
     if mutation in ("bad_hash", "other_task", "other_protocol"):
@@ -305,7 +314,7 @@ def test_trusted_runtime_rejects_foreign_repo_and_direct_package(tmp_path):
             cli_isolation.validate_trusted_runtime_paths((str(path),))
 
 
-def test_trusted_runtime_allows_only_four_standalone_worker_files():
+def test_trusted_runtime_allows_only_approved_standalone_worker_files():
     package = Path(cli_isolation.__file__).resolve().parent
     approved = tuple(str(package / name) for name in cli_isolation.SAFE_WORKER_FILES)
     cli_isolation.validate_trusted_runtime_paths(approved)

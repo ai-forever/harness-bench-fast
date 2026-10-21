@@ -369,6 +369,7 @@ def _cmd_verify_task(args: argparse.Namespace) -> int:
         from harness_bench.feasibility_tasks.trusted_service import (
             MAX_EVIDENCE_BYTES,
             evidence_context,
+            get_session,
         )
 
         evidence = Path(evidence).resolve()
@@ -386,6 +387,11 @@ def _cmd_verify_task(args: argparse.Namespace) -> int:
                                   + str(metadata.get("failure_kind") or metadata.get("phase")))
         else:
             with evidence_context(workspace, evidence):
+                if metadata.get("agent_timed_out"):
+                    receipt = get_session(workspace).completion_receipt()
+                    if (receipt is None or receipt != metadata.get("completion_receipt")
+                            or receipt["timeout_seconds"] != metadata.get("timeout")):
+                        raise ValueError("Timed-out execution lacks matching trusted completion receipt")
                 result = task.verify(workspace)
             if result.passed != metadata.get("passed"):
                 raise ValueError("Replayed score does not match the recorded host execution")
@@ -572,8 +578,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_run.add_argument(
         "--recursion-limit",
         type=int,
-        default=80,
-        help="Cap on agent loop iterations per task (default: 80)",
+        default=0,
+        help="Optional graph step cap per task; 0 means unlimited (default)",
     )
     p_run.add_argument(
         "--concurrency",
@@ -608,7 +614,8 @@ def build_parser() -> argparse.ArgumentParser:
         help=f"OpenRouter model id (default: {DEFAULT_OPENROUTER_MODEL}).",
     )
     p_or.add_argument("--keep", action="store_true", help="Keep temp workspaces")
-    p_or.add_argument("--recursion-limit", type=int, default=80)
+    p_or.add_argument("--recursion-limit", type=int, default=0,
+                        help="Optional graph step cap; 0 means unlimited (default).")
     p_or.add_argument(
         "--max-tokens",
         type=int,
@@ -725,7 +732,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_pure.add_argument("--task", action="append", help="Task id (repeatable)")
     p_pure.add_argument("--keep", action="store_true", help="Keep temp workspaces")
-    p_pure.add_argument("--recursion-limit", type=int, default=80)
+    p_pure.add_argument("--recursion-limit", type=int, default=0,
+                        help="Optional graph step cap; 0 means unlimited (default).")
     p_pure.add_argument("--concurrency", type=int, default=1)
     _add_metric_args(p_pure)
     _add_json_output(p_pure)
@@ -829,7 +837,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--timeout",
         type=int,
         default=DEFAULT_TIMEOUT_SECONDS,
-        help=f"Per-task timeout in seconds (default: {DEFAULT_TIMEOUT_SECONDS}).",
+        help=f"Sanitary per-task timeout in seconds (default: {DEFAULT_TIMEOUT_SECONDS}).",
     )
     p_cli.add_argument(
         "--concurrency",

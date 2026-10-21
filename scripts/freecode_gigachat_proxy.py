@@ -674,6 +674,8 @@ def main() -> int:
     ap.add_argument("--chat-path", default="/chat")
     ap.add_argument("--giga-model", default="GigaChat")
     ap.add_argument("--debug", action="store_true")
+    ap.add_argument("--request-timeout", type=float, default=3600,
+                    help="Upstream response timeout in seconds (default: 3600).")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
 
@@ -684,7 +686,7 @@ def main() -> int:
     UPSTREAM = args.upstream.rstrip("/")
     CHAT_PATH = args.chat_path if args.chat_path.startswith("/") else "/" + args.chat_path
     GIGA_MODEL = args.giga_model
-    _client = httpx.Client(base_url=UPSTREAM, timeout=httpx.Timeout(600.0, connect=15.0))
+    _client = httpx.Client(base_url=UPSTREAM, timeout=httpx.Timeout(args.request_timeout, connect=15.0))
 
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
     print(

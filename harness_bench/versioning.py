@@ -387,6 +387,24 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
         ),
     ),
 
+    TaskSetRevision(
+        version="0.19.1",
+        introduced="2026-10-21",
+        total_tasks=471,
+        added_task_numbers=(0, 0),
+        modules=("feasibility_tasks", "long_tasks/t19_recipe_nutrition.py"),
+        notes=(
+            "Wave 19 protocol revision; no new tasks. Replace the 120-second "
+            "deadline with a 3600-second sanitary guard and accept a correct "
+            "timely host-service submission even if the final agent reply hangs. "
+            "Default agent step caps are disabled, ordinary task timeout is 3600 s, "
+            "and the existing 7200 s long-task floor remains. Formal resource "
+            "budgets inside tasks are unchanged. Clarify mandatory extra sugar "
+            "and the potato synonym in task 410 without changing nutrition targets. "
+            "Historical 0.19.0 scores are not measurements of this protocol; "
+            "resume must use a fresh result file. The wave remains wave 19."
+        ),
+    ),
 )
 
 CURRENT_TASK_SET_REVISION = TASK_SET_REVISIONS[-1]

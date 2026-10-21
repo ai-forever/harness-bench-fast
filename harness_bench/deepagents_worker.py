@@ -1,7 +1,7 @@
 """Standalone deepagents CLI worker. This file never imports benchmark tasks.
 
 Invoked by run-openrouter's per-task sandbox; prompt is the final argument.
-Only this file and its three runtime helpers need to be visible to the worker.
+Only this file and its runtime helpers need to be visible to the worker.
 """
 
 from __future__ import annotations
@@ -20,7 +20,8 @@ def emit(event: dict) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True)
-    parser.add_argument("--recursion-limit", type=int, default=80)
+    parser.add_argument("--recursion-limit", type=int, default=0,
+                        help="Optional graph step cap; 0 means unlimited (default).")
     parser.add_argument("--max-tokens", type=int)
     parser.add_argument("--harness-profile")
     parser.add_argument("--forward-reasoning-history", action="store_true")
@@ -36,6 +37,7 @@ def main() -> int:
         from langchain_core.callbacks import BaseCallbackHandler
         from langchain_core.messages import messages_to_dict
         from openrouter_agent import build_agent
+        from runtime_limits import effective_recursion_limit
 
         class Evidence(BaseCallbackHandler):
             raise_error = True
@@ -63,7 +65,7 @@ def main() -> int:
                 )
 
         workspace = Path.cwd()
-        limit = max(args.recursion_limit, int(os.getenv("HBF_TASK_MIN_RECURSION_LIMIT", "0")))
+        limit = effective_recursion_limit(args.recursion_limit, int(os.getenv("HBF_TASK_MIN_RECURSION_LIMIT", "0")))
         stats = AgentRunStatsCollector()
         agent = build_agent(
             workspace,
