@@ -7,14 +7,14 @@
     "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
     "wave_results_sha256": "6dd03c599564c086bb8c0bf3f9c4a90c3edf27d9b4b7bb746bc5004e59f25683",
     "secret_700b_sha256": "2f016f31bee69ce7f27be2935631f7737d8d30acabb3c149b38a6e03baa1785d",
-    "secret_sft_codex_sha256": "9d314580f69d8933827569df41355f7140eb7a9a183f61fb3e56278aee9bb70d",
+    "secret_sft_codex_sha256": "d2a7ae15ae0534e5c036e3b573a9595ac5a3966e33fa1f68b3b3baf3f44fefb7",
     "secret_sft_mini_sha256": "3be9fea9bf69468e2b7db3df5a7d3d7f7300a9366ab3fde5c047150807f98fb7",
     "sonnet55_medium_sha256": "05184a8a69a1e3f75a7bfd0ecd185022203b6219abe5c7dd900a524e67ab540e",
     "astra_medium_sha256": "e46b98a77b9270db0957173f07cffbdf25f3cd5a2bcc16905a04234bf0768701",
     "universal_agent_haiku_sha256": "5680801cb7a3efd9eb8e0fac92484f2ac8eeb96d2805fbc3aa465adbd94bcb57",
     "giga35_ultra_reasoning_sha256": "611fd53c116e51cbe2b772b909034cf7db6ccb4547adede3e145a186e1df5fc9",
     "archive_sha256": "448eb41a006bca486a21328f7e1799d1c1b7a05e52ee91a11f40fe9de0a8711f",
-    "telemetry_sha256": "ca28de9e5dd85493e9ffa05d33e6d79abdb9526abc649b76f1b4f685c36d49aa",
+    "telemetry_sha256": "2058f482d9cc941a8a453c7b9003ee4b3d6525643ff61037001e58dc1b6d8773",
     "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability."
   },
   "rows": [
@@ -3509,7 +3509,7 @@
           "timeouts": 18,
           "notes": [
             "API usage for final retained task attempts: 2116/2134 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
-            "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+            "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded from published usage."
           ],
           "sources_sha256": [
             "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
@@ -3537,7 +3537,7 @@
           "timeouts": 56,
           "notes": [
             "API usage for final retained task attempts: 1660/1731 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
-            "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+            "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded from published usage."
           ],
           "sources_sha256": [
             "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
@@ -3565,7 +3565,7 @@
           "timeouts": 39,
           "notes": [
             "API usage for final retained task attempts: 73/112 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
-            "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+            "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded from published usage."
           ],
           "sources_sha256": [
             "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"

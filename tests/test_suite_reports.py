@@ -244,5 +244,4 @@ def test_codex_final_wire_audit_and_subset_token_sums():
         assert public["tokens"]["value"] == audited["total_tokens"]
         assert public["tokens"]["unmetered_requests"] == audited["requests_missing_usage"]
         assert public["tokens"]["status"] == "partial"
-    assert codex["telemetry"]["all_attempts_api"]["total_tokens"] == 113666663
-    assert codex["telemetry"]["all_attempts_api"]["total_tokens"] > usage["total_tokens"]
+    assert "all_attempts_api" not in codex["telemetry"]
