@@ -1175,6 +1175,92 @@
           "d08c13d94724849741076aec91045026632eb6a49668076a7cea7d3a0b8e808e"
         ]
       }
+    },
+    "secret-sft-codex-v019": {
+      "light": {
+        "observed_tasks": 391,
+        "tasks": 391,
+        "steps": {
+          "value": 1441,
+          "covered_tasks": 373,
+          "status": "raw",
+          "unit": "agent_steps"
+        },
+        "tokens": {
+          "value": 8998150,
+          "input_tokens": 8405920,
+          "output_tokens": 592230,
+          "covered_tasks": 391,
+          "status": "partial",
+          "lower_bound": true,
+          "completed_responses": 2116,
+          "unmetered_requests": 18
+        },
+        "timeouts": 18,
+        "notes": [
+          "API usage for final retained task attempts: 2116/2134 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
+          "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+        ],
+        "sources_sha256": [
+          "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
+        ]
+      },
+      "medium": {
+        "observed_tasks": 80,
+        "tasks": 80,
+        "steps": {
+          "value": 774,
+          "covered_tasks": 24,
+          "status": "raw",
+          "unit": "agent_steps"
+        },
+        "tokens": {
+          "value": 103032947,
+          "input_tokens": 102086268,
+          "output_tokens": 946679,
+          "covered_tasks": 80,
+          "status": "partial",
+          "lower_bound": true,
+          "completed_responses": 1660,
+          "unmetered_requests": 71
+        },
+        "timeouts": 56,
+        "notes": [
+          "API usage for final retained task attempts: 1660/1731 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
+          "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+        ],
+        "sources_sha256": [
+          "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
+        ]
+      },
+      "wave19": {
+        "observed_tasks": 40,
+        "tasks": 40,
+        "steps": {
+          "value": 1,
+          "covered_tasks": 1,
+          "status": "raw",
+          "unit": "agent_steps"
+        },
+        "tokens": {
+          "value": 360166,
+          "input_tokens": 345317,
+          "output_tokens": 14849,
+          "covered_tasks": 40,
+          "status": "partial",
+          "lower_bound": true,
+          "completed_responses": 73,
+          "unmetered_requests": 39
+        },
+        "timeouts": 39,
+        "notes": [
+          "API usage for final retained task attempts: 73/112 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
+          "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+        ],
+        "sources_sha256": [
+          "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
+        ]
+      }
     }
   }
 }

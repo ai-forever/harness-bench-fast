@@ -3,17 +3,18 @@
   "light_tasks": 391,
   "medium_tasks": 80,
   "provenance": {
-    "method": "Historical rescores, seven complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
+    "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
     "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
     "wave_results_sha256": "6dd03c599564c086bb8c0bf3f9c4a90c3edf27d9b4b7bb746bc5004e59f25683",
     "secret_700b_sha256": "2f016f31bee69ce7f27be2935631f7737d8d30acabb3c149b38a6e03baa1785d",
+    "secret_sft_codex_sha256": "9d314580f69d8933827569df41355f7140eb7a9a183f61fb3e56278aee9bb70d",
     "secret_sft_mini_sha256": "3be9fea9bf69468e2b7db3df5a7d3d7f7300a9366ab3fde5c047150807f98fb7",
     "sonnet55_medium_sha256": "05184a8a69a1e3f75a7bfd0ecd185022203b6219abe5c7dd900a524e67ab540e",
     "astra_medium_sha256": "e46b98a77b9270db0957173f07cffbdf25f3cd5a2bcc16905a04234bf0768701",
     "universal_agent_haiku_sha256": "5680801cb7a3efd9eb8e0fac92484f2ac8eeb96d2805fbc3aa465adbd94bcb57",
     "giga35_ultra_reasoning_sha256": "611fd53c116e51cbe2b772b909034cf7db6ccb4547adede3e145a186e1df5fc9",
     "archive_sha256": "448eb41a006bca486a21328f7e1799d1c1b7a05e52ee91a11f40fe9de0a8711f",
-    "telemetry_sha256": "9817e686fc68ec94bb3c9f8b8b7ee10e1db453772fce001fb4cc74e96dd77f1a",
+    "telemetry_sha256": "ca28de9e5dd85493e9ffa05d33e6d79abdb9526abc649b76f1b4f685c36d49aa",
     "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability."
   },
   "rows": [
@@ -3414,6 +3415,162 @@
           0.0044268315026814095,
           0.1288136896347409
         ]
+      }
+    },
+    {
+      "id": "secret-sft-codex-v019",
+      "harness": "Codex CLI",
+      "model": "secret sft",
+      "runs": 1,
+      "measurement_type": "full_run",
+      "measurement_valid": true,
+      "validation_basis": "automated_validation_and_wire_audit",
+      "reasoning_effort": "default",
+      "source_version": "0.19.0",
+      "source_passed": 370,
+      "source_sha256": "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d",
+      "measurement_date": "2026-10-21",
+      "medium_historical": null,
+      "details_url": "secret-sft-codex.html",
+      "light": {
+        "passed": 365,
+        "total": 391,
+        "wilson95": [
+          0.9043519616177298,
+          0.9542204917728527
+        ],
+        "token_usage": {
+          "input_tokens": 8405920,
+          "output_tokens": 592230,
+          "total_tokens": 8998150,
+          "requests": 2134,
+          "requests_with_usage": 2116,
+          "requests_missing_usage": 18,
+          "tasks_with_usage": 391,
+          "lower_bound": true
+        }
+      },
+      "medium": {
+        "passed": 5,
+        "total": 80,
+        "wilson95": [
+          0.026989375670841982,
+          0.13810148767274424
+        ],
+        "token_usage": {
+          "input_tokens": 102086268,
+          "output_tokens": 946679,
+          "total_tokens": 103032947,
+          "requests": 1731,
+          "requests_with_usage": 1660,
+          "requests_missing_usage": 71,
+          "tasks_with_usage": 80,
+          "lower_bound": true
+        }
+      },
+      "wave19": {
+        "passed": 0,
+        "total": 40,
+        "wilson95": [
+          0.0,
+          0.08762160119728664
+        ],
+        "token_usage": {
+          "input_tokens": 345317,
+          "output_tokens": 14849,
+          "total_tokens": 360166,
+          "requests": 112,
+          "requests_with_usage": 73,
+          "requests_missing_usage": 39,
+          "tasks_with_usage": 40,
+          "lower_bound": true
+        }
+      },
+      "telemetry": {
+        "light": {
+          "observed_tasks": 391,
+          "tasks": 391,
+          "steps": {
+            "value": 1441,
+            "covered_tasks": 373,
+            "status": "raw",
+            "unit": "agent_steps"
+          },
+          "tokens": {
+            "value": 8998150,
+            "input_tokens": 8405920,
+            "output_tokens": 592230,
+            "covered_tasks": 391,
+            "status": "partial",
+            "lower_bound": true,
+            "completed_responses": 2116,
+            "unmetered_requests": 18
+          },
+          "timeouts": 18,
+          "notes": [
+            "API usage for final retained task attempts: 2116/2134 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
+            "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+          ],
+          "sources_sha256": [
+            "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
+          ]
+        },
+        "medium": {
+          "observed_tasks": 80,
+          "tasks": 80,
+          "steps": {
+            "value": 774,
+            "covered_tasks": 24,
+            "status": "raw",
+            "unit": "agent_steps"
+          },
+          "tokens": {
+            "value": 103032947,
+            "input_tokens": 102086268,
+            "output_tokens": 946679,
+            "covered_tasks": 80,
+            "status": "partial",
+            "lower_bound": true,
+            "completed_responses": 1660,
+            "unmetered_requests": 71
+          },
+          "timeouts": 56,
+          "notes": [
+            "API usage for final retained task attempts: 1660/1731 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
+            "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+          ],
+          "sources_sha256": [
+            "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
+          ]
+        },
+        "wave19": {
+          "observed_tasks": 40,
+          "tasks": 40,
+          "steps": {
+            "value": 1,
+            "covered_tasks": 1,
+            "status": "raw",
+            "unit": "agent_steps"
+          },
+          "tokens": {
+            "value": 360166,
+            "input_tokens": 345317,
+            "output_tokens": 14849,
+            "covered_tasks": 40,
+            "status": "partial",
+            "lower_bound": true,
+            "completed_responses": 73,
+            "unmetered_requests": 39
+          },
+          "timeouts": 39,
+          "notes": [
+            "API usage for final retained task attempts: 73/112 requests metered; token sum is a lower bound. Includes repeated context and compaction; reasoning is not added twice. Setup probes excluded.",
+            "Steps are incomplete native agent_steps counters, not audited tool calls. Superseded infrastructure attempts are excluded here; the protocol page reports all-attempt spend separately."
+          ],
+          "sources_sha256": [
+            "c7e1618a3a5efea30fd194824c72bee8e2e48882f9dea1137d26a991a1d06d0d"
+          ]
+        }
       }
     }
   ]
