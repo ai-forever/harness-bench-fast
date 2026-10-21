@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>GigaChat 3.5 Ultra Reasoning · PROM</title><link rel="stylesheet" href="landing.css"></head><body><main>
+<p><a href="index.html#giga35-ultra-reasoning">← GigaChat 3.5 Ultra Reasoning in the common leaderboard</a></p>
+<section class="measurement-protocol" aria-labelledby="title">
+  <p class="snapshot-label">Full suite · 471 tasks · one run</p>
+  <h1 id="title">GigaChat 3.5 Ultra Reasoning (PROM)</h1>
+  <p class="snapshot-meta">deepagents 0.6.12 · no profile · reasoning medium · task-set v0.19.0 · 21 October 2026</p>
+  <p><strong>277/471 passed (58.8%).</strong> 95% Wilson interval: 54.3–63.2%.</p>
+  <div class="table-wrap"><table aria-label="GigaChat 3.5 Ultra Reasoning and GigaChat 3.5">
+    <thead><tr><th scope="col">Task subset</th><th scope="col" class="numeric">Ultra Reasoning (medium)</th><th scope="col" class="numeric">GigaChat 3.5 (default)</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Full suite · 1–471</th><td class="numeric">277/471 (58.8%)</td><td class="numeric">292/471 (62.0%)</td></tr>
+      <tr><th scope="row">Light · 1–391</th><td class="numeric">273/391 (69.8%)</td><td class="numeric">292/391 (74.7%)</td></tr>
+      <tr><th scope="row">Medium · 392–471</th><td class="numeric">4/80 (5.0%)</td><td class="numeric">0/80 (0.0%)</td></tr>
+    </tbody>
+  </table></div>
+  <p>Medium breakdown: long context <strong>0/20</strong>, tool reflection <strong>3/20</strong>, wave 19 feasibility <strong>1/40</strong>. Light Wilson95: 65.1–74.2%; Medium: 2.0–12.2%.</p>
+  <p>The <a href="wave19-measurements.html#wave19-giga35">GigaChat 3.5 PROM default-effort run</a> uses the same harness, isolation and task contracts. The model and reasoning effort differ, so the comparison is descriptive.</p>
+  <details open><summary>Run configuration and validation</summary>
+    <p>Linux bwrap with trusted host services; four workers. Task timeouts: ordinary 900 seconds, long context 7,200 seconds, tool reflection 1,800 seconds, wave 19 120 seconds. Recursion limit 80 with task-specific floors. Maximum output 16,384 tokens per response. Temperature and top_p omitted (native/server defaults). One retained outcome per task; no best-of selection.</p>
+    <p>Stock deepagents 0.6.12, no GigaChat profile. Production GigaChat API (PROM), build 3.5.16.9. Reasoning enabled with medium effort and history forwarded; no additional reasoning budget. Native <code>run</code> cannot score wave 19; this run used the isolated OpenRouter worker against the GigaChat API.</p>
+    <p>Three long-context tasks (398, 399, 411) ended on <code>CONTEXT_TOO_LONG</code> HTTP 422 and count as failures. One HTTP 500 and one HTTP 502 appeared on the wire and were retried; no unresolved transient infrastructure failures remain. Task timeouts and graph recursion-limit hits count as failures.</p>
+    <p>Frozen benchmark source <code>598ccea4f6905c4b53850d4b4b8a0fbbd44c235a</code> (task-set v0.19.0). Raw runner counters: 11,427 steps covering 403/471 tasks and 103,572,447 tokens covering 441/471 tasks; these are incomplete and not audited API spend. Raw traces and backend identifiers remain private.</p>
+  </details>
+  <p><a href="giga35-ultra-reasoning-v019.json">Download measurement data →</a></p>
+</section>
+</main></body></html>

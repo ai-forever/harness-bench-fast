@@ -3,7 +3,7 @@
   "light_tasks": 391,
   "medium_tasks": 80,
   "provenance": {
-    "method": "Historical rescores, six complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
+    "method": "Historical rescores, seven complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
     "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
     "wave_results_sha256": "6dd03c599564c086bb8c0bf3f9c4a90c3edf27d9b4b7bb746bc5004e59f25683",
     "secret_700b_sha256": "2f016f31bee69ce7f27be2935631f7737d8d30acabb3c149b38a6e03baa1785d",
@@ -11,6 +11,7 @@
     "sonnet55_medium_sha256": "05184a8a69a1e3f75a7bfd0ecd185022203b6219abe5c7dd900a524e67ab540e",
     "astra_medium_sha256": "e46b98a77b9270db0957173f07cffbdf25f3cd5a2bcc16905a04234bf0768701",
     "universal_agent_haiku_sha256": "5680801cb7a3efd9eb8e0fac92484f2ac8eeb96d2805fbc3aa465adbd94bcb57",
+    "giga35_ultra_reasoning_sha256": "611fd53c116e51cbe2b772b909034cf7db6ccb4547adede3e145a186e1df5fc9",
     "archive_sha256": "448eb41a006bca486a21328f7e1799d1c1b7a05e52ee91a11f40fe9de0a8711f",
     "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability."
   },
@@ -2193,6 +2194,48 @@
         "wilson95": [
           0.652426936536005,
           0.895000102745623
+        ]
+      }
+    },
+    {
+      "id": "giga35-ultra-reasoning-v019",
+      "harness": "deepagents (no profile)",
+      "model": "GigaChat 3.5 Ultra Reasoning (PROM), build 3.5.16.9 (medium)",
+      "runs": 1,
+      "measurement_type": "full_run",
+      "measurement_valid": true,
+      "validation_basis": "automated_validation",
+      "reasoning_effort": "medium",
+      "source_version": "0.19.0",
+      "source_passed": 277,
+      "source_sha256": "a927bd3f81a2cacf30d807be6289f43fa40e672cfd8809e2520117c1585851ea",
+      "measurement_date": [
+        "2026-10-21"
+      ],
+      "medium_historical": null,
+      "details_url": "giga35-ultra-reasoning.html",
+      "light": {
+        "passed": 273,
+        "total": 391,
+        "wilson95": [
+          0.6509627813855698,
+          0.7415998447959651
+        ]
+      },
+      "medium": {
+        "passed": 4,
+        "total": 80,
+        "wilson95": [
+          0.01961355453554428,
+          0.1216227620464301
+        ]
+      },
+      "wave19": {
+        "passed": 1,
+        "total": 40,
+        "wilson95": [
+          0.0044268315026814095,
+          0.1288136896347409
         ]
       }
     }

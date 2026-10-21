@@ -44,6 +44,23 @@ Current task set: **471 tasks, `task-set v0.19.0`**. Tasks 432–471 are **wave 
 
 Full-suite v0.19.0 measurements are available in the live leaderboard and the measurement sections below. Wave 19 calibration used an earlier frozen protocol; it does not measure the current host-service implementation or updated prompts. The earlier-results tables retain their original task sets, denominators and scores.
 
+## GigaChat 3.5 Ultra Reasoning (PROM) (2026-10-21)
+
+[GigaChat 3.5 Ultra Reasoning in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#giga35-ultra-reasoning):
+**277/471 (58.8%)**, 95% Wilson interval **54.3–63.2%**.
+Light **273/391 (69.8%)**; Medium **4/80 (5.0%)** — long context 0/20,
+tool reflection 3/20, wave 19 feasibility 1/40.
+
+Stock deepagents 0.6.12, no profile; production GigaChat API; reasoning
+medium, history forwarded, max output 16,384. Linux bwrap, four workers,
+temperature omitted. Three long-context `CONTEXT_TOO_LONG` 422s count as
+failures; one HTTP 500 and one HTTP 502 were retried. Timeouts and
+recursion-limit hits remain failures.
+
+The same-harness GigaChat 3.5 PROM default-effort run scored 292/471
+(62.0%). The model and reasoning effort differ. [Protocol](docs/giga35-ultra-reasoning.html)
+· [Measurement data](docs/giga35-ultra-reasoning-v019.json). Raw traces remain private.
+
 ## Universal Agent + Claude Haiku 5.5 (2026-10-20/21)
 
 [Universal Agent in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#universal-agent-haiku):
