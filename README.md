@@ -42,7 +42,28 @@ Current task set: **471 tasks, `task-set v0.19.0`**. Tasks 432–471 are **wave 
 
 **Wave 19 requires Linux/bubblewrap and a trusted host service.** Use `run-cli --isolation bwrap` or `run-openrouter --isolation bwrap` (the isolated CLI worker). Native `run` / `run-pure`, native OpenRouter execution, RLI and Harbor export reject selections containing these tasks before model execution. To use those paths on earlier tasks, select `--from-task 1 --to-task 431`.
 
-No full-suite (471-task) model results on v0.19.0 have been recorded yet. Wave 19 calibration used an earlier frozen protocol; it does not measure the current host-service implementation or updated prompts. The tables below describe historical task sets; their denominators and scores are unchanged.
+Full-suite v0.19.0 measurements are available in the live leaderboard and the measurement sections below. Wave 19 calibration used an earlier frozen protocol; it does not measure the current host-service implementation or updated prompts. The earlier-results tables retain their original task sets, denominators and scores.
+
+## Universal Agent + Claude Haiku 5.5 (2026-10-20/21)
+
+[Universal Agent in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#universal-agent-haiku):
+**437/471 (92.8%)**, 95% Wilson interval **90.1–94.8%**.
+Light **384/391 (98.2%)**; Medium **53/80 (66.3%)** — long context 8/20,
+tool reflection 13/20, wave 19 feasibility 32/40.
+
+Universal Agent gc-cli/core 0.4.0, user profile with finish gate and token
+compaction; subagents, skills and MCP disabled. OpenRouter; default temperature
+and reasoning effort. Thinking requested but application unconfirmed.
+Linux bwrap, four workers, one retained outcome per task. All 14 tasks affected
+by HTTP 502 were replaced by their first transport-clean retry, regardless of
+score. Native output truncation, finish-gate limit acceptance and nine task
+timeouts remain part of the measured behavior.
+
+The same-model DeepAgents baseline scored 427/471 (90.7%): **+2.1 pp**, with a
+descriptive paired task-bootstrap interval of 0.0 to +4.5 pp. Configuration and
+output budgets differ; this is not an isolated harness-effect estimate or repeat
+variance. [Full protocol, telemetry and comparison](docs/universal-agent-haiku.html)
+and [public aggregate](docs/universal-agent-haiku.json). Raw traces remain private.
 
 ## secret sft (2026-10-19/20)
 

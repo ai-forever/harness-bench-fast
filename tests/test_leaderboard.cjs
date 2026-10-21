@@ -4,9 +4,9 @@ const { selectResults, formatPassed } = require("../docs/leaderboard.js");
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 85);
+assert.equal(light.length, 86);
 assert.equal(medium.length, 79);
-assert.equal(selectResults(data, "medium", "current", "").length, 11);
+assert.equal(selectResults(data, "medium", "current", "").length, 12);
 for (const rows of [light, medium]) {
   for (let i = 1; i < rows.length; i++) assert.ok(rows[i - 1].result.passed >= rows[i].result.passed);
 }
@@ -23,7 +23,13 @@ console.log("Leaderboard scope, ranking, missing-data and search checks passed."
 for (const row of data.rows.filter(r => r.measurement_type === "full_run")) { assert.equal(row.light.passed + row.medium.passed, row.source_passed); assert.equal(row.medium.total, 80); }
 
 const wave19 = selectResults(data, "medium", "wave19", "");
-assert.equal(wave19.length, 24);
+assert.equal(wave19.length, 25);
+const ua = selectResults(data, "light", "current", "Universal Agent").filter(r => r.id === "universal-agent-haiku");
+assert.equal(ua.length, 1);
+assert.equal(ua[0].result.passed, 384);
+assert.equal(selectResults(data, "medium", "current", "Universal Agent").find(r => r.id === "universal-agent-haiku").result.passed, 53);
+assert.equal(wave19.find(r => r.id === "universal-agent-haiku").result.passed, 32);
+assert.equal(ua[0].details_url, "universal-agent-haiku.html");
 assert.equal(selectResults(data, "light", "current", "GPT-6-Astra (OpenRouter) (medium)").length, 0);
 assert.equal(selectResults(data, "medium", "current", "GPT-6-Astra (OpenRouter) (medium)")[0].result.passed, 58);
 assert.equal(wave19.find(r => r.id === "astra-pi-medium").result.passed, 23);

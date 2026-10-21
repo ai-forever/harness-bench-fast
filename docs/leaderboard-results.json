@@ -3,13 +3,14 @@
   "light_tasks": 391,
   "medium_tasks": 80,
   "provenance": {
-    "method": "Historical rescores, five complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
+    "method": "Historical rescores, six complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
     "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
     "wave_results_sha256": "6dd03c599564c086bb8c0bf3f9c4a90c3edf27d9b4b7bb746bc5004e59f25683",
     "secret_700b_sha256": "2f016f31bee69ce7f27be2935631f7737d8d30acabb3c149b38a6e03baa1785d",
     "secret_sft_mini_sha256": "3be9fea9bf69468e2b7db3df5a7d3d7f7300a9366ab3fde5c047150807f98fb7",
     "sonnet55_medium_sha256": "05184a8a69a1e3f75a7bfd0ecd185022203b6219abe5c7dd900a524e67ab540e",
     "astra_medium_sha256": "e46b98a77b9270db0957173f07cffbdf25f3cd5a2bcc16905a04234bf0768701",
+    "universal_agent_haiku_sha256": "5680801cb7a3efd9eb8e0fac92484f2ac8eeb96d2805fbc3aa465adbd94bcb57",
     "archive_sha256": "448eb41a006bca486a21328f7e1799d1c1b7a05e52ee91a11f40fe9de0a8711f",
     "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability."
   },
@@ -2149,6 +2150,49 @@
         "wilson95": [
           0.0,
           0.08762160119728664
+        ]
+      }
+    },
+    {
+      "id": "universal-agent-haiku",
+      "harness": "Universal Agent (gc-cli 0.4.0)",
+      "model": "Claude Haiku 5.5 (OpenRouter)",
+      "runs": 1,
+      "measurement_type": "full_run",
+      "measurement_valid": true,
+      "validation_basis": "frozen source and runtime hashes, complete coverage, native grading, transport and independent trace review",
+      "reasoning_effort": "default",
+      "source_version": "0.19.0",
+      "source_passed": 437,
+      "source_sha256": "df83c1ab6c0063dc79a53f15717daa2f00acb3d3a89d8b49e94eba537cec34c5",
+      "measurement_date": [
+        "2026-10-20",
+        "2026-10-21"
+      ],
+      "medium_historical": null,
+      "details_url": "universal-agent-haiku.html",
+      "light": {
+        "passed": 384,
+        "total": 391,
+        "wilson95": [
+          0.9635122053239145,
+          0.9913014080337541
+        ]
+      },
+      "medium": {
+        "passed": 53,
+        "total": 80,
+        "wilson95": [
+          0.5535652339817697,
+          0.756543873919184
+        ]
+      },
+      "wave19": {
+        "passed": 32,
+        "total": 40,
+        "wilson95": [
+          0.652426936536005,
+          0.895000102745623
         ]
       }
     }

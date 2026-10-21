@@ -203,10 +203,35 @@ def build():
         "source_sha256": mini["source_report_sha256"], "measurement_date": mini["run_dates"],
         "medium_historical": None, "details_url": "secret-sft-mini.html", **subsets,
     })
+    ua_path = ROOT / "docs/universal-agent-haiku.json"
+    ua = json.loads(ua_path.read_text(encoding="utf-8"))
+    assert ua["measurement_valid"] is True and ua["infrastructure_failures"] == 0
+    assert ua["task_set_version"] == "0.19.0" and ua["total"] == 471
+    passed_numbers = ua["passed_task_numbers"]
+    assert len(set(passed_numbers)) == len(passed_numbers) == ua["passed"]
+    assert all(1 <= number <= 471 for number in passed_numbers)
+    subsets = {}
+    for name, source, start, end in (
+        ("light", "light", 1, 391), ("medium", "medium", 392, 471),
+        ("wave19", "wave19_feasibility", 432, 471),
+    ):
+        count = ua["counts"][source]
+        assert count["total"] == end - start + 1
+        assert count["passed"] == sum(start <= number <= end for number in passed_numbers)
+        subsets[name] = metric(count["passed"], count["total"])
+    assert subsets["light"]["passed"] + subsets["medium"]["passed"] == ua["passed"]
+    rows.append({
+        "id": "universal-agent-haiku", "harness": ua["harness"], "model": ua["model"],
+        "runs": 1, "measurement_type": "full_run", "measurement_valid": True,
+        "validation_basis": ua["validation_basis"], "reasoning_effort": ua["reasoning_effort"],
+        "source_version": ua["task_set_version"], "source_passed": ua["passed"],
+        "source_sha256": ua["source_report_sha256"], "measurement_date": ua["measurement_dates"],
+        "medium_historical": None, "details_url": "universal-agent-haiku.html", **subsets,
+    })
     return {
         "task_set_version": "0.19.0", "light_tasks": 391, "medium_tasks": 80,
         "provenance": {
-            "method": "Historical rescores, five complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
+            "method": "Historical rescores, six complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
             # Hash canonical UTF-8/LF text, independent of Git checkout CRLF.
             "wave_results_sha256": hashlib.sha256(waves.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
@@ -214,6 +239,7 @@ def build():
             "secret_sft_mini_sha256": hashlib.sha256(mini_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "sonnet55_medium_sha256": hashlib.sha256(sonnet_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "astra_medium_sha256": hashlib.sha256(astra_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
+            "universal_agent_haiku_sha256": hashlib.sha256(ua_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "archive_sha256": hashlib.sha256(archive.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability.",
         },
