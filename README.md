@@ -43,7 +43,8 @@ The public `docs/leaderboard-telemetry.json` snapshot binds these counters to
 the source result hashes. Native tool calls and recorded input/output usage are
 recovered where available; partial or unaudited counters are labeled, and missing
 subset totals appear as a dash. Full-run usage is never substituted for Light,
-Medium or wave 19 usage. Historical scores and measurement protocols are unchanged.
+Medium or wave 19 usage. Published usage counts only final retained task attempts;
+superseded recovery attempts are excluded. Historical scores and measurement protocols are unchanged.
 
 Current task set: **471 tasks, `task-set v0.19.1`**. Tasks 432–471 remain **wave 19: feasibility** — 40 tasks in 20 matched pairs; this revision adds no tasks. The agent must construct and submit a solution, execute a feasible search strategy, or prove that the formal conditions cannot be met. The runtime has a 3,600-second sanitary guard against hangs; formal resource budgets inside tasks are unchanged. A timely host-recorded `submit`/`finish` that passes the full verifier earns credit even if the subsequent final reply or process times out. Format and protocol compliance are part of the score. This measures the complete agent configuration, not a separate ability to predict its own solving time. Individual task credit is the main metric; both halves must pass for additional pair credit. See [wave 19](docs/wave19-feasibility.md) for the contracts, runtime and validation limits.
 
@@ -116,10 +117,9 @@ failures. Task-set and execution protocol remain **v0.19.0**, not v0.19.1.
 API usage for the final retained attempts is **at least 112,031,097 tokens**:
 110,492,188 input and 1,538,909 output, with usage on 3,776/3,865 requests.
 Light accounts for 8,998,150 and Medium for 103,032,947 tokens, shown in the
-common Tokens column. Including the replaced infrastructure attempt, the run
-spent **at least 113,666,663 tokens** (112,103,498 input; 1,563,165 output).
+common Tokens column. Superseded infrastructure attempts are excluded.
 These counts include repeated context, exclude setup probes, and do not add
-reasoning twice. Missing usage makes both sums lower bounds. Native counters
+reasoning twice. Missing usage makes the total a lower bound. Native counters
 (2,215 steps; 55,347,206 tokens; coverage 397/471) are retained separately.
 [Audit and protocol](docs/secret-sft-codex.html) ·
 [Final aggregate with token coverage](docs/secret-sft-codex-v019.json).

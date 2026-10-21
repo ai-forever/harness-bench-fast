@@ -16,6 +16,7 @@ Rules:
 - Do not include artifact links or artifact paths in the main table unless explicitly requested.
 - Use the human-readable harness and model names, not only the JSON filename.
 - Include `steps` and `tokens` from the run JSON when present.
+- Publish token usage only for the final retained attempt of each task, whether passed or failed. Exclude superseded infrastructure/recovery attempts from public tables, protocol pages and aggregates; keep all-attempt accounting private.
 - If a run artifact does not contain steps or token metrics, show `0` and note that `0` means the metric is absent from the artifact, not that nothing was spent.
 
 ## Scoring Rules
