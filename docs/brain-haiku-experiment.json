@@ -1,0 +1,4743 @@
+{
+  "measurement_date": "2026-10-21",
+  "harness": "Brain",
+  "harness_revision": "f65453dd",
+  "model": "anthropic/claude-haiku-5.5",
+  "provider": "OpenRouter",
+  "reasoning": "default",
+  "temperature": "default; no override",
+  "task_set_version": "0.19.0",
+  "protocol": "experimental mixed protocol; five tasks use 7200s instead of120s",
+  "status": "completed experimental outcomes; unresolved transport errors; not leaderboard eligible",
+  "total": 471,
+  "passed": 444,
+  "score": 0.9426751592356688,
+  "original_passed": 428,
+  "timeout_retry_passed": 11,
+  "timeout_retry_tasks": 24,
+  "no120_retry_passed": 5,
+  "no120_retry_tasks": 5,
+  "steps": 2803,
+  "tokens": 191781602,
+  "input_tokens": 184907548,
+  "output_tokens": 6874054,
+  "token_task_coverage": 471,
+  "accounting": "Only final retained attempt per task, passed or failed. Superseded attempts excluded. Token counter presence is not an audit of failed-request usage completeness.",
+  "source_sha256": {
+    "original": "66e84a46846e1a462d9ce0f654c3c8b41b483511e9df52fe1a5aee765702bfce",
+    "timeout_retry": "c31885135fd27c49e2620ac61c7dc46f41aef72168c17a4f43033b1891f6101a",
+    "no120_retry": "5e983dfac344d784353db9a2d9650a38024a7a022b8699b562bc7cb8a26c08f1"
+  },
+  "tasks": [
+    {
+      "task_id": "task_01_create_hello",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20456,
+      "output_tokens": 158,
+      "tokens": 20614,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_02_write_data_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20568,
+      "output_tokens": 233,
+      "tokens": 20801,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_03_slugify",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42922,
+      "output_tokens": 1878,
+      "tokens": 44800,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_04_write_numbers",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20510,
+      "output_tokens": 188,
+      "tokens": 20698,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_05_greet",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20713,
+      "output_tokens": 244,
+      "tokens": 20957,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_06_toggle_debug",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31158,
+      "output_tokens": 273,
+      "tokens": 31431,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_07_rename_function",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31260,
+      "output_tokens": 451,
+      "tokens": 31711,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_08_bump_version",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31173,
+      "output_tokens": 375,
+      "tokens": 31548,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_09_replace_hello",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31187,
+      "output_tokens": 311,
+      "tokens": 31498,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_10_bump_pyproject",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30967,
+      "output_tokens": 387,
+      "tokens": 31354,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_11_count_py",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30903,
+      "output_tokens": 257,
+      "tokens": 31160,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_12_extract_todos",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20594,
+      "output_tokens": 412,
+      "tokens": 21006,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_13_count_csv_lines",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31009,
+      "output_tokens": 543,
+      "tokens": 31552,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_14_sum_numbers",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30864,
+      "output_tokens": 308,
+      "tokens": 31172,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_15_first_word",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30882,
+      "output_tokens": 358,
+      "tokens": 31240,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_16_add_type_hints",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42549,
+      "output_tokens": 571,
+      "tokens": 43120,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_17_add_future_imports",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31267,
+      "output_tokens": 413,
+      "tokens": 31680,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_18_add_docstring",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31082,
+      "output_tokens": 519,
+      "tokens": 31601,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_19_remove_old_func",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31369,
+      "output_tokens": 385,
+      "tokens": 31754,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_20_move_function",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31713,
+      "output_tokens": 616,
+      "tokens": 32329,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_21_rename_file",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31393,
+      "output_tokens": 296,
+      "tokens": 31689,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_22_delete_file",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20719,
+      "output_tokens": 130,
+      "tokens": 20849,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_23_append_log",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42837,
+      "output_tokens": 650,
+      "tokens": 43487,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_24_add_header_comment",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42158,
+      "output_tokens": 773,
+      "tokens": 42931,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_25_sort_lines",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42155,
+      "output_tokens": 1176,
+      "tokens": 43331,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_26_add_json_key",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42560,
+      "output_tokens": 1760,
+      "tokens": 44320,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_27_update_dep_version",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31060,
+      "output_tokens": 378,
+      "tokens": 31438,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_28_csv_to_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31382,
+      "output_tokens": 420,
+      "tokens": 31802,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_29_create_gitignore",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20574,
+      "output_tokens": 221,
+      "tokens": 20795,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_30_add_todo",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31468,
+      "output_tokens": 454,
+      "tokens": 31922,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_31_rename_in_multi",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31578,
+      "output_tokens": 464,
+      "tokens": 32042,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_32_count_words",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30832,
+      "output_tokens": 246,
+      "tokens": 31078,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_33_find_max",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 31397,
+      "output_tokens": 343,
+      "tokens": 31740,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_34_filter_errors",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31375,
+      "output_tokens": 510,
+      "tokens": 31885,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_35_remove_blank_lines",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32001,
+      "output_tokens": 751,
+      "tokens": 32752,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_36_add_imports",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 41769,
+      "output_tokens": 782,
+      "tokens": 42551,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_37_make_pytest_test",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 65393,
+      "output_tokens": 1377,
+      "tokens": 66770,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_38_trim_trailing_ws",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 53419,
+      "output_tokens": 1724,
+      "tokens": 55143,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_39_reverse_lines",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30928,
+      "output_tokens": 475,
+      "tokens": 31403,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_40_merge_files",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20848,
+      "output_tokens": 315,
+      "tokens": 21163,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_41_count_todos",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42442,
+      "output_tokens": 700,
+      "tokens": 43142,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_42_snake_case",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31381,
+      "output_tokens": 352,
+      "tokens": 31733,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_43_longest_line",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30986,
+      "output_tokens": 615,
+      "tokens": 31601,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_44_create_requirements",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20519,
+      "output_tokens": 192,
+      "tokens": 20711,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_45_inline_constant",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31675,
+      "output_tokens": 405,
+      "tokens": 32080,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_46_add_init_export",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20606,
+      "output_tokens": 231,
+      "tokens": 20837,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_47_dedupe_lines",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31036,
+      "output_tokens": 362,
+      "tokens": 31398,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_48_append_eof_each",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42660,
+      "output_tokens": 865,
+      "tokens": 43525,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_49_csv_to_markdown",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31146,
+      "output_tokens": 319,
+      "tokens": 31465,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_50_fix_typo",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31256,
+      "output_tokens": 496,
+      "tokens": 31752,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_51_count_total_lines",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 41779,
+      "output_tokens": 629,
+      "tokens": 42408,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_52_find_files_with",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31504,
+      "output_tokens": 502,
+      "tokens": 32006,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_53_add_shebang",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31130,
+      "output_tokens": 377,
+      "tokens": 31507,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_54_swap_csv_cols",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31333,
+      "output_tokens": 469,
+      "tokens": 31802,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_55_add_conftest",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 7,
+      "input_tokens": 57243,
+      "output_tokens": 2196,
+      "tokens": 59439,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_56_move_to_subdir",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31585,
+      "output_tokens": 389,
+      "tokens": 31974,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_57_add_main_guard",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42035,
+      "output_tokens": 1015,
+      "tokens": 43050,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_58_format_phones",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42341,
+      "output_tokens": 726,
+      "tokens": 43067,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_59_unique_words",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31289,
+      "output_tokens": 373,
+      "tokens": 31662,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_60_rename_dir",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31853,
+      "output_tokens": 339,
+      "tokens": 32192,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_61_add_env_var",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30993,
+      "output_tokens": 424,
+      "tokens": 31417,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_62_remove_env_var",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30923,
+      "output_tokens": 520,
+      "tokens": 31443,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_63_nested_json_edit",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42461,
+      "output_tokens": 1027,
+      "tokens": 43488,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_64_add_logger_call",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31074,
+      "output_tokens": 532,
+      "tokens": 31606,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_65_sum_floats",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31219,
+      "output_tokens": 460,
+      "tokens": 31679,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_66_join_with_comma",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31058,
+      "output_tokens": 524,
+      "tokens": 31582,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_67_replace_in_logs",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31821,
+      "output_tokens": 848,
+      "tokens": 32669,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_68_add_two_keys",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42054,
+      "output_tokens": 729,
+      "tokens": 42783,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_69_remove_comments",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31321,
+      "output_tokens": 423,
+      "tokens": 31744,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_70_uppercase_first_column",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42637,
+      "output_tokens": 972,
+      "tokens": 43609,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_71_count_assert",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42213,
+      "output_tokens": 623,
+      "tokens": 42836,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_72_wrap_in_function",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31065,
+      "output_tokens": 692,
+      "tokens": 31757,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_73_extract_emails",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31475,
+      "output_tokens": 623,
+      "tokens": 32098,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_74_rename_class",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 42736,
+      "output_tokens": 420,
+      "tokens": 43156,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_75_squash_blank",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31442,
+      "output_tokens": 986,
+      "tokens": 32428,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_76_create_dataclass",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20604,
+      "output_tokens": 257,
+      "tokens": 20861,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_77_tally_grades",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31425,
+      "output_tokens": 463,
+      "tokens": 31888,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_78_add_property",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31433,
+      "output_tokens": 650,
+      "tokens": 32083,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_79_double_to_single_quotes",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42936,
+      "output_tokens": 759,
+      "tokens": 43695,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_80_delete_lines_with",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42820,
+      "output_tokens": 1440,
+      "tokens": 44260,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_81_swap_lines",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30855,
+      "output_tokens": 287,
+      "tokens": 31142,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_82_add_csv_column",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31276,
+      "output_tokens": 428,
+      "tokens": 31704,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_83_const_uppercase",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31380,
+      "output_tokens": 325,
+      "tokens": 31705,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_84_concat_csvs",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31731,
+      "output_tokens": 656,
+      "tokens": 32387,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_85_add_logging_import",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30860,
+      "output_tokens": 297,
+      "tokens": 31157,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_86_extract_numbers",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30962,
+      "output_tokens": 394,
+      "tokens": 31356,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_87_flip_booleans",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30954,
+      "output_tokens": 399,
+      "tokens": 31353,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_88_sort_imports",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31489,
+      "output_tokens": 456,
+      "tokens": 31945,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_89_create_pre_commit",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20778,
+      "output_tokens": 578,
+      "tokens": 21356,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_90_duplicate_function",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31397,
+      "output_tokens": 436,
+      "tokens": 31833,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_91_kv_to_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31380,
+      "output_tokens": 384,
+      "tokens": 31764,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_92_count_chars",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31114,
+      "output_tokens": 298,
+      "tokens": 31412,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_93_split_rows",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31727,
+      "output_tokens": 442,
+      "tokens": 32169,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_94_remove_unused",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31488,
+      "output_tokens": 606,
+      "tokens": 32094,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_95_add_default_arg",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31198,
+      "output_tokens": 344,
+      "tokens": 31542,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_96_group_by_letter",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31438,
+      "output_tokens": 443,
+      "tokens": 31881,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_97_negate_filter",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 43652,
+      "output_tokens": 746,
+      "tokens": 44398,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_98_count_unique",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 41811,
+      "output_tokens": 327,
+      "tokens": 42138,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_99_add_readme",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20491,
+      "output_tokens": 185,
+      "tokens": 20676,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_100_zero_balance",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43078,
+      "output_tokens": 1481,
+      "tokens": 44559,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_101_csv_mean_score",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31622,
+      "output_tokens": 424,
+      "tokens": 32046,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_102_csv_filter_adults",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42671,
+      "output_tokens": 687,
+      "tokens": 43358,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_103_csv_sort_desc",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31592,
+      "output_tokens": 430,
+      "tokens": 32022,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_104_csv_join",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31843,
+      "output_tokens": 609,
+      "tokens": 32452,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_105_csv_to_tsv",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31426,
+      "output_tokens": 637,
+      "tokens": 32063,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_106_csv_group_count",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31686,
+      "output_tokens": 735,
+      "tokens": 32421,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_107_csv_max_row",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31281,
+      "output_tokens": 520,
+      "tokens": 31801,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_108_csv_dedupe",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31457,
+      "output_tokens": 518,
+      "tokens": 31975,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_109_csv_add_total",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31588,
+      "output_tokens": 635,
+      "tokens": 32223,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_110_csv_count_above",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31161,
+      "output_tokens": 332,
+      "tokens": 31493,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_111_xlsx_extract_b2",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43633,
+      "output_tokens": 1530,
+      "tokens": 45163,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_112_xlsx_sum_column",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 67224,
+      "output_tokens": 1674,
+      "tokens": 68898,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_113_xlsx_update_cell",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 79134,
+      "output_tokens": 3251,
+      "tokens": 82385,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_114_jsonl_sum_amount",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31534,
+      "output_tokens": 477,
+      "tokens": 32011,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_115_json_extract_nested",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 54180,
+      "output_tokens": 1480,
+      "tokens": 55660,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_116_json_filter_active",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31501,
+      "output_tokens": 332,
+      "tokens": 31833,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_117_json_to_yaml",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31582,
+      "output_tokens": 502,
+      "tokens": 32084,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_118_jsonl_count_by_status",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31952,
+      "output_tokens": 973,
+      "tokens": 32925,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_119_yaml_bump_version",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 31663,
+      "output_tokens": 403,
+      "tokens": 32066,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_120_ini_add_section",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31547,
+      "output_tokens": 631,
+      "tokens": 32178,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_121_toml_add_dep",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31186,
+      "output_tokens": 342,
+      "tokens": 31528,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_122_yaml_to_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31285,
+      "output_tokens": 466,
+      "tokens": 31751,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_123_sqlite_count",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20601,
+      "output_tokens": 436,
+      "tokens": 21037,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_124_sqlite_sum",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31492,
+      "output_tokens": 570,
+      "tokens": 32062,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_125_impl_fib",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20873,
+      "output_tokens": 466,
+      "tokens": 21339,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_126_impl_count_vowels",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31431,
+      "output_tokens": 551,
+      "tokens": 31982,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_127_impl_is_palindrome",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31719,
+      "output_tokens": 1083,
+      "tokens": 32802,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_128_fix_bug",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31847,
+      "output_tokens": 445,
+      "tokens": 32292,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_129_implement_passing",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 66251,
+      "output_tokens": 1752,
+      "tokens": 68003,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_130_impl_extract_phones",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43217,
+      "output_tokens": 886,
+      "tokens": 44103,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_131_script_wordcount",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30983,
+      "output_tokens": 390,
+      "tokens": 31373,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_132_md5_hash",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 43581,
+      "output_tokens": 1162,
+      "tokens": 44743,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_133_impl_factorial",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20714,
+      "output_tokens": 388,
+      "tokens": 21102,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_134_run_and_capture",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20603,
+      "output_tokens": 194,
+      "tokens": 20797,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_135_grep_count_imports",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31537,
+      "output_tokens": 1030,
+      "tokens": 32567,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_136_grep_files_with_todo",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32709,
+      "output_tokens": 443,
+      "tokens": 33152,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_137_grep_count_defs",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42144,
+      "output_tokens": 675,
+      "tokens": 42819,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_138_grep_yaml_with_key",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31958,
+      "output_tokens": 497,
+      "tokens": 32455,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_139_grep_log_errors",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42603,
+      "output_tokens": 749,
+      "tokens": 43352,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_140_grep_emails",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 32072,
+      "output_tokens": 584,
+      "tokens": 32656,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_141_grep_classnames",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31381,
+      "output_tokens": 662,
+      "tokens": 32043,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_142_grep_asserts",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31349,
+      "output_tokens": 345,
+      "tokens": 31694,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_143_grep_largest_file",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31294,
+      "output_tokens": 240,
+      "tokens": 31534,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_144_grep_duplicate_funcs",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31272,
+      "output_tokens": 625,
+      "tokens": 31897,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_145_log_top_ip",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 31866,
+      "output_tokens": 362,
+      "tokens": 32228,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_146_log_count_5xx",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43027,
+      "output_tokens": 1038,
+      "tokens": 44065,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_147_log_filter_404",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43328,
+      "output_tokens": 1735,
+      "tokens": 45063,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_148_csv_to_xlsx",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 55640,
+      "output_tokens": 1765,
+      "tokens": 57405,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_149_sqlite_to_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31893,
+      "output_tokens": 755,
+      "tokens": 32648,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_150_script_csv_total",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31724,
+      "output_tokens": 810,
+      "tokens": 32534,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_151_pipeline_csv_to_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43690,
+      "output_tokens": 1665,
+      "tokens": 45355,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_152_sqlite_join_to_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43050,
+      "output_tokens": 747,
+      "tokens": 43797,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_153_xlsx_to_markdown_report",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 48502,
+      "output_tokens": 1123,
+      "tokens": 49625,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_154_jsonl_into_sqlite",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32794,
+      "output_tokens": 828,
+      "tokens": 33622,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_155_log_count_per_endpoint",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 48622,
+      "output_tokens": 1152,
+      "tokens": 49774,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_156_csv_validate_split",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 55766,
+      "output_tokens": 2576,
+      "tokens": 58342,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_157_two_csv_diff",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32177,
+      "output_tokens": 791,
+      "tokens": 32968,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_158_xlsx_split_sheets",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 67048,
+      "output_tokens": 1587,
+      "tokens": 68635,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_159_unzip_extract",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31997,
+      "output_tokens": 553,
+      "tokens": 32550,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_160_create_zip",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31814,
+      "output_tokens": 445,
+      "tokens": 32259,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_161_gzip_compress",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31535,
+      "output_tokens": 404,
+      "tokens": 31939,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_162_split_module_by_class",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32003,
+      "output_tokens": 773,
+      "tokens": 32776,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_163_extract_constants",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32026,
+      "output_tokens": 711,
+      "tokens": 32737,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_164_add_type_hints_module",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31636,
+      "output_tokens": 511,
+      "tokens": 32147,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_165_rename_across_files",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 45087,
+      "output_tokens": 787,
+      "tokens": 45874,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_166_convert_to_dataclass",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31596,
+      "output_tokens": 468,
+      "tokens": 32064,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_167_impl_quicksort",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43521,
+      "output_tokens": 928,
+      "tokens": 44449,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_168_impl_binary_search",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 54927,
+      "output_tokens": 1498,
+      "tokens": 56425,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_169_impl_balanced_parens",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43705,
+      "output_tokens": 891,
+      "tokens": 44596,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_170_impl_lru_cache",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 56091,
+      "output_tokens": 1489,
+      "tokens": 57580,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_171_impl_linked_list",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44566,
+      "output_tokens": 1325,
+      "tokens": 45891,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_172_impl_tree_inorder",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43788,
+      "output_tokens": 867,
+      "tokens": 44655,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_173_impl_anagram",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 54546,
+      "output_tokens": 941,
+      "tokens": 55487,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_174_impl_two_sum",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 55133,
+      "output_tokens": 1398,
+      "tokens": 56531,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_175_csv_stats_basic",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32066,
+      "output_tokens": 1375,
+      "tokens": 33441,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_176_csv_rolling_avg",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42526,
+      "output_tokens": 1034,
+      "tokens": 43560,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_177_csv_histogram",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32038,
+      "output_tokens": 872,
+      "tokens": 32910,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_178_csv_pivot_count",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32000,
+      "output_tokens": 1394,
+      "tokens": 33394,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_179_csv_zscore_outliers",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31853,
+      "output_tokens": 872,
+      "tokens": 32725,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_180_csv_percentiles",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43397,
+      "output_tokens": 1091,
+      "tokens": 44488,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_181_csv_cumsum",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30933,
+      "output_tokens": 354,
+      "tokens": 31287,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_182_csv_group_agg",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31739,
+      "output_tokens": 835,
+      "tokens": 32574,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_183_xml_to_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43606,
+      "output_tokens": 783,
+      "tokens": 44389,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_184_md_toc_gen",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42965,
+      "output_tokens": 1113,
+      "tokens": 44078,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_185_md_frontmatter",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42525,
+      "output_tokens": 735,
+      "tokens": 43260,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_186_find_call_sites",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31747,
+      "output_tokens": 427,
+      "tokens": 32174,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_187_dead_functions",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31951,
+      "output_tokens": 597,
+      "tokens": 32548,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_188_csv_three_way_join",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32325,
+      "output_tokens": 726,
+      "tokens": 33051,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_189_log_hourly_counts",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43492,
+      "output_tokens": 951,
+      "tokens": 44443,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_190_concat_dedupe_sort",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31980,
+      "output_tokens": 1176,
+      "tokens": 33156,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_191_sqlite_revenue_report",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43651,
+      "output_tokens": 1254,
+      "tokens": 44905,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_192_rewrite_imports",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31998,
+      "output_tokens": 626,
+      "tokens": 32624,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_193_impl_memoize",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 55424,
+      "output_tokens": 1402,
+      "tokens": 56826,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_194_impl_context_manager",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 55076,
+      "output_tokens": 1394,
+      "tokens": 56470,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_195_impl_iterator",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 55157,
+      "output_tokens": 1270,
+      "tokens": 56427,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_196_xlsx_to_csv_and_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 66501,
+      "output_tokens": 1589,
+      "tokens": 68090,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_197_filter_md_by_tag",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32229,
+      "output_tokens": 721,
+      "tokens": 32950,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_198_tar_extract",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31516,
+      "output_tokens": 478,
+      "tokens": 31994,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_199_sqlite_filtered_export",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42770,
+      "output_tokens": 662,
+      "tokens": 43432,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_200_impl_priority_queue",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 56070,
+      "output_tokens": 1514,
+      "tokens": 57584,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_201_reconcile_vip_users",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 46051,
+      "output_tokens": 1525,
+      "tokens": 47576,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_202_zip_sales_consolidation",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43444,
+      "output_tokens": 1178,
+      "tokens": 44622,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_203_sqlite_team_markdown_report",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43307,
+      "output_tokens": 1225,
+      "tokens": 44532,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_204_requests_to_http_client_migration",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45743,
+      "output_tokens": 1494,
+      "tokens": 47237,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_205_impl_paid_aggregator",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 58531,
+      "output_tokens": 1575,
+      "tokens": 60106,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_206_reconcile_paid_revenue",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 46564,
+      "output_tokens": 2184,
+      "tokens": 48748,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_207_inventory_anomaly_report",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43779,
+      "output_tokens": 1531,
+      "tokens": 45310,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_208_pricing_api_migration",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 86222,
+      "output_tokens": 2532,
+      "tokens": 88754,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_209_request_latency_reconstruction",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32663,
+      "output_tokens": 1253,
+      "tokens": 33916,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_210_tar_manifest_with_hashes",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31838,
+      "output_tokens": 938,
+      "tokens": 32776,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_211_impl_merge_intervals",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 7,
+      "input_tokens": 91688,
+      "output_tokens": 1871,
+      "tokens": 93559,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_212_merge_config_precedence",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32518,
+      "output_tokens": 1076,
+      "tokens": 33594,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_213_markdown_link_audit",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43781,
+      "output_tokens": 1436,
+      "tokens": 45217,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_214_customer_data_quality_report",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32468,
+      "output_tokens": 1381,
+      "tokens": 33849,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_215_source_todo_fixme_triage",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32050,
+      "output_tokens": 1000,
+      "tokens": 33050,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_216_category_revenue_rollup",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32149,
+      "output_tokens": 899,
+      "tokens": 33048,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_217_extract_user_emails",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31611,
+      "output_tokens": 643,
+      "tokens": 32254,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_218_build_runtime_config",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31992,
+      "output_tokens": 918,
+      "tokens": 32910,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_219_sql_paid_leaderboard",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42891,
+      "output_tokens": 900,
+      "tokens": 43791,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_220_python_import_migration",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 84182,
+      "output_tokens": 1824,
+      "tokens": 86006,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_221_log_level_summary",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 31964,
+      "output_tokens": 655,
+      "tokens": 32619,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_222_memory_name_pyproject",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44371,
+      "output_tokens": 1087,
+      "tokens": 45458,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_223_memory_city_timezone_script",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20538,
+      "output_tokens": 512,
+      "tokens": 21050,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_224_memory_mit_license",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44789,
+      "output_tokens": 1209,
+      "tokens": 45998,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_225_memory_compute_age_bio",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43353,
+      "output_tokens": 767,
+      "tokens": 44120,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_226_memory_requirements_dev",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 46592,
+      "output_tokens": 2780,
+      "tokens": 49372,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_227_memory_profile_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45526,
+      "output_tokens": 878,
+      "tokens": 46404,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_228_memory_style_refactor",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 60853,
+      "output_tokens": 1599,
+      "tokens": 62452,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_229_memory_update_contacts",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 250514,
+      "output_tokens": 1275,
+      "tokens": 251789,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_230_memory_forget_telegram",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45868,
+      "output_tokens": 970,
+      "tokens": 46838,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_231_memory_refuse_secrets",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44602,
+      "output_tokens": 1422,
+      "tokens": 46024,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_232_memory_focus_day_schedule_rules",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 57957,
+      "output_tokens": 2798,
+      "tokens": 60755,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_233_memory_endpoints_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 46979,
+      "output_tokens": 1340,
+      "tokens": 48319,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_234_memory_messenger_migration",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 46709,
+      "output_tokens": 874,
+      "tokens": 47583,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_235_memory_event_ordering_timeline",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 85994,
+      "output_tokens": 1316,
+      "tokens": 87310,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_236_memory_contradiction_resolution_region",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 74393,
+      "output_tokens": 2060,
+      "tokens": 76453,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_237_memory_preference_following_weekend_plan",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 54450,
+      "output_tokens": 1067,
+      "tokens": 55517,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_238_memory_abstention_unknown_phone",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44726,
+      "output_tokens": 1038,
+      "tokens": 45764,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_239_memory_multi_hop_salary",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 46724,
+      "output_tokens": 1075,
+      "tokens": 47799,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_240_memory_summarize_profile",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 49392,
+      "output_tokens": 671,
+      "tokens": 50063,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_241_memory_instruction_reformat_json",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 45337,
+      "output_tokens": 1059,
+      "tokens": 46396,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_242_memory_knowledge_update_job_change",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 48314,
+      "output_tokens": 1313,
+      "tokens": 49627,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_243_memory_multi_session_packing_list",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 87129,
+      "output_tokens": 2821,
+      "tokens": 89950,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_244_memory_save_multi_facts_env",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44347,
+      "output_tokens": 1466,
+      "tokens": 45813,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_245_memory_temporal_deadline_urgency",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 55765,
+      "output_tokens": 1157,
+      "tokens": 56922,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_246_memory_contradiction_latest_version",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44256,
+      "output_tokens": 762,
+      "tokens": 45018,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_247_memory_preference_dockerfile",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44776,
+      "output_tokens": 1887,
+      "tokens": 46663,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_248_memory_forget_work_contacts",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45251,
+      "output_tokens": 940,
+      "tokens": 46191,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_249_memory_info_extraction_spec",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 65326,
+      "output_tokens": 794,
+      "tokens": 66120,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_250_memory_abstention_dataclass",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 46121,
+      "output_tokens": 1091,
+      "tokens": 47212,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_251_memory_save_height_unit_convert",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 1,
+      "input_tokens": 20849,
+      "output_tokens": 1380,
+      "tokens": 22229,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_252_memory_event_ordering_next_milestone",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44430,
+      "output_tokens": 1214,
+      "tokens": 45644,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_253_memory_mixed_save_refuse_use",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 62789,
+      "output_tokens": 1582,
+      "tokens": 64371,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_254_terminal_log_status_matrix",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43157,
+      "output_tokens": 915,
+      "tokens": 44072,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_255_terminal_process_hotspots",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32020,
+      "output_tokens": 1035,
+      "tokens": 33055,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_256_terminal_event_summary",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32327,
+      "output_tokens": 1115,
+      "tokens": 33442,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_257_tau2_airline_refusal",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32382,
+      "output_tokens": 863,
+      "tokens": 33245,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_258_tau2_retail_partial_return",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32571,
+      "output_tokens": 806,
+      "tokens": 33377,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_259_tau2_telecom_plan_switch",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32695,
+      "output_tokens": 1006,
+      "tokens": 33701,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_260_swe_version_parser",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44619,
+      "output_tokens": 1457,
+      "tokens": 46076,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_261_swe_config_precedence",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44458,
+      "output_tokens": 1359,
+      "tokens": 45817,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_262_swe_csv_top_customers",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 56560,
+      "output_tokens": 1300,
+      "tokens": 57860,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_263_terminal_du_top_dirs",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43436,
+      "output_tokens": 1988,
+      "tokens": 45424,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_264_terminal_env_precedence",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32170,
+      "output_tokens": 865,
+      "tokens": 33035,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_265_terminal_makefile_plan",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31525,
+      "output_tokens": 734,
+      "tokens": 32259,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_266_terminal_sha256_manifest",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31673,
+      "output_tokens": 552,
+      "tokens": 32225,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_267_terminal_job_log_report",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31901,
+      "output_tokens": 918,
+      "tokens": 32819,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_268_terminal_permission_audit",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43227,
+      "output_tokens": 2319,
+      "tokens": 45546,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_269_terminal_markdown_index",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42497,
+      "output_tokens": 633,
+      "tokens": 43130,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_270_tau2_bank_duplicate_charge",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31817,
+      "output_tokens": 806,
+      "tokens": 32623,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_271_tau2_hotel_late_checkout",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31921,
+      "output_tokens": 766,
+      "tokens": 32687,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_272_tau2_clinic_reschedule",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31929,
+      "output_tokens": 689,
+      "tokens": 32618,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_273_tau2_insurance_docs",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31739,
+      "output_tokens": 649,
+      "tokens": 32388,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_274_tau2_delivery_late_food",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31921,
+      "output_tokens": 526,
+      "tokens": 32447,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_275_tau2_subscription_downgrade",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31767,
+      "output_tokens": 593,
+      "tokens": 32360,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_276_tau2_baggage_delay",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31591,
+      "output_tokens": 538,
+      "tokens": 32129,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_277_swe_date_parser",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 66495,
+      "output_tokens": 1345,
+      "tokens": 67840,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_278_swe_query_parser",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 55225,
+      "output_tokens": 1223,
+      "tokens": 56448,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_279_swe_markdown_slug_duplicates",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43168,
+      "output_tokens": 870,
+      "tokens": 44038,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_280_swe_pagination_one_based",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 55030,
+      "output_tokens": 1234,
+      "tokens": 56264,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_281_swe_retry_backoff_cap",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 66394,
+      "output_tokens": 1283,
+      "tokens": 67677,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_282_swe_safe_join",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 78696,
+      "output_tokens": 2084,
+      "tokens": 80780,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_283_swe_inventory_allocate",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 79212,
+      "output_tokens": 1619,
+      "tokens": 80831,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_284_terminal_json_config_inventory",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31564,
+      "output_tokens": 628,
+      "tokens": 32192,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_285_terminal_patch_stat_summary",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31765,
+      "output_tokens": 999,
+      "tokens": 32764,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_286_terminal_nginx_endpoint_classes",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31975,
+      "output_tokens": 967,
+      "tokens": 32942,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_287_terminal_changelog_extract",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31656,
+      "output_tokens": 587,
+      "tokens": 32243,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_288_terminal_artifact_filter",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31900,
+      "output_tokens": 528,
+      "tokens": 32428,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_289_tau2_utility_payment_plan",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31735,
+      "output_tokens": 618,
+      "tokens": 32353,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_290_tau2_car_rental_fee",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31728,
+      "output_tokens": 594,
+      "tokens": 32322,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_291_tau2_student_extension",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31729,
+      "output_tokens": 549,
+      "tokens": 32278,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_292_tau2_pharmacy_refill",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31830,
+      "output_tokens": 613,
+      "tokens": 32443,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_293_tau2_event_ticket_exchange",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31935,
+      "output_tokens": 589,
+      "tokens": 32524,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_294_swe_money_cents",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 68877,
+      "output_tokens": 2509,
+      "tokens": 71386,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_295_swe_parse_tags",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42830,
+      "output_tokens": 717,
+      "tokens": 43547,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_296_swe_roman_parser",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 7,
+      "input_tokens": 91703,
+      "output_tokens": 1695,
+      "tokens": 93398,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_297_swe_authz_admin",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 54028,
+      "output_tokens": 755,
+      "tokens": 54783,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_298_swe_median_even_empty",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 65282,
+      "output_tokens": 1096,
+      "tokens": 66378,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_299_resolve_conflict_take_both",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31856,
+      "output_tokens": 563,
+      "tokens": 32419,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_300_resolve_conflict_take_ours",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31668,
+      "output_tokens": 498,
+      "tokens": 32166,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_301_resolve_conflict_take_theirs",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31818,
+      "output_tokens": 515,
+      "tokens": 32333,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_302_apply_unified_diff",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31934,
+      "output_tokens": 387,
+      "tokens": 32321,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_303_cascading_cross_file",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45341,
+      "output_tokens": 1481,
+      "tokens": 46822,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_304_apply_patch_chain",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32422,
+      "output_tokens": 619,
+      "tokens": 33041,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_305_resolve_and_propagate_rename",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 101306,
+      "output_tokens": 4761,
+      "tokens": 106067,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_306_compute_deep_merge",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32781,
+      "output_tokens": 1082,
+      "tokens": 33863,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_307_resolve_many_files",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 63157,
+      "output_tokens": 1769,
+      "tokens": 64926,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_308_detect_unresolved_conflicts",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 54778,
+      "output_tokens": 741,
+      "tokens": 55519,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_309_rename_refactor_scale",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 95199,
+      "output_tokens": 2484,
+      "tokens": 97683,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_310_module_split",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 69375,
+      "output_tokens": 1584,
+      "tokens": 70959,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_311_apply_patch_stack_multifile",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 47760,
+      "output_tokens": 889,
+      "tokens": 48649,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_312_policy_driven_merge",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 82545,
+      "output_tokens": 2263,
+      "tokens": 84808,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_313_aggregate_config_fragments",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45612,
+      "output_tokens": 1978,
+      "tokens": 47590,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_314_skill_r1_brand_landing",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 55438,
+      "output_tokens": 1967,
+      "tokens": 57405,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_315_skill_b1_failure_codebook",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 67299,
+      "output_tokens": 1857,
+      "tokens": 69156,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_316_skill_b3_claim_triage_policy",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 86715,
+      "output_tokens": 2243,
+      "tokens": 88958,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_317_skill_g2_repair_phone_skill",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32684,
+      "output_tokens": 1952,
+      "tokens": 34636,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_318_skill_r2_style_guide_report",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 64916,
+      "output_tokens": 1365,
+      "tokens": 66281,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_319_skill_b2_ndr7_parse",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 64762,
+      "output_tokens": 1954,
+      "tokens": 66716,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_320_skill_e1_codebook_with_distractors",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 65446,
+      "output_tokens": 1752,
+      "tokens": 67198,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_321_skill_e2_negative_control_sum",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 30974,
+      "output_tokens": 482,
+      "tokens": 31456,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_322_skill_e3_codebook_selection",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 66914,
+      "output_tokens": 1643,
+      "tokens": 68557,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_323_skill_g1_create_slugify_skill",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 63168,
+      "output_tokens": 2942,
+      "tokens": 66110,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_324_skill_a1_lumen_recipe_dsl",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 47387,
+      "output_tokens": 1017,
+      "tokens": 48404,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_325_skill_a2_q9_binary_protocol",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45786,
+      "output_tokens": 3027,
+      "tokens": 48813,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_326_skill_a3_quokka_library_quirk",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 47092,
+      "output_tokens": 1237,
+      "tokens": 48329,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_327_skill_r3_act4_compliance_notice",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 64450,
+      "output_tokens": 1347,
+      "tokens": 65797,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_328_skill_d2_meridian_reconcile_xlsx",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 10,
+      "input_tokens": 159039,
+      "output_tokens": 4352,
+      "tokens": 163391,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_329_skill_d1_arcflux_exposure",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 69565,
+      "output_tokens": 2174,
+      "tokens": 71739,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_330_skill_d1b_arcflux_multifile",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 65876,
+      "output_tokens": 2054,
+      "tokens": 67930,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_331_adv_py2_to_py3",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31490,
+      "output_tokens": 497,
+      "tokens": 31987,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_332_adv_broken_build",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32248,
+      "output_tokens": 696,
+      "tokens": 32944,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_333_adv_cp1251_decode",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31670,
+      "output_tokens": 609,
+      "tokens": 32279,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_334_adv_locked_file",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42074,
+      "output_tokens": 880,
+      "tokens": 42954,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_335_adv_missing_config_file",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44091,
+      "output_tokens": 1574,
+      "tokens": 45665,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_336_adv_hardcoded_path",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31687,
+      "output_tokens": 556,
+      "tokens": 32243,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_337_adv_skill_missing_template",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 59991,
+      "output_tokens": 1040,
+      "tokens": 61031,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_338_adv_removed_stdlib",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31732,
+      "output_tokens": 271,
+      "tokens": 32003,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_339_adv_false_python_version",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 66465,
+      "output_tokens": 1680,
+      "tokens": 68145,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_340_adv_unneeded_dependency",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31624,
+      "output_tokens": 599,
+      "tokens": 32223,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_341_adv_set_e_abort",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 42784,
+      "output_tokens": 1043,
+      "tokens": 43827,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_342_adv_npm_in_python_project",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 43251,
+      "output_tokens": 818,
+      "tokens": 44069,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_343_adv_gzip_masquerade",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31399,
+      "output_tokens": 518,
+      "tokens": 31917,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_344_adv_dirty_log_sanitize",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31862,
+      "output_tokens": 942,
+      "tokens": 32804,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_345_adv_agentsmd_wrong_layout",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 52731,
+      "output_tokens": 824,
+      "tokens": 53555,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_346_adv_wrong_tests_dir",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 44206,
+      "output_tokens": 1125,
+      "tokens": 45331,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_347_adv_broken_import_path",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31522,
+      "output_tokens": 420,
+      "tokens": 31942,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_348_adv_broken_package_layout",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 82567,
+      "output_tokens": 1595,
+      "tokens": 84162,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_349_adv_malformed_skill_frontmatter",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44306,
+      "output_tokens": 1196,
+      "tokens": 45502,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_350_adv_contradictory_skills",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 49903,
+      "output_tokens": 764,
+      "tokens": 50667,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_351_adv_huge_file_no_slurp",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 44066,
+      "output_tokens": 1158,
+      "tokens": 45224,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_352_structured_log_summary",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 57447,
+      "output_tokens": 2507,
+      "tokens": 59954,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_353_reconstruct_sessions",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 33601,
+      "output_tokens": 2308,
+      "tokens": 35909,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_354_catalog_join",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 35368,
+      "output_tokens": 2608,
+      "tokens": 37976,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_355_segment_audit",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32400,
+      "output_tokens": 1030,
+      "tokens": 33430,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_356_deduplicate_contacts",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 33672,
+      "output_tokens": 2415,
+      "tokens": 36087,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_357_request_latency",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45259,
+      "output_tokens": 2179,
+      "tokens": 47438,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_358_range_parser",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 33143,
+      "output_tokens": 2411,
+      "tokens": 35554,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_359_retry_schedule",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31989,
+      "output_tokens": 1142,
+      "tokens": 33131,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_360_safe_relative_path",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32170,
+      "output_tokens": 1669,
+      "tokens": 33839,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_361_jsonl_cleaner",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44423,
+      "output_tokens": 2319,
+      "tokens": 46742,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_362_dependency_order",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44233,
+      "output_tokens": 2139,
+      "tokens": 46372,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_363_config_precedence",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 34398,
+      "output_tokens": 2873,
+      "tokens": 37271,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_364_manifest_conflicts",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 46229,
+      "output_tokens": 1948,
+      "tokens": 48177,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_365_package_rename",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 7,
+      "input_tokens": 174335,
+      "output_tokens": 3441,
+      "tokens": 177776,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_366_checksum_manifest",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 46315,
+      "output_tokens": 1939,
+      "tokens": 48254,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_367_invoice_reconciliation",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32379,
+      "output_tokens": 1166,
+      "tokens": 33545,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_368_sqlite_migration",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45642,
+      "output_tokens": 3224,
+      "tokens": 48866,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_369_ini_update",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 31781,
+      "output_tokens": 735,
+      "tokens": 32516,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_370_change_plan",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45224,
+      "output_tokens": 1762,
+      "tokens": 46986,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_371_test_result_aggregation",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45175,
+      "output_tokens": 2359,
+      "tokens": 47534,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_372_cli_logq_percentile_window",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 61944,
+      "output_tokens": 2382,
+      "tokens": 64326,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_373_cli_logq_mean_by_component",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 62934,
+      "output_tokens": 1836,
+      "tokens": 64770,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_374_cli_pktool_filter_decode",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 50033,
+      "output_tokens": 1747,
+      "tokens": 51780,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_375_cli_pktool_stats_corrupt",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 9,
+      "input_tokens": 131201,
+      "output_tokens": 4526,
+      "tokens": 135727,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_376_cli_xtab_column_share",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 35234,
+      "output_tokens": 1465,
+      "tokens": 36699,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_377_cli_xtab_mean_pivot",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 48882,
+      "output_tokens": 1434,
+      "tokens": 50316,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_378_cli_cfgctl_layered_merge",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 47848,
+      "output_tokens": 1606,
+      "tokens": 49454,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_379_cli_cfgctl_diff_changed",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 59935,
+      "output_tokens": 1576,
+      "tokens": 61511,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_380_cli_depwalk_build_order",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 35195,
+      "output_tokens": 1200,
+      "tokens": 36395,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_381_cli_slicer_restock",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 48253,
+      "output_tokens": 1134,
+      "tokens": 49387,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_382_cli_mixed_depwalk_hotspots",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 82400,
+      "output_tokens": 3197,
+      "tokens": 85597,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_383_cli_mixed_pktool_ports",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 48898,
+      "output_tokens": 1630,
+      "tokens": 50528,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_384_cli_mixed_slicer_warehouse_value",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 73314,
+      "output_tokens": 2689,
+      "tokens": 76003,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_385_cli_sort_multikey",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32736,
+      "output_tokens": 1245,
+      "tokens": 33981,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_386_cli_join_left_outer",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 33363,
+      "output_tokens": 2256,
+      "tokens": 35619,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_387_cli_comm_set_algebra",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 44795,
+      "output_tokens": 1529,
+      "tokens": 46324,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_388_cli_grep_uniq_ranking",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 45936,
+      "output_tokens": 2094,
+      "tokens": 48030,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_389_cli_find_xargs_predicates",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32907,
+      "output_tokens": 1717,
+      "tokens": 34624,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_390_cli_awk_group_report",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 56057,
+      "output_tokens": 1646,
+      "tokens": 57703,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_391_cli_sed_section_extract",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 2,
+      "input_tokens": 32690,
+      "output_tokens": 1386,
+      "tokens": 34076,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_392_manuscript_continuity",
+      "passed": false,
+      "retained_stage": "timeout_retry",
+      "steps": 38,
+      "input_tokens": 2457435,
+      "output_tokens": 123363,
+      "tokens": 2580798,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_393_intranet_multihop",
+      "passed": true,
+      "retained_stage": "timeout_retry",
+      "steps": 43,
+      "input_tokens": 4270693,
+      "output_tokens": 477170,
+      "tokens": 4747863,
+      "transport_error_in_terminal_message": true
+    },
+    {
+      "task_id": "task_394_review_annotation",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 23,
+      "input_tokens": 1226431,
+      "output_tokens": 63395,
+      "tokens": 1289826,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_395_homework_grading",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 29,
+      "input_tokens": 2786492,
+      "output_tokens": 185806,
+      "tokens": 2972298,
+      "transport_error_in_terminal_message": true
+    },
+    {
+      "task_id": "task_396_parish_genealogy",
+      "passed": false,
+      "retained_stage": "timeout_retry",
+      "steps": 152,
+      "input_tokens": 20846259,
+      "output_tokens": 281831,
+      "tokens": 21128090,
+      "transport_error_in_terminal_message": true
+    },
+    {
+      "task_id": "task_397_conference_schedule",
+      "passed": false,
+      "retained_stage": "timeout_retry",
+      "steps": 32,
+      "input_tokens": 4037942,
+      "output_tokens": 290063,
+      "tokens": 4328005,
+      "transport_error_in_terminal_message": true
+    },
+    {
+      "task_id": "task_398_card_game_engine",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 14,
+      "input_tokens": 741168,
+      "output_tokens": 6198,
+      "tokens": 747366,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_399_port_js_library",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 27,
+      "input_tokens": 2474337,
+      "output_tokens": 204361,
+      "tokens": 2678698,
+      "transport_error_in_terminal_message": true
+    },
+    {
+      "task_id": "task_400_sql_dialect_port",
+      "passed": true,
+      "retained_stage": "timeout_retry",
+      "steps": 69,
+      "input_tokens": 11138839,
+      "output_tokens": 207583,
+      "tokens": 11346422,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_401_review_comments",
+      "passed": true,
+      "retained_stage": "timeout_retry",
+      "steps": 51,
+      "input_tokens": 7472371,
+      "output_tokens": 243041,
+      "tokens": 7715412,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_402_changelog_semver",
+      "passed": false,
+      "retained_stage": "timeout_retry",
+      "steps": 63,
+      "input_tokens": 7699460,
+      "output_tokens": 433019,
+      "tokens": 8132479,
+      "transport_error_in_terminal_message": true
+    },
+    {
+      "task_id": "task_403_binary_format_reverse",
+      "passed": false,
+      "retained_stage": "timeout_retry",
+      "steps": 19,
+      "input_tokens": 4431583,
+      "output_tokens": 223400,
+      "tokens": 4654983,
+      "transport_error_in_terminal_message": true
+    },
+    {
+      "task_id": "task_404_text_adventure",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 150,
+      "input_tokens": 9638732,
+      "output_tokens": 68651,
+      "tokens": 9707383,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_405_paper_reproduce",
+      "passed": true,
+      "retained_stage": "timeout_retry",
+      "steps": 51,
+      "input_tokens": 6702438,
+      "output_tokens": 174948,
+      "tokens": 6877386,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_406_spreadsheet_audit",
+      "passed": true,
+      "retained_stage": "timeout_retry",
+      "steps": 51,
+      "input_tokens": 5710762,
+      "output_tokens": 440152,
+      "tokens": 6150914,
+      "transport_error_in_terminal_message": true
+    },
+    {
+      "task_id": "task_407_courier_routes",
+      "passed": false,
+      "retained_stage": "timeout_retry",
+      "steps": 42,
+      "input_tokens": 3047534,
+      "output_tokens": 574418,
+      "tokens": 3621952,
+      "transport_error_in_terminal_message": true
+    },
+    {
+      "task_id": "task_408_legacy_feature",
+      "passed": true,
+      "retained_stage": "timeout_retry",
+      "steps": 64,
+      "input_tokens": 10124892,
+      "output_tokens": 404905,
+      "tokens": 10529797,
+      "transport_error_in_terminal_message": true
+    },
+    {
+      "task_id": "task_409_procurement_datasheets",
+      "passed": true,
+      "retained_stage": "timeout_retry",
+      "steps": 53,
+      "input_tokens": 5381605,
+      "output_tokens": 355955,
+      "tokens": 5737560,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_410_recipe_nutrition",
+      "passed": true,
+      "retained_stage": "timeout_retry",
+      "steps": 69,
+      "input_tokens": 11138599,
+      "output_tokens": 820007,
+      "tokens": 11958606,
+      "transport_error_in_terminal_message": true
+    },
+    {
+      "task_id": "task_411_math_solutions_check",
+      "passed": false,
+      "retained_stage": "timeout_retry",
+      "steps": 150,
+      "input_tokens": 27186372,
+      "output_tokens": 252907,
+      "tokens": 27439279,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_412_supplier_minimum",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 9,
+      "input_tokens": 131530,
+      "output_tokens": 21198,
+      "tokens": 152728,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_413_crm_pagination",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 8,
+      "input_tokens": 134574,
+      "output_tokens": 6123,
+      "tokens": 140697,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_414_batch_partial",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 105144,
+      "output_tokens": 3134,
+      "tokens": 108278,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_415_api_throttle",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 87573,
+      "output_tokens": 3665,
+      "tokens": 91238,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_416_pay_units",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 10,
+      "input_tokens": 177236,
+      "output_tokens": 10232,
+      "tokens": 187468,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_417_transfer_fees",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 12,
+      "input_tokens": 183314,
+      "output_tokens": 9126,
+      "tokens": 192440,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_418_ticket_timeout_dupes",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 24,
+      "input_tokens": 529208,
+      "output_tokens": 14204,
+      "tokens": 543412,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_419_storage_async_delete",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 14,
+      "input_tokens": 279292,
+      "output_tokens": 8122,
+      "tokens": 287414,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_420_wiki_optimistic_lock",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 28,
+      "input_tokens": 642449,
+      "output_tokens": 42473,
+      "tokens": 684922,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_421_catalog_case_search",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 14,
+      "input_tokens": 244760,
+      "output_tokens": 7134,
+      "tokens": 251894,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_422_calendar_timezone",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 9,
+      "input_tokens": 136848,
+      "output_tokens": 7833,
+      "tokens": 144681,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_423_rooms_duration_cap",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 107113,
+      "output_tokens": 7555,
+      "tokens": 114668,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_424_payments_split_limits",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 12,
+      "input_tokens": 212533,
+      "output_tokens": 14336,
+      "tokens": 226869,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_425_shipping_weight_codes",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 12,
+      "input_tokens": 247033,
+      "output_tokens": 11002,
+      "tokens": 258035,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_426_kv_eventual",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 98253,
+      "output_tokens": 7345,
+      "tokens": 105598,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_427_report_deprecated_flag",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 7,
+      "input_tokens": 358039,
+      "output_tokens": 3139,
+      "tokens": 361178,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_428_geocode_quota",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 16,
+      "input_tokens": 310223,
+      "output_tokens": 16330,
+      "tokens": 326553,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_429_mail_bounce",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 13,
+      "input_tokens": 249749,
+      "output_tokens": 7264,
+      "tokens": 257013,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_430_orders_backorder",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 8,
+      "input_tokens": 148262,
+      "output_tokens": 8623,
+      "tokens": 156885,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_431_admin_elevation",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 19,
+      "input_tokens": 371259,
+      "output_tokens": 52088,
+      "tokens": 423347,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_432_clock_contract",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 455004,
+      "output_tokens": 5969,
+      "tokens": 460973,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_433_aggregate_identifiability",
+      "passed": true,
+      "retained_stage": "no120_retry",
+      "steps": 9,
+      "input_tokens": 417646,
+      "output_tokens": 20065,
+      "tokens": 437711,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_434_universal_compressor",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 8,
+      "input_tokens": 486242,
+      "output_tokens": 8868,
+      "tokens": 495110,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_435_archive_transfer",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 236242,
+      "output_tokens": 8198,
+      "tokens": 244440,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_436_search_capabilities",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 119180,
+      "output_tokens": 3732,
+      "tokens": 122912,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_437_search_index",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 145522,
+      "output_tokens": 3971,
+      "tokens": 149493,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_438_opaque_guid",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 441068,
+      "output_tokens": 7409,
+      "tokens": 448477,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_439_ledger_reachability",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 7,
+      "input_tokens": 261011,
+      "output_tokens": 5265,
+      "tokens": 266276,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_440_universal_compressor",
+      "passed": true,
+      "retained_stage": "timeout_retry",
+      "steps": 8,
+      "input_tokens": 485820,
+      "output_tokens": 10409,
+      "tokens": 496229,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_441_stateless_contract",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 459035,
+      "output_tokens": 10475,
+      "tokens": 469510,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_442_ledger_reachability",
+      "passed": false,
+      "retained_stage": "timeout_retry",
+      "steps": 6,
+      "input_tokens": 229151,
+      "output_tokens": 8829,
+      "tokens": 237980,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_443_search_count",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 131197,
+      "output_tokens": 4310,
+      "tokens": 135507,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_444_stateless_contract",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 444906,
+      "output_tokens": 6509,
+      "tokens": 451415,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_445_parity_repair",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 428456,
+      "output_tokens": 4161,
+      "tokens": 432617,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_446_archive_transfer",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 118530,
+      "output_tokens": 2043,
+      "tokens": 120573,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_447_sealed_partition",
+      "passed": false,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 393421,
+      "output_tokens": 10071,
+      "tokens": 403492,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_448_aggregate_identifiability",
+      "passed": true,
+      "retained_stage": "timeout_retry",
+      "steps": 6,
+      "input_tokens": 279187,
+      "output_tokens": 17909,
+      "tokens": 297096,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_449_search_capabilities",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 8,
+      "input_tokens": 168162,
+      "output_tokens": 6158,
+      "tokens": 174320,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_450_maintenance_windows",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 7,
+      "input_tokens": 513379,
+      "output_tokens": 8986,
+      "tokens": 522365,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_451_search_index",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 107964,
+      "output_tokens": 3591,
+      "tokens": 111555,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_452_search_hint",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 107251,
+      "output_tokens": 3424,
+      "tokens": 110675,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_453_opaque_guid",
+      "passed": true,
+      "retained_stage": "no120_retry",
+      "steps": 17,
+      "input_tokens": 1428095,
+      "output_tokens": 39323,
+      "tokens": 1467418,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_454_search_boundary",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 139489,
+      "output_tokens": 4733,
+      "tokens": 144222,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_455_maintenance_windows",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 8,
+      "input_tokens": 585821,
+      "output_tokens": 7530,
+      "tokens": 593351,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_456_build_critical_path",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 202449,
+      "output_tokens": 4401,
+      "tokens": 206850,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_457_search_pool",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 4,
+      "input_tokens": 91880,
+      "output_tokens": 2844,
+      "tokens": 94724,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_458_deployment_matching",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 291636,
+      "output_tokens": 10971,
+      "tokens": 302607,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_459_replication_cut",
+      "passed": true,
+      "retained_stage": "no120_retry",
+      "steps": 28,
+      "input_tokens": 1256969,
+      "output_tokens": 34842,
+      "tokens": 1291811,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_460_replication_cut",
+      "passed": true,
+      "retained_stage": "no120_retry",
+      "steps": 13,
+      "input_tokens": 526219,
+      "output_tokens": 18570,
+      "tokens": 544789,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_461_search_pool",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 140348,
+      "output_tokens": 4455,
+      "tokens": 144803,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_462_build_critical_path",
+      "passed": true,
+      "retained_stage": "no120_retry",
+      "steps": 15,
+      "input_tokens": 801229,
+      "output_tokens": 18118,
+      "tokens": 819347,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_463_diagnostic_queries",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 8,
+      "input_tokens": 537831,
+      "output_tokens": 10518,
+      "tokens": 548349,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_464_search_boundary",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 106779,
+      "output_tokens": 3488,
+      "tokens": 110267,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_465_search_count",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 7,
+      "input_tokens": 150666,
+      "output_tokens": 4693,
+      "tokens": 155359,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_466_parity_repair",
+      "passed": true,
+      "retained_stage": "timeout_retry",
+      "steps": 8,
+      "input_tokens": 588847,
+      "output_tokens": 9597,
+      "tokens": 598444,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_467_sealed_partition",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 321758,
+      "output_tokens": 5397,
+      "tokens": 327155,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_468_diagnostic_queries",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 3,
+      "input_tokens": 199744,
+      "output_tokens": 4212,
+      "tokens": 203956,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_469_deployment_matching",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 5,
+      "input_tokens": 291976,
+      "output_tokens": 6872,
+      "tokens": 298848,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_470_search_hint",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 6,
+      "input_tokens": 101780,
+      "output_tokens": 4781,
+      "tokens": 106561,
+      "transport_error_in_terminal_message": false
+    },
+    {
+      "task_id": "task_471_clock_contract",
+      "passed": true,
+      "retained_stage": "original",
+      "steps": 10,
+      "input_tokens": 779164,
+      "output_tokens": 11739,
+      "tokens": 790903,
+      "transport_error_in_terminal_message": false
+    }
+  ]
+}
