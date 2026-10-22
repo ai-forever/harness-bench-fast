@@ -44,7 +44,7 @@ if (typeof document !== "undefined") {
     const empty = document.getElementById("empty");
     const buttons = [...document.querySelectorAll("[data-suite]")];
     let suite = location.hash === "#medium" ? "medium" : "light";
-    const rowAnchors = { "#secret-sft-codex": "secret-sft-codex-v019", "#secret-700b": "secret-700b-v019", "#secret-sft-mini": "secret-sft-mini-v019", "#universal-agent-haiku": "universal-agent-haiku", "#giga35-ultra-reasoning": "giga35-ultra-reasoning-v019" };
+    const rowAnchors = { "#secret-sft-codex": "secret-sft-codex-v019", "#secret-700b": "secret-700b-v019", "#secret-sft-mini": "secret-sft-mini-v019", "#universal-agent-haiku": "universal-agent-haiku", "#universal-agent-deepseek": "universal-agent-deepseek", "#giga35-ultra-reasoning": "giga35-ultra-reasoning-v019" };
     // Preserve incoming links to models and protocol notes from the old landing.
     if (location.hash && !["#light", "#medium", ...Object.keys(rowAnchors)].includes(location.hash)) {
       location.replace("archive.html" + location.hash);

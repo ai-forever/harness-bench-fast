@@ -69,6 +69,25 @@ The same-harness GigaChat 3.5 PROM default-effort run scored 292/471
 (62.0%). The model and reasoning effort differ. [Protocol](docs/giga35-ultra-reasoning.html)
 · [Measurement data](docs/giga35-ultra-reasoning-v019.json). Raw traces remain private.
 
+## Universal Agent + DeepSeek V4.1 Flash (2026-10-21/22)
+
+[Universal Agent + DeepSeek in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#universal-agent-deepseek):
+**444/471 (94.3%)**, 95% Wilson interval **91.8–96.0%**.
+Light **389/391 (99.5%)**; Medium **55/80 (68.8%)** — long context 13/20,
+tool reflection 17/20, wave 19 feasibility 25/40.
+
+Universal Agent 0.4.0, OpenRouter, default reasoning effort; historical v0.19.0
+task contracts and user profile preserved. Native reasoning enabled for main
+calls and disabled for auxiliary calls. Compaction/protocol failures and nine
+timeouts remain part of the result. Independent audit restored original HTTP
+400 outcomes instead of retaining later successful retries. Selected traces
+record 5,915 main LLM responses and at least 411,778,773 API tokens.
+
+Against the same-harness Haiku run: **+1.5 pp**, descriptive paired-task 95%
+interval **−0.6 to +3.6 pp**; one run per configuration does not establish
+superiority. [Protocol and comparison](docs/universal-agent-deepseek.html)
+· [Public aggregate](docs/universal-agent-deepseek.json).
+
 ## Universal Agent + Claude Haiku 5.5 (2026-10-20/21)
 
 [Universal Agent in the common leaderboard](https://ai-forever.github.io/harness-bench-fast/#universal-agent-haiku):

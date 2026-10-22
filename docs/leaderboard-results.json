@@ -12,6 +12,7 @@
     "sonnet55_medium_sha256": "05184a8a69a1e3f75a7bfd0ecd185022203b6219abe5c7dd900a524e67ab540e",
     "astra_medium_sha256": "e46b98a77b9270db0957173f07cffbdf25f3cd5a2bcc16905a04234bf0768701",
     "universal_agent_haiku_sha256": "5680801cb7a3efd9eb8e0fac92484f2ac8eeb96d2805fbc3aa465adbd94bcb57",
+    "universal_agent_deepseek_sha256": "e2e923f7324f5908d8bff8cddde6b7999f55828df13c761855bca24554770683",
     "giga35_ultra_reasoning_sha256": "611fd53c116e51cbe2b772b909034cf7db6ccb4547adede3e145a186e1df5fc9",
     "archive_sha256": "448eb41a006bca486a21328f7e1799d1c1b7a05e52ee91a11f40fe9de0a8711f",
     "brain_haiku_experiment_sha256": "d2eeb500c752c07a71f15f58474334298e590370edd42f0e39f2511130db8cca",
@@ -3375,6 +3376,126 @@
           0.652426936536005,
           0.895000102745623
         ]
+      }
+    },
+    {
+      "id": "universal-agent-deepseek",
+      "harness": "Universal Agent (gc-cli 0.4.0)",
+      "model": "DeepSeek V4.1 Flash (OpenRouter) (default)",
+      "runs": 1,
+      "measurement_type": "full_run",
+      "measurement_valid": true,
+      "validation_basis": "Independent reconstruction matched all 471 exact executions; first nontransport outcome independent of grade; frozen source/config/workspace hashes verified; original400 grades and native timeouts retained. Accepted as-run harness profile with disclosed compaction and adapter-classification defects.",
+      "reasoning_effort": "default",
+      "source_version": "0.19.0",
+      "source_passed": 444,
+      "source_sha256": "09a965fc79b6c0163a3a43612cf17f05554c23dda0bf8bf94d3eaa349ff66ea8",
+      "measurement_date": [
+        "2026-10-21",
+        "2026-10-22"
+      ],
+      "medium_historical": null,
+      "details_url": "universal-agent-deepseek.html",
+      "light": {
+        "passed": 389,
+        "total": 391,
+        "wilson95": [
+          0.9815440990411085,
+          0.99859613536053
+        ]
+      },
+      "medium": {
+        "passed": 55,
+        "total": 80,
+        "wilson95": [
+          0.5793222425531256,
+          0.7784959588710517
+        ]
+      },
+      "wave19": {
+        "passed": 25,
+        "total": 40,
+        "wilson95": [
+          0.47032439137301096,
+          0.7577702083276673
+        ]
+      },
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "sources_sha256": [
+            "09a965fc79b6c0163a3a43612cf17f05554c23dda0bf8bf94d3eaa349ff66ea8"
+          ],
+          "steps": {
+            "value": 1922,
+            "covered_tasks": 391,
+            "status": "complete",
+            "unit": "main_llm_responses",
+            "lower_bound": false
+          },
+          "tokens": {
+            "value": 24723469,
+            "covered_tasks": 391,
+            "status": "complete",
+            "lower_bound": false
+          },
+          "notes": [
+            "Only retained attempts; both passed and failed tasks.",
+            "Steps count recorded main LLM responses; API tokens include main and auxiliary calls.",
+            "Interrupted or unreturned responses may be missing; partial scopes are lower bounds."
+          ]
+        },
+        "medium": {
+          "tasks": 80,
+          "observed_tasks": 80,
+          "sources_sha256": [
+            "09a965fc79b6c0163a3a43612cf17f05554c23dda0bf8bf94d3eaa349ff66ea8"
+          ],
+          "steps": {
+            "value": 3993,
+            "covered_tasks": 80,
+            "status": "partial",
+            "unit": "main_llm_responses",
+            "lower_bound": true
+          },
+          "tokens": {
+            "value": 387055304,
+            "covered_tasks": 80,
+            "status": "partial",
+            "lower_bound": true
+          },
+          "notes": [
+            "Only retained attempts; both passed and failed tasks.",
+            "Steps count recorded main LLM responses; API tokens include main and auxiliary calls.",
+            "Interrupted or unreturned responses may be missing; partial scopes are lower bounds."
+          ]
+        },
+        "wave19": {
+          "tasks": 40,
+          "observed_tasks": 40,
+          "sources_sha256": [
+            "09a965fc79b6c0163a3a43612cf17f05554c23dda0bf8bf94d3eaa349ff66ea8"
+          ],
+          "steps": {
+            "value": 425,
+            "covered_tasks": 40,
+            "status": "partial",
+            "unit": "main_llm_responses",
+            "lower_bound": true
+          },
+          "tokens": {
+            "value": 12265071,
+            "covered_tasks": 40,
+            "status": "partial",
+            "lower_bound": true
+          },
+          "notes": [
+            "Only retained attempts; both passed and failed tasks.",
+            "Steps count recorded main LLM responses; API tokens include main and auxiliary calls.",
+            "Interrupted or unreturned responses may be missing; partial scopes are lower bounds."
+          ]
+        }
       }
     },
     {

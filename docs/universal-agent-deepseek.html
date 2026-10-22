@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Universal Agent · DeepSeek V4.1 Flash</title><link rel="stylesheet" href="landing.css"></head><body><main>
+<p><a href="index.html#universal-agent-deepseek">← Universal Agent in the common leaderboard</a></p>
+<section class="measurement-protocol" aria-labelledby="title">
+  <p class="snapshot-label">Full suite · 471 tasks · one retained outcome per task</p>
+  <h1 id="title">Universal Agent · DeepSeek V4.1 Flash</h1>
+  <p class="snapshot-meta">gc-cli / gc-core 0.4.0 · OpenRouter · reasoning effort default · task-set v0.19.0 · 21–22 October 2026</p>
+  <p><strong>444/471 passed (94.3%).</strong> 95% Wilson interval: 91.8–96.0%.</p>
+  <div class="table-wrap"><table aria-label="Universal Agent with DeepSeek and Haiku">
+    <thead><tr><th scope="col">Task subset</th><th scope="col" class="numeric">DeepSeek V4.1 Flash</th><th scope="col" class="numeric">Claude Haiku 5.5</th><th scope="col" class="numeric">Difference</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Full suite · 1–471</th><td class="numeric">444/471 (94.3%)</td><td class="numeric">437/471 (92.8%)</td><td class="numeric">+1.5 pp</td></tr>
+      <tr><th scope="row">Light · 1–391</th><td class="numeric">389/391 (99.5%)</td><td class="numeric">384/391 (98.2%)</td><td class="numeric">+1.3 pp</td></tr>
+      <tr><th scope="row">Medium · 392–471</th><td class="numeric">55/80 (68.8%)</td><td class="numeric">53/80 (66.3%)</td><td class="numeric">+2.5 pp</td></tr>
+    </tbody>
+  </table></div>
+  <p>Medium breakdown: long context <strong>13/20</strong>, tool reflection <strong>17/20</strong>, wave 19 feasibility <strong>25/40</strong>. Light Wilson95: 98.2–99.9%; Medium: 57.9–77.8%.</p>
+  <p>The <a href="universal-agent-haiku.html">Universal Agent + Haiku baseline</a> uses the same frozen task contracts and user profile, with a different model and provider reasoning dialect. Paired task-bootstrap 95% intervals for the differences: overall −0.6 to +3.6 pp, Light 0.0 to +2.6 pp, Medium −8.8 to +13.8 pp (10,000 samples, seed 20261021). The overall interval includes zero. One run per configuration; these descriptive intervals do not estimate repeat variability or establish model superiority.</p>
+  <details open><summary>Configuration and validation</summary>
+    <p>Historical task-set v0.19.0 protocol, preserved without rescoring under v0.19.1. Linux bwrap with trusted host services; four workers. Timeouts: ordinary 900 seconds, long context 7,200 seconds, tool reflection 1,800 seconds, wave 19 120 seconds. Nine timeouts remain failures.</p>
+    <p>User-supplied profile: subagents, skills and MCP disabled; finish gate enabled with at most ten iterations; up to 1,000 steps. Token compaction trigger 200,000, turn-end trigger 160,000. Maximum main output 32,768 tokens; auxiliary 8,192 and judge 10,000. Temperature omitted from every audited request.</p>
+    <p>Exact requested and returned model: <code>deepseek/deepseek-v4.1-flash-1017</code>. Native <code>thinking.type</code> enabled for main calls and disabled for auxiliary calls; effort default. Reasoning content and its replay were verified before compaction.</p>
+    <p>The first attempt without HTTP 429/5xx is retained independently of grade. HTTP 400 is a harness/protocol outcome. The adapter initially misclassified exhausted HTTP 400 as infrastructure; the audit restored the original attempts, so later successes cannot replace them. Frozen verifiers on copies of the preserved workspaces scored tasks 403, 405 and 411 as failures and task 408 as passed.</p>
+    <p>There are 26 HTTP 400 responses across five retained tasks: four terminal failures after compaction, plus two requests recovered by native adaptive retries on task 407. Native compaction was observed to lose assistant reasoning; the provider returned a generic invalid-parameter error without specifying its exact validation rule. These defects remain part of the measured configuration. Finish-gate review: 458 accept, four reject, zero fail-open.</p>
+    <p>Frozen benchmark source <code>bda46b1f8b08b8416e7d59bfecf55fc822572022</code>; Universal Agent source <code>8c76e8b0c767cabd9d9122c354df632ef15cc22e</code>. Independent reconstruction matched all 471 selected executions. Source/runtime/config hashes, exact task coverage, model identity, default temperature, isolation, original workspace hashes and trusted-service evidence were checked.</p>
+  </details>
+  <details><summary>Retained-attempt steps and tokens</summary>
+    <p>Selected traces contain <strong>5,915 main LLM response steps</strong> and <strong>411,778,773 reported API tokens</strong>. Tokens include both main and auxiliary input/output usage; repeatedly sent context is counted. Steps are main LLM responses, not tool calls.</p>
+    <p>Light: 1,922 steps and 24,723,469 tokens. Medium: at least 3,993 steps and 387,055,304 tokens. Within Medium, wave 19 accounts for at least 425 steps and 12,265,071 tokens; it must not be added to Medium again.</p>
+    <p>Native terminal usage covers 458/471 tasks and matches API usage on all 458: 380,958,610 tokens. Four protocol failures and nine timeouts have no final native usage event. API totals and trace steps include their available records, but interrupted or unreturned requests may be missing. Only retained attempts are counted, including passed and failed tasks. Raw traces and private infrastructure details stay on the benchmark server.</p>
+  </details>
+  <p><a href="universal-agent-deepseek.json">Download aggregate, intervals, protocol and source fingerprints →</a></p>
+</section>
+</main></body></html>

@@ -4,9 +4,9 @@ const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboar
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 92);
+assert.equal(light.length, 93);
 assert.equal(medium.length, 79);
-assert.equal(selectResults(data, "medium", "current", "").length, 18);
+assert.equal(selectResults(data, "medium", "current", "").length, 19);
 for (const rows of [light, medium]) {
   for (let i = 1; i < rows.length; i++) assert.ok(rows[i - 1].result.passed >= rows[i].result.passed);
 }
@@ -23,13 +23,21 @@ console.log("Leaderboard scope, ranking, missing-data and search checks passed."
 for (const row of data.rows.filter(r => r.measurement_type === "full_run")) { assert.equal(row.light.passed + row.medium.passed, row.source_passed); assert.equal(row.medium.total, 80); }
 
 const wave19 = selectResults(data, "medium", "wave19", "");
-assert.equal(wave19.length, 31);
+assert.equal(wave19.length, 32);
 const ua = selectResults(data, "light", "current", "Universal Agent").filter(r => r.id === "universal-agent-haiku");
 assert.equal(ua.length, 1);
 assert.equal(ua[0].result.passed, 384);
 assert.equal(selectResults(data, "medium", "current", "Universal Agent").find(r => r.id === "universal-agent-haiku").result.passed, 53);
 assert.equal(wave19.find(r => r.id === "universal-agent-haiku").result.passed, 32);
 assert.equal(ua[0].details_url, "universal-agent-haiku.html");
+const uaDeepseek = light.find(row => row.id === "universal-agent-deepseek");
+assert.equal(uaDeepseek.result.passed, 389);
+assert.equal(uaDeepseek.medium.passed, 55);
+assert.equal(uaDeepseek.wave19.passed, 25);
+assert.equal(uaDeepseek.source_version, "0.19.0");
+assert.equal(uaDeepseek.telemetry.light.tokens.value + uaDeepseek.telemetry.medium.tokens.value, 411778773);
+assert.equal(formatUsage(uaDeepseek.telemetry.medium, "tokens").text, "≥ 387.06M");
+assert.equal(uaDeepseek.details_url, "universal-agent-deepseek.html");
 const ultra = selectResults(data, "light", "current", "Ultra Reasoning").filter(r => r.id === "giga35-ultra-reasoning-v019");
 assert.equal(ultra.length, 1);
 assert.equal(ultra[0].result.passed, 273);
