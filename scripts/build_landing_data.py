@@ -272,6 +272,34 @@ def build():
         "source_sha256": ua["source_report_sha256"], "measurement_date": ua["measurement_dates"],
         "medium_historical": None, "details_url": "universal-agent-haiku.html", **subsets,
     })
+    ua_deepseek_path = ROOT / "docs/universal-agent-deepseek.json"
+    ua_deepseek = json.loads(ua_deepseek_path.read_text(encoding="utf-8"))
+    assert ua_deepseek["measurement_valid"] is True and ua_deepseek["infrastructure_failures"] == 0
+    assert ua_deepseek["task_set_version"] == "0.19.0" and ua_deepseek["total"] == 471
+    passed_numbers = ua_deepseek["passed_task_numbers"]
+    assert len(set(passed_numbers)) == len(passed_numbers) == ua_deepseek["passed"]
+    assert all(1 <= number <= 471 for number in passed_numbers)
+    subsets = {}
+    for name, source, start, end in (
+        ("light", "light", 1, 391), ("medium", "medium", 392, 471),
+        ("wave19", "wave19_feasibility", 432, 471),
+    ):
+        count = ua_deepseek["counts"][source]
+        assert count["total"] == end - start + 1
+        assert count["passed"] == sum(start <= number <= end for number in passed_numbers)
+        subsets[name] = metric(count["passed"], count["total"])
+    assert subsets["light"]["passed"] + subsets["medium"]["passed"] == ua_deepseek["passed"]
+    rows.append({
+        "id": "universal-agent-deepseek", "harness": ua_deepseek["harness"],
+        "model": ua_deepseek["model"] + " (default)",
+        "runs": 1, "measurement_type": "full_run", "measurement_valid": True,
+        "validation_basis": ua_deepseek["validation_basis"],
+        "reasoning_effort": ua_deepseek["reasoning_effort"],
+        "source_version": ua_deepseek["task_set_version"], "source_passed": ua_deepseek["passed"],
+        "source_sha256": ua_deepseek["source_report_sha256"],
+        "measurement_date": ua_deepseek["measurement_dates"],
+        "medium_historical": None, "details_url": "universal-agent-deepseek.html", **subsets,
+    })
     ultra_path = ROOT / "docs/giga35-ultra-reasoning-v019.json"
     ultra = json.loads(ultra_path.read_text(encoding="utf-8"))
     assert ultra["measurement_valid"] is True and ultra["infrastructure_failures"] == 0
@@ -410,6 +438,7 @@ def build():
     telemetry = json.loads(telemetry_path.read_text(encoding="utf-8"))
     telemetry["rows"]["brain-haiku-experiment"] = usage
     telemetry["rows"].update(haiku_usage)
+    telemetry["rows"]["universal-agent-deepseek"] = ua_deepseek["subset_telemetry"]
     attach_telemetry(rows, telemetry)
     return {
         "task_set_version": "0.19", "light_tasks": 391, "medium_tasks": 80,
@@ -424,6 +453,7 @@ def build():
             "sonnet55_medium_sha256": hashlib.sha256(sonnet_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "astra_medium_sha256": hashlib.sha256(astra_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "universal_agent_haiku_sha256": hashlib.sha256(ua_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
+            "universal_agent_deepseek_sha256": hashlib.sha256(ua_deepseek_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "giga35_ultra_reasoning_sha256": hashlib.sha256(ultra_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "archive_sha256": hashlib.sha256(archive.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "brain_haiku_experiment_sha256": hashlib.sha256(brain_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
