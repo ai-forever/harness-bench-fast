@@ -125,7 +125,7 @@ if (typeof document !== "undefined") {
       buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.suite === suite)));
       document.getElementById("suite-title").textContent = "harness_bench_fast " + suite;
       document.getElementById("coverage-note").textContent = suite === "light"
-        ? "Tasks 1–391 · complete Light coverage · v0.19.0 measurements and historical v0.18.0 rescores."
+        ? "Tasks 1–391 · complete Light coverage · v0.19 measurements and historical v0.18.0 rescores."
         : "Tasks 392–471 · all 80 Medium tasks · historical + wave 19 composites are labeled. New-task results follow below.";
       const rows = selectResults(data, suite, "current", search.value);
       const ranking = selectResults(data, suite, "current", "");

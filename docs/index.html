@@ -6,7 +6,7 @@
   <meta name="description" content="Compare agent harnesses on harness_bench_fast Light (391 tasks) and Medium (80 tasks). Mechanically verified, with explicit measurement coverage.">
   <title>harness_bench_fast · Light &amp; Medium</title>
   <link rel="stylesheet" href="landing.css?v=usage-20261021">
-  <script src="leaderboard.js?v=codex-final-20261021" defer></script>
+  <script src="leaderboard.js?v=unified19-20261022" defer></script>
 </head>
 <body>
   <header>
@@ -15,13 +15,13 @@
   </header>
   <main>
     <section class="intro">
-      <p class="eyebrow">Agent benchmarks · v0.19.0</p>
+      <p class="eyebrow">Agent benchmarks · v0.19</p>
       <h1>How well does your<br>agent get things done?</h1>
       <p><a href="harness-wave19.html">New: four harnesses × four models · wave 19 results →</a></p>
-      <p><a href="brain-haiku-experiment.html">Brain + Haiku 5.5: timeout experiment, final-attempt tokens &amp; limitations →</a></p>
+      <p><a href="brain-haiku-experiment.html">Brain + Claude Haiku 5.5: timeout experiment, final-attempt tokens &amp; limitations →</a></p>
       <p class="lead">Files, code, tools and memory. Real tasks, mechanically verified.</p>
     </section>
-<section id="haiku-v0191" aria-label="Claude Haiku 5.5 current protocol"><h2>Claude Haiku 5.5 · v0.19.1 · full 471-task runs</h2><div class="table-wrap"><table class="leaderboard-table"><thead><tr><th>Harness</th><th>Model</th><th>Passed</th><th>Score</th><th>Steps</th><th>Tokens</th></tr></thead><tbody><tr><td>Codex CLI 0.160.1</td><td>Claude Haiku 5.5 (default)</td><td>442/471</td><td>93.8%</td><td>3,865</td><td>266,166,053</td></tr><tr><td>Claude Code 2.1.300</td><td>Claude Haiku 5.5 (default)</td><td>437/471</td><td>92.8%</td><td>5,663</td><td>221,979,563</td></tr><tr><td>mini-SWE-agent 2.4.6</td><td>Claude Haiku 5.5 (default)</td><td>435/471</td><td>92.4%</td><td>4,163</td><td>422,797,092</td></tr></tbody></table></div><p>Fresh native harness measurements. Default reasoning and temperature; 3600-second guard, 7200 seconds for long tasks. Steps count upstream tool calls. Tokens count only the final retained attempt of every task, passed or failed; superseded transport attempts are excluded. Historical v0.19.0 results below keep their original conditions. <a href="haiku-three-harnesses-v0191.html">Protocol, Light/Medium splits and token coverage →</a></p></section>
+
     <section aria-label="Benchmark results">
       <div class="suite-switch" role="group" aria-label="Benchmark suite">
         <button type="button" data-suite="light" aria-pressed="true"><strong>Light</strong><span>391 tasks · everyday workflows</span></button>
@@ -37,7 +37,7 @@
       </div>
       <p id="empty" role="status" hidden></p>
       <button type="button" class="more" id="show-more" hidden>Show all results</button>
-      <p class="fine-print">Scores compare complete agent configurations; tools and budgets vary. Brain + Haiku is an experimental selected-retry result with a changed deadline and unresolved transport errors; see its protocol label. mean@N is the mean of N runs, not pass@N. Rescored historical runs use v0.18.0 task definitions. <a href="archive.html#current">Protocols &amp; original results →</a></p>
+      <p class="fine-print">Scores compare complete agent configurations; tools and budgets vary. Brain + Claude Haiku is an experimental selected-retry result with a changed deadline and unresolved transport errors; see its protocol label. mean@N is the mean of N runs, not pass@N. Rescored historical runs use v0.18.0 task definitions. <a href="archive.html#current">Protocols &amp; original results →</a></p>
       <details class="usage-guide"><summary>About steps and tokens</summary><p>Totals cover the tasks in each table, including failed tasks. Steps are tool calls where native traces are available; raw counters follow the harness's own accounting. Tokens are recorded input + output usage, including reported cache usage; reasoning is not added twice. These are token counts, not a monetary bill.</p><p><strong>Partial</strong> means some usage is missing; <strong>Raw</strong> means the counters have not been audited and may include accounting errors. Task counts show where metrics were recorded, not whether every request was captured. A dash means no usable total for this subset. Hover or focus a value for its exact total and notes. Historical full-run totals are not reused for smaller subsets.</p></details>
       <noscript><p>Enable JavaScript to compare suites, or <a href="archive.html#current">read the static measurement archive</a>.</p></noscript>
       <section id="wave19-section" class="wave19-section" aria-labelledby="wave19-title" hidden>

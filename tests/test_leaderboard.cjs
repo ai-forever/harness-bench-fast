@@ -4,15 +4,15 @@ const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboar
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 89);
+assert.equal(light.length, 92);
 assert.equal(medium.length, 79);
-assert.equal(selectResults(data, "medium", "current", "").length, 15);
+assert.equal(selectResults(data, "medium", "current", "").length, 18);
 for (const rows of [light, medium]) {
   for (let i = 1; i < rows.length; i++) assert.ok(rows[i - 1].result.passed >= rows[i].result.passed);
 }
 assert.equal(light.find(r => r.id === "secret-700-sft").result.passed, 368);
 assert.equal(medium.find(r => r.id === "secret-700-sft").result.passed, 9);
-assert.equal(selectResults(data, "light", "historical", "  CODEX ").length, 2);
+assert.equal(selectResults(data, "light", "historical", "  CODEX ").length, 3);
 assert.equal(selectResults(data, "light", "historical", "no-such-model").length, 0);
 assert.equal(formatPassed(390), "390");
 assert.equal(formatPassed(389 + 1 / 3), "389.3");
@@ -23,7 +23,7 @@ console.log("Leaderboard scope, ranking, missing-data and search checks passed."
 for (const row of data.rows.filter(r => r.measurement_type === "full_run")) { assert.equal(row.light.passed + row.medium.passed, row.source_passed); assert.equal(row.medium.total, 80); }
 
 const wave19 = selectResults(data, "medium", "wave19", "");
-assert.equal(wave19.length, 28);
+assert.equal(wave19.length, 31);
 const ua = selectResults(data, "light", "current", "Universal Agent").filter(r => r.id === "universal-agent-haiku");
 assert.equal(ua.length, 1);
 assert.equal(ua[0].result.passed, 384);
@@ -46,8 +46,8 @@ assert.equal(selectResults(data, "light", "current", "Sonnet 5.5 (OpenRouter) (m
 assert.equal(selectResults(data, "medium", "current", "Sonnet 5.5 (OpenRouter) (medium)")[0].result.passed, 53);
 assert.equal(wave19.find(r => r.id === "sonnet55-pi-medium").result.passed, 32);
 assert.equal(wave19.find(r => r.id === "w19-claude-haiku").result.passed, 26);
-assert.equal(selectResults(data, "medium", "current", "Claude Code").length, 0);
-assert.equal(selectResults(data, "medium", "wave19", "Claude Code").length, 4);
+assert.equal(selectResults(data, "medium", "current", "Claude Code").length, 1);
+assert.equal(selectResults(data, "medium", "wave19", "Claude Code").length, 5);
 assert.equal(selectResults(data, "medium", "current", "OpenClaw")[0].result.passed, 41);
 for (const row of data.rows.filter(r => r.measurement_type === "historical_plus_wave19")) {
   assert.equal(row.medium.passed, row.medium_historical.passed + row.wave19.passed);
@@ -102,8 +102,8 @@ assert.equal(formatUsage({ tasks: 40, steps: { value: 0, covered_tasks: 40, stat
 assert.equal(formatUsage({ tasks: 80, steps: { value: 17, covered_tasks: 3, status: "raw" } }, "steps").note, "Raw · 3/80 tasks");
 assert.equal(selectResults(data, "medium", "current", "").find(r => r.id === "run-19").usage.steps.value, null);
 assert.equal(selectResults(data, "light", "current", "Codex").find(r => r.id !== "secret-sft-codex-v019").usage, null);
-assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 3);
-assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 3);
+assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 2);
+assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 2);
 console.log("Subset usage, exact totals, incomplete counters and real zero checks passed.");
 
 const codex = selectResults(data, "light", "current", "secret sft Codex")[0];
@@ -125,7 +125,7 @@ assert.equal(selectResults(data, "medium", "current", "Brain").length, 1);
 const haikuRuns = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/haiku-three-harnesses-v0191.json")));
 assert.equal(haikuRuns.task_set_version, "0.19.1");
 assert.equal(haikuRuns.rows.length, 3);
-assert.ok(landing.includes('id="haiku-v0191"'));
+assert.ok(!landing.includes('id="haiku-v0191"'));
 for (const row of haikuRuns.rows) {
   assert.equal(row.tasks.length, 471);
   assert.equal(new Set(row.tasks.map(t => t.task_id)).size, 471);
@@ -134,3 +134,15 @@ for (const row of haikuRuns.rows) {
   assert.ok(row.model.startsWith("Claude Haiku 5.5"));
 }
 assert.ok(data.rows.filter(r => /Haiku 5\.5/.test(r.model)).every(r => /Claude Haiku 5\.5/.test(r.model)));
+
+assert.equal(data.task_set_version, "0.19");
+for (const id of ["haiku-mini-v019", "haiku-codex-v019", "haiku-claude-v019"]) {
+  const row = data.rows.find(row => row.id === id);
+  assert.equal(row.source_version, "0.19.1");
+  assert.equal(row.display_version, "0.19");
+  assert.equal(selectResults(data, "light", "current", "").filter(row => row.id === id).length, 1);
+  assert.equal(selectResults(data, "medium", "current", "").filter(row => row.id === id).length, 1);
+  assert.equal(row.telemetry.light.tokens.value + row.telemetry.medium.tokens.value,
+    haikuRuns.rows.find(source => source.harness === row.harness).tokens);
+  assert.equal(row.telemetry.medium.tokens.status, "complete");
+}

@@ -1,9 +1,9 @@
 {
-  "task_set_version": "0.19.0",
+  "task_set_version": "0.19",
   "light_tasks": 391,
   "medium_tasks": 80,
   "provenance": {
-    "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
+    "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs plus three complete Claude Haiku harness runs; v0.19 protocol revisions grouped for display, exact source_version retained per row; composites explicitly labeled; secret sft deepagents accepted by the operator",
     "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
     "wave_results_sha256": "6dd03c599564c086bb8c0bf3f9c4a90c3edf27d9b4b7bb746bc5004e59f25683",
     "secret_700b_sha256": "2f016f31bee69ce7f27be2935631f7737d8d30acabb3c149b38a6e03baa1785d",
@@ -15,6 +15,7 @@
     "giga35_ultra_reasoning_sha256": "611fd53c116e51cbe2b772b909034cf7db6ccb4547adede3e145a186e1df5fc9",
     "archive_sha256": "448eb41a006bca486a21328f7e1799d1c1b7a05e52ee91a11f40fe9de0a8711f",
     "brain_haiku_experiment_sha256": "d2eeb500c752c07a71f15f58474334298e590370edd42f0e39f2511130db8cca",
+    "haiku_three_harnesses_sha256": "2a9ab223dbe6038d58715c8193a94b414d981b6d3f1388f253a4dcc34dbf26c2",
     "telemetry_sha256": "2058f482d9cc941a8a453c7b9003ee4b3d6525643ff61037001e58dc1b6d8773",
     "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability."
   },
@@ -3677,6 +3678,312 @@
           },
           "notes": [
             "Only final retained attempt per task, passed or failed. Superseded attempts excluded. Token counter presence is not an audit of failed-request usage completeness."
+          ]
+        }
+      }
+    },
+    {
+      "id": "haiku-mini-v019",
+      "harness": "mini-SWE-agent 2.4.6",
+      "model": "Claude Haiku 5.5 (OpenRouter) (default)",
+      "runs": 1,
+      "measurement_type": "full_run",
+      "measurement_valid": true,
+      "reasoning_effort": "default",
+      "source_version": "0.19.1",
+      "display_version": "0.19",
+      "source_passed": 435,
+      "source_sha256": "eacc0a8c2947a46d942d644a73bc0ff3d3bbc03ccd3d509102615e59bad5f2a1",
+      "measurement_date": "2026-10-21",
+      "medium_historical": null,
+      "details_url": "haiku-three-harnesses-v0191.html",
+      "light": {
+        "passed": 383,
+        "total": 391
+      },
+      "medium": {
+        "passed": 52,
+        "total": 80
+      },
+      "wave19": {
+        "passed": 34,
+        "total": 40
+      },
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "sources_sha256": [
+            "eacc0a8c2947a46d942d644a73bc0ff3d3bbc03ccd3d509102615e59bad5f2a1"
+          ],
+          "steps": {
+            "value": 1867,
+            "covered_tasks": 391,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 6553166,
+            "input_tokens": 5949339,
+            "output_tokens": 603827,
+            "covered_tasks": 391,
+            "status": "complete"
+          },
+          "notes": [
+            "final retained attempt per task, passed or failed; superseded transport attempts excluded",
+            "Upstream response usage verified per task; steps count tool calls."
+          ]
+        },
+        "medium": {
+          "tasks": 80,
+          "observed_tasks": 80,
+          "sources_sha256": [
+            "eacc0a8c2947a46d942d644a73bc0ff3d3bbc03ccd3d509102615e59bad5f2a1"
+          ],
+          "steps": {
+            "value": 2296,
+            "covered_tasks": 80,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 416243926,
+            "input_tokens": 413302740,
+            "output_tokens": 2941186,
+            "covered_tasks": 80,
+            "status": "complete"
+          },
+          "notes": [
+            "final retained attempt per task, passed or failed; superseded transport attempts excluded",
+            "Upstream response usage verified per task; steps count tool calls."
+          ]
+        },
+        "wave19": {
+          "tasks": 40,
+          "observed_tasks": 40,
+          "sources_sha256": [
+            "eacc0a8c2947a46d942d644a73bc0ff3d3bbc03ccd3d509102615e59bad5f2a1"
+          ],
+          "steps": {
+            "value": 578,
+            "covered_tasks": 40,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 18077643,
+            "input_tokens": 17417764,
+            "output_tokens": 659879,
+            "covered_tasks": 40,
+            "status": "complete"
+          },
+          "notes": [
+            "final retained attempt per task, passed or failed; superseded transport attempts excluded",
+            "Upstream response usage verified per task; steps count tool calls."
+          ]
+        }
+      }
+    },
+    {
+      "id": "haiku-codex-v019",
+      "harness": "Codex CLI 0.160.1",
+      "model": "Claude Haiku 5.5 (OpenRouter) (default)",
+      "runs": 1,
+      "measurement_type": "full_run",
+      "measurement_valid": true,
+      "reasoning_effort": "default",
+      "source_version": "0.19.1",
+      "display_version": "0.19",
+      "source_passed": 442,
+      "source_sha256": "d022be400fd3462def1777af4a6dbc1ae18f58a833ba72c1cae29d15b55a9f5b",
+      "measurement_date": "2026-10-21",
+      "medium_historical": null,
+      "details_url": "haiku-three-harnesses-v0191.html",
+      "light": {
+        "passed": 387,
+        "total": 391
+      },
+      "medium": {
+        "passed": 55,
+        "total": 80
+      },
+      "wave19": {
+        "passed": 38,
+        "total": 40
+      },
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "sources_sha256": [
+            "d022be400fd3462def1777af4a6dbc1ae18f58a833ba72c1cae29d15b55a9f5b"
+          ],
+          "steps": {
+            "value": 1158,
+            "covered_tasks": 391,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 16194487,
+            "input_tokens": 15765515,
+            "output_tokens": 428972,
+            "covered_tasks": 391,
+            "status": "complete"
+          },
+          "notes": [
+            "final retained attempt per task, passed or failed; superseded transport attempts excluded",
+            "Upstream response usage verified per task; steps count tool calls."
+          ]
+        },
+        "medium": {
+          "tasks": 80,
+          "observed_tasks": 80,
+          "sources_sha256": [
+            "d022be400fd3462def1777af4a6dbc1ae18f58a833ba72c1cae29d15b55a9f5b"
+          ],
+          "steps": {
+            "value": 2707,
+            "covered_tasks": 80,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 249971566,
+            "input_tokens": 241979781,
+            "output_tokens": 7991785,
+            "covered_tasks": 80,
+            "status": "complete"
+          },
+          "notes": [
+            "final retained attempt per task, passed or failed; superseded transport attempts excluded",
+            "Upstream response usage verified per task; steps count tool calls."
+          ]
+        },
+        "wave19": {
+          "tasks": 40,
+          "observed_tasks": 40,
+          "sources_sha256": [
+            "d022be400fd3462def1777af4a6dbc1ae18f58a833ba72c1cae29d15b55a9f5b"
+          ],
+          "steps": {
+            "value": 519,
+            "covered_tasks": 40,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 14107372,
+            "input_tokens": 13514044,
+            "output_tokens": 593328,
+            "covered_tasks": 40,
+            "status": "complete"
+          },
+          "notes": [
+            "final retained attempt per task, passed or failed; superseded transport attempts excluded",
+            "Upstream response usage verified per task; steps count tool calls."
+          ]
+        }
+      }
+    },
+    {
+      "id": "haiku-claude-v019",
+      "harness": "Claude Code 2.1.300",
+      "model": "Claude Haiku 5.5 (OpenRouter) (default)",
+      "runs": 1,
+      "measurement_type": "full_run",
+      "measurement_valid": true,
+      "reasoning_effort": "default",
+      "source_version": "0.19.1",
+      "display_version": "0.19",
+      "source_passed": 437,
+      "source_sha256": "fb21d4a0d90970ba18534348270bbada5f7628fa1ada5a95750756ca4c29b599",
+      "measurement_date": "2026-10-21",
+      "medium_historical": null,
+      "details_url": "haiku-three-harnesses-v0191.html",
+      "light": {
+        "passed": 377,
+        "total": 391
+      },
+      "medium": {
+        "passed": 60,
+        "total": 80
+      },
+      "wave19": {
+        "passed": 38,
+        "total": 40
+      },
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "sources_sha256": [
+            "fb21d4a0d90970ba18534348270bbada5f7628fa1ada5a95750756ca4c29b599"
+          ],
+          "steps": {
+            "value": 1301,
+            "covered_tasks": 391,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 29044277,
+            "input_tokens": 28552977,
+            "output_tokens": 491300,
+            "covered_tasks": 391,
+            "status": "complete"
+          },
+          "notes": [
+            "final retained attempt per task, passed or failed; superseded transport attempts excluded",
+            "Upstream response usage verified per task; steps count tool calls."
+          ]
+        },
+        "medium": {
+          "tasks": 80,
+          "observed_tasks": 80,
+          "sources_sha256": [
+            "fb21d4a0d90970ba18534348270bbada5f7628fa1ada5a95750756ca4c29b599"
+          ],
+          "steps": {
+            "value": 4362,
+            "covered_tasks": 80,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 192935286,
+            "input_tokens": 180906889,
+            "output_tokens": 12028397,
+            "covered_tasks": 80,
+            "status": "complete"
+          },
+          "notes": [
+            "final retained attempt per task, passed or failed; superseded transport attempts excluded",
+            "Upstream response usage verified per task; steps count tool calls."
+          ]
+        },
+        "wave19": {
+          "tasks": 40,
+          "observed_tasks": 40,
+          "sources_sha256": [
+            "fb21d4a0d90970ba18534348270bbada5f7628fa1ada5a95750756ca4c29b599"
+          ],
+          "steps": {
+            "value": 520,
+            "covered_tasks": 40,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 18807813,
+            "input_tokens": 18101081,
+            "output_tokens": 706732,
+            "covered_tasks": 40,
+            "status": "complete"
+          },
+          "notes": [
+            "final retained attempt per task, passed or failed; superseded transport attempts excluded",
+            "Upstream response usage verified per task; steps count tool calls."
           ]
         }
       }

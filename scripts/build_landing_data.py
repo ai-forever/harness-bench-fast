@@ -369,14 +369,52 @@ def build():
         "source_passed": brain["passed"], "measurement_date": brain["measurement_date"],
         "medium_historical": None, "details_url": "brain-haiku-experiment.html", **subsets,
     })
+    haiku_path = ROOT / "docs/haiku-three-harnesses-v0191.json"
+    haiku = json.loads(haiku_path.read_text(encoding="utf-8"))
+    haiku_usage = {}
+    assert haiku["task_set_version"] == "0.19.1" and len(haiku["rows"]) == 3
+    for run in haiku["rows"]:
+        tasks = run["tasks"]
+        assert len(tasks) == len({task["task_id"] for task in tasks}) == 471
+        assert sum(task["passed"] for task in tasks) == run["passed"]
+        assert sum(task["tokens"] for task in tasks) == run["tokens"]
+        assert sum(task["steps"] for task in tasks) == run["steps"]
+        row_id = "haiku-" + ("mini" if run["harness"].startswith("mini") else "codex" if run["harness"].startswith("Codex") else "claude") + "-v019"
+        subsets, scopes = {}, {}
+        for scope, start, end in (("light", 1, 391), ("medium", 392, 471), ("wave19", 432, 471)):
+            selected = [task for task in tasks if start <= int(task["task_id"].split("_")[1]) <= end]
+            assert len(selected) == end - start + 1
+            subsets[scope] = {"passed": sum(task["passed"] for task in selected), "total": len(selected)}
+            scopes[scope] = {
+                "tasks": len(selected), "observed_tasks": len(selected),
+                "sources_sha256": [run["source_sha256"]],
+                "steps": {"value": sum(task["steps"] for task in selected),
+                          "covered_tasks": len(selected), "status": "complete", "unit": "tool_calls"},
+                "tokens": {"value": sum(task["tokens"] for task in selected),
+                           "input_tokens": sum(task["input_tokens"] for task in selected),
+                           "output_tokens": sum(task["output_tokens"] for task in selected),
+                           "covered_tasks": len(selected), "status": "complete"},
+                "notes": [run["accounting"], "Upstream response usage verified per task; steps count tool calls."],
+            }
+        haiku_usage[row_id] = scopes
+        rows.append({
+            "id": row_id, "harness": run["harness"],
+            "model": "Claude Haiku 5.5 (OpenRouter) (default)", "runs": 1,
+            "measurement_type": "full_run", "measurement_valid": True,
+            "reasoning_effort": "default", "source_version": run["task_set_version"],
+            "display_version": "0.19", "source_passed": run["passed"],
+            "source_sha256": run["source_sha256"], "measurement_date": run["date"],
+            "medium_historical": None, "details_url": "haiku-three-harnesses-v0191.html", **subsets,
+        })
     telemetry_path = ROOT / "docs/leaderboard-telemetry.json"
     telemetry = json.loads(telemetry_path.read_text(encoding="utf-8"))
     telemetry["rows"]["brain-haiku-experiment"] = usage
+    telemetry["rows"].update(haiku_usage)
     attach_telemetry(rows, telemetry)
     return {
-        "task_set_version": "0.19.0", "light_tasks": 391, "medium_tasks": 80,
+        "task_set_version": "0.19", "light_tasks": 391, "medium_tasks": 80,
         "provenance": {
-            "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs; composites explicitly labeled; secret sft deepagents accepted by the operator",
+            "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs plus three complete Claude Haiku harness runs; v0.19 protocol revisions grouped for display, exact source_version retained per row; composites explicitly labeled; secret sft deepagents accepted by the operator",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
             # Hash canonical UTF-8/LF text, independent of Git checkout CRLF.
             "wave_results_sha256": hashlib.sha256(waves.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
@@ -389,6 +427,7 @@ def build():
             "giga35_ultra_reasoning_sha256": hashlib.sha256(ultra_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "archive_sha256": hashlib.sha256(archive.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "brain_haiku_experiment_sha256": hashlib.sha256(brain_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
+            "haiku_three_harnesses_sha256": hashlib.sha256(haiku_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "telemetry_sha256": hashlib.sha256(telemetry_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability.",
         },
