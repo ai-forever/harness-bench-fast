@@ -102,8 +102,8 @@ assert.equal(formatUsage({ tasks: 40, steps: { value: 0, covered_tasks: 40, stat
 assert.equal(formatUsage({ tasks: 80, steps: { value: 17, covered_tasks: 3, status: "raw" } }, "steps").note, "Raw · 3/80 tasks");
 assert.equal(selectResults(data, "medium", "current", "").find(r => r.id === "run-19").usage.steps.value, null);
 assert.equal(selectResults(data, "light", "current", "Codex").find(r => r.id !== "secret-sft-codex-v019").usage, null);
-assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 2);
-assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 2);
+assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 3);
+assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 3);
 console.log("Subset usage, exact totals, incomplete counters and real zero checks passed.");
 
 const codex = selectResults(data, "light", "current", "secret sft Codex")[0];
@@ -121,3 +121,16 @@ assert.match(brain.medium.note, /changed deadline.*transport errors unresolved/)
 assert.equal(brain.telemetry.wave19.tasks, 40);
 assert.equal(brain.telemetry.wave19.tokens.covered_tasks, 40);
 assert.equal(selectResults(data, "medium", "current", "Brain").length, 1);
+
+const haikuRuns = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/haiku-three-harnesses-v0191.json")));
+assert.equal(haikuRuns.task_set_version, "0.19.1");
+assert.equal(haikuRuns.rows.length, 3);
+assert.ok(landing.includes('id="haiku-v0191"'));
+for (const row of haikuRuns.rows) {
+  assert.equal(row.tasks.length, 471);
+  assert.equal(new Set(row.tasks.map(t => t.task_id)).size, 471);
+  assert.equal(row.tasks.reduce((n, t) => n + t.tokens, 0), row.tokens);
+  assert.equal(row.tasks.filter(t => t.passed).length, row.passed);
+  assert.ok(row.model.startsWith("Claude Haiku 5.5"));
+}
+assert.ok(data.rows.filter(r => /Haiku 5\.5/.test(r.model)).every(r => /Claude Haiku 5\.5/.test(r.model)));

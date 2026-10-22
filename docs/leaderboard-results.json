@@ -3577,7 +3577,7 @@
     {
       "id": "brain-haiku-experiment",
       "harness": "Brain (experimental)",
-      "model": "Haiku 5.5 (OpenRouter) (default)",
+      "model": "Claude Haiku 5.5 (OpenRouter) (default)",
       "runs": 1,
       "measurement_type": "selected_retries_changed_protocol",
       "measurement_valid": false,

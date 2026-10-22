@@ -362,7 +362,7 @@ def build():
     assert subsets["light"]["passed"] + subsets["medium"]["passed"] == brain["passed"]
     rows.append({
         "id": "brain-haiku-experiment", "harness": "Brain (experimental)",
-        "model": "Haiku 5.5 (OpenRouter) (default)", "runs": 1,
+        "model": "Claude Haiku 5.5 (OpenRouter) (default)", "runs": 1,
         "measurement_type": "selected_retries_changed_protocol", "measurement_valid": False,
         "validation_basis": "operator_requested_experimental_table_inclusion",
         "reasoning_effort": "default", "source_version": "0.19.0",
