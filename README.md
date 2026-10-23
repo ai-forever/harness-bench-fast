@@ -2,7 +2,7 @@
 
 [Live leaderboard and benchmark results](https://ai-forever.github.io/harness-bench-fast/)
 
-**Wave 21 / task-set v0.21.2: ten selected coupled workflows.** Use
+**Medium continuation · wave 21 / task-set v0.21.2: ten selected coupled workflows.** Use
 `--suite composite-hard` for IDs **512, 518, 520, 522, 523, 524, 525, 526, 527, 530**.
 Each task combines two general workflows with documented changes to current
 state, versions and obligations; both goals must be satisfied in one trajectory.
@@ -27,7 +27,7 @@ are 531 and 140. The published historical tables below keep their original
 wave 1–20 definitions, denominators, protocols and measurements. Missing new
 coverage is never counted as failure. No full 531-task measurement is published.
 
-The common leaderboard adds **Hard / Wave 21** (the selected ten tasks), with
+The common leaderboard adds **wave 21 within Medium** (the selected ten tasks), with
 [retained calibration results and historical wave 20](docs/wave21-measurements.html).
 Different budgets remain separate rows. The existing two views remain available: **harness_bench_fast light** (tasks
 1–391) and **harness_bench_fast medium** (tasks 392–471, 80 tasks).

@@ -3,10 +3,10 @@
 // Every view has one explicit denominator. Missing scores never fall back to a
 // full-run score, and unmeasured waves are never treated as failures.
 function selectResults(data, suite, coverage, search) {
-  const key = suite === "hard" ? "wave21" : suite === "light" ? "light" : coverage === "current" ? "medium" : coverage === "wave19" ? "wave19" : "medium_historical";
+  const key = suite === "medium" && coverage === "wave21" ? "wave21" : suite === "light" ? "light" : coverage === "current" ? "medium" : coverage === "wave19" ? "wave19" : "medium_historical";
   const query = search.trim().toLocaleLowerCase();
   return data.rows.filter(row => row[key] !== null && row[key] !== undefined)
-    .filter(row => suite !== "hard" || row[key].total === 10)
+    .filter(row => key !== "wave21" || row[key].total === 10)
     .filter(row => (row.model + " " + row.harness).toLocaleLowerCase().includes(query))
     .map(row => ({ ...row, result: row[key], usage: row.telemetry?.[key] || null }))
     .sort((a, b) => b.result.passed / b.result.total - a.result.passed / a.result.total ||
@@ -44,10 +44,15 @@ if (typeof document !== "undefined") {
     const more = document.getElementById("show-more");
     const empty = document.getElementById("empty");
     const buttons = [...document.querySelectorAll("[data-suite]")];
-    let suite = location.hash === "#hard" ? "hard" : location.hash === "#medium" ? "medium" : "light";
+    function selectedSuite() {
+      // Keep the previously published wave link working under Medium.
+      if (location.hash === "#hard") history.replaceState(null, "", "#medium-wave21");
+      return ["#medium", "#medium-wave21"].includes(location.hash) ? "medium" : "light";
+    }
+    let suite = selectedSuite();
     const rowAnchors = { "#secret-sft-codex": "secret-sft-codex-v019", "#secret-700b": "secret-700b-v019", "#secret-sft-mini": "secret-sft-mini-v019", "#universal-agent-haiku": "universal-agent-haiku", "#universal-agent-deepseek": "universal-agent-deepseek", "#giga35-ultra-reasoning": "giga35-ultra-reasoning-v019" };
     // Preserve incoming links to models and protocol notes from the old landing.
-    if (location.hash && !["#light", "#medium", "#hard", ...Object.keys(rowAnchors)].includes(location.hash)) {
+    if (location.hash && !["#light", "#medium", "#medium-wave21", ...Object.keys(rowAnchors)].includes(location.hash)) {
       location.replace("archive.html" + location.hash);
       return;
     }
@@ -124,13 +129,10 @@ if (typeof document !== "undefined") {
     }
     function render() {
       buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.suite === suite)));
-      document.getElementById("suite-title").textContent = suite === "hard" ? "Wave 21 · Hard" : "harness_bench_fast " + suite;
-      document.getElementById("wave21-note").hidden = suite !== "hard";
+      document.getElementById("suite-title").textContent = "harness_bench_fast " + suite;
       document.getElementById("coverage-note").textContent = suite === "light"
         ? "Tasks 1–391 · complete Light coverage · v0.19 measurements and historical v0.18.0 rescores."
-        : suite === "hard"
-          ? "10 selected composite tasks · v0.21.2 · existing runs rescored on the same subset. Budgets are labeled per configuration."
-          : "Tasks 392–471 · all 80 Medium tasks · historical + wave 19 composites are labeled. New-task results follow below.";
+        : "Historical Medium · tasks 392–471 · 80 tasks. Wave 21 continues Medium with ten selected coupled workflows below; each wave keeps its own coverage.";
       const rows = selectResults(data, suite, "current", search.value);
       const ranking = selectResults(data, suite, "current", "");
       renderTable(body, expanded ? rows : rows.slice(0, 12), ranking, "current");
@@ -145,16 +147,25 @@ if (typeof document !== "undefined") {
         document.getElementById("wave19-count").textContent = waveRows.length + (waveRows.length === 1 ? " configuration" : " configurations");
         document.getElementById("wave19-empty").hidden = waveRows.length > 0;
       }
+      const continuation = document.getElementById("medium-wave21");
+      continuation.hidden = suite !== "medium";
+      const continuationRows = suite === "medium" ? selectResults(data, "medium", "wave21", search.value) : [];
+      if (suite === "medium") {
+        renderTable(document.getElementById("wave21-results"), continuationRows, selectResults(data, "medium", "wave21", ""), "wave21");
+        document.getElementById("wave21-count").textContent = continuationRows.length + (continuationRows.length === 1 ? " configuration" : " configurations");
+        document.getElementById("wave21-empty").hidden = continuationRows.length > 0;
+      }
       empty.hidden = rows.length > 0;
-      empty.textContent = waveRows.length > 0
+      empty.textContent = waveRows.length > 0 || continuationRows.length > 0
         ? "No complete 80-task results match this search. New-task results are listed below."
         : "No results match your search.";
     }
     try {
-      const response = await fetch("leaderboard-results.json");
+      const response = await fetch("leaderboard-results.json", { cache: "no-cache" });
       if (!response.ok) throw new Error("HTTP " + response.status);
       data = await response.json();
       render();
+      if (location.hash === "#medium-wave21") document.getElementById("medium-wave21").scrollIntoView({ block: "start" });
       if (Object.hasOwn(rowAnchors, location.hash)) {
         document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: "center" });
       }
@@ -165,10 +176,11 @@ if (typeof document !== "undefined") {
         render();
       }));
       window.addEventListener("hashchange", () => {
-        suite = location.hash === "#hard" ? "hard" : location.hash === "#medium" ? "medium" : "light";
+        suite = selectedSuite();
         expanded = Object.hasOwn(rowAnchors, location.hash);
         if (expanded) search.value = "";
         render();
+        if (location.hash === "#medium-wave21") document.getElementById("medium-wave21").scrollIntoView({ block: "start" });
         if (expanded) document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: "center" });
       });
       search.addEventListener("input", () => { expanded = false; render(); });
