@@ -29,10 +29,11 @@ def split(payload):
 def test_named_suites_are_disjoint_complete_and_available_on_runners(command):
     light = _task_ids(build_parser().parse_args([command, "--suite", "light"]))
     medium = _task_ids(build_parser().parse_args([command, "--suite", "medium"]))
-    assert len(light) == 391 and len(medium) == 140
+    assert len(light) == 391 and len(medium) == 90
     assert not set(light) & set(medium)
-    assert light + medium == [t.id for t in ALL_TASKS]
-    assert [task_number(x) for x in medium] == list(range(392, 532))
+    assert len(set(light + medium)) == 481
+    assert light + medium == [t.id for t in ALL_TASKS if t in SUITES["light"] or t in SUITES["medium"]]
+    assert [task_number(x) for x in medium] == [*range(392, 472), 512, 518, 520, 522, 523, 524, 525, 526, 527, 530]
 
 
 def test_split_recomputes_counts_telemetry_and_boundaries_without_mutating_source():
@@ -42,9 +43,9 @@ def test_split_recomputes_counts_telemetry_and_boundaries_without_mutating_sourc
     assert payload == original
     light, medium = reports["light"], reports["medium"]
     assert (light["passed"], light["total"], light["steps"], light["tokens"]) == (1, 391, 782, 3910)
-    assert (medium["passed"], medium["total"], medium["steps"], medium["tokens"]) == (4, 140, 280, 1400)
+    assert (medium["passed"], medium["total"], medium["steps"], medium["tokens"]) == (4, 90, 180, 900)
     assert all(r["complete"] and r["status"] == "complete" for r in reports.values())
-    assert medium["attempts"][0]["wilson95"][0] < 4 / 140 < medium["attempts"][0]["wilson95"][1]
+    assert medium["attempts"][0]["wilson95"][0] < 4 / 90 < medium["attempts"][0]["wilson95"][1]
 
 
 def test_old431_source_stays_partial_medium_with_original_version():
@@ -54,16 +55,32 @@ def test_old431_source_stays_partial_medium_with_original_version():
     assert reports["light"]["status"] == "complete"
     medium = reports["medium"]
     assert medium["task_set_version"] == "0.18.0"
-    assert (medium["measured_tasks"], medium["expected_tasks"]) == (40, 140)
+    assert (medium["measured_tasks"], medium["expected_tasks"]) == (40, 90)
     assert medium["pass_rate"] is None
     assert medium["attempts"][0]["score"] is None
-    assert len(medium["attempts"][0]["missing_task_ids"]) == 100
+    assert len(medium["attempts"][0]["missing_task_ids"]) == 50
+
+
+
+def test_historical80_is_partial_medium90_and_controls_do_not_fill_gaps():
+    payload = source(SUITES["medium-historical80"])
+    payload["task_set_version"] = "0.19.0"
+    report = split(payload)["medium"]
+    assert report["task_set_version"] == "0.19.0"
+    assert report["suite_definition_version"] == TASK_SET_VERSION
+    assert (report["measured_tasks"], report["expected_tasks"]) == (80, 90)
+    assert report["pass_rate"] is None and report["attempts"][0]["score"] is None
+    assert len(report["attempts"][0]["missing_task_ids"]) == 10
+    payload["tasks"].extend(source(SUITES["general-hard"])["tasks"])
+    report = split(payload)["medium"]
+    assert report["measured_tasks"] == 80 and report["status"] == "partial"
+    assert report["tokens"] == 800
 
 
 def test_infrastructure_invalidity_is_local_to_affected_suite_and_no_score():
     payload = source()
     payload["measurement_valid"] = False
-    payload["tasks"][-1].update(failure_kind="infrastructure", passed=False)
+    next(row for row in payload["tasks"] if row["task_id"] == SUITES["medium"][-1].id).update(failure_kind="infrastructure", passed=False)
     reports = split(payload)
     assert reports["light"]["status"] == "complete"
     assert reports["medium"]["status"] == "infrastructure_invalid"
@@ -72,10 +89,10 @@ def test_infrastructure_invalidity_is_local_to_affected_suite_and_no_score():
 
 def test_timeout_is_normal_failure_and_missing_telemetry_stays_missing():
     payload = source()
-    payload["tasks"][-1].update(failure_kind="timeout", passed=False, agent_steps=None, agent_total_tokens=None)
+    next(row for row in payload["tasks"] if row["task_id"] == SUITES["medium"][-1].id).update(failure_kind="timeout", passed=False, agent_steps=None, agent_total_tokens=None)
     medium = split(payload)["medium"]
     assert medium["status"] == "complete"
-    assert medium["step_metric_coverage"] == medium["token_metric_coverage"] == 139
+    assert medium["step_metric_coverage"] == medium["token_metric_coverage"] == 89
 
 
 def test_unexplained_source_invalidity_cannot_be_cleared_by_split():
@@ -99,7 +116,7 @@ def test_missing_source_validity_is_not_upgraded_to_verified():
 
 def test_pending_retry_counts_as_invalid_in_both_status_and_counter():
     payload = source()
-    payload["tasks"][-1]["rerun_on_continue"] = True
+    next(row for row in payload["tasks"] if row["task_id"] == SUITES["medium"][-1].id)["rerun_on_continue"] = True
     medium = split(payload)["medium"]
     assert medium["status"] == "infrastructure_invalid"
     assert medium["infrastructure_failures"] == 1

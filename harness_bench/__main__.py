@@ -866,7 +866,8 @@ def build_parser() -> argparse.ArgumentParser:
             help=(
                 "Task suite when no --task is given: 'default' is the scored "
                 f"task registry (531 tasks, v{TASK_SET_VERSION}, including calibration controls); 'light' selects tasks 1-391, "
-                "'medium' selects tasks 392-531; 'long' is the long-context "
+                "'medium' selects historical tasks 392-471 plus ten selected wave21 tasks (90 total); "
+                "'medium-historical80' selects tasks 392-471; 'long' is the long-context "
                 "wave (tasks 392-411), 'reflect' is the tool-reflection "
                 "wave inside it (tasks 412-431), 'feasibility' is wave 19 (tasks 432-471), "
                 "'general-hard' is wave 20 (tasks 472-511); 'composite-hard' "

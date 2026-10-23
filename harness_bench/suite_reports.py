@@ -11,7 +11,7 @@ import math
 from pathlib import Path
 
 from harness_bench.runner import results_to_payload, task_run_from_payload
-from harness_bench.tasks import ALL_TASKS, get_task
+from harness_bench.tasks import SUITES, get_task
 from harness_bench.versioning import TASK_SET_VERSION, task_number
 
 
@@ -53,7 +53,7 @@ def split_reports(payload: dict, *, source_sha256: str, source_path: str) -> dic
     source_validity_known = type(payload.get("measurement_valid")) is bool
     reports = {}
     for name in ("light", "medium"):
-        expected = {t.id for t in ALL_TASKS if (task_number(t.id) <= 391) == (name == "light")}
+        expected = {t.id for t in SUITES[name]}
         selected = [item for (task_id, _), item in entries.items() if task_id in expected]
         runs = [task_run_from_payload(item) for item in selected]
         summary = results_to_payload(runs, command=payload.get("command"))

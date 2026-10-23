@@ -854,11 +854,18 @@ _TASK_INDEX.update({
     for t in REFLECT_TASKS
 })
 
-# These suites select tasks already included in the default scored set.
+# Public suites are fixed memberships, not open-ended numeric partitions.
+# Keep calibration controls addressable in the unchanged historical registry.
+LIGHT_TASKS = [t for t in ALL_TASKS if 1 <= task_number(t.id) <= 391]
+MEDIUM_HISTORICAL_TASKS = [t for t in ALL_TASKS if 392 <= task_number(t.id) <= 471]
+MEDIUM_TASKS = [*MEDIUM_HISTORICAL_TASKS, *COMPOSITE_HARD_TASKS]
+
+# These suites select tasks already included in the default registry.
 SUITES: dict[str, list[Task]] = {
     "default": ALL_TASKS,
-    "light": [t for t in ALL_TASKS if task_number(t.id) <= 391],
-    "medium": [t for t in ALL_TASKS if task_number(t.id) > 391],
+    "light": LIGHT_TASKS,
+    "medium": MEDIUM_TASKS,
+    "medium-historical80": MEDIUM_HISTORICAL_TASKS,
     "long": LONG_TASKS,
     "reflect": REFLECT_TASKS,
     "feasibility": FEASIBILITY_TASKS,

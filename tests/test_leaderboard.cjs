@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboard.js");
+const { selectResults, selectMedium90, formatComponent, formatPassed, formatUsage } = require("../docs/leaderboard.js");
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
@@ -65,7 +65,7 @@ for (const row of data.rows.filter(r => r.measurement_type === "historical_plus_
 const landing = fs.readFileSync(require("node:path").join(__dirname, "../docs/index.html"), "utf8");
 assert.ok(!landing.includes("medium-coverage"));
 assert.ok(!landing.includes("Task coverage"));
-assert.ok(landing.includes('id="wave19-results"'));
+assert.ok(!landing.includes('id="wave19-results"'));
 
 const allSecret = selectResults(data, "light", "current", "secret sft");
 assert.equal(allSecret.length, 3);
@@ -110,8 +110,8 @@ assert.equal(formatUsage({ tasks: 40, steps: { value: 0, covered_tasks: 40, stat
 assert.equal(formatUsage({ tasks: 80, steps: { value: 17, covered_tasks: 3, status: "raw" } }, "steps").note, "Raw · 3/80 tasks");
 assert.equal(selectResults(data, "medium", "current", "").find(r => r.id === "run-19").usage.steps.value, null);
 assert.equal(selectResults(data, "light", "current", "Codex").find(r => r.id !== "secret-sft-codex-v019").usage, null);
-assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 3);
-assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 3);
+assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 1);
+assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 1);
 console.log("Subset usage, exact totals, incomplete counters and real zero checks passed.");
 
 const codex = selectResults(data, "light", "current", "secret sft Codex")[0];
@@ -169,9 +169,9 @@ assert.equal(wave21FixtureRows[0].usage.steps.value, 100);
 assert.equal(selectResults(wave21Fixture, "medium", "wave21", "no-such-model").length, 0);
 assert.ok(!landing.includes('data-suite="hard"'));
 assert.equal((landing.match(/data-suite=/g) || []).length, 2);
-assert.ok(landing.includes('id="medium-wave21"'));
+assert.ok(!landing.includes('id="medium-wave21"'));
 assert.ok(!landing.includes('Hard'));
-assert.ok(landing.includes('id="wave21-note"'));
+assert.ok(landing.includes('id="coverage-filter"'));
 assert.ok(landing.includes('wave21-measurements.html'));
 const wave21 = selectResults(data, "medium", "wave21", "");
 assert.equal(wave21.length, 8);
@@ -183,3 +183,23 @@ assert.equal(wave21.find(row => row.id === "wave21-sonnet55_80").result.passed, 
 assert.equal(wave21.find(row => row.id === "wave21-sonnet55_high_160").result.passed, 9);
 assert.equal(wave21.find(row => row.id === "wave21-codex0163_deepseek41_unc_high_160").result.passed, 9);
 assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.passed, 0);
+
+
+// Medium 90 preserves coverage and never manufactures a full denominator.
+const medium90Fixture = { rows: [
+  { id: "high-partial", model: "A", harness: "fixture", status: "partial", previous: { passed: 10, measured: 10, total: 80 }, wave21: null, measured_tasks: 10, overall_passed: null },
+  { id: "wide-partial", model: "B", harness: "fixture", status: "partial", previous: { passed: 1, measured: 80, total: 80 }, wave21: null, measured_tasks: 80, overall_passed: null },
+  { id: "complete", model: "C", harness: "fixture", status: "complete", previous: { passed: 40, measured: 80, total: 80 }, wave21: { passed: 5, measured: 10, total: 10 }, measured_tasks: 90, overall_passed: 45 },
+  { id: "opus-partial", model: "Opus", harness: "fixture", status: "partial", previous: null, wave21: { passed: 1, measured: 1, total: 10 }, measured_tasks: 1, overall_passed: null }
+] };
+assert.deepEqual(selectMedium90(medium90Fixture, "all", "").map(row => row.id), ["complete", "wide-partial", "high-partial", "opus-partial"]);
+assert.deepEqual(selectMedium90(medium90Fixture, "complete", "").map(row => row.id), ["complete"]);
+assert.deepEqual(selectMedium90(medium90Fixture, "wave21", " OPUS ").map(row => row.id), ["opus-partial"]);
+assert.equal(formatComponent(null), "—");
+assert.equal(formatComponent({ passed: 0, measured: 0, total: 80 }), "—");
+assert.equal(formatComponent({ passed: 9, measured: 40, total: 80 }), "9/40");
+assert.equal(formatComponent({ passed: 1, measured: 1, total: 10 }), "1/1");
+assert.ok(landing.includes("90 tasks"));
+assert.equal((landing.match(/<tbody/g) || []).length, 1);
+assert.ok(landing.includes("medium90-results.json"));
+console.log("Medium 90 coverage, partial ordering, scope and complete-only ranking checks passed.");

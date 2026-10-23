@@ -118,7 +118,7 @@ def test_wave20_keeps_its_original_candidate_revision() -> None:
 
 
 def test_composite_selection_preserves_the_calibration_registry() -> None:
-    assert TASK_SET_VERSION == "0.21.2"
+    assert TASK_SET_VERSION == "0.21.3"
     assert CURRENT_TASK_SET_REVISION.total_tasks == 531
     assert CURRENT_TASK_SET_REVISION.added_task_numbers == (0, 0)
     assert revision_for_task_id(ALL_TASKS[511].id).version == "0.21.0"

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Medium 90 · membership and reused measurements</title><link rel="stylesheet" href="landing.css"></head>
+<body><main><p><a href="index.html#medium">← Common leaderboard</a></p>
+<section class="measurement-protocol"><p class="snapshot-label">Task-set v0.21.3 · 23 October 2026</p>
+<h1>Medium · 90 tasks</h1>
+<p>The current Medium suite contains historical tasks 392–471 and selected wave 21 tasks 512, 518, 520, 522, 523, 524, 525, 526, 527 and 530. Light (Lite) is frozen at tasks 1–391. Task IDs and task contracts are unchanged. The full registry retains 531 tasks, including archived controls and calibration tasks.</p>
+<h2>Combining existing measurements</h2>
+<p>The cumulative table reuses public measurements on disjoint subsets within the same published measured configuration. It preserves original source versions, reasoning settings, harness profiles and budgets. Historical 80-task results already include wave 19; those results are counted once. Model display names alone do not establish compatibility.</p>
+<p>Historical DeepAgents GLM and DeepSeek profiles enabled native subagents; wave 21 profiles disabled them. These remain separate. Sonnet with pi-mono and Sonnet with DeepAgents remain separate, as do 80/160 graph-step limits and Codex model-request limits. The configured uncensored DeepSeek endpoint is separate from the official model. See the linked original protocols for each measurement.</p>
+<p>Only a valid configuration covering all 90 tasks receives an overall result, percentage and rank. Missing tasks are unmeasured, never failures. Partial results show their actual denominator and coverage. There are currently 117 configurations: 19 cover 80 tasks, 89 cover 40, eight cover ten and one covers one task. None covers all 90.</p>
+<h2>Provenance and limitations</h2>
+<p>No new model calls were made for this publication. The ten new tasks were selected from prior calibration outcomes; these reused results are retrospective and are not a fresh held-out evaluation. No repeat-variability interval is inferred from this projection.</p>
+<p>Steps and tokens count final retained task attempts only. Native step units differ between harnesses. Missing counters, raw counters and incomplete request accounting remain explicit; token lower bounds are marked. Coverage of task counters does not prove complete request-level accounting.</p>
+<p><a href="medium90-results.json">Cumulative data and source fingerprints</a> · <a href="leaderboard-results.json">Unchanged historical and Light data</a> · <a href="archive.html#current">Historical protocols and results</a> · <a href="wave21-measurements.html">Wave 21 protocols</a></p>
+<p>Run <code>uv run python -m harness_bench list --suite medium</code> for the canonical 90 tasks. <code>medium-historical80</code> preserves the earlier scope. The forty wave 20 controls and ten unselected composite calibration tasks are excluded from Medium 90.</p>
+</section></main></body></html>
