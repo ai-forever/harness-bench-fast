@@ -28,7 +28,8 @@ def test_general_hard_registry_and_parent_coverage():
 def test_general_hard_suite_preserves_the_original_wave():
     assert SUITES["general-hard"] == GENERAL_HARD_TASKS == ALL_TASKS[471:511]
     assert sum("interactive" in task.tags for task in GENERAL_HARD_TASKS) == 40
-    assert all(task in SUITES["medium"] for task in GENERAL_HARD_TASKS)
+    assert all(task not in SUITES["medium"] for task in GENERAL_HARD_TASKS)
+    assert all(task in SUITES["default"] for task in GENERAL_HARD_TASKS)
     assert not {task.id for task in GENERAL_HARD_TASKS} & {
         task.id for task in SUITES["light"]
     }

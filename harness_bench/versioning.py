@@ -473,6 +473,23 @@ TASK_SET_REVISIONS += (
     ),
 )
 
+TASK_SET_REVISIONS += (
+    TaskSetRevision(
+        version="0.21.3",
+        introduced="2026-10-23",
+        total_tasks=531,
+        added_task_numbers=(0, 0),
+        modules=("tasks.py", "suite_reports.py"),
+        notes=(
+            "Define the public Medium suite as historical tasks 392-471 plus "
+            "the ten selected wave21 workflows: 90 tasks. Freeze Light at "
+            "tasks 1-391. Preserve the 531-task registry/default, calibration "
+            "controls and every task contract unchanged. Historical results "
+            "retain source versions and protocols; absent coverage is unmeasured."
+        ),
+    ),
+)
+
 CURRENT_TASK_SET_REVISION = TASK_SET_REVISIONS[-1]
 TASK_SET_VERSION = CURRENT_TASK_SET_REVISION.version
 EXPECTED_TASK_COUNT = CURRENT_TASK_SET_REVISION.total_tasks

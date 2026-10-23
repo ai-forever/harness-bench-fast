@@ -2,7 +2,7 @@
 
 [Live leaderboard and benchmark results](https://ai-forever.github.io/harness-bench-fast/)
 
-**Medium continuation · wave 21 / task-set v0.21.2: ten selected coupled workflows.** Use
+**Medium continuation · wave 21 / task-set v0.21.3: ten selected coupled workflows.** Use
 `--suite composite-hard` for IDs **512, 518, 520, 522, 523, 524, 525, 526, 527, 530**.
 Each task combines two general workflows with documented changes to current
 state, versions and obligations; both goals must be satisfied in one trajectory.
@@ -19,31 +19,43 @@ model run. The Opus follow-up covered only two tasks and is recorded separately.
 See [wave 21 and its contracts](docs/wave21-composite-hard.md) and the
 [selection manifest](docs/wave21-selected10.json).
 
-The registry contains **531 tasks** to preserve original IDs and historical
-controls: `general-hard` retains wave 20 (472–511), and
-`composite-hard-calibration` retains all twenty coupled tasks (512–531).
-`default` and `medium` now include these controls; their registry denominators
-are 531 and 140. The published historical tables below keep their original
-wave 1–20 definitions, denominators, protocols and measurements. Missing new
-coverage is never counted as failure. No full 531-task measurement is published.
+The public leaderboard has two canonical suites:
 
-The common leaderboard adds **wave 21 within Medium** (the selected ten tasks), with
-[retained calibration results and historical wave 20](docs/wave21-measurements.html).
-Different budgets remain separate rows. The existing two views remain available: **harness_bench_fast light** (tasks
-1–391) and **harness_bench_fast medium** (tasks 392–471, 80 tasks).
-Light covers everyday workflows; Medium covers long context, tool reflection
-and feasibility. These are disjoint subsets of the same task set, not new task
-definitions. The 78 published configurations (80 underlying runs) have been
-rescored from the frozen v0.18.0 wave aggregates: Light has full 391-task coverage;
-historical Medium covers only tasks 392–431 (40/80). The remaining 40 tasks are
-unmeasured in those runs and do not count as failures. Four new wave 19 measurements now cover all 80 Medium tasks and all 391 Light tasks; see the [new measurement protocols](docs/wave19-measurements.html). Original
-full-run scores, protocols and budgets remain in the [measurement archive](docs/archive.html).
+- **Light: 391 tasks, IDs 1–391.** This suite is frozen; future waves do not add tasks to it.
+- **Medium: 90 tasks**, historical IDs 392–471 plus selected wave 21 IDs
+  **512, 518, 520, 522, 523, 524, 525, 526, 527, 530**. Use `--suite medium`.
+
+The two suites contain 481 distinct tasks. The registry still contains **531 tasks**
+to preserve original IDs and historical controls: `default` selects that registry,
+`general-hard` retains wave 20 controls (472–511), and
+`composite-hard-calibration` retains all twenty coupled tasks (512–531).
+Those controls are outside the public Medium score. `medium-historical80` selects
+only IDs 392–471 for reproducing the older Medium scope. No task definitions,
+formal resource budgets or historical outcomes changed in task-set v0.21.3.
+
+Existing measurements are rescored offline on the new membership. Historical
+source versions, protocols, reasoning levels and budgets remain visible;
+results are combined only for compatible configurations. **A Medium score is
+withheld until all 90 tasks are measured and valid**; missing coverage is
+unmeasured, never a failure. The selected ten are adaptive calibration reuse,
+not a fresh held-out evaluation. Prior wave 1–20 measurements remain available,
+including complete historical Medium 80 results and partial 40-task results.
+See [Medium 90 membership and combination policy](docs/medium90-protocol.html),
+[retained calibration results and historical wave 20](docs/wave21-measurements.html)
+and the [measurement archive](docs/archive.html). No full 531-task measurement is published.
+
+Light covers everyday workflows. Medium covers long context, tool reflection,
+feasibility and coupled general workflows. The 78 published configurations
+(80 underlying runs) rescored from frozen v0.18.0 wave aggregates have complete
+Light coverage and historical Medium coverage of IDs 392–431. Their remaining
+50 current Medium tasks are unmeasured. Existing complete historical 80-task
+measurements retain that scope, including the [wave 19 measurement protocols](docs/wave19-measurements.html).
 
 The [native harness wave 19 comparison](docs/harness-wave19.html) adds Codex,
 Claude Code, pi-mono and OpenClaw on GigaChat 3.5 PROM, Haiku 5.5, GLM-5.3 and
 DeepSeek V4.1 Flash. All sixteen configurations cover tasks 432–471 only.
-The Medium view shows complete 80-task results first and the matched new
-40-task wave separately below;
+Historical Medium results preserve the complete 80-task scope and the matched
+40-task wave separately;
 missing earlier coverage stays unmeasured. Three full Medium entries combine
 historical and new disjoint subsets and are explicitly labeled. Claude Code +
 Haiku is corrected to 26/40 after three confirmed adapter/API-invalid attempts
@@ -58,7 +70,7 @@ uv run python -m harness_bench run-openrouter --suite medium --model YOUR_MODEL 
 uv run python -m harness_bench.suite_reports results.json --output-dir derived
 ```
 
-Medium includes wave 19 and requires the Linux/bwrap trusted-service path
+Medium includes wave 19 and selected wave 21 tasks and requires the Linux/bwrap trusted-service path
 described below. Offline reports preserve source definitions and task records,
 recompute steps/tokens with coverage, keep attempts separate and withhold scores
 for incomplete or infrastructure-invalid suites. Wilson intervals in complete

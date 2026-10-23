@@ -81,3 +81,12 @@ def test_selected_composite_wave_keeps_sparse_original_numbers() -> None:
     assert _ids("run-openrouter", "--suite", "composite-hard", "--from-task", "523", "--to-task", "527") == [
         ALL_TASKS[n - 1].id for n in selected if 523 <= n <= 527
     ]
+
+
+def test_medium90_keeps_historical80_and_selected_ten_only() -> None:
+    historical = [t.id for t in ALL_TASKS[391:471]]
+    selected = _ids("run", "--suite", "composite-hard")
+    assert _ids("run", "--suite", "medium") == historical + selected
+    assert _ids("run", "--suite", "medium-historical80") == historical
+    assert _ids("run", "--suite", "medium", "--from-task", "472") == selected
+    assert _ids("run", "--suite", "light") == [t.id for t in ALL_TASKS[:391]]

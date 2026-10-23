@@ -8,7 +8,7 @@ When reporting итоговую таблицу benchmark runs for this repositor
 |---|---|---:|---:|---:|---:|
 
 Rules:
-- Include only completed runs with exactly 531 registry tasks (current task-set v0.21.2) unless the user asks for partials.
+- Use the canonical public suites by default: frozen Light (391 tasks, IDs 1–391) and Medium (90 tasks: IDs 392–471 plus selected wave 21). Publish an overall suite score only with complete valid coverage. The unchanged 531-task registry/default includes archival controls and is not the public leaderboard denominator. Current task-set membership version is v0.21.3. Preserve historical 80-task Medium scores under their original scope.
 - Sort rows by `score` descending.
 - Use `passed` as `<passed>/<suite total>` and `score` as a percentage with one decimal place.
 - Do not mix task-set versions in one table. Earlier runs are not comparable: v0.14.0 scored 371 tasks, v0.16.0 corrected defects across the 391 of v0.15.0 without changing their number, v0.17.0 adds the long-context wave as tasks 392–411, v0.18.0 adds the tool-reflection wave as tasks 412–431, and v0.19.0 adds wave 19 (feasibility) as tasks 432–471. If more than one version must appear, split the table and name the task-set version in each.
@@ -70,7 +70,8 @@ Name waves by their task-set version: the v0.19.0 addition is **wave 19**, never
 The current registry contains 531 tasks; `composite-hard` is the selected ten
 original IDs 512, 518, 520, 522, 523, 524, 525, 526, 527, 530.
 `general-hard` retains forty wave20 controls, and `composite-hard-calibration`
-retains all twenty coupled tasks. Historical leaderboard scopes and results
-remain unchanged. Report selected-ten rescoring separately by actual harness,
+retains all twenty coupled tasks. The canonical Medium suite combines historical IDs 392–471 with those ten,
+for 90 tasks. Light is frozen at IDs 1–391. Historical result scopes and scores
+remain available; missing current Medium coverage does not earn a zero. Report selected-ten rescoring separately by actual harness,
 model, effort, protocol and budget; it is adaptive selection, not a fresh run.
 Missing coverage is unmeasured. Never combine graph-step and model-request caps.
