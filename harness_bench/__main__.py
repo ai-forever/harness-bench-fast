@@ -865,10 +865,13 @@ def build_parser() -> argparse.ArgumentParser:
             default="default",
             help=(
                 "Task suite when no --task is given: 'default' is the scored "
-                "task set (471 tasks, v0.19.0); 'light' selects tasks 1-391, "
-                "'medium' selects tasks 392-471; 'long' is the long-context "
+                f"task registry (531 tasks, v{TASK_SET_VERSION}, including calibration controls); 'light' selects tasks 1-391, "
+                "'medium' selects tasks 392-531; 'long' is the long-context "
                 "wave (tasks 392-411), 'reflect' is the tool-reflection "
-                "wave inside it (tasks 412-431), 'feasibility' is wave 19 (tasks 432-471)."
+                "wave inside it (tasks 412-431), 'feasibility' is wave 19 (tasks 432-471), "
+                "'general-hard' is wave 20 (tasks 472-511); 'composite-hard' "
+                "is the selected ten-task wave 21; 'composite-hard-calibration' "
+                "retains all twenty original coupled workflows (tasks 512-531)."
             ),
         )
     for command in ("list", "run", "run-openrouter", "run-pure", "run-cli", "verify-gold", "export-harbor"):

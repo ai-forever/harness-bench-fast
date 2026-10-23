@@ -1,0 +1,1255 @@
+{
+  "schema_version": 1,
+  "wave": 21,
+  "task_set_version": "0.21.2",
+  "suite": "composite-hard",
+  "selection": "Ten tasks selected retrospectively from a twenty-task calibration; historical measurements projected without rerunning. Opus did not participate in the full-configuration selection denominator.",
+  "task_count": 10,
+  "task_numbers": [
+    512,
+    518,
+    520,
+    522,
+    523,
+    524,
+    525,
+    526,
+    527,
+    530
+  ],
+  "tasks": [
+    {
+      "number": 512,
+      "task_id": "task_512_incident_delivery_feedback",
+      "name": "Reconcile incident ownership with a changing delivery policy"
+    },
+    {
+      "number": 518,
+      "task_id": "task_518_restore_backup_feedback",
+      "name": "Publish mutually dependent restoration and backup snapshots"
+    },
+    {
+      "number": 520,
+      "task_id": "task_520_identity_namespace_feedback",
+      "name": "Contact groups and client namespace handoff"
+    },
+    {
+      "number": 522,
+      "task_id": "task_522_latency_runtime_feedback",
+      "name": "Latency reports and layered runtime feedback"
+    },
+    {
+      "number": 523,
+      "task_id": "task_523_template_release_feedback",
+      "name": "Template providers and package artifact feedback"
+    },
+    {
+      "number": 524,
+      "task_id": "task_524_document_merge_feedback",
+      "name": "Versioned document recipes and source-pin merge"
+    },
+    {
+      "number": 525,
+      "task_id": "task_525_delivery_test_feedback",
+      "name": "Delivery compensation and dependency test coverage"
+    },
+    {
+      "number": 526,
+      "task_id": "task_526_migration_database_roundtrip",
+      "name": "Reconcile a migrated snapshot with a changing database view"
+    },
+    {
+      "number": 527,
+      "task_id": "task_527_live_restore_copy_cutover",
+      "name": "Close a live restore and copy-store cutover without stale replicas"
+    },
+    {
+      "number": 530,
+      "task_id": "task_530_inherited_runtime_roundtrip",
+      "name": "Reconcile inherited tenant configuration with live profile deployment"
+    }
+  ],
+  "protocol": {
+    "metric": "scored_run_pass",
+    "aggregation": "single_selected_execution_per_task_then_arithmetic_mean",
+    "api_failures": "Non-censorship API failures excluded and retried; historical Sonnet80 recovered HTTP502 on527 is retained and explicitly labelled.",
+    "censorship": "Terminal FAIL; separately labelled censor.",
+    "domain_acceptance": "Reported separately; does not override scored run failure. Qwen525 remains FAIL.",
+    "native_counters": "Selected execution only; missing counters null, observed subtotals explicitly partial. Output tokens include reasoning when provider reports it; no additional summing of reasoning.",
+    "comparability": "Graph steps and model API requests are different units. Budget80 and160 remain separate configurations; no best-of mixing.",
+    "source_projection": "0.21.0 and0.21.1 calibration outcomes retained with original source digest/version;0.21.2 selects task IDs and preserves160task contracts.",
+    "limitations": "Post-selection reuse of calibration, one selected attempt per task, no independent holdout or repeated-run variance. Opus1/10 incomplete: no full-wave score."
+  },
+  "configurations": [
+    {
+      "configuration_id": "sonnet55_80",
+      "model": "Sonnet 5.5",
+      "harness": "DeepAgents 0.6.12",
+      "reasoning_effort": "high",
+      "source_task_set_version": "0.21.0",
+      "source_digest": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "wave": 21,
+      "public_task_set_version": "0.21.2",
+      "task_count": 10,
+      "measured_task_count": 10,
+      "complete": true,
+      "passed": 5,
+      "score_percent": 50.0,
+      "observed_pass_rate_percent": 50.0,
+      "native_steps": {
+        "total": null,
+        "observed_subtotal": 262,
+        "coverage": 8,
+        "expected": 10
+      },
+      "native_tokens": {
+        "total": 3507874,
+        "observed_subtotal": 3507874,
+        "coverage": 10,
+        "expected": 10
+      },
+      "budget": {
+        "graph_supersteps": 80,
+        "model_api_requests": null,
+        "service_calls": 320,
+        "seconds": 900,
+        "max_output_tokens": 16384,
+        "temperature": "provider_default",
+        "explicitly_disclosed": true
+      },
+      "selection_policy": "historical_recorded_execution_with_recovered_HTTP502_on_task527",
+      "outcomes": [
+        {
+          "number": 512,
+          "task_id": "task_512_incident_delivery_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": 9,
+          "native_tokens": 53260,
+          "evidence_sha256": "8cc7c219ed0ff6c7bc7ffd53e3bd882eaffa238001ec4a5745758595b8921c9b"
+        },
+        {
+          "number": 518,
+          "task_id": "task_518_restore_backup_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 45,
+          "native_tokens": 417281,
+          "evidence_sha256": "770f7046bff46468db204f5269e2d0b4a53af48ca4c810036d55953f8c5cb4e2"
+        },
+        {
+          "number": 520,
+          "task_id": "task_520_identity_namespace_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 39,
+          "native_tokens": 368222,
+          "evidence_sha256": "a51865530527a5fbf9d10c0ead8d972979ac0687305da4c85dcbb2eb678ceeb0"
+        },
+        {
+          "number": 522,
+          "task_id": "task_522_latency_runtime_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 49,
+          "native_tokens": 501926,
+          "evidence_sha256": "ebfab9e2ca1459af0ecc66c2329c216d3ee6d0e501a1fa4b2b7975fe87d1ae0a"
+        },
+        {
+          "number": 523,
+          "task_id": "task_523_template_release_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 47,
+          "native_tokens": 461962,
+          "evidence_sha256": "ea6162bdb326740147c6d20516952038561eef0525e71d62c8cd3f54fec277c9"
+        },
+        {
+          "number": 524,
+          "task_id": "task_524_document_merge_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": 9,
+          "native_tokens": 51417,
+          "evidence_sha256": "5e6fc81ef7b611cdaf74501b5546a8cc0fc1336f993b17715439370ad1ea5c14"
+        },
+        {
+          "number": 525,
+          "task_id": "task_525_delivery_test_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": 17,
+          "native_tokens": 114494,
+          "evidence_sha256": "4ebc1a098274cac87741eea5ac8fca2e814a914874a8afa8cf51113cb0ca5329"
+        },
+        {
+          "number": 526,
+          "task_id": "task_526_migration_database_roundtrip",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 472416,
+          "evidence_sha256": "734b203ae7b60c525c23146c52518ba01fc7a6e05cc336712a8c6528f10f9b5a"
+        },
+        {
+          "number": 527,
+          "task_id": "task_527_live_restore_copy_cutover",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 47,
+          "native_tokens": 457907,
+          "evidence_sha256": "c7cb53c2c8d531624c40553403db6adde99a55b446731a5ff91a2d2123f48e35"
+        },
+        {
+          "number": 530,
+          "task_id": "task_530_inherited_runtime_roundtrip",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 608989,
+          "evidence_sha256": "d90c6127c8e49932d5e002353d44b492708a2f85b85a217d3fcb24241f8028cd"
+        }
+      ],
+      "calibration20": {
+        "measured_task_count": 20,
+        "passed": 12,
+        "score_percent": 60.0
+      },
+      "measurement_dates_utc": [
+        "2026-10-21"
+      ],
+      "measurement_date": "2026-10-21"
+    },
+    {
+      "configuration_id": "deepseek41_flash_80",
+      "model": "DeepSeek V4.1 Flash 1017",
+      "harness": "DeepAgents 0.6.12",
+      "reasoning_effort": "high",
+      "source_task_set_version": "0.21.0",
+      "source_digest": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "wave": 21,
+      "public_task_set_version": "0.21.2",
+      "task_count": 10,
+      "measured_task_count": 10,
+      "complete": true,
+      "passed": 0,
+      "score_percent": 0.0,
+      "observed_pass_rate_percent": 0.0,
+      "native_steps": {
+        "total": null,
+        "observed_subtotal": null,
+        "coverage": 0,
+        "expected": 10
+      },
+      "native_tokens": {
+        "total": 4096759,
+        "observed_subtotal": 4096759,
+        "coverage": 10,
+        "expected": 10
+      },
+      "budget": {
+        "graph_supersteps": 80,
+        "model_api_requests": null,
+        "service_calls": 320,
+        "seconds": 900,
+        "max_output_tokens": 16384,
+        "temperature": "provider_default",
+        "explicitly_disclosed": true
+      },
+      "selection_policy": "first_clean_execution",
+      "outcomes": [
+        {
+          "number": 512,
+          "task_id": "task_512_incident_delivery_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 411613,
+          "evidence_sha256": "3919c8051357d4d16da8de64f88c171b93bf54a205a94ffbcbcdd1137f1450ef"
+        },
+        {
+          "number": 518,
+          "task_id": "task_518_restore_backup_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 425849,
+          "evidence_sha256": "87f9b851e9c85f026ab205e1a4c19a1225840e0db7131df874075be68a8e4c9b"
+        },
+        {
+          "number": 520,
+          "task_id": "task_520_identity_namespace_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 322467,
+          "evidence_sha256": "f11299b297552b971c1dd2d722eda246f98aa8962d0c596ca93a00788d80acce"
+        },
+        {
+          "number": 522,
+          "task_id": "task_522_latency_runtime_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 313874,
+          "evidence_sha256": "672bfb3c52b13c69d31050244ceb5085007d715d0350d4195c371b6b17ab7ba7"
+        },
+        {
+          "number": 523,
+          "task_id": "task_523_template_release_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 318392,
+          "evidence_sha256": "a8bb2225a6d8cdfd139dd1522f86e0646f9df1496d0eb51a83dcee0417079cde"
+        },
+        {
+          "number": 524,
+          "task_id": "task_524_document_merge_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 470027,
+          "evidence_sha256": "eea9fe25f454a648658c5de84470544e6434f6a221aa5e6962a3e6fe802df5a7"
+        },
+        {
+          "number": 525,
+          "task_id": "task_525_delivery_test_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 478041,
+          "evidence_sha256": "d410ac3617bcd57058c05ff40878864a2f79ecb43cef2ee973da4a868506b13e"
+        },
+        {
+          "number": 526,
+          "task_id": "task_526_migration_database_roundtrip",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 367823,
+          "evidence_sha256": "9c769f3c2929a7018c8b0a7915a4ad475214b4775a1b885104e4d7acc92885e5"
+        },
+        {
+          "number": 527,
+          "task_id": "task_527_live_restore_copy_cutover",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 530696,
+          "evidence_sha256": "8e7b938f9006b59356c69fcbe8e98197fae1bb7743ae1c1eb7b554c84e484947"
+        },
+        {
+          "number": 530,
+          "task_id": "task_530_inherited_runtime_roundtrip",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 457977,
+          "evidence_sha256": "d2190529ed18f41892fe15ca20074f7018430988875246bfb34a47523f133f28"
+        }
+      ],
+      "calibration20": {
+        "measured_task_count": 20,
+        "passed": 0,
+        "score_percent": 0.0
+      },
+      "measurement_dates_utc": [
+        "2026-10-22"
+      ],
+      "measurement_date": "2026-10-22"
+    },
+    {
+      "configuration_id": "fable51_medium_80",
+      "model": "Fable 5.1",
+      "harness": "DeepAgents 0.6.12",
+      "reasoning_effort": "medium",
+      "source_task_set_version": "0.21.0",
+      "source_digest": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "wave": 21,
+      "public_task_set_version": "0.21.2",
+      "task_count": 10,
+      "measured_task_count": 10,
+      "complete": true,
+      "passed": 0,
+      "score_percent": 0.0,
+      "observed_pass_rate_percent": 0.0,
+      "native_steps": {
+        "total": null,
+        "observed_subtotal": 72,
+        "coverage": 8,
+        "expected": 10
+      },
+      "native_tokens": {
+        "total": null,
+        "observed_subtotal": 1186934,
+        "coverage": 9,
+        "expected": 10
+      },
+      "budget": {
+        "graph_supersteps": 80,
+        "model_api_requests": null,
+        "service_calls": 320,
+        "seconds": 900,
+        "max_output_tokens": 16384,
+        "temperature": "provider_default",
+        "explicitly_disclosed": true
+      },
+      "selection_policy": "first_entirely_api_clean_attempt",
+      "outcomes": [
+        {
+          "number": 512,
+          "task_id": "task_512_incident_delivery_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": 31,
+          "native_tokens": 334191,
+          "evidence_sha256": "65048b24efb82424bfe212058e02fafa56f81c7e3e53c7aa41fa662a86c05c13"
+        },
+        {
+          "number": 518,
+          "task_id": "task_518_restore_backup_feedback",
+          "outcome": "censor",
+          "domain_verifier_passed": false,
+          "native_steps": 1,
+          "native_tokens": 6897,
+          "evidence_sha256": "50d4e12e9405e77c449a0625926e5cfdc304bc5a70c08c90286ee36323399355"
+        },
+        {
+          "number": 520,
+          "task_id": "task_520_identity_namespace_feedback",
+          "outcome": "censor",
+          "domain_verifier_passed": false,
+          "native_steps": 1,
+          "native_tokens": 6913,
+          "evidence_sha256": "7fb1bb77be2f806b1c12d96f43f26c5ce48004221a932785846391386ab5b1e6"
+        },
+        {
+          "number": 522,
+          "task_id": "task_522_latency_runtime_feedback",
+          "outcome": "censor",
+          "domain_verifier_passed": false,
+          "native_steps": 1,
+          "native_tokens": 6914,
+          "evidence_sha256": "12f20eabdaba5803962a4570f098c1e979274057aa228c93544d83e61caa4957"
+        },
+        {
+          "number": 523,
+          "task_id": "task_523_template_release_feedback",
+          "outcome": "censor",
+          "domain_verifier_passed": false,
+          "native_steps": 1,
+          "native_tokens": 6912,
+          "evidence_sha256": "795b2a931df3374943b7137f25b95a9378eed3dc8f5c224a69499f3b88f4ad88"
+        },
+        {
+          "number": 524,
+          "task_id": "task_524_document_merge_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 489992,
+          "evidence_sha256": "d0f443409c5fd6201bb79982ed091349c99ff7eec0d9e56a64f2e3e53cce5fdc"
+        },
+        {
+          "number": 525,
+          "task_id": "task_525_delivery_test_feedback",
+          "outcome": "censor",
+          "domain_verifier_passed": false,
+          "native_steps": 1,
+          "native_tokens": 6893,
+          "evidence_sha256": "ff1caa48ca059a4bd81d2b8217d7ef299e4d508bfb804de64486c3d9abb031fa"
+        },
+        {
+          "number": 526,
+          "task_id": "task_526_migration_database_roundtrip",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": 35,
+          "native_tokens": 321301,
+          "evidence_sha256": "4c1d6ec13a65a3a9adb949c589e00989c6b851ad9cbeaae6f8a7d8d41e5fae80"
+        },
+        {
+          "number": 527,
+          "task_id": "task_527_live_restore_copy_cutover",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": null,
+          "evidence_sha256": "e2f94aea121398152e2a62e65216929c811db83b09d328c8741d4ff7590147b8"
+        },
+        {
+          "number": 530,
+          "task_id": "task_530_inherited_runtime_roundtrip",
+          "outcome": "censor",
+          "domain_verifier_passed": false,
+          "native_steps": 1,
+          "native_tokens": 6921,
+          "evidence_sha256": "059f5e70fb3cfe223f18ecfc4aa30e4dff3dad132c5db98a22613dea185e6269"
+        }
+      ],
+      "calibration20": {
+        "measured_task_count": 20,
+        "passed": 10,
+        "score_percent": 50.0
+      },
+      "measurement_dates_utc": [
+        "2026-10-22"
+      ],
+      "measurement_date": "2026-10-22"
+    },
+    {
+      "configuration_id": "glm53_high_80",
+      "model": "GLM 5.3",
+      "harness": "DeepAgents 0.6.12",
+      "reasoning_effort": "high",
+      "source_task_set_version": "0.21.0",
+      "source_digest": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "wave": 21,
+      "public_task_set_version": "0.21.2",
+      "task_count": 10,
+      "measured_task_count": 10,
+      "complete": true,
+      "passed": 0,
+      "score_percent": 0.0,
+      "observed_pass_rate_percent": 0.0,
+      "native_steps": {
+        "total": null,
+        "observed_subtotal": 19,
+        "coverage": 1,
+        "expected": 10
+      },
+      "native_tokens": {
+        "total": 3469103,
+        "observed_subtotal": 3469103,
+        "coverage": 10,
+        "expected": 10
+      },
+      "budget": {
+        "graph_supersteps": 80,
+        "model_api_requests": null,
+        "service_calls": 320,
+        "seconds": 900,
+        "max_output_tokens": 16384,
+        "temperature": "provider_default",
+        "explicitly_disclosed": true
+      },
+      "selection_policy": "first_entirely_api_clean_attempt",
+      "outcomes": [
+        {
+          "number": 512,
+          "task_id": "task_512_incident_delivery_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 344220,
+          "evidence_sha256": "30573cc49c2e4419dfad328a55654a6af8944595618975fec5ee7945a3393b1c"
+        },
+        {
+          "number": 518,
+          "task_id": "task_518_restore_backup_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 386436,
+          "evidence_sha256": "62d690f480477dbbbe80f4ebfdbdbf861b04a1e8896cb74b84158cb58029bc46"
+        },
+        {
+          "number": 520,
+          "task_id": "task_520_identity_namespace_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 271689,
+          "evidence_sha256": "793372782c8e73f91845e9cddcbb09a0f870a1d1e53cd46c667114164689feeb"
+        },
+        {
+          "number": 522,
+          "task_id": "task_522_latency_runtime_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 392686,
+          "evidence_sha256": "fe514afed70107135b48d50c28e43d06bec0365b262aeef1f9b0b33ffedb508b"
+        },
+        {
+          "number": 523,
+          "task_id": "task_523_template_release_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 334357,
+          "evidence_sha256": "1ea26d0c05e319a87748579663d8d362dd0fb14f111bca994e5f901957af0759"
+        },
+        {
+          "number": 524,
+          "task_id": "task_524_document_merge_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 397211,
+          "evidence_sha256": "89b8011d445317766299a0a79cb148e9826c439953808d3a4ddad74c2ba6bd48"
+        },
+        {
+          "number": 525,
+          "task_id": "task_525_delivery_test_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 511043,
+          "evidence_sha256": "7cb5ea11429477ddde28bbe56bf6417ba2e9c60d54074601d9fd540728cdabbe"
+        },
+        {
+          "number": 526,
+          "task_id": "task_526_migration_database_roundtrip",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 323833,
+          "evidence_sha256": "4d886dbee6588c55f5d7196c04356c5d2d6f0c94867644f82e58d9d7b3bc4314"
+        },
+        {
+          "number": 527,
+          "task_id": "task_527_live_restore_copy_cutover",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": 19,
+          "native_tokens": 65082,
+          "evidence_sha256": "c092d3a9abeb42e2e6ef1467c4dea9b8372e4ae31e4974160e813a4f7a37c9c5"
+        },
+        {
+          "number": 530,
+          "task_id": "task_530_inherited_runtime_roundtrip",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 442546,
+          "evidence_sha256": "d0e50aa21cb1b1ccb50876b61744e97b327c9705e97a2e370daf172f03fdc758"
+        }
+      ],
+      "calibration20": {
+        "measured_task_count": 20,
+        "passed": 0,
+        "score_percent": 0.0
+      },
+      "measurement_dates_utc": [
+        "2026-10-22"
+      ],
+      "measurement_date": "2026-10-22"
+    },
+    {
+      "configuration_id": "mimo26pro_high_80",
+      "model": "MiMo 2.6 Pro",
+      "harness": "DeepAgents 0.6.12",
+      "reasoning_effort": "high",
+      "source_task_set_version": "0.21.0",
+      "source_digest": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "wave": 21,
+      "public_task_set_version": "0.21.2",
+      "task_count": 10,
+      "measured_task_count": 10,
+      "complete": true,
+      "passed": 0,
+      "score_percent": 0.0,
+      "observed_pass_rate_percent": 0.0,
+      "native_steps": {
+        "total": null,
+        "observed_subtotal": 67,
+        "coverage": 3,
+        "expected": 10
+      },
+      "native_tokens": {
+        "total": null,
+        "observed_subtotal": 908521,
+        "coverage": 4,
+        "expected": 10
+      },
+      "budget": {
+        "graph_supersteps": 80,
+        "model_api_requests": null,
+        "service_calls": 320,
+        "seconds": 900,
+        "max_output_tokens": 16384,
+        "temperature": "provider_default",
+        "explicitly_disclosed": true
+      },
+      "selection_policy": "first_entirely_api_clean_attempt",
+      "outcomes": [
+        {
+          "number": 512,
+          "task_id": "task_512_incident_delivery_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": null,
+          "evidence_sha256": "aa301567ed9f6ff34f709cd78ebf4db4c89f893a1b65b5116ad12dd1fd71e287"
+        },
+        {
+          "number": 518,
+          "task_id": "task_518_restore_backup_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": null,
+          "evidence_sha256": "1f4312e9ed53d9b3c247efd684e46da3cb4899671f0e830a3dcd5c6ba23d73b6"
+        },
+        {
+          "number": 520,
+          "task_id": "task_520_identity_namespace_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": null,
+          "evidence_sha256": "6ed5269f420af7d952994f7b5eaa6edcc17f8380206b8d095bcf413807061e90"
+        },
+        {
+          "number": 522,
+          "task_id": "task_522_latency_runtime_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": null,
+          "evidence_sha256": "380f5bed210358bceddcac003c0d36c10f43091d6933ae0e7926f8df960e4323"
+        },
+        {
+          "number": 523,
+          "task_id": "task_523_template_release_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 529726,
+          "evidence_sha256": "c8ec4f579b2916277c8c81949a5addb1e46b4067dc400eeece1227b74a738986"
+        },
+        {
+          "number": 524,
+          "task_id": "task_524_document_merge_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": null,
+          "evidence_sha256": "4f30843bd37bb8634c038daa09c082741880f2a08c80a36bfa56c84803f2c35e"
+        },
+        {
+          "number": 525,
+          "task_id": "task_525_delivery_test_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": 21,
+          "native_tokens": 81906,
+          "evidence_sha256": "fca8b0b49369f8387c7b265825d7781ba04f355422a4000381e379f492164ba1"
+        },
+        {
+          "number": 526,
+          "task_id": "task_526_migration_database_roundtrip",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": null,
+          "evidence_sha256": "da06daaaf64a372a23da696b80efba9feea4185bcf0fcde3d807cfa06fb2ba07"
+        },
+        {
+          "number": 527,
+          "task_id": "task_527_live_restore_copy_cutover",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": 19,
+          "native_tokens": 104851,
+          "evidence_sha256": "23e8657487cba654cc9a6c548618acd6b7fead358096f9711a778c63f1f651a4"
+        },
+        {
+          "number": 530,
+          "task_id": "task_530_inherited_runtime_roundtrip",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": 27,
+          "native_tokens": 192038,
+          "evidence_sha256": "1c4fd40bcee6b987157b330d9e33ea16806a37c9f2e052773f868d0a02f49faa"
+        }
+      ],
+      "calibration20": {
+        "measured_task_count": 20,
+        "passed": 1,
+        "score_percent": 5.0
+      },
+      "measurement_dates_utc": [
+        "2026-10-22"
+      ],
+      "measurement_date": "2026-10-22"
+    },
+    {
+      "configuration_id": "qwen38max_high_80",
+      "model": "Qwen 3.8 Max",
+      "harness": "DeepAgents 0.6.12",
+      "reasoning_effort": "high",
+      "source_task_set_version": "0.21.0",
+      "source_digest": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "wave": 21,
+      "public_task_set_version": "0.21.2",
+      "task_count": 10,
+      "measured_task_count": 10,
+      "complete": true,
+      "passed": 0,
+      "score_percent": 0.0,
+      "observed_pass_rate_percent": 0.0,
+      "native_steps": {
+        "total": null,
+        "observed_subtotal": null,
+        "coverage": 0,
+        "expected": 10
+      },
+      "native_tokens": {
+        "total": null,
+        "observed_subtotal": 4712361,
+        "coverage": 9,
+        "expected": 10
+      },
+      "budget": {
+        "graph_supersteps": 80,
+        "model_api_requests": null,
+        "service_calls": 320,
+        "seconds": 900,
+        "max_output_tokens": 16384,
+        "temperature": "provider_default",
+        "explicitly_disclosed": true
+      },
+      "selection_policy": "first_entirely_api_clean_attempt",
+      "outcomes": [
+        {
+          "number": 512,
+          "task_id": "task_512_incident_delivery_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 559028,
+          "evidence_sha256": "d2cb4e8732be4ecbf0bd44a912fe574e4f4e1ae3a568418cc4fd0b2371a410b8"
+        },
+        {
+          "number": 518,
+          "task_id": "task_518_restore_backup_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 469427,
+          "evidence_sha256": "beaff231a276aa6b99c0069ba8f8c278185a1989264b75047166771fe64fb08e"
+        },
+        {
+          "number": 520,
+          "task_id": "task_520_identity_namespace_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 489315,
+          "evidence_sha256": "b5099d40c46ff7d60c6fae1706821c2a44b59ae4a09a8dbd54b353fd21d83416"
+        },
+        {
+          "number": 522,
+          "task_id": "task_522_latency_runtime_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 549183,
+          "evidence_sha256": "caa4aec9a1a34d12302f82d53d0108a6f102dc7aec614ccf5491f19ca5ef42c1"
+        },
+        {
+          "number": 523,
+          "task_id": "task_523_template_release_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 334332,
+          "evidence_sha256": "2b7c27d21dfff4caf4354e1a9085f63e41ab2b26b25ec31e8fa8043b47bbcaeb"
+        },
+        {
+          "number": 524,
+          "task_id": "task_524_document_merge_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": null,
+          "evidence_sha256": "25a482a53be82e0436b9d972c4d01c54a1ff962414a8d4e784c4e15664049ac8"
+        },
+        {
+          "number": 525,
+          "task_id": "task_525_delivery_test_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": true,
+          "native_steps": null,
+          "native_tokens": 673203,
+          "evidence_sha256": "509816b64ab23f636d954bafafa888649e5e1117a091dfab9b8e9d106c242e78"
+        },
+        {
+          "number": 526,
+          "task_id": "task_526_migration_database_roundtrip",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 623274,
+          "evidence_sha256": "d7234c41aed0c3dac56ba68c4baa0057e2b9852158eb93bd67a7da4264adf118"
+        },
+        {
+          "number": 527,
+          "task_id": "task_527_live_restore_copy_cutover",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 557651,
+          "evidence_sha256": "05effcc9ee4b0e5b366c89a6595d9f8a082d95b6c318ba1161c00538e401c479"
+        },
+        {
+          "number": 530,
+          "task_id": "task_530_inherited_runtime_roundtrip",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 456948,
+          "evidence_sha256": "2b1d9104e50ae0d69ae4e8435b8e5ce744a0f73ad15967b875fb6c02e45e3547"
+        }
+      ],
+      "calibration20": {
+        "measured_task_count": 20,
+        "passed": 0,
+        "score_percent": 0.0
+      },
+      "measurement_dates_utc": [
+        "2026-10-22"
+      ],
+      "measurement_date": "2026-10-22"
+    },
+    {
+      "configuration_id": "sonnet55_high_160",
+      "model": "Sonnet 5.5",
+      "harness": "DeepAgents 0.6.12",
+      "reasoning_effort": "high",
+      "source_task_set_version": "0.21.1",
+      "source_digest": "b8007ec6b0060e889b76aa71d8de6cea8db9403f36c1ea06303b6bd872fd6ac5",
+      "wave": 21,
+      "public_task_set_version": "0.21.2",
+      "task_count": 10,
+      "measured_task_count": 10,
+      "complete": true,
+      "passed": 9,
+      "score_percent": 90.0,
+      "observed_pass_rate_percent": 90.0,
+      "native_steps": {
+        "total": 484,
+        "observed_subtotal": 484,
+        "coverage": 10,
+        "expected": 10
+      },
+      "native_tokens": {
+        "total": 4766905,
+        "observed_subtotal": 4766905,
+        "coverage": 10,
+        "expected": 10
+      },
+      "budget": {
+        "graph_supersteps": 160,
+        "model_api_requests": null,
+        "service_calls": 320,
+        "seconds": 900,
+        "max_output_tokens": 16384,
+        "temperature": "provider_default",
+        "explicitly_disclosed": true
+      },
+      "selection_policy": "first_entirely_api_clean_attempt",
+      "outcomes": [
+        {
+          "number": 512,
+          "task_id": "task_512_incident_delivery_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 52,
+          "native_tokens": 501984,
+          "evidence_sha256": "d3ddfcbe22f3bdc8ac50eb5d547d79f4d30bf4a0a6f9a5fd18ebfdb486cc679a"
+        },
+        {
+          "number": 518,
+          "task_id": "task_518_restore_backup_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 42,
+          "native_tokens": 377278,
+          "evidence_sha256": "c11c01ff8f606d5ae949609cf1009cdb6810d579120c2da43ee0cb16d0880179"
+        },
+        {
+          "number": 520,
+          "task_id": "task_520_identity_namespace_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 42,
+          "native_tokens": 377453,
+          "evidence_sha256": "204ff33c9d2321ba3ff4494a114e2f2abf1f93cad61b701683215754e8b65af2"
+        },
+        {
+          "number": 522,
+          "task_id": "task_522_latency_runtime_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": 31,
+          "native_tokens": 213442,
+          "evidence_sha256": "76ae2c1bc345ff4785606309848a644bfbb4fa692c6556d1a6c28a9236720dcb"
+        },
+        {
+          "number": 523,
+          "task_id": "task_523_template_release_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 55,
+          "native_tokens": 590732,
+          "evidence_sha256": "3b388804c4d6ae9a5443007237cce0b1ad45930fecf7b2546aff558895a719e7"
+        },
+        {
+          "number": 524,
+          "task_id": "task_524_document_merge_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 60,
+          "native_tokens": 701101,
+          "evidence_sha256": "d3ad05b3f8bd44310f124ee1319f5be3c8264b047ef4d590f827b34f15cc8165"
+        },
+        {
+          "number": 525,
+          "task_id": "task_525_delivery_test_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 38,
+          "native_tokens": 400396,
+          "evidence_sha256": "43571652416c23f350e42e512719534195171fabbf36716d07db2dd1de390374"
+        },
+        {
+          "number": 526,
+          "task_id": "task_526_migration_database_roundtrip",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 52,
+          "native_tokens": 463481,
+          "evidence_sha256": "d56f646e2e17edff3ed77fb16b6ef12bad83c9ebc6e047e0bd35bd83ae3560b1"
+        },
+        {
+          "number": 527,
+          "task_id": "task_527_live_restore_copy_cutover",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 54,
+          "native_tokens": 531247,
+          "evidence_sha256": "e42f7d9e40c5e823fa14deedd047c8f1886a13659a02b329629d5a4f35280e83"
+        },
+        {
+          "number": 530,
+          "task_id": "task_530_inherited_runtime_roundtrip",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 58,
+          "native_tokens": 609791,
+          "evidence_sha256": "efe694640d04b331fc554ec35f15898d4093abd0288a8a7c8ff50ab6fe9acdfc"
+        }
+      ],
+      "calibration20": {
+        "measured_task_count": 20,
+        "passed": 18,
+        "score_percent": 90.0
+      },
+      "measurement_dates_utc": [
+        "2026-10-22"
+      ],
+      "measurement_date": "2026-10-22"
+    },
+    {
+      "configuration_id": "opus55_high_160_partial",
+      "model": "Opus 5.5",
+      "harness": "DeepAgents 0.6.12",
+      "reasoning_effort": "high",
+      "source_task_set_version": "0.21.1",
+      "source_digest": "b8007ec6b0060e889b76aa71d8de6cea8db9403f36c1ea06303b6bd872fd6ac5",
+      "wave": 21,
+      "public_task_set_version": "0.21.2",
+      "task_count": 10,
+      "measured_task_count": 1,
+      "complete": false,
+      "passed": 1,
+      "score_percent": null,
+      "observed_pass_rate_percent": 100.0,
+      "native_steps": {
+        "total": 44,
+        "observed_subtotal": 44,
+        "coverage": 1,
+        "expected": 1
+      },
+      "native_tokens": {
+        "total": 428830,
+        "observed_subtotal": 428830,
+        "coverage": 1,
+        "expected": 1
+      },
+      "budget": {
+        "graph_supersteps": 160,
+        "model_api_requests": null,
+        "service_calls": 320,
+        "seconds": 900,
+        "max_output_tokens": 16384,
+        "temperature": "provider_default",
+        "explicitly_disclosed": true
+      },
+      "selection_policy": "first_entirely_api_clean_attempt",
+      "outcomes": [
+        {
+          "number": 522,
+          "task_id": "task_522_latency_runtime_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 44,
+          "native_tokens": 428830,
+          "evidence_sha256": "849e4732da5922a03e496c4280a2a5834d10ece67d39119cd1774cc5ea80cf85"
+        }
+      ],
+      "calibration20": {
+        "measured_task_count": 2,
+        "passed": 2,
+        "score_percent": null
+      },
+      "measurement_dates_utc": [
+        "2026-10-22"
+      ],
+      "measurement_date": "2026-10-22"
+    },
+    {
+      "configuration_id": "codex0163_deepseek41_unc_high_160",
+      "model": "DeepSeek V4.1 Flash 1017 UNCENSORED",
+      "harness": "Codex CLI 0.163.0",
+      "reasoning_effort": "high",
+      "source_task_set_version": "0.21.1",
+      "source_digest": "b8007ec6b0060e889b76aa71d8de6cea8db9403f36c1ea06303b6bd872fd6ac5",
+      "wave": 21,
+      "public_task_set_version": "0.21.2",
+      "task_count": 10,
+      "measured_task_count": 10,
+      "complete": true,
+      "passed": 9,
+      "score_percent": 90.0,
+      "observed_pass_rate_percent": 90.0,
+      "native_steps": {
+        "total": 679,
+        "observed_subtotal": 679,
+        "coverage": 10,
+        "expected": 10
+      },
+      "native_tokens": {
+        "total": 19225827,
+        "observed_subtotal": 19225827,
+        "coverage": 10,
+        "expected": 10
+      },
+      "budget": {
+        "graph_supersteps": null,
+        "model_api_requests": 160,
+        "service_calls": 320,
+        "seconds": 900,
+        "max_output_tokens": 16384,
+        "temperature": "provider_default",
+        "explicitly_disclosed": true
+      },
+      "selection_policy": "first_entirely_api_clean_attempt",
+      "outcomes": [
+        {
+          "number": 512,
+          "task_id": "task_512_incident_delivery_feedback",
+          "outcome": "fail",
+          "domain_verifier_passed": false,
+          "native_steps": 129,
+          "native_tokens": 6324523,
+          "evidence_sha256": "90a471da87e0f70554cb47ee90f3b409b95af3bbb6ea70c0d3d375e823e8b519"
+        },
+        {
+          "number": 518,
+          "task_id": "task_518_restore_backup_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 61,
+          "native_tokens": 1256162,
+          "evidence_sha256": "856293b545f69856543e071b90ad0628a02fb253b459af010d36202eee1c29e5"
+        },
+        {
+          "number": 520,
+          "task_id": "task_520_identity_namespace_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 52,
+          "native_tokens": 1062552,
+          "evidence_sha256": "63d409f034f477e3f3fe6764b9b584e6b661d8fee61084df538e76f8a9b106c5"
+        },
+        {
+          "number": 522,
+          "task_id": "task_522_latency_runtime_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 60,
+          "native_tokens": 1083066,
+          "evidence_sha256": "119d9e376e850642bfab30cf8d86a63378f96199b95b49f48865fba6d9bd7242"
+        },
+        {
+          "number": 523,
+          "task_id": "task_523_template_release_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 56,
+          "native_tokens": 1073315,
+          "evidence_sha256": "a77a13a0b1c853700f5158da26f3123d1aa49d573a73318650fbffc76b37945a"
+        },
+        {
+          "number": 524,
+          "task_id": "task_524_document_merge_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 91,
+          "native_tokens": 3008664,
+          "evidence_sha256": "daa8f859b53adf5050d89beeeca5d1e5601f876e32544af3f019b385402750f3"
+        },
+        {
+          "number": 525,
+          "task_id": "task_525_delivery_test_feedback",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 56,
+          "native_tokens": 1352753,
+          "evidence_sha256": "161834cba04469ed6706cc15f88bd33708c388e04cd4b57ef59206edf0e97097"
+        },
+        {
+          "number": 526,
+          "task_id": "task_526_migration_database_roundtrip",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 62,
+          "native_tokens": 1129203,
+          "evidence_sha256": "b82dcfca908e8e02b0bdcddd640b5cd3d9c210aab82953e38f6cad8494db7808"
+        },
+        {
+          "number": 527,
+          "task_id": "task_527_live_restore_copy_cutover",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 59,
+          "native_tokens": 1544401,
+          "evidence_sha256": "25089962f8fbeb932d94c79a529d66e08b7ca2caeb0b2f0d49a6ecf86965f219"
+        },
+        {
+          "number": 530,
+          "task_id": "task_530_inherited_runtime_roundtrip",
+          "outcome": "pass",
+          "domain_verifier_passed": true,
+          "native_steps": 53,
+          "native_tokens": 1391188,
+          "evidence_sha256": "f5843008d43836f0d112dede3bc4e79977c688329205e22d6edb5e83a19c3e60"
+        }
+      ],
+      "calibration20": {
+        "measured_task_count": 20,
+        "passed": 19,
+        "score_percent": 95.0
+      },
+      "measurement_dates_utc": [
+        "2026-10-22"
+      ],
+      "measurement_date": "2026-10-22"
+    }
+  ]
+}

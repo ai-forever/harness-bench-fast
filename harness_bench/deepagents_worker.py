@@ -37,7 +37,7 @@ def main() -> int:
         from langchain_core.callbacks import BaseCallbackHandler
         from langchain_core.messages import messages_to_dict
         from openrouter_agent import build_agent
-        from runtime_limits import effective_recursion_limit
+        from runtime_limits import effective_recursion_limit, prompt_with_execution_budget
 
         class Evidence(BaseCallbackHandler):
             raise_error = True
@@ -84,7 +84,7 @@ def main() -> int:
         if callback := stats.as_callback():
             callbacks.append(callback)
         result = agent.invoke(
-            {"messages": [{"role": "user", "content": args.prompt}]},
+            {"messages": [{"role": "user", "content": prompt_with_execution_budget(args.prompt, recursion_limit=limit, max_tokens=args.max_tokens)}]},
             config={"callbacks": callbacks},
         )
         emit({"type": "hbf_trajectory", "messages": messages_to_dict(result.get("messages", []))})

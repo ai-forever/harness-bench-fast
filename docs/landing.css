@@ -12,7 +12,7 @@ nav a { text-decoration: none; }
 .eyebrow { font: 12px ui-monospace, monospace; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
 h1 { margin: 18px 0; font-size: clamp(36px, 5vw, 56px); line-height: 1.1; font-weight: 650; letter-spacing: -2px; }
 .lead { color: var(--muted); margin-bottom: 0; }
-.suite-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.suite-switch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 button, input, select { font: inherit; }
 button, select, summary { cursor: pointer; }
 .suite-switch button { text-align: left; border: 1px solid var(--line); border-radius: 12px; background: transparent; padding: 18px 22px; color: var(--ink); }
@@ -68,6 +68,7 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding-block
   .intro { padding-block: 14px 28px; }
   h1 { letter-spacing: -1.4px; }
   .lead { font-size: 14px; }
+  .suite-switch { grid-template-columns: 1fr; gap: 8px; }
   .suite-switch button { padding: 14px; }
   .suite-switch span { font-size: 11px; }
   .suite-switch strong { font-size: 19px; }

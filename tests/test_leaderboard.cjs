@@ -154,3 +154,29 @@ for (const id of ["haiku-mini-v019", "haiku-codex-v019", "haiku-claude-v019"]) {
     haikuRuns.rows.find(source => source.harness === row.harness).tokens);
   assert.equal(row.telemetry.medium.tokens.status, "complete");
 }
+
+// Hard uses its own complete 10-task denominator. Historical and partial
+// measurements never fall back into this ranking.
+const hardFixture = { rows: [
+  { id: "old", model: "Fixture", harness: "A", medium: { passed: 80, total: 80 } },
+  { id: "partial", model: "Fixture", harness: "B", wave21: { passed: 1, total: 1 } },
+  { id: "hard80", model: "Sonnet high", harness: "DeepAgents · 80 graph steps", wave21: { passed: 5, total: 10 } },
+  { id: "hard160", model: "Sonnet high", harness: "DeepAgents · 160 graph steps", wave21: { passed: 9, total: 10 }, telemetry: { wave21: { tasks: 10, steps: { value: 100, covered_tasks: 10, status: "complete" } } } }
+] };
+const hardFixtureRows = selectResults(hardFixture, "hard", "current", "sonnet");
+assert.deepEqual(hardFixtureRows.map(row => row.id), ["hard160", "hard80"]);
+assert.equal(hardFixtureRows[0].usage.steps.value, 100);
+assert.equal(selectResults(hardFixture, "hard", "current", "no-such-model").length, 0);
+assert.ok(landing.includes('data-suite="hard"'));
+assert.ok(landing.includes('id="wave21-note"'));
+assert.ok(landing.includes('wave21-measurements.html'));
+const hard = selectResults(data, "hard", "current", "");
+assert.equal(hard.length, 8);
+assert.ok(hard.every(row => row.result.total === 10));
+assert.deepEqual(hard.map(row => row.result.passed).sort((a, b) => b - a), [9, 9, 5, 0, 0, 0, 0, 0]);
+assert.equal(selectResults(data, "hard", "current", "Opus").length, 0);
+assert.equal(selectResults(data, "hard", "current", "Sonnet").length, 2);
+assert.equal(hard.find(row => row.id === "wave21-sonnet55_80").result.passed, 5);
+assert.equal(hard.find(row => row.id === "wave21-sonnet55_high_160").result.passed, 9);
+assert.equal(hard.find(row => row.id === "wave21-codex0163_deepseek41_unc_high_160").result.passed, 9);
+assert.equal(hard.find(row => row.id === "wave21-qwen38max_high_80").result.passed, 0);

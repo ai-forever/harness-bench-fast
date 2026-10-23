@@ -2,9 +2,12 @@
   "task_set_version": "0.19",
   "light_tasks": 391,
   "medium_tasks": 80,
+  "hard_task_set_version": "0.21.2",
+  "hard_tasks": 10,
   "provenance": {
     "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs plus three complete Claude Haiku harness runs; v0.19 protocol revisions grouped for display, exact source_version retained per row; composites explicitly labeled; secret sft deepagents accepted by the operator",
     "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
+    "wave21_results_sha256": "1d35d5b2b0d9b28829b5d27d28f852d6f1f33d768e95df7581ffa0073d299803",
     "wave_results_sha256": "6dd03c599564c086bb8c0bf3f9c4a90c3edf27d9b4b7bb746bc5004e59f25683",
     "secret_700b_sha256": "2f016f31bee69ce7f27be2935631f7737d8d30acabb3c149b38a6e03baa1785d",
     "secret_sft_codex_sha256": "d2a7ae15ae0534e5c036e3b573a9595ac5a3966e33fa1f68b3b3baf3f44fefb7",
@@ -4108,6 +4111,382 @@
           ]
         }
       }
+    },
+    {
+      "id": "wave21-sonnet55_80",
+      "model": "Sonnet 5.5 (high)",
+      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "runs": 1,
+      "measurement_type": "post_selection_rescore",
+      "measurement_valid": true,
+      "source_version": "0.21.0",
+      "display_version": "0.21.2",
+      "measurement_date": "2026-10-21",
+      "reasoning_effort": "high",
+      "source_sha256": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": null,
+      "wave21": {
+        "passed": 5,
+        "total": 10,
+        "note": "calibration rescore"
+      },
+      "telemetry": {
+        "wave21": {
+          "tasks": 10,
+          "observed_tasks": 10,
+          "sources_sha256": [
+            "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial. Output tokens include reasoning when provider reports it; no additional summing of reasoning.",
+            "Graph steps and model API requests are different units. Budget80 and160 remain separate configurations; no best-of mixing."
+          ],
+          "steps": {
+            "value": 262,
+            "covered_tasks": 8,
+            "status": "partial",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 3507874,
+            "covered_tasks": 10,
+            "status": "complete"
+          }
+        }
+      },
+      "details_url": "wave21-measurements.html#sonnet55_80"
+    },
+    {
+      "id": "wave21-deepseek41_flash_80",
+      "model": "DeepSeek V4.1 Flash 1017 (high)",
+      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "runs": 1,
+      "measurement_type": "post_selection_rescore",
+      "measurement_valid": true,
+      "source_version": "0.21.0",
+      "display_version": "0.21.2",
+      "measurement_date": "2026-10-22",
+      "reasoning_effort": "high",
+      "source_sha256": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": null,
+      "wave21": {
+        "passed": 0,
+        "total": 10,
+        "note": "calibration rescore"
+      },
+      "telemetry": {
+        "wave21": {
+          "tasks": 10,
+          "observed_tasks": 10,
+          "sources_sha256": [
+            "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial. Output tokens include reasoning when provider reports it; no additional summing of reasoning.",
+            "Graph steps and model API requests are different units. Budget80 and160 remain separate configurations; no best-of mixing."
+          ],
+          "steps": {
+            "value": null,
+            "covered_tasks": 0,
+            "status": "unavailable",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 4096759,
+            "covered_tasks": 10,
+            "status": "complete"
+          }
+        }
+      },
+      "details_url": "wave21-measurements.html#deepseek41_flash_80"
+    },
+    {
+      "id": "wave21-fable51_medium_80",
+      "model": "Fable 5.1 (medium)",
+      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "runs": 1,
+      "measurement_type": "post_selection_rescore",
+      "measurement_valid": true,
+      "source_version": "0.21.0",
+      "display_version": "0.21.2",
+      "measurement_date": "2026-10-22",
+      "reasoning_effort": "medium",
+      "source_sha256": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": null,
+      "wave21": {
+        "passed": 0,
+        "total": 10,
+        "note": "calibration rescore"
+      },
+      "telemetry": {
+        "wave21": {
+          "tasks": 10,
+          "observed_tasks": 10,
+          "sources_sha256": [
+            "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial. Output tokens include reasoning when provider reports it; no additional summing of reasoning.",
+            "Graph steps and model API requests are different units. Budget80 and160 remain separate configurations; no best-of mixing."
+          ],
+          "steps": {
+            "value": 72,
+            "covered_tasks": 8,
+            "status": "partial",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 1186934,
+            "covered_tasks": 9,
+            "status": "partial"
+          }
+        }
+      },
+      "details_url": "wave21-measurements.html#fable51_medium_80"
+    },
+    {
+      "id": "wave21-glm53_high_80",
+      "model": "GLM 5.3 (high)",
+      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "runs": 1,
+      "measurement_type": "post_selection_rescore",
+      "measurement_valid": true,
+      "source_version": "0.21.0",
+      "display_version": "0.21.2",
+      "measurement_date": "2026-10-22",
+      "reasoning_effort": "high",
+      "source_sha256": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": null,
+      "wave21": {
+        "passed": 0,
+        "total": 10,
+        "note": "calibration rescore"
+      },
+      "telemetry": {
+        "wave21": {
+          "tasks": 10,
+          "observed_tasks": 10,
+          "sources_sha256": [
+            "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial. Output tokens include reasoning when provider reports it; no additional summing of reasoning.",
+            "Graph steps and model API requests are different units. Budget80 and160 remain separate configurations; no best-of mixing."
+          ],
+          "steps": {
+            "value": 19,
+            "covered_tasks": 1,
+            "status": "partial",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 3469103,
+            "covered_tasks": 10,
+            "status": "complete"
+          }
+        }
+      },
+      "details_url": "wave21-measurements.html#glm53_high_80"
+    },
+    {
+      "id": "wave21-mimo26pro_high_80",
+      "model": "MiMo 2.6 Pro (high)",
+      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "runs": 1,
+      "measurement_type": "post_selection_rescore",
+      "measurement_valid": true,
+      "source_version": "0.21.0",
+      "display_version": "0.21.2",
+      "measurement_date": "2026-10-22",
+      "reasoning_effort": "high",
+      "source_sha256": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": null,
+      "wave21": {
+        "passed": 0,
+        "total": 10,
+        "note": "calibration rescore"
+      },
+      "telemetry": {
+        "wave21": {
+          "tasks": 10,
+          "observed_tasks": 10,
+          "sources_sha256": [
+            "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial. Output tokens include reasoning when provider reports it; no additional summing of reasoning.",
+            "Graph steps and model API requests are different units. Budget80 and160 remain separate configurations; no best-of mixing."
+          ],
+          "steps": {
+            "value": 67,
+            "covered_tasks": 3,
+            "status": "partial",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 908521,
+            "covered_tasks": 4,
+            "status": "partial"
+          }
+        }
+      },
+      "details_url": "wave21-measurements.html#mimo26pro_high_80"
+    },
+    {
+      "id": "wave21-qwen38max_high_80",
+      "model": "Qwen 3.8 Max (high)",
+      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "runs": 1,
+      "measurement_type": "post_selection_rescore",
+      "measurement_valid": true,
+      "source_version": "0.21.0",
+      "display_version": "0.21.2",
+      "measurement_date": "2026-10-22",
+      "reasoning_effort": "high",
+      "source_sha256": "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": null,
+      "wave21": {
+        "passed": 0,
+        "total": 10,
+        "note": "calibration rescore"
+      },
+      "telemetry": {
+        "wave21": {
+          "tasks": 10,
+          "observed_tasks": 10,
+          "sources_sha256": [
+            "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial. Output tokens include reasoning when provider reports it; no additional summing of reasoning.",
+            "Graph steps and model API requests are different units. Budget80 and160 remain separate configurations; no best-of mixing."
+          ],
+          "steps": {
+            "value": null,
+            "covered_tasks": 0,
+            "status": "unavailable",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 4712361,
+            "covered_tasks": 9,
+            "status": "partial"
+          }
+        }
+      },
+      "details_url": "wave21-measurements.html#qwen38max_high_80"
+    },
+    {
+      "id": "wave21-sonnet55_high_160",
+      "model": "Sonnet 5.5 (high)",
+      "harness": "DeepAgents 0.6.12 · 160 graph steps",
+      "runs": 1,
+      "measurement_type": "post_selection_rescore",
+      "measurement_valid": true,
+      "source_version": "0.21.1",
+      "display_version": "0.21.2",
+      "measurement_date": "2026-10-22",
+      "reasoning_effort": "high",
+      "source_sha256": "b8007ec6b0060e889b76aa71d8de6cea8db9403f36c1ea06303b6bd872fd6ac5",
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": null,
+      "wave21": {
+        "passed": 9,
+        "total": 10,
+        "note": "calibration rescore"
+      },
+      "telemetry": {
+        "wave21": {
+          "tasks": 10,
+          "observed_tasks": 10,
+          "sources_sha256": [
+            "b8007ec6b0060e889b76aa71d8de6cea8db9403f36c1ea06303b6bd872fd6ac5"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial. Output tokens include reasoning when provider reports it; no additional summing of reasoning.",
+            "Graph steps and model API requests are different units. Budget80 and160 remain separate configurations; no best-of mixing."
+          ],
+          "steps": {
+            "value": 484,
+            "covered_tasks": 10,
+            "status": "complete",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 4766905,
+            "covered_tasks": 10,
+            "status": "complete"
+          }
+        }
+      },
+      "details_url": "wave21-measurements.html#sonnet55_high_160"
+    },
+    {
+      "id": "wave21-codex0163_deepseek41_unc_high_160",
+      "model": "DeepSeek V4.1 Flash 1017 UNCENSORED (high)",
+      "harness": "Codex CLI 0.163.0 · 160 model requests",
+      "runs": 1,
+      "measurement_type": "post_selection_rescore",
+      "measurement_valid": true,
+      "source_version": "0.21.1",
+      "display_version": "0.21.2",
+      "measurement_date": "2026-10-22",
+      "reasoning_effort": "high",
+      "source_sha256": "b8007ec6b0060e889b76aa71d8de6cea8db9403f36c1ea06303b6bd872fd6ac5",
+      "light": null,
+      "medium": null,
+      "medium_historical": null,
+      "wave19": null,
+      "wave21": {
+        "passed": 9,
+        "total": 10,
+        "note": "calibration rescore"
+      },
+      "telemetry": {
+        "wave21": {
+          "tasks": 10,
+          "observed_tasks": 10,
+          "sources_sha256": [
+            "b8007ec6b0060e889b76aa71d8de6cea8db9403f36c1ea06303b6bd872fd6ac5"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial. Output tokens include reasoning when provider reports it; no additional summing of reasoning.",
+            "Graph steps and model API requests are different units. Budget80 and160 remain separate configurations; no best-of mixing."
+          ],
+          "steps": {
+            "value": 679,
+            "covered_tasks": 10,
+            "status": "complete",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 19225827,
+            "covered_tasks": 10,
+            "status": "complete"
+          }
+        }
+      },
+      "details_url": "wave21-measurements.html#codex0163_deepseek41_unc_high_160"
     }
   ]
 }

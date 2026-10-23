@@ -1,0 +1,676 @@
+{
+  "schema_version": 1,
+  "wave": 20,
+  "suite": "general-hard",
+  "task_count": 40,
+  "task_numbers": [
+    472,
+    473,
+    474,
+    475,
+    476,
+    477,
+    478,
+    479,
+    480,
+    481,
+    482,
+    483,
+    484,
+    485,
+    486,
+    487,
+    488,
+    489,
+    490,
+    491,
+    492,
+    493,
+    494,
+    495,
+    496,
+    497,
+    498,
+    499,
+    500,
+    501,
+    502,
+    503,
+    504,
+    505,
+    506,
+    507,
+    508,
+    509,
+    510,
+    511
+  ],
+  "historical_archive": true,
+  "protocol": {
+    "metric": "original_scored_run_pass",
+    "aggregation": "single_execution_per_task_arithmetic_mean",
+    "score_scope": "40task raw score only for complete profile; partial pilot has no full-wave score.",
+    "censorship": "Terminal FAIL with separate censor outcome.",
+    "native_counters": "Selected native execution only; missing counters null, observed partial sums explicitly labelled.",
+    "revision_difference": "v8a->v8b clarified task479 public quota-capacity wording; no algorithm/verifier/budget change. Source revisions remain separate.",
+    "quality": "Known contract ambiguities and provider censorship prevent an unqualified clean difficulty comparison. Historical measurements are preserved without rerun.",
+    "compatibility": "Wave20 historical archive is separate from wave21 ten selected composites. No ranking or total combines these two suites."
+  },
+  "configurations": [
+    {
+      "configuration_id": "haiku55_high_v8b",
+      "model": "Claude Haiku 5.5",
+      "harness": "DeepAgents 0.6.12",
+      "reasoning_effort": "high",
+      "wave": 20,
+      "source_task_set_version": "0.20.0",
+      "source_revision": "v8b",
+      "source_digest": "2e7a823ac85716ef76fd99b97dafdc768182cca62fc9f802a727e81ab6b6b237",
+      "measured_task_count": 40,
+      "task_count": 40,
+      "complete": true,
+      "passed": 29,
+      "score_percent": 72.5,
+      "observed_pass_rate_percent": 72.5,
+      "quality_valid": false,
+      "quality_notes": [
+        "Task473 public window-key encoding was ambiguous; its raw FAIL is retained. Excluding473 gives diagnostic29/39, not a replacement40-task score."
+      ],
+      "budget": {
+        "graph_supersteps": 80,
+        "service_calls": 160,
+        "seconds": 900,
+        "max_output_tokens": 16384,
+        "temperature": "provider_default",
+        "explicitly_disclosed": true
+      },
+      "selection_policy": "one_execution_per_measured_task_no_retries",
+      "native_steps": {
+        "total": null,
+        "observed_subtotal": 1135,
+        "coverage": 35,
+        "expected": 40
+      },
+      "native_tokens": {
+        "total": 9606273,
+        "observed_subtotal": 9606273,
+        "coverage": 40,
+        "expected": 40
+      },
+      "outcomes": [
+        {
+          "task_id": "task_472_corrected_log_incidents",
+          "number": 472,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 31,
+          "native_tokens": 190496,
+          "evidence_sha256": "a72e5fc93e139513d0ad6a120b2bd619f132ee51c29382d31f81ac700692b676"
+        },
+        {
+          "task_id": "task_473_watermarked_logfmt",
+          "number": 473,
+          "outcome": "fail",
+          "classification": "contract_ambiguity",
+          "domain_verifier_passed": false,
+          "native_steps": 35,
+          "native_tokens": 227159,
+          "evidence_sha256": "2cda64f8dae18c85c95c4ed806e38f5fd572619289b651cbfd00bc56565f661a"
+        },
+        {
+          "task_id": "task_474_session_expiry_restatement",
+          "number": 474,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 43,
+          "native_tokens": 378009,
+          "evidence_sha256": "439baa41373c83406414546a590c05b0844fc6fa31fba2aa0b91b2352ba1bd5b"
+        },
+        {
+          "task_id": "task_475_capacity_session_matching",
+          "number": 475,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 27,
+          "native_tokens": 192379,
+          "evidence_sha256": "95e79ee9d5e9ab463ec97a4ba6c2120f367b10574af7665def7b0fbce0fd1821"
+        },
+        {
+          "task_id": "task_476_catalog_bundle_allocation",
+          "number": 476,
+          "outcome": "fail",
+          "classification": "agent_budget",
+          "domain_verifier_passed": true,
+          "native_steps": null,
+          "native_tokens": 404941,
+          "evidence_sha256": "1696709827e228fc5f7f655a5d76c47a7cf734996cafbdd7e19bfbb4048c8748"
+        },
+        {
+          "task_id": "task_477_expiring_warehouse_ledger",
+          "number": 477,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 33,
+          "native_tokens": 249622,
+          "evidence_sha256": "1aa387b39869e2a19a0bc961c657eccc0a769ddd4661c611888640abdbfd79be"
+        },
+        {
+          "task_id": "task_478_segment_chain_recovery",
+          "number": 478,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 29,
+          "native_tokens": 183192,
+          "evidence_sha256": "d96af729b166056a1dab42ce3b7d1120c51452734b4d37ee68505e9016347750"
+        },
+        {
+          "task_id": "task_479_shared_segment_repair",
+          "number": 479,
+          "outcome": "fail",
+          "classification": "agent_budget",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 382496,
+          "evidence_sha256": "d5666ca7ded9893fb8032bb49c4b9202b8d580d949544461eb049b4fd092c84e"
+        },
+        {
+          "task_id": "task_480_temporal_contact_provenance",
+          "number": 480,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 39,
+          "native_tokens": 267723,
+          "evidence_sha256": "60c17125763199c40aac527377277df793dd3f766a2eb9b07071ca30cc43c5d0"
+        },
+        {
+          "task_id": "task_481_constrained_contact_partition",
+          "number": 481,
+          "outcome": "fail",
+          "classification": "task_failure",
+          "domain_verifier_passed": false,
+          "native_steps": 40,
+          "native_tokens": 263793,
+          "evidence_sha256": "0bc96a78865dab490e89d2d9a9fc7458b52740531a42d3485fafb6822d0024e2"
+        },
+        {
+          "task_id": "task_482_retry_terminal_races",
+          "number": 482,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 32,
+          "native_tokens": 208292,
+          "evidence_sha256": "6e79ce7392795689c4181bee68c9dc49e48ece0bebdbf4e3865905b7ab7a238d"
+        },
+        {
+          "task_id": "task_483_latency_overlap_windows",
+          "number": 483,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 40,
+          "native_tokens": 283802,
+          "evidence_sha256": "a63941592b6f9d07444bac9a6e155e3a98f1065cbf7c07ee2253085fbce7e726"
+        },
+        {
+          "task_id": "task_484_nested_ordered_ranges",
+          "number": 484,
+          "outcome": "fail",
+          "classification": "agent_budget",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 423963,
+          "evidence_sha256": "cc249d4e5864f95623ebcf5dbed4bf2783e850de314c77cd02ecf35dfab0841f"
+        },
+        {
+          "task_id": "task_485_compressed_ordered_ranges",
+          "number": 485,
+          "outcome": "fail",
+          "classification": "task_failure",
+          "domain_verifier_passed": false,
+          "native_steps": 38,
+          "native_tokens": 245833,
+          "evidence_sha256": "c77e2234e29c701536ad7dae437c973b62d0316e259bed4b0ecfa5310af0ff74"
+        },
+        {
+          "task_id": "task_486_retry_dispatcher",
+          "number": 486,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 36,
+          "native_tokens": 237918,
+          "evidence_sha256": "db0673465882c0894e123dc116f82aac80f9acfc99aa00ec1ad30a8e0d191fc3"
+        },
+        {
+          "task_id": "task_487_adaptive_retry_policy",
+          "number": 487,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 39,
+          "native_tokens": 300079,
+          "evidence_sha256": "f65b2042f11d145dab94a6b7b7be27893eb2f115350d110e6d53fdc13a96dd6f"
+        },
+        {
+          "task_id": "task_488_archive_namespace_audit",
+          "number": 488,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 47,
+          "native_tokens": 305081,
+          "evidence_sha256": "508958b9ec36c67e87346bbc33fa15e0b59dd6284f94bab6aecfb459fa5a2973"
+        },
+        {
+          "task_id": "task_489_atomic_tree_migration",
+          "number": 489,
+          "outcome": "fail",
+          "classification": "agent_budget",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 402078,
+          "evidence_sha256": "a6c3c53849d375a634280658c5e292b6d0a5b7d9deb8cd6b5d060cb218efd62f"
+        },
+        {
+          "task_id": "task_490_causal_jsonl_reducer",
+          "number": 490,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 28,
+          "native_tokens": 166082,
+          "evidence_sha256": "aa3f23fd1c1366820f967357300251b9ea9d2e902cbbc76c8a14792e821fe3a1"
+        },
+        {
+          "task_id": "task_491_transaction_jsonl_replay",
+          "number": 491,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 19,
+          "native_tokens": 103052,
+          "evidence_sha256": "6924efec290d41c839023d60e83543c6cdb68cacdd866d7b771b2cb456692a1b"
+        },
+        {
+          "task_id": "task_492_weighted_dependency_repair",
+          "number": 492,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 30,
+          "native_tokens": 219683,
+          "evidence_sha256": "aaf7c3659e0076e6a0bfea151195ec860dee67ac2bc73d7378115e0a0f9bd908"
+        },
+        {
+          "task_id": "task_493_calendar_dependency_schedule",
+          "number": 493,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 39,
+          "native_tokens": 252706,
+          "evidence_sha256": "d487d2081a5ff341eb9629a8c7e4dbff89c352e8f6ee07bbfd31038b8784c290"
+        },
+        {
+          "task_id": "task_494_config_provenance_interpolation",
+          "number": 494,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 51,
+          "native_tokens": 346620,
+          "evidence_sha256": "054a179f4c32fc447f0d4862dadfa0f2983b7d1174e2fd0055db9436828766e5"
+        },
+        {
+          "task_id": "task_495_c3_profile_resolution",
+          "number": 495,
+          "outcome": "fail",
+          "classification": "task_failure",
+          "domain_verifier_passed": false,
+          "native_steps": 13,
+          "native_tokens": 69536,
+          "evidence_sha256": "a40caa66d73e702c2deeae21d684ccdf3b83dafd2729d3389825dadea1cd81cf"
+        },
+        {
+          "task_id": "task_496_structural_three_way_merge",
+          "number": 496,
+          "outcome": "fail",
+          "classification": "task_failure",
+          "domain_verifier_passed": false,
+          "native_steps": 13,
+          "native_tokens": 84942,
+          "evidence_sha256": "480d12d87c4f3720ae6cdc825dc0c56e9ceb195dda403827e7d4fe193627892b"
+        },
+        {
+          "task_id": "task_497_optimal_context_patch",
+          "number": 497,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 27,
+          "native_tokens": 191010,
+          "evidence_sha256": "0e4e0364320ac5a20248517874b95e797d40c6f82ccaff7dc25e77563e40d764"
+        },
+        {
+          "task_id": "task_498_simultaneous_namespace_migration",
+          "number": 498,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 45,
+          "native_tokens": 288150,
+          "evidence_sha256": "947deb5e8b0e5b3373b09fbd8b88262339681cb1f52e594932df57f195d5d246"
+        },
+        {
+          "task_id": "task_499_minimal_spill_rename",
+          "number": 499,
+          "outcome": "fail",
+          "classification": "task_failure",
+          "domain_verifier_passed": false,
+          "native_steps": 7,
+          "native_tokens": 38144,
+          "evidence_sha256": "f78276882f4551198dd6b452838f454d1030dbb8f7335d23ba1505b6b739776e"
+        },
+        {
+          "task_id": "task_500_incremental_backup_gc",
+          "number": 500,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 28,
+          "native_tokens": 167806,
+          "evidence_sha256": "30b7583fcf2b81cb332e8cb547504ab1ef566628b2e38831ec2dba0d3c187a5d"
+        },
+        {
+          "task_id": "task_501_portable_merkle_archive",
+          "number": 501,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 38,
+          "native_tokens": 241840,
+          "evidence_sha256": "a3615ee5ad1a7d962f578c18faeb843b3a619f80202c7c7420a5d7b72539bec2"
+        },
+        {
+          "task_id": "task_502_invoice_event_settlement",
+          "number": 502,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 44,
+          "native_tokens": 294055,
+          "evidence_sha256": "759c9e97b01349ffdd9acf735e95b5cb0dc2557bf7a15edd8460dc9ac7814bd9"
+        },
+        {
+          "task_id": "task_503_rational_invoice_fx",
+          "number": 503,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 38,
+          "native_tokens": 256697,
+          "evidence_sha256": "b749551975c0970b7d0a8bb72591acfba1cbc4ec4cbefdf86cc9b94ac9a0f3bc"
+        },
+        {
+          "task_id": "task_504_atomic_relational_migration",
+          "number": 504,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 52,
+          "native_tokens": 379160,
+          "evidence_sha256": "bd3499e62315ee1b5d3f80145525cfa006872bc0bb25c06128580b193556834f"
+        },
+        {
+          "task_id": "task_505_temporal_history_migration",
+          "number": 505,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 34,
+          "native_tokens": 213375,
+          "evidence_sha256": "2f82c38cb4b034fc5a844c50f61db33b3aa5ec0b67a1f04a29bc7e3d6656384f"
+        },
+        {
+          "task_id": "task_506_lossless_ini_edit_plan",
+          "number": 506,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 38,
+          "native_tokens": 232839,
+          "evidence_sha256": "7f74c28d99d52d467bb16e52610337a8517e6428d1d9ec6143aa8dae8fb8147a"
+        },
+        {
+          "task_id": "task_507_scoped_ini_includes",
+          "number": 507,
+          "outcome": "fail",
+          "classification": "agent_budget",
+          "domain_verifier_passed": false,
+          "native_steps": null,
+          "native_tokens": 444656,
+          "evidence_sha256": "36f1ce35235bb63f58c8261ce174d809ccb2d8989845cae5cceff593de349546"
+        },
+        {
+          "task_id": "task_508_atomic_guarded_edits",
+          "number": 508,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 20,
+          "native_tokens": 99437,
+          "evidence_sha256": "0be7f93fcbf072e1bf68bb1d675e9cb10dc77f51d8552db32093fd25ad2f9dde"
+        },
+        {
+          "task_id": "task_509_snapshot_savepoint_schedule",
+          "number": 509,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 20,
+          "native_tokens": 111453,
+          "evidence_sha256": "dd030ca7af5504a7ca8d8b425de58b841f7426ab369eff91b71bd3f431343fe4"
+        },
+        {
+          "task_id": "task_510_retry_shard_reconciliation",
+          "number": 510,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 28,
+          "native_tokens": 179571,
+          "evidence_sha256": "3a58f10d572965050d6bd45115c92a0ca3dffb9600bd3e9a76600daa08c6b233"
+        },
+        {
+          "task_id": "task_511_exact_ci_diagnosis",
+          "number": 511,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 14,
+          "native_tokens": 78603,
+          "evidence_sha256": "91c7de4fa31d67d79ce85267f4bbbdc5f8093b2b0cf29f465b6e805e0f1b3225"
+        }
+      ],
+      "measurement_date": "2026-10-21",
+      "measurement_dates_utc": [
+        "2026-10-21"
+      ]
+    },
+    {
+      "configuration_id": "sonnet55_high_v8a_partial",
+      "model": "Claude Sonnet 5.5",
+      "harness": "DeepAgents 0.6.12",
+      "reasoning_effort": "high",
+      "wave": 20,
+      "source_task_set_version": "0.20.0",
+      "source_revision": "v8a",
+      "source_digest": "cd6361b31ff19632a7eb9ebfcae98cd8a495895fa38aa197dbaccd5c3cb70298",
+      "measured_task_count": 12,
+      "task_count": 40,
+      "complete": false,
+      "passed": 9,
+      "score_percent": null,
+      "observed_pass_rate_percent": 75.0,
+      "quality_valid": false,
+      "quality_notes": [
+        "Selected12-task pilot only; task479 quota wording was later clarified in v8b, with no verifier/algorithm/budget change.",
+        "Task479 final state passed domain verifier but scored FAIL due graph limit;485and499 censorFAIL."
+      ],
+      "budget": {
+        "graph_supersteps": 80,
+        "service_calls": 160,
+        "seconds": 900,
+        "max_output_tokens": 16384,
+        "temperature": "provider_default",
+        "explicitly_disclosed": true
+      },
+      "selection_policy": "one_execution_per_measured_task_no_retries",
+      "native_steps": {
+        "total": null,
+        "observed_subtotal": 241,
+        "coverage": 11,
+        "expected": 12
+      },
+      "native_tokens": {
+        "total": 1843090,
+        "observed_subtotal": 1843090,
+        "coverage": 12,
+        "expected": 12
+      },
+      "outcomes": [
+        {
+          "task_id": "task_473_watermarked_logfmt",
+          "number": 473,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 25,
+          "native_tokens": 144079,
+          "evidence_sha256": "34239286f4aee29f980de72596cd40bcd6d37181d1ddf9597bb8c68d11d523f5"
+        },
+        {
+          "task_id": "task_475_capacity_session_matching",
+          "number": 475,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 18,
+          "native_tokens": 99825,
+          "evidence_sha256": "bb5f3f2a0b155d375863f07093b9a27128bc0c63afd6c949acafd43119014f35"
+        },
+        {
+          "task_id": "task_479_shared_segment_repair",
+          "number": 479,
+          "outcome": "fail",
+          "classification": "agent_budget",
+          "domain_verifier_passed": true,
+          "native_steps": null,
+          "native_tokens": 398186,
+          "evidence_sha256": "eb78d09164f1c95a4cdfd0efc97d802bd953f9b32d4f80984cdd6db7efeea4f3"
+        },
+        {
+          "task_id": "task_485_compressed_ordered_ranges",
+          "number": 485,
+          "outcome": "censor",
+          "classification": "provider_content_filter",
+          "domain_verifier_passed": false,
+          "native_steps": 10,
+          "native_tokens": 48902,
+          "evidence_sha256": "e77fe557342c2b7dd72a448bc83894bf2a12417e0b3c7295eafa7072f5f88d54"
+        },
+        {
+          "task_id": "task_487_adaptive_retry_policy",
+          "number": 487,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 15,
+          "native_tokens": 89007,
+          "evidence_sha256": "ea66bd77317cd955c9b8b60f1dea91f88359764aa5f81c9c92d6b00ec82d541c"
+        },
+        {
+          "task_id": "task_489_atomic_tree_migration",
+          "number": 489,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 40,
+          "native_tokens": 247312,
+          "evidence_sha256": "d9887b0a63bfb3ae91febd744781fb11689669fe464ef36a738f7314f571d216"
+        },
+        {
+          "task_id": "task_495_c3_profile_resolution",
+          "number": 495,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 33,
+          "native_tokens": 214655,
+          "evidence_sha256": "4ce64561abc83e8a9178af6fe80bdd366a3bd2648fa5eb6a662ec68f1e2f6f23"
+        },
+        {
+          "task_id": "task_499_minimal_spill_rename",
+          "number": 499,
+          "outcome": "censor",
+          "classification": "provider_content_filter",
+          "domain_verifier_passed": false,
+          "native_steps": 15,
+          "native_tokens": 87448,
+          "evidence_sha256": "633d0cc2f461bab8d349abb20cf611fd5cb02c5618576555fe67f55ad3e4b7a6"
+        },
+        {
+          "task_id": "task_503_rational_invoice_fx",
+          "number": 503,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 26,
+          "native_tokens": 169559,
+          "evidence_sha256": "ec185c57c1be6b99d1eb35ed56f195847445c0865ff0ae9e5571a4295423dd84"
+        },
+        {
+          "task_id": "task_507_scoped_ini_includes",
+          "number": 507,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 27,
+          "native_tokens": 159484,
+          "evidence_sha256": "7522649b93cf0390fcf8ca47eb92113aee87f96758377c83a8f5190b6e3addf4"
+        },
+        {
+          "task_id": "task_509_snapshot_savepoint_schedule",
+          "number": 509,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 17,
+          "native_tokens": 96963,
+          "evidence_sha256": "0d40e2445d11176a86c075c91e019aa8237e714a0a5630064665c1591a945271"
+        },
+        {
+          "task_id": "task_511_exact_ci_diagnosis",
+          "number": 511,
+          "outcome": "pass",
+          "classification": "passed",
+          "domain_verifier_passed": true,
+          "native_steps": 15,
+          "native_tokens": 87670,
+          "evidence_sha256": "d97911b72333041063ba776fb68b1ff24085faaf28cd72274bf2d9fa78133a2b"
+        }
+      ],
+      "measurement_date": "2026-10-21",
+      "measurement_dates_utc": [
+        "2026-10-21"
+      ]
+    }
+  ]
+}

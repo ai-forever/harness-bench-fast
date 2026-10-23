@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wave 21 · Composite Hard</title>
+<link rel="stylesheet" href="landing.css">
+</head>
+<body>
+<main>
+<p>
+<a href="index.html#hard">← Common leaderboard</a>
+</p>
+<section class="measurement-protocol">
+<p class="snapshot-label">Wave 21 · v0.21.2 · 10 selected tasks</p>
+<h1>Composite Hard</h1>
+<p>Two coupled workflows per task, with changing service state, dependency constraints and mechanically checked final submissions. No specialist factual knowledge is required. The model must inspect tools, manage state and finish both workflows within the declared limits.</p>
+<p>Selected task IDs: 512, 518, 520, 522, 523, 524, 525, 526, 527, 530. The original IDs are preserved. Run <code>uv run python -m harness_bench list --suite composite-hard</code>. The full 20-task calibration is available as <code>composite-hard-calibration</code>; the 531-task registry also retains the 40 original wave 20 controls.</p>
+<p>
+<strong>Retrospective calibration rescore, not a fresh held-out evaluation.</strong> These ten tasks were selected using existing model outcomes, then the same audited executions were projected onto the selected IDs. There are no new model calls and no best-of mixing between budgets. One retained execution per task; no repeat-variability estimate.</p>
+<p>Measurements: 21–22 October 2026; selected-wave projection: 23 October 2026. Exact dates and source fingerprints are retained per configuration.</p>
+<div class="table-wrap">
+<table class="leaderboard-table">
+<thead>
+<tr>
+<th>Model / harness</th>
+<th>Budget</th>
+<th>Passed</th>
+<th>Score</th>
+<th>Steps</th>
+<th>Tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr id="sonnet55_high_160">
+<td>Sonnet 5.5 (high)<span class="harness">DeepAgents 0.6.12</span>
+</td>
+<td>160 graph steps</td>
+<td>9/10</td>
+<td>90.0%</td>
+<td>484</td>
+<td>4,766,905</td>
+</tr>
+<tr id="codex0163_deepseek41_unc_high_160">
+<td>DeepSeek V4.1 Flash 1017 UNCENSORED (high)<span class="harness">Codex CLI 0.163.0</span>
+</td>
+<td>160 model requests</td>
+<td>9/10</td>
+<td>90.0%</td>
+<td>679</td>
+<td>19,225,827</td>
+</tr>
+<tr id="sonnet55_80">
+<td>Sonnet 5.5 (high)<span class="harness">DeepAgents 0.6.12</span>
+</td>
+<td>80 graph steps</td>
+<td>5/10</td>
+<td>50.0%</td>
+<td>≥262 (8/10 tasks)</td>
+<td>3,507,874</td>
+</tr>
+<tr id="deepseek41_flash_80">
+<td>DeepSeek V4.1 Flash 1017 (high)<span class="harness">DeepAgents 0.6.12</span>
+</td>
+<td>80 graph steps</td>
+<td>0/10</td>
+<td>0.0%</td>
+<td>Unavailable</td>
+<td>4,096,759</td>
+</tr>
+<tr id="fable51_medium_80">
+<td>Fable 5.1 (medium)<span class="harness">DeepAgents 0.6.12</span>
+</td>
+<td>80 graph steps</td>
+<td>0/10</td>
+<td>0.0%</td>
+<td>≥72 (8/10 tasks)</td>
+<td>≥1,186,934 (9/10 tasks)</td>
+</tr>
+<tr id="glm53_high_80">
+<td>GLM 5.3 (high)<span class="harness">DeepAgents 0.6.12</span>
+</td>
+<td>80 graph steps</td>
+<td>0/10</td>
+<td>0.0%</td>
+<td>≥19 (1/10 tasks)</td>
+<td>3,469,103</td>
+</tr>
+<tr id="mimo26pro_high_80">
+<td>MiMo 2.6 Pro (high)<span class="harness">DeepAgents 0.6.12</span>
+</td>
+<td>80 graph steps</td>
+<td>0/10</td>
+<td>0.0%</td>
+<td>≥67 (3/10 tasks)</td>
+<td>≥908,521 (4/10 tasks)</td>
+</tr>
+<tr id="qwen38max_high_80">
+<td>Qwen 3.8 Max (high)<span class="harness">DeepAgents 0.6.12</span>
+</td>
+<td>80 graph steps</td>
+<td>0/10</td>
+<td>0.0%</td>
+<td>Unavailable</td>
+<td>≥4,712,361 (9/10 tasks)</td>
+</tr>
+<tr id="opus55_high_160_partial">
+<td>Opus 5.5 (high)<span class="harness">DeepAgents 0.6.12</span>
+</td>
+<td>160 graph steps</td>
+<td>1/1</td>
+<td>Incomplete · 1/10 measured</td>
+<td>44</td>
+<td>428,830</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2>Protocol and limits</h2>
+<p>Linux bubblewrap isolation; no subagents; provider-default temperature; 900 seconds, 320 trusted-service calls and 16,384 output tokens. DeepAgents 0.6.12 uses 80 or 160 graph supersteps. Configured Codex CLI 0.163.0 uses 160 model API requests, including transport retries: those units are different. The task prompt states its resource limits; runner prompt additions disclose finite graph limits. Historical 80-step results retain their original task prompts and source version.</p>
+<p>Non-censorship API failures are retried and do not count as model failures. Censorship is a terminal failure. Historical Sonnet80 task527 retained a recovered HTTP502; it is not labelled a first-entire-clean execution. Formal run status governs scoring: Qwen task525 remains a failure despite domain goal acceptance after budget exhaustion. Configured Codex task512 remains a failure because the service-call contract was violated; it is not retried as an API failure.</p>
+<p>Steps and tokens count only retained executions, passed and failed. Missing metrics remain unavailable; partial sums state coverage. Repeated input context is counted; cached input is already part of input tokens. Reasoning tokens are not added again to reported output totals. The configured uncensored DeepSeek on private servers is distinct from the official OpenRouter DeepSeek model. The default-catalog Codex diagnostic is excluded.</p>
+<p>Sources are frozen calibration task sets v0.21.0 (80-step profiles) and v0.21.1 (160-step profiles); v0.21.2 selects IDs without changing the 160-step contracts. The frozen selected suite passed gold, blank-workspace rejection and frozen replay admission on all ten tasks. This release preserves current upstream trusted-service v2 runtime handling; historical results retain their original source/runtime versions and are not presented as new executions of that runtime. Calibration outcome selection and missing-counter coverage are preserved in the downloadable JSON.</p>
+<h2>Per-task outcomes</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>sonnet55_80</th>
+<th>deepseek41_flash_80</th>
+<th>fable51_medium_80</th>
+<th>glm53_high_80</th>
+<th>mimo26pro_high_80</th>
+<th>qwen38max_high_80</th>
+<th>sonnet55_high_160</th>
+<th>opus55_high_160_partial</th>
+<th>codex0163_deepseek41_unc_high_160</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>512 · Reconcile incident ownership with a changing delivery policy</th>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>PASS</td>
+<td>Unmeasured</td>
+<td>FAIL</td>
+</tr>
+<tr>
+<th>518 · Publish mutually dependent restoration and backup snapshots</th>
+<td>PASS</td>
+<td>FAIL</td>
+<td>CENSOR</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>PASS</td>
+<td>Unmeasured</td>
+<td>PASS</td>
+</tr>
+<tr>
+<th>520 · Contact groups and client namespace handoff</th>
+<td>PASS</td>
+<td>FAIL</td>
+<td>CENSOR</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>PASS</td>
+<td>Unmeasured</td>
+<td>PASS</td>
+</tr>
+<tr>
+<th>522 · Latency reports and layered runtime feedback</th>
+<td>PASS</td>
+<td>FAIL</td>
+<td>CENSOR</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>PASS</td>
+<td>PASS</td>
+</tr>
+<tr>
+<th>523 · Template providers and package artifact feedback</th>
+<td>PASS</td>
+<td>FAIL</td>
+<td>CENSOR</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>PASS</td>
+<td>Unmeasured</td>
+<td>PASS</td>
+</tr>
+<tr>
+<th>524 · Versioned document recipes and source-pin merge</th>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>PASS</td>
+<td>Unmeasured</td>
+<td>PASS</td>
+</tr>
+<tr>
+<th>525 · Delivery compensation and dependency test coverage</th>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>CENSOR</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>PASS</td>
+<td>Unmeasured</td>
+<td>PASS</td>
+</tr>
+<tr>
+<th>526 · Reconcile a migrated snapshot with a changing database view</th>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>PASS</td>
+<td>Unmeasured</td>
+<td>PASS</td>
+</tr>
+<tr>
+<th>527 · Close a live restore and copy-store cutover without stale replicas</th>
+<td>PASS</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>PASS</td>
+<td>Unmeasured</td>
+<td>PASS</td>
+</tr>
+<tr>
+<th>530 · Reconcile inherited tenant configuration with live profile deployment</th>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>CENSOR</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>FAIL</td>
+<td>PASS</td>
+<td>Unmeasured</td>
+<td>PASS</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2>Historical wave 20 · preserved separately</h2>
+<p>The 40 original tasks 472–511 remain available, together with all previously published wave 1–19 results. They are not replaced by the selected wave 21 ranking. Different suites, source revisions, reasoning levels or budgets are not summed into an unsupported full-run score.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Model / harness</th>
+<th>Coverage</th>
+<th>Recorded pass count</th>
+<th>Status</th>
+<th>Steps</th>
+<th>Tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude Haiku 5.5 (high) · DeepAgents 0.6.12</td>
+<td>40/40</td>
+<td>29/40</td>
+<td>Historical raw score · 72.5%</td>
+<td>≥1,135 (35/40 tasks)</td>
+<td>9,606,273</td>
+</tr>
+<tr>
+<td>Claude Sonnet 5.5 (high) · DeepAgents 0.6.12</td>
+<td>12/40</td>
+<td>9/12</td>
+<td>Partial pilot · no full-wave score</td>
+<td>≥241 (11/12 tasks)</td>
+<td>1,843,090</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Wave20 Haiku retains an ambiguous window-key contract on task473 as a raw failure; its 29/40 is not an unqualified clean difficulty estimate. The Sonnet pilot covers 12/40 only, with two censorship outcomes. Source v8a→v8b clarified task479 quota-capacity wording, so revisions stay explicit. Historical numbers are preserved without rerunning or silently correcting them.</p>
+<p>
+<a href="wave21-results.json">Wave 21 outcomes, coverage and source fingerprints</a> · <a href="wave20-results.json">Historical wave 20 outcomes and caveats</a> · <a href="wave21-composite-hard.md">Task-set documentation</a> · <a href="index.html">Existing Light and Medium results</a> · <a href="archive.html">Original measurement archive</a>
+</p>
+</section>
+</main>
+</body>
+</html>

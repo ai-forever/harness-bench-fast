@@ -37,6 +37,17 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Prepare Linux verifier isolation
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap
+          # Ephemeral CI runner: allow bwrap's unprivileged user namespace.
+          if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          bwrap --unshare-user --unshare-net --ro-bind / / --proc /proc --dev /dev -- /usr/bin/true
+
       - name: Install dependencies
         run: uv sync --dev
 

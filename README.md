@@ -2,7 +2,34 @@
 
 [Live leaderboard and benchmark results](https://ai-forever.github.io/harness-bench-fast/)
 
-The leaderboard has two independent views: **harness_bench_fast light** (tasks
+**Wave 21 / task-set v0.21.2: ten selected coupled workflows.** Use
+`--suite composite-hard` for IDs **512, 518, 520, 522, 523, 524, 525, 526, 527, 530**.
+Each task combines two general workflows with documented changes to current
+state, versions and obligations; both goals must be satisfied in one trajectory.
+All domain rules and tools are available locally. Linux/bubblewrap and the
+trusted host service are required. Each task allows 900 seconds and 320 shared
+service requests. For the calibrated DeepAgents profile, use
+`--recursion-limit 160 --max-tokens 16384 --forward-reasoning-history --no-subagents`;
+the prompt discloses the graph budget. A graph step is not a model or service call.
+
+These ten were selected from existing calibration, using at most two successful
+unique model+harness pairs among seven configurations tested on all twenty.
+This is a post-selection rescore, not a held-out difficulty estimate or a new
+model run. The Opus follow-up covered only two tasks and is recorded separately.
+See [wave 21 and its contracts](docs/wave21-composite-hard.md) and the
+[selection manifest](docs/wave21-selected10.json).
+
+The registry contains **531 tasks** to preserve original IDs and historical
+controls: `general-hard` retains wave 20 (472–511), and
+`composite-hard-calibration` retains all twenty coupled tasks (512–531).
+`default` and `medium` now include these controls; their registry denominators
+are 531 and 140. The published historical tables below keep their original
+wave 1–20 definitions, denominators, protocols and measurements. Missing new
+coverage is never counted as failure. No full 531-task measurement is published.
+
+The common leaderboard adds **Hard / Wave 21** (the selected ten tasks), with
+[retained calibration results and historical wave 20](docs/wave21-measurements.html).
+Different budgets remain separate rows. The existing two views remain available: **harness_bench_fast light** (tasks
 1–391) and **harness_bench_fast medium** (tasks 392–471, 80 tasks).
 Light covers everyday workflows; Medium covers long context, tool reflection
 and feasibility. These are disjoint subsets of the same task set, not new task
@@ -46,7 +73,7 @@ subset totals appear as a dash. Full-run usage is never substituted for Light,
 Medium or wave 19 usage. Published usage counts only final retained task attempts;
 superseded recovery attempts are excluded. Historical scores and measurement protocols are unchanged.
 
-Current task set: **471 tasks, `task-set v0.19.1`**. Tasks 432–471 remain **wave 19: feasibility** — 40 tasks in 20 matched pairs; this revision adds no tasks. The agent must construct and submit a solution, execute a feasible search strategy, or prove that the formal conditions cannot be met. The runtime has a 3,600-second sanitary guard against hangs; formal resource budgets inside tasks are unchanged. A timely host-recorded `submit`/`finish` that passes the full verifier earns credit even if the subsequent final reply or process times out. Format and protocol compliance are part of the score. This measures the complete agent configuration, not a separate ability to predict its own solving time. Individual task credit is the main metric; both halves must pass for additional pair credit. See [wave 19](docs/wave19-feasibility.md) for the contracts, runtime and validation limits.
+Historical task set: **471 tasks, `task-set v0.19.1`**. Tasks 432–471 remain **wave 19: feasibility** — 40 tasks in 20 matched pairs; this revision adds no tasks. The agent must construct and submit a solution, execute a feasible search strategy, or prove that the formal conditions cannot be met. The runtime has a 3,600-second sanitary guard against hangs; formal resource budgets inside tasks are unchanged. A timely host-recorded `submit`/`finish` that passes the full verifier earns credit even if the subsequent final reply or process times out. Format and protocol compliance are part of the score. This measures the complete agent configuration, not a separate ability to predict its own solving time. Individual task credit is the main metric; both halves must pass for additional pair credit. See [wave 19](docs/wave19-feasibility.md) for the contracts, runtime and validation limits.
 
 **Wave 19 requires Linux/bubblewrap and a trusted host service.** Use `run-cli --isolation bwrap` or `run-openrouter --isolation bwrap` (the isolated CLI worker). Native `run` / `run-pure`, native OpenRouter execution, RLI and Harbor export reject selections containing these tasks before model execution. To use those paths on earlier tasks, select `--from-task 1 --to-task 431`.
 

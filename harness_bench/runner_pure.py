@@ -34,6 +34,7 @@ from harness_bench.runtime_limits import (
     DEFAULT_TASK_TIMEOUT_SECONDS,
     effective_recursion_limit,
     langgraph_recursion_limit,
+    prompt_with_execution_budget,
 )
 from harness_bench.tasks import ALL_TASKS, get_task
 
@@ -125,7 +126,7 @@ def run_task(
             started = time.monotonic()
             invocation_result = invoke_agent_with_stats(
                 agent,
-                {"messages": [{"role": "user", "content": task.prompt}]},
+                {"messages": [{"role": "user", "content": prompt_with_execution_budget(task.prompt, recursion_limit=recursion_limit)}]},
                 stats,
                 min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
                 max_timeout_seconds=getattr(task, "max_timeout_seconds", None),
