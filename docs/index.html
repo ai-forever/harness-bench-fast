@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Compare agent harnesses on harness_bench_fast Light (391 tasks), Medium (80 tasks), and Hard wave 21 (10 tasks). Mechanically verified, with explicit measurement coverage.">
-  <title>harness_bench_fast · Light, Medium &amp; Hard</title>
-  <link rel="stylesheet" href="landing.css?v=wave21-20261023">
-  <script src="leaderboard.js?v=wave21-20261023" defer></script>
+  <meta name="description" content="Compare agent harnesses on harness_bench_fast Light and Medium, including the ten new Medium tasks in wave 21. Mechanically verified, with explicit measurement coverage.">
+  <title>harness_bench_fast · Light &amp; Medium</title>
+  <link rel="stylesheet" href="landing.css?v=medium-wave21-20261023">
+  <script src="leaderboard.js?v=medium-wave21-20261023" defer></script>
 </head>
 <body>
   <header>
@@ -17,7 +17,7 @@
     <section class="intro">
       <p class="eyebrow">Agent benchmarks · waves 1–21</p>
       <h1>How well does your<br>agent get things done?</h1>
-      <p><a href="#hard">New: wave 21 · 10 composite tasks →</a> · <a href="wave21-measurements.html">Measurements &amp; protocol</a></p>
+      <p><a href="#medium-wave21">New in Medium: wave 21 · 10 composite tasks →</a> · <a href="wave21-measurements.html">Measurements &amp; protocol</a></p>
       <p><a href="harness-wave19.html">Four harnesses × four models · wave 19 results →</a></p>
       <p><a href="brain-haiku-experiment.html">Brain + Claude Haiku 5.5: timeout experiment, final-attempt tokens &amp; limitations →</a></p>
       <p class="lead">Files, code, tools and memory. Real tasks, mechanically verified.</p>
@@ -26,15 +26,10 @@
     <section aria-label="Benchmark results">
       <div class="suite-switch" role="group" aria-label="Benchmark suite">
         <button type="button" data-suite="light" aria-pressed="true"><strong>Light</strong><span>391 tasks · everyday workflows</span></button>
-        <button type="button" data-suite="medium" aria-pressed="false"><strong>Medium</strong><span>80 tasks · long context, reflection &amp; feasibility</span></button>
-        <button type="button" data-suite="hard" aria-pressed="false"><strong>Hard · wave 21</strong><span>10 tasks · coupled tool workflows</span></button>
+        <button type="button" data-suite="medium" aria-pressed="false"><strong>Medium</strong><span>Long context, reflection &amp; coupled workflows</span></button>
       </div>
       <div class="results-heading"><h2 id="suite-title">harness_bench_fast light</h2><span id="run-count" aria-live="polite"></span></div>
       <p id="coverage-note" class="coverage-note" aria-live="polite">Tasks 1–391. Loading published measurements…</p>
-      <div id="wave21-note" hidden>
-        <p class="fine-print">This subset was selected adaptively from calibration results. Scores reuse existing runs; this is a post-selection rescore, not a fresh held-out evaluation. The 80-step historical diagnostics and 160-step runs remain separate. Codex’s 160 model-request budget differs from DeepAgents’ 160 graph-step budget. <a href="wave21-measurements.html">Exact protocols and per-task results →</a></p>
-        <p class="fine-print">Opus 5.5 solved the one selected task it was tested on (522); the other nine were not measured. This partial result is excluded from the complete 10-task ranking.</p>
-      </div>
       <div class="filters">
         <label class="search">Search model or harness<input id="search" type="search" placeholder="e.g. GigaChat, Codex, deepagents" autocomplete="off"></label>
       </div>
@@ -46,6 +41,16 @@
       <p class="fine-print">Scores compare complete agent configurations; tools and budgets vary. Brain + Claude Haiku is an experimental selected-retry result with a changed deadline and unresolved transport errors; see its protocol label. mean@N is the mean of N runs, not pass@N. Rescored historical runs use v0.18.0 task definitions. <a href="archive.html#current">Protocols &amp; original results →</a></p>
       <details class="usage-guide"><summary>About steps and tokens</summary><p>Totals cover the tasks in each table, including failed tasks. Steps are tool calls where native traces are available; raw counters follow the harness's own accounting. Tokens are recorded input + output usage, including reported cache usage; reasoning is not added twice. These are token counts, not a monetary bill.</p><p><strong>Partial</strong> means some usage is missing; <strong>Raw</strong> means the counters have not been audited and may include accounting errors. Task counts show where metrics were recorded, not whether every request was captured. A dash means no usable total for this subset. Hover or focus a value for its exact total and notes. Historical full-run totals are not reused for smaller subsets.</p></details>
       <noscript><p>Enable JavaScript to compare suites, or <a href="archive.html#current">read the static measurement archive</a>.</p></noscript>
+      <section id="medium-wave21" class="wave19-section" aria-labelledby="wave21-title" hidden>
+        <div class="results-heading"><h2 id="wave21-title">Wave 21 · Medium continuation</h2><span id="wave21-count"></span></div>
+        <p class="coverage-note">10 selected coupled workflows · v0.21.2. Existing runs rescored on this subset; budgets remain separate. Historical Medium measurements are preserved above and below.</p>
+        <div id="wave21-note">
+          <p class="fine-print">This subset was selected adaptively from calibration results. Scores reuse existing runs; this is a post-selection rescore, not a fresh held-out evaluation. The 80-step historical diagnostics and 160-step runs remain separate. Codex’s 160 model-request budget differs from DeepAgents’ 160 graph-step budget. <a href="wave21-measurements.html">Exact protocols and per-task results →</a></p>
+          <p class="fine-print">Opus 5.5 solved the one selected task it was tested on (522); the other nine were not measured. This partial result is excluded from the complete 10-task ranking.</p>
+        </div>
+        <div class="table-wrap"><table class="leaderboard-table"><thead><tr><th scope="col">#</th><th scope="col">Model / harness</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">Score</th><th scope="col" class="numeric">Steps</th><th scope="col" class="numeric">Tokens</th></tr></thead><tbody id="wave21-results"></tbody></table></div>
+        <p id="wave21-empty" role="status" hidden>No wave 21 results match your search.</p>
+      </section>
       <section id="wave19-section" class="wave19-section" aria-labelledby="wave19-title" hidden>
         <div class="results-heading"><h2 id="wave19-title">Wave 19 · new Medium tasks</h2><span id="wave19-count"></span></div>
         <p class="coverage-note">Tasks 432–471 · 40 new tasks. These scores compare the same subset; they are ranked separately from the complete 80-task results above.</p>
@@ -56,7 +61,7 @@
     <details class="about"><summary>What is in each benchmark?</summary>
       <p><strong>Light · tasks 1–391:</strong> files, code, data, memory, agent workflows, Git and terminal tools.</p>
       <p><strong>Medium · tasks 392–471:</strong> long context (20), tool reflection (20), and wave 19 feasibility (40). The published v0.18.0 runs cover only the first 40 Medium tasks. Medium shows complete 80-task results first, followed by the new 40-task wave 19 separately. Historical 40-task data stays in the archive. Missing old coverage is never scored as zero.</p>
-      <p><strong>Hard · wave 21:</strong> tasks 512, 518, 520, 522–527 and 530. Each task combines two workflows with shared state and mechanical checks. Wave 20 and the original 20-task calibration results remain available in the <a href="wave21-measurements.html">measurement history</a>; Light and Medium keep their existing measurements.</p>
+      <p><strong>Medium · wave 21:</strong> tasks 512, 518, 520, 522–527 and 530. Each task combines two workflows with shared state and mechanical checks. Wave 20 and the original 20-task calibration results remain available in the <a href="wave21-measurements.html">measurement history</a>; all existing Light and Medium measurements are preserved.</p>
       <p>All tasks use mechanical verification. Partial Medium results are ranked only against the same 40-task subset, separately from the current 80-task suite. Historical scores are offline rescores; four DeepAgents configurations are full runs; the new harness matrix measures only wave 19. Historical + wave 19 rows combine disjoint measurements and are labeled. Repeat variability is unavailable for single runs.</p>
       <p><a href="https://github.com/ai-forever/harness-bench-fast#readme">Run the benchmark</a> · <a href="leaderboard-results.json">Download aggregate data</a> · <a href="wave19-feasibility.md">Wave 19 protocol</a></p>
     </details>

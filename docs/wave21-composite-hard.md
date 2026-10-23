@@ -1,4 +1,4 @@
-# Wave 21: ten selected coupled workflows
+# Wave 21: Medium continuation with ten coupled workflows
 
 Task-set 0.21.2 selects **512,518,520,522,523,524,525,526,527,530** as the new
 wave. Run it with `--suite composite-hard`. Original task IDs, prompts, domain

@@ -110,8 +110,8 @@ assert.equal(formatUsage({ tasks: 40, steps: { value: 0, covered_tasks: 40, stat
 assert.equal(formatUsage({ tasks: 80, steps: { value: 17, covered_tasks: 3, status: "raw" } }, "steps").note, "Raw · 3/80 tasks");
 assert.equal(selectResults(data, "medium", "current", "").find(r => r.id === "run-19").usage.steps.value, null);
 assert.equal(selectResults(data, "light", "current", "Codex").find(r => r.id !== "secret-sft-codex-v019").usage, null);
-assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 2);
-assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 2);
+assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 3);
+assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 3);
 console.log("Subset usage, exact totals, incomplete counters and real zero checks passed.");
 
 const codex = selectResults(data, "light", "current", "secret sft Codex")[0];
@@ -155,28 +155,31 @@ for (const id of ["haiku-mini-v019", "haiku-codex-v019", "haiku-claude-v019"]) {
   assert.equal(row.telemetry.medium.tokens.status, "complete");
 }
 
-// Hard uses its own complete 10-task denominator. Historical and partial
+// Wave 21 within Medium uses its own complete 10-task denominator. Historical and partial
 // measurements never fall back into this ranking.
-const hardFixture = { rows: [
+const wave21Fixture = { rows: [
   { id: "old", model: "Fixture", harness: "A", medium: { passed: 80, total: 80 } },
   { id: "partial", model: "Fixture", harness: "B", wave21: { passed: 1, total: 1 } },
-  { id: "hard80", model: "Sonnet high", harness: "DeepAgents · 80 graph steps", wave21: { passed: 5, total: 10 } },
-  { id: "hard160", model: "Sonnet high", harness: "DeepAgents · 160 graph steps", wave21: { passed: 9, total: 10 }, telemetry: { wave21: { tasks: 10, steps: { value: 100, covered_tasks: 10, status: "complete" } } } }
+  { id: "wave21-80", model: "Sonnet high", harness: "DeepAgents · 80 graph steps", wave21: { passed: 5, total: 10 } },
+  { id: "wave21-160", model: "Sonnet high", harness: "DeepAgents · 160 graph steps", wave21: { passed: 9, total: 10 }, telemetry: { wave21: { tasks: 10, steps: { value: 100, covered_tasks: 10, status: "complete" } } } }
 ] };
-const hardFixtureRows = selectResults(hardFixture, "hard", "current", "sonnet");
-assert.deepEqual(hardFixtureRows.map(row => row.id), ["hard160", "hard80"]);
-assert.equal(hardFixtureRows[0].usage.steps.value, 100);
-assert.equal(selectResults(hardFixture, "hard", "current", "no-such-model").length, 0);
-assert.ok(landing.includes('data-suite="hard"'));
+const wave21FixtureRows = selectResults(wave21Fixture, "medium", "wave21", "sonnet");
+assert.deepEqual(wave21FixtureRows.map(row => row.id), ["wave21-160", "wave21-80"]);
+assert.equal(wave21FixtureRows[0].usage.steps.value, 100);
+assert.equal(selectResults(wave21Fixture, "medium", "wave21", "no-such-model").length, 0);
+assert.ok(!landing.includes('data-suite="hard"'));
+assert.equal((landing.match(/data-suite=/g) || []).length, 2);
+assert.ok(landing.includes('id="medium-wave21"'));
+assert.ok(!landing.includes('Hard'));
 assert.ok(landing.includes('id="wave21-note"'));
 assert.ok(landing.includes('wave21-measurements.html'));
-const hard = selectResults(data, "hard", "current", "");
-assert.equal(hard.length, 8);
-assert.ok(hard.every(row => row.result.total === 10));
-assert.deepEqual(hard.map(row => row.result.passed).sort((a, b) => b - a), [9, 9, 5, 0, 0, 0, 0, 0]);
-assert.equal(selectResults(data, "hard", "current", "Opus").length, 0);
-assert.equal(selectResults(data, "hard", "current", "Sonnet").length, 2);
-assert.equal(hard.find(row => row.id === "wave21-sonnet55_80").result.passed, 5);
-assert.equal(hard.find(row => row.id === "wave21-sonnet55_high_160").result.passed, 9);
-assert.equal(hard.find(row => row.id === "wave21-codex0163_deepseek41_unc_high_160").result.passed, 9);
-assert.equal(hard.find(row => row.id === "wave21-qwen38max_high_80").result.passed, 0);
+const wave21 = selectResults(data, "medium", "wave21", "");
+assert.equal(wave21.length, 8);
+assert.ok(wave21.every(row => row.result.total === 10));
+assert.deepEqual(wave21.map(row => row.result.passed).sort((a, b) => b - a), [9, 9, 5, 0, 0, 0, 0, 0]);
+assert.equal(selectResults(data, "medium", "wave21", "Opus").length, 0);
+assert.equal(selectResults(data, "medium", "wave21", "Sonnet").length, 2);
+assert.equal(wave21.find(row => row.id === "wave21-sonnet55_80").result.passed, 5);
+assert.equal(wave21.find(row => row.id === "wave21-sonnet55_high_160").result.passed, 9);
+assert.equal(wave21.find(row => row.id === "wave21-codex0163_deepseek41_unc_high_160").result.passed, 9);
+assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.passed, 0);

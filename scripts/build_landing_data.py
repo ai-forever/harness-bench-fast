@@ -445,7 +445,7 @@ def build():
     APPEND_WAVE21(rows, ROOT)
     return {
         "task_set_version": "0.19", "light_tasks": 391, "medium_tasks": 80,
-        "hard_task_set_version": "0.21.2", "hard_tasks": 10,
+        "wave21_task_set_version": "0.21.2", "wave21_tasks": 10,
         "provenance": {
             "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs plus three complete Claude Haiku harness runs; v0.19 protocol revisions grouped for display, exact source_version retained per row; composites explicitly labeled; secret sft deepagents accepted by the operator",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
