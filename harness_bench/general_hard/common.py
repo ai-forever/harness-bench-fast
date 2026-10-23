@@ -147,7 +147,9 @@ def program_task(
             workspace = root / "work"
             workspace.mkdir()
             (workspace / "solution.py").write_bytes(source)
-            argv = [sys.executable, "-I", "-S", str(workspace / "solution.py")]
+            # Isolated mode ignores PYTHONIOENCODING; force the JSONL UTF-8
+            # contract explicitly, including on Windows locale-based stdio.
+            argv = [sys.executable, "-I", "-S", "-X", "utf8", str(workspace / "solution.py")]
             if sys.platform == "linux":
                 from harness_bench.cli_isolation import sandbox_argv
 
@@ -155,7 +157,7 @@ def program_task(
                 scratch.mkdir()
                 home.mkdir()
                 argv = sandbox_argv(
-                    ["/usr/bin/python3", "-I", "-S", str(workspace / "solution.py")],
+                    ["/usr/bin/python3", "-I", "-S", "-X", "utf8", str(workspace / "solution.py")],
                     workspace=workspace,
                     scratch=scratch,
                     home=home,
