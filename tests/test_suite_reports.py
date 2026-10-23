@@ -10,11 +10,11 @@ import pytest
 from harness_bench.__main__ import _task_ids, build_parser
 from harness_bench.suite_reports import split_reports
 from harness_bench.tasks import ALL_TASKS, SUITES
-from harness_bench.versioning import task_number
+from harness_bench.versioning import TASK_SET_VERSION, task_number
 
 
 def source(tasks=ALL_TASKS):
-    return {"task_set_version": "0.19.0", "measurement_valid": True, "tasks": [
+    return {"task_set_version": TASK_SET_VERSION, "measurement_valid": True, "tasks": [
         {"task_id": task.id, "passed": task_number(task.id) in {391, 392, 431, 432, 471},
          "attempt": 1, "attempts": 1, "agent_steps": 2, "agent_total_tokens": 10}
         for task in tasks
@@ -29,10 +29,10 @@ def split(payload):
 def test_named_suites_are_disjoint_complete_and_available_on_runners(command):
     light = _task_ids(build_parser().parse_args([command, "--suite", "light"]))
     medium = _task_ids(build_parser().parse_args([command, "--suite", "medium"]))
-    assert len(light) == 391 and len(medium) == 80
+    assert len(light) == 391 and len(medium) == 140
     assert not set(light) & set(medium)
     assert light + medium == [t.id for t in ALL_TASKS]
-    assert [task_number(x) for x in medium] == list(range(392, 472))
+    assert [task_number(x) for x in medium] == list(range(392, 532))
 
 
 def test_split_recomputes_counts_telemetry_and_boundaries_without_mutating_source():
@@ -42,9 +42,9 @@ def test_split_recomputes_counts_telemetry_and_boundaries_without_mutating_sourc
     assert payload == original
     light, medium = reports["light"], reports["medium"]
     assert (light["passed"], light["total"], light["steps"], light["tokens"]) == (1, 391, 782, 3910)
-    assert (medium["passed"], medium["total"], medium["steps"], medium["tokens"]) == (4, 80, 160, 800)
+    assert (medium["passed"], medium["total"], medium["steps"], medium["tokens"]) == (4, 140, 280, 1400)
     assert all(r["complete"] and r["status"] == "complete" for r in reports.values())
-    assert medium["attempts"][0]["wilson95"][0] < 4 / 80 < medium["attempts"][0]["wilson95"][1]
+    assert medium["attempts"][0]["wilson95"][0] < 4 / 140 < medium["attempts"][0]["wilson95"][1]
 
 
 def test_old431_source_stays_partial_medium_with_original_version():
@@ -54,10 +54,10 @@ def test_old431_source_stays_partial_medium_with_original_version():
     assert reports["light"]["status"] == "complete"
     medium = reports["medium"]
     assert medium["task_set_version"] == "0.18.0"
-    assert (medium["measured_tasks"], medium["expected_tasks"]) == (40, 80)
+    assert (medium["measured_tasks"], medium["expected_tasks"]) == (40, 140)
     assert medium["pass_rate"] is None
     assert medium["attempts"][0]["score"] is None
-    assert len(medium["attempts"][0]["missing_task_ids"]) == 40
+    assert len(medium["attempts"][0]["missing_task_ids"]) == 100
 
 
 def test_infrastructure_invalidity_is_local_to_affected_suite_and_no_score():
@@ -75,7 +75,7 @@ def test_timeout_is_normal_failure_and_missing_telemetry_stays_missing():
     payload["tasks"][-1].update(failure_kind="timeout", passed=False, agent_steps=None, agent_total_tokens=None)
     medium = split(payload)["medium"]
     assert medium["status"] == "complete"
-    assert medium["step_metric_coverage"] == medium["token_metric_coverage"] == 79
+    assert medium["step_metric_coverage"] == medium["token_metric_coverage"] == 139
 
 
 def test_unexplained_source_invalidity_cannot_be_cleared_by_split():
@@ -161,7 +161,7 @@ def test_published_landing_scores_preserve_all_source_totals_and_missing_wave19(
     composites = [row for row in data["rows"] if row.get("measurement_type") == "historical_plus_wave19"]
     assert len(historical) == 78 and len(full) == 12
     assert len(new_only) == 13 and len(composites) == 3
-    assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 108
+    assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 116
     astra = next(row for row in data["rows"] if row["id"] == "astra-pi-medium")
     assert astra["light"] is None and astra["medium_historical"] is None
     assert astra["medium"]["passed"] == 58 and astra["medium"]["total"] == 80
@@ -212,7 +212,7 @@ def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
     expected = build()
     docs = tmp_path / "docs"
     docs.mkdir()
-    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json", "secret-sft-mini-v019.json", "sonnet55-medium.json", "astra-medium.json", "universal-agent-haiku.json", "universal-agent-deepseek.json", "giga35-ultra-reasoning-v019.json", "leaderboard-telemetry.json", "secret-sft-codex-v019.json", "brain-haiku-experiment.json", "haiku-three-harnesses-v0191.json"):
+    for name in ("archive.html", "wave-results.js", "wave19-results.json", "wave19-harness-results.json", "secret-700b-v019.json", "secret-sft-mini-v019.json", "sonnet55-medium.json", "astra-medium.json", "universal-agent-haiku.json", "universal-agent-deepseek.json", "giga35-ultra-reasoning-v019.json", "leaderboard-telemetry.json", "secret-sft-codex-v019.json", "brain-haiku-experiment.json", "haiku-three-harnesses-v0191.json", "wave21-results.json"):
         text = (root / "docs" / name).read_text(encoding="utf-8")
         assert "\n" in text
         (docs / name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))

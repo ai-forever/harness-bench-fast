@@ -57,7 +57,27 @@ def test_range_selects_the_reflect_wave_in_default_and_named_suites() -> None:
 
 
 def test_wave19_and_open_ended_ranges() -> None:
-    expected = [t.id for t in ALL_TASKS[431:]]
-    assert _ids("run", "--suite", "feasibility") == expected
-    assert _ids("run-openrouter", "--from-task", "432") == expected
+    assert _ids("run", "--suite", "feasibility") == [t.id for t in ALL_TASKS[431:471]]
+    assert _ids("run-openrouter", "--from-task", "432") == [t.id for t in ALL_TASKS[431:]]
     assert _ids("run-openrouter", "--from-task", "412") == [t.id for t in ALL_TASKS[411:]]
+
+
+def test_wave20_named_and_open_ended_ranges_agree() -> None:
+    expected = [t.id for t in ALL_TASKS[471:511]]
+    assert _ids("run", "--suite", "general-hard") == expected
+    assert _ids("run-openrouter", "--from-task", "472", "--to-task", "511") == expected
+
+
+def test_composite_calibration_named_and_open_ended_ranges_agree() -> None:
+    expected = [t.id for t in ALL_TASKS[511:531]]
+    assert len(expected) == 20
+    assert _ids("run", "--suite", "composite-hard-calibration") == expected
+    assert _ids("run-openrouter", "--from-task", "512") == expected
+
+
+def test_selected_composite_wave_keeps_sparse_original_numbers() -> None:
+    selected = (512, 518, 520, 522, 523, 524, 525, 526, 527, 530)
+    assert _ids("run", "--suite", "composite-hard") == [ALL_TASKS[n - 1].id for n in selected]
+    assert _ids("run-openrouter", "--suite", "composite-hard", "--from-task", "523", "--to-task", "527") == [
+        ALL_TASKS[n - 1].id for n in selected if 523 <= n <= 527
+    ]

@@ -105,10 +105,22 @@ def test_reflect_wave_keeps_its_original_revision() -> None:
     assert revision_for_task_id("task_431_admin_elevation").version == "0.18.0"
 
 
-def test_wave19_is_the_current_revision() -> None:
-    assert TASK_SET_VERSION == "0.19.1"
-    assert CURRENT_TASK_SET_REVISION.total_tasks == 471
-    assert CURRENT_TASK_SET_REVISION.added_task_numbers == (0, 0)
+def test_wave19_keeps_its_original_revision() -> None:
     assert revision_for_task_id(ALL_TASKS[431].id).version == "0.19.0"
-    assert revision_for_task_id(ALL_TASKS[-1].id).version == "0.19.0"
-    assert TASK_WAVES[-1].name == "wave19-feasibility"
+    assert revision_for_task_id(ALL_TASKS[470].id).version == "0.19.0"
+    assert TASK_WAVES[-3].name == "wave19-feasibility"
+
+
+def test_wave20_keeps_its_original_candidate_revision() -> None:
+    assert revision_for_task_id(ALL_TASKS[471].id).version == "0.20.0"
+    assert revision_for_task_id(ALL_TASKS[510].id).version == "0.20.0"
+    assert TASK_WAVES[-2].name == "wave20-general-hard"
+
+
+def test_composite_selection_preserves_the_calibration_registry() -> None:
+    assert TASK_SET_VERSION == "0.21.2"
+    assert CURRENT_TASK_SET_REVISION.total_tasks == 531
+    assert CURRENT_TASK_SET_REVISION.added_task_numbers == (0, 0)
+    assert revision_for_task_id(ALL_TASKS[511].id).version == "0.21.0"
+    assert revision_for_task_id(ALL_TASKS[-1].id).version == "0.21.0"
+    assert TASK_WAVES[-1].name == "wave21-composite-hard"

@@ -8,9 +8,9 @@ When reporting итоговую таблицу benchmark runs for this repositor
 |---|---|---:|---:|---:|---:|
 
 Rules:
-- Include only completed runs with exactly 471 tasks (current task-set v0.19.1) unless the user asks for partials.
+- Include only completed runs with exactly 531 registry tasks (current task-set v0.21.2) unless the user asks for partials.
 - Sort rows by `score` descending.
-- Use `passed` as `<passed>/471` and `score` as a percentage with one decimal place.
+- Use `passed` as `<passed>/<suite total>` and `score` as a percentage with one decimal place.
 - Do not mix task-set versions in one table. Earlier runs are not comparable: v0.14.0 scored 371 tasks, v0.16.0 corrected defects across the 391 of v0.15.0 without changing their number, v0.17.0 adds the long-context wave as tasks 392–411, v0.18.0 adds the tool-reflection wave as tasks 412–431, and v0.19.0 adds wave 19 (feasibility) as tasks 432–471. If more than one version must appear, split the table and name the task-set version in each.
 - v0.19.1 changes execution/scoring protocol and clarifies task 410 without adding tasks. Preserve historical v0.19.0 scores and protocols; do not relabel them as v0.19.1. Use a fresh result JSON: resume rejects a different task-set version and wave 19 runtime/contract hash.
 - Do not include artifact links or artifact paths in the main table unless explicitly requested.
@@ -64,3 +64,13 @@ Rules:
 ## Wave naming
 
 Name waves by their task-set version: the v0.19.0 addition is **wave 19**, never by its positional index in `TASK_WAVES`. The v0.19.1 protocol revision adds no tasks and remains **wave 19**.
+
+## Wave 21 selection
+
+The current registry contains 531 tasks; `composite-hard` is the selected ten
+original IDs 512, 518, 520, 522, 523, 524, 525, 526, 527, 530.
+`general-hard` retains forty wave20 controls, and `composite-hard-calibration`
+retains all twenty coupled tasks. Historical leaderboard scopes and results
+remain unchanged. Report selected-ten rescoring separately by actual harness,
+model, effort, protocol and budget; it is adaptive selection, not a fresh run.
+Missing coverage is unmeasured. Never combine graph-step and model-request caps.

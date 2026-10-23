@@ -9,10 +9,12 @@ import hashlib
 import json
 import math
 import re
+import runpy
 from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+APPEND_WAVE21 = runpy.run_path(str(ROOT / "scripts/wave21_landing_data.py"))["append_wave21"]
 
 
 class PublishedRows(HTMLParser):
@@ -440,11 +442,14 @@ def build():
     telemetry["rows"].update(haiku_usage)
     telemetry["rows"]["universal-agent-deepseek"] = ua_deepseek["subset_telemetry"]
     attach_telemetry(rows, telemetry)
+    APPEND_WAVE21(rows, ROOT)
     return {
         "task_set_version": "0.19", "light_tasks": 391, "medium_tasks": 80,
+        "hard_task_set_version": "0.21.2", "hard_tasks": 10,
         "provenance": {
             "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs plus three complete Claude Haiku harness runs; v0.19 protocol revisions grouped for display, exact source_version retained per row; composites explicitly labeled; secret sft deepagents accepted by the operator",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
+            "wave21_results_sha256": hashlib.sha256((ROOT / "docs/wave21-results.json").read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             # Hash canonical UTF-8/LF text, independent of Git checkout CRLF.
             "wave_results_sha256": hashlib.sha256(waves.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "secret_700b_sha256": hashlib.sha256(secret_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),

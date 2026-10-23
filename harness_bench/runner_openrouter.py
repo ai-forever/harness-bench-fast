@@ -50,7 +50,7 @@ from harness_bench.runner import (
     invoke_agent_with_stats,
     normalize_json_output_path,
 )
-from harness_bench.runtime_limits import effective_recursion_limit
+from harness_bench.runtime_limits import effective_recursion_limit, prompt_with_execution_budget
 from harness_bench.tasks import ALL_TASKS, get_task
 
 DEFAULT_OPENROUTER_MODEL = "qwen/qwen3.6-plus"
@@ -339,7 +339,7 @@ def run_task(
                 started = time.monotonic()
                 invocation_result = invoke_agent_with_stats(
                     agent,
-                    {"messages": [{"role": "user", "content": task.prompt}]},
+                    {"messages": [{"role": "user", "content": prompt_with_execution_budget(task.prompt, recursion_limit=recursion_limit, max_tokens=max_tokens)}]},
                     stats,
                     min_timeout_seconds=getattr(task, "min_timeout_seconds", None),
                     max_timeout_seconds=getattr(task, "max_timeout_seconds", None),

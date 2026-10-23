@@ -21,6 +21,11 @@ from pathlib import Path
 
 from harness_bench.core import Task, VerifyResult
 from harness_bench.feasibility_tasks import FEASIBILITY_TASKS
+from harness_bench.general_hard import GENERAL_HARD_TASKS
+from harness_bench.general_hard.composite_tasks import (
+    COMPOSITE_CALIBRATION_TASKS,
+    COMPOSITE_HARD_TASKS,
+)
 from harness_bench.long_tasks import LONG_TASKS
 from harness_bench.reflect_tasks import REFLECT_TASKS
 from harness_bench.tasks_adversarial import ADVERSARIAL_TASKS
@@ -838,6 +843,8 @@ ALL_TASKS: list[Task] = [
     *LONG_TASKS,
     *REFLECT_TASKS,
     *FEASIBILITY_TASKS,
+    *GENERAL_HARD_TASKS,
+    *COMPOSITE_CALIBRATION_TASKS,
 ]
 
 # Canonical scored ids; retain the pre-publication reflection names as aliases.
@@ -855,6 +862,9 @@ SUITES: dict[str, list[Task]] = {
     "long": LONG_TASKS,
     "reflect": REFLECT_TASKS,
     "feasibility": FEASIBILITY_TASKS,
+    "general-hard": GENERAL_HARD_TASKS,
+    "composite-hard": COMPOSITE_HARD_TASKS,
+    "composite-hard-calibration": COMPOSITE_CALIBRATION_TASKS,
 }
 
 

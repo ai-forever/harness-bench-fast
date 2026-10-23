@@ -23,3 +23,23 @@ def effective_recursion_limit(configured: int, minimum: int | None = None) -> in
 def langgraph_recursion_limit(configured: int) -> int:
     """Translate our unlimited sentinel to the positive integer LangGraph needs."""
     return effective_recursion_limit(configured) or sys.maxsize
+
+
+def prompt_with_execution_budget(
+    prompt: str, *, recursion_limit: int, max_tokens: int | None = None,
+) -> str:
+    """Disclose effective runtime caps, including an explicit unlimited override."""
+    effective_recursion_limit(recursion_limit)
+    if recursion_limit:
+        notice = (
+            f"This run has a hard limit of {recursion_limit} graph supersteps. "
+            "Model, tool and middleware nodes consume this budget; it is NOT "
+            f"{recursion_limit} model calls or tool calls. The run fails if the limit "
+            "is reached before termination. Finish with a final answer before "
+            "exhausting the budget. Do not attempt to change or bypass the limit."
+        )
+    else:
+        notice = "This run has no benchmark-imposed graph-step cap."
+    if max_tokens is not None:
+        notice += f" Each model response is capped at {max_tokens} output tokens."
+    return prompt + "\n\n[Effective execution budget]\n" + notice

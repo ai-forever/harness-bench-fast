@@ -64,6 +64,8 @@ TASK_WAVES: tuple[TaskWave, ...] = (
     TaskWave("long", 392, 411),
     TaskWave("reflect", 412, 431),
     TaskWave("wave19-feasibility", 432, 471),
+    TaskWave("wave20-general-hard", 472, 511),
+    TaskWave("wave21-composite-hard", 512, 531),
 )
 
 
@@ -403,6 +405,70 @@ TASK_SET_REVISIONS: tuple[TaskSetRevision, ...] = (
             "and the potato synonym in task 410 without changing nutrition targets. "
             "Historical 0.19.0 scores are not measurements of this protocol; "
             "resume must use a fresh result file. The wave remains wave 19."
+        ),
+    ),
+)
+
+TASK_SET_REVISIONS += (
+    TaskSetRevision(
+        version="0.20.0",
+        introduced="2026-10-20",
+        total_tasks=511,
+        added_task_numbers=(472, 511),
+        modules=("general_hard",),
+        notes=(
+            "Candidate wave 20: forty general-purpose tasks, two harder descendants "
+            "of each first-wave tbench-lite task 352-371. Candidate revision v8 "
+            "couples concurrent changes, dependent resources, partial effects and "
+            "safe recovery with host-owned state/history; local docs define all rules. "
+            "Agent budget 900 seconds. Linux scoring requires CLI/bubblewrap and "
+            "the trusted service. Gold acceptance is not evidence "
+            "of frontier difficulty; model calibration is recorded separately. "
+            "Not score-comparable with task-set 0.19.0."
+        ),
+    ),
+)
+
+TASK_SET_REVISIONS += (
+    TaskSetRevision(
+        version="0.21.0",
+        introduced="2026-10-21",
+        total_tasks=531,
+        added_task_numbers=(512, 531),
+        modules=("general_hard.composite_tasks",),
+        notes=(
+            "Candidate wave 21: twenty bidirectionally coupled workflows using "
+            "each of the forty wave20 v8b tasks exactly once. Version-bound "
+            "cross-service data changes require compensation and revalidation "
+            "of both current domain goals. The original forty remain a separate "
+            "general-hard suite. One trusted host session, 320 shared service "
+            "requests, 900 seconds, Linux CLI/bubblewrap; all rules are local. "
+            "Gold witnesses establish solvability only, not frontier difficulty. "
+            "Not score-comparable with task-set 0.20.0."
+        ),
+    ),
+)
+
+TASK_SET_REVISIONS += (
+    TaskSetRevision(version="0.21.1", introduced="2026-10-22", total_tasks=531,
+                    added_task_numbers=(512, 531), modules=("general_hard.composite_tasks",),
+                    notes="Composite20 calibration prompt discloses 160 graph steps; domain rules, 320 service requests and 900 seconds unchanged. Results separate from 80-step profile."),
+)
+
+TASK_SET_REVISIONS += (
+    TaskSetRevision(
+        version="0.21.2",
+        introduced="2026-10-23",
+        total_tasks=531,
+        added_task_numbers=(0, 0),
+        modules=("general_hard.composite_tasks",),
+        notes=(
+            "Select ten wave21 workflows with at most two successful pairs among "
+            "seven fully calibrated model+harness configurations. composite-hard "
+            "now selects IDs512,518,520,522,523,524,525,526,527,530. Preserve all "
+            "twenty in composite-hard-calibration and the historical registry; "
+            "no task IDs, prompts, domain rules or budgets change. Scores for "
+            "the selected ten are post-selection rescoring, not new model runs."
         ),
     ),
 )

@@ -1,0 +1,304 @@
+{
+  "selection_version": "wave21-selected10-v1",
+  "task_set_version": "0.21.2",
+  "selected_on": "2026-10-23",
+  "suite": "composite-hard",
+  "calibration_suite": "composite-hard-calibration",
+  "selected_count": 10,
+  "registry_count_including_controls": 531,
+  "selected_original_numbers": [
+    512,
+    518,
+    520,
+    522,
+    523,
+    524,
+    525,
+    526,
+    527,
+    530
+  ],
+  "excluded_original_numbers": [
+    513,
+    514,
+    515,
+    516,
+    517,
+    519,
+    521,
+    528,
+    529,
+    531
+  ],
+  "fully_tested_pairs": [
+    "Sonnet5.5/high",
+    "DeepSeek4.1Flash1017/high",
+    "Fable5.1/medium",
+    "GLM5.3/high",
+    "MiMo2.6Pro/high",
+    "Qwen3.8Max/high",
+    "Codex+DeepSeekUNC/high"
+  ],
+  "rule": "At most two unique successful pairs among seven fully tested configurations; normal verified runPASS required; Sonnet80/160 deduplicated.",
+  "scope_notes": [
+    "Different budgets and revisions; not an equal-budget difficulty estimate.",
+    "Opus only521/522, excluded from threshold.522 has an additional Opus PASS.",
+    "Default-catalog Codex diagnostics excluded. Qwen525 verifier-only success is not runPASS.",
+    "Task IDs/domain/protocols retained; full registry includes controls. Use explicit suite for ten-task score.",
+    "Adaptive selection on existing outcomes, not fresh or held-out measurements."
+  ],
+  "parent_source_digests": [
+    "0578e676f8fb351651bea971fadb7b5a770aa8c7793e25a741579de0f05001b0",
+    "b8007ec6b0060e889b76aa71d8de6cea8db9403f36c1ea06303b6bd872fd6ac5"
+  ],
+  "provenance": {
+    "calibration80": {
+      "sha256": "bc7e14e338e053c3acd7ca8651bc0e8816d45ba72ca60061edaf6dcf809cef8d"
+    },
+    "sonnet160": {
+      "sha256": "fcc7bc784c795cf198a0f3f0a530462c03f1c2378e2748ffa05e86d9b7a318c9"
+    },
+    "opus_targeted": {
+      "sha256": "db1413d7a6aaa5778b5d345c4f0cc0bd612770a6a5c50f19b65726d3d135fe24"
+    },
+    "codex_configured": {
+      "sha256": "989a7ab6cba0191203185422bbb6566c06016e04f928a9b1ac86ba9a6dbf697e"
+    }
+  },
+  "tasks": [
+    {
+      "original_number": 512,
+      "task_id": "task_512_incident_delivery_feedback",
+      "selected": true,
+      "successful_full_pairs": 1,
+      "full_pair_solvers": [
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 513,
+      "task_id": "task_513_stream_causal_feedback",
+      "selected": false,
+      "successful_full_pairs": 3,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Fable5.1/medium",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 514,
+      "task_id": "task_514_closeout_configuration_feedback",
+      "selected": false,
+      "successful_full_pairs": 4,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Fable5.1/medium",
+        "MiMo2.6Pro/high",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 515,
+      "task_id": "task_515_booking_routing_feedback",
+      "selected": false,
+      "successful_full_pairs": 3,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Fable5.1/medium",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 516,
+      "task_id": "task_516_shipment_invoice_feedback",
+      "selected": false,
+      "successful_full_pairs": 3,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Fable5.1/medium",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 517,
+      "task_id": "task_517_posting_settlement_feedback",
+      "selected": false,
+      "successful_full_pairs": 3,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Fable5.1/medium",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 518,
+      "task_id": "task_518_restore_backup_feedback",
+      "selected": true,
+      "successful_full_pairs": 2,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 519,
+      "task_id": "task_519_repair_archive_feedback",
+      "selected": false,
+      "successful_full_pairs": 3,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Fable5.1/medium",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 520,
+      "task_id": "task_520_identity_namespace_feedback",
+      "selected": true,
+      "successful_full_pairs": 2,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 521,
+      "task_id": "task_521_privacy_migration_feedback",
+      "selected": false,
+      "successful_full_pairs": 3,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Fable5.1/medium",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": [
+        "Opus5.5/high"
+      ]
+    },
+    {
+      "original_number": 522,
+      "task_id": "task_522_latency_runtime_feedback",
+      "selected": true,
+      "successful_full_pairs": 2,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": [
+        "Opus5.5/high"
+      ]
+    },
+    {
+      "original_number": 523,
+      "task_id": "task_523_template_release_feedback",
+      "selected": true,
+      "successful_full_pairs": 2,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 524,
+      "task_id": "task_524_document_merge_feedback",
+      "selected": true,
+      "successful_full_pairs": 2,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 525,
+      "task_id": "task_525_delivery_test_feedback",
+      "selected": true,
+      "successful_full_pairs": 2,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 526,
+      "task_id": "task_526_migration_database_roundtrip",
+      "selected": true,
+      "successful_full_pairs": 2,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 527,
+      "task_id": "task_527_live_restore_copy_cutover",
+      "selected": true,
+      "successful_full_pairs": 2,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 528,
+      "task_id": "task_528_predicate_policy_retirement",
+      "selected": false,
+      "successful_full_pairs": 3,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Fable5.1/medium",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 529,
+      "task_id": "task_529_rollback_acceptance_roundtrip",
+      "selected": false,
+      "successful_full_pairs": 3,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Fable5.1/medium",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 530,
+      "task_id": "task_530_inherited_runtime_roundtrip",
+      "selected": true,
+      "successful_full_pairs": 2,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    },
+    {
+      "original_number": 531,
+      "task_id": "task_531_anchor_file_feedback",
+      "selected": false,
+      "successful_full_pairs": 3,
+      "full_pair_solvers": [
+        "Codex+DeepSeekUNC/high",
+        "Fable5.1/medium",
+        "Sonnet5.5/high"
+      ],
+      "additional_targeted_solvers": []
+    }
+  ]
+}

@@ -100,7 +100,10 @@ def test_worker_invokes_same_builder_without_task_registry(monkeypatch, tmp_path
     )
     assert module.main() == 0
     assert captured["forward_reasoning_history"] is True and captured["recursion_limit"] == expected
-    assert captured["payload"] == {"messages": [{"role": "user", "content": "fixture"}]}
+    assert captured["payload"]["messages"][0]["content"].startswith("fixture\n\n[Effective execution budget]")
+    content = captured["payload"]["messages"][0]["content"]
+    assert (f"limit of {expected} graph supersteps" if expected else "no benchmark-imposed graph-step cap") in content
+    assert "16384 output tokens" in content
     events = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
     assert events[-1]["type"] == "hbf_deepagents_result"
     assert events[-1]["stats"]["agent_compactions"] == 0
