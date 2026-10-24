@@ -42,3 +42,16 @@ def append_wave21(rows: list[dict], root: Path) -> None:
             "wave21": {"passed": run["passed"], "total": 10, "note": "calibration rescore"},
             "telemetry": {"wave21": usage}, "details_url": "wave21-measurements.html#" + run["configuration_id"],
         })
+
+
+def append_fresh_rows(rows: list[dict], root: Path) -> None:
+    """Append the three fresh small-model rows (80 earlier tasks + ten wave 21 tasks).
+
+    The rows are kept in docs/wave21-small-models.json so the landing rebuild stays
+    reproducible without model calls.
+    """
+    payload = json.loads((root / "docs/wave21-small-models.json").read_text(encoding="utf-8"))
+    assert payload["task_numbers"] == [512, 518, 520, 522, 523, 524, 525, 526, 527, 530]
+    for row in payload["landing_rows"]:
+        assert row["wave21"]["total"] == 10 and row["medium"]["total"] == 80
+        rows.append(row)

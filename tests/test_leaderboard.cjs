@@ -4,9 +4,9 @@ const { selectResults, selectMedium90, formatComponent, formatPassed, formatUsag
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 93);
+assert.equal(light.length, 96);
 assert.equal(medium.length, 79);
-assert.equal(selectResults(data, "medium", "current", "").length, 19);
+assert.equal(selectResults(data, "medium", "current", "").length, 22);
 for (const rows of [light, medium]) {
   for (let i = 1; i < rows.length; i++) assert.ok(rows[i - 1].result.passed >= rows[i].result.passed);
 }
@@ -174,9 +174,11 @@ assert.ok(!landing.includes('Hard'));
 assert.ok(landing.includes('id="coverage-filter"'));
 assert.ok(landing.includes('wave21-measurements.html'));
 const wave21 = selectResults(data, "medium", "wave21", "");
-assert.equal(wave21.length, 8);
+assert.equal(wave21.length, 11);
+assert.equal(wave21.find(row => row.id === "run-qwen3.8-27b-20261023").result.passed, 1);
+assert.equal(wave21.find(row => row.id === "run-gpt-oss-20b-20261023").result.passed, 0);
 assert.ok(wave21.every(row => row.result.total === 10));
-assert.deepEqual(wave21.map(row => row.result.passed).sort((a, b) => b - a), [9, 9, 5, 0, 0, 0, 0, 0]);
+assert.deepEqual(wave21.map(row => row.result.passed).sort((a, b) => b - a), [9, 9, 5, 1, 0, 0, 0, 0, 0, 0, 0]);
 assert.equal(selectResults(data, "medium", "wave21", "Opus").length, 0);
 assert.equal(selectResults(data, "medium", "wave21", "Sonnet").length, 2);
 assert.equal(wave21.find(row => row.id === "wave21-sonnet55_80").result.passed, 5);
