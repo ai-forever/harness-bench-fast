@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Compare agent harnesses on harness_bench_fast Light and Medium, 391 frozen Light tasks and the new 90-task Medium suite. Mechanically verified, with explicit measurement coverage.">
+  <meta name="description" content="Compare agent harnesses on harness_bench_fast Light and Medium, 391 frozen Light tasks and 80 Medium tasks. Mechanically verified, with published scores and usage.">
   <title>harness_bench_fast · Light &amp; Medium</title>
-  <link rel="stylesheet" href="landing.css?v=medium90-bars-20261024">
-  <script src="leaderboard.js?v=medium90-bars-20261024" defer></script>
+  <link rel="stylesheet" href="landing.css?v=medium80-20261024">
+  <script src="leaderboard.js?v=medium80-20261024" defer></script>
 </head>
 <body>
   <header>
@@ -15,41 +15,34 @@
   </header>
   <main>
     <section class="intro">
-      <p class="eyebrow">Agent benchmarks · waves 1–21</p>
+      <p class="eyebrow">Agent benchmarks · Light &amp; Medium</p>
       <h1>How well does your<br>agent get things done?</h1>
-      <p><a href="#medium">Medium · 90 tasks · combined measurement coverage →</a> · <a href="medium90-protocol.html">Measurements &amp; protocol</a></p>
-      <p><a href="harness-wave19.html">Four harnesses × four models · wave 19 results →</a></p>
-      <p><a href="brain-haiku-experiment.html">Brain + Claude Haiku 5.5: timeout experiment, final-attempt tokens &amp; limitations →</a></p>
       <p class="lead">Files, code, tools and memory. Real tasks, mechanically verified.</p>
     </section>
 
     <section aria-label="Benchmark results">
       <div class="suite-switch" role="group" aria-label="Benchmark suite">
         <button type="button" data-suite="light" aria-pressed="true"><strong>Light</strong><span>391 tasks · frozen suite</span></button>
-        <button type="button" data-suite="medium" aria-pressed="false"><strong>Medium</strong><span>90 tasks · long context, reflection &amp; coupled workflows</span></button>
+        <button type="button" data-suite="medium" aria-pressed="false"><strong>Medium</strong><span>80 tasks · long context, reflection &amp; feasibility</span></button>
       </div>
       <div class="results-heading"><h2 id="suite-title">harness_bench_fast light</h2><span id="run-count" aria-live="polite"></span></div>
       <p id="coverage-note" class="coverage-note" aria-live="polite">Tasks 1–391. Loading published measurements…</p>
       <div class="filters">
         <label class="search">Search model or harness<input id="search" type="search" placeholder="e.g. GigaChat, Codex, deepagents" autocomplete="off"></label>
-        <label id="coverage-filter-label" hidden>Coverage<select id="coverage-filter"><option value="all">All measurements</option><option value="wave21">With wave 21 results</option><option value="complete">Complete 90 tasks</option></select></label>
       </div>
       <div class="table-wrap">
-        <table id="leaderboard" class="leaderboard-table"><thead id="results-head"><tr><th scope="col">#</th><th scope="col">Model / harness</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">Score</th><th scope="col" class="numeric">Steps</th><th scope="col" class="numeric">Tokens</th></tr></thead><tbody id="results"></tbody></table>
+        <table class="leaderboard-table"><thead><tr><th scope="col">#</th><th scope="col">Model / harness</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">Score</th><th scope="col" class="numeric">Steps</th><th scope="col" class="numeric">Tokens</th></tr></thead><tbody id="results"></tbody></table>
       </div>
       <p id="empty" role="status" hidden></p>
       <button type="button" class="more" id="show-more" hidden>Show all results</button>
-      <p class="fine-print">Medium combines compatible measurements on disjoint tasks. Only complete 90-task configurations receive an overall score and rank; partial rows show their measured coverage. Tools and budgets vary. Brain + Claude Haiku is an experimental selected-retry result with a changed deadline and unresolved transport errors; see its protocol label. mean@N is the mean of N runs, not pass@N. Rescored historical runs use v0.18.0 task definitions. <a href="archive.html#current">Protocols &amp; original results →</a></p>
+      <p class="fine-print">Scores compare complete agent configurations; tools and budgets vary. Brain + Claude Haiku is an experimental selected-retry result with a changed deadline and unresolved transport errors; see its protocol label. mean@N is the mean of N runs, not pass@N. Rescored historical runs use v0.18.0 task definitions. <a href="archive.html#current">Protocols &amp; original results →</a></p>
       <details class="usage-guide"><summary>About steps and tokens</summary><p>Totals cover the tasks in each table, including failed tasks. Steps are tool calls where native traces are available; raw counters follow the harness's own accounting. Tokens are recorded input + output usage, including reported cache usage; reasoning is not added twice. These are token counts, not a monetary bill.</p><p><strong>Partial</strong> means some usage is missing; <strong>Raw</strong> means the counters have not been audited and may include accounting errors. Task counts show where metrics were recorded, not whether every request was captured. A dash means no usable total for this subset. Hover or focus a value for its exact total and notes. Historical full-run totals are not reused for smaller subsets.</p></details>
       <noscript><p>Enable JavaScript to compare suites, or <a href="archive.html#current">read the static measurement archive</a>.</p></noscript>
-
     </section>
     <details class="about"><summary>What is in each benchmark?</summary>
       <p><strong>Light · 391 frozen tasks:</strong> files, code, data, memory, agent workflows, Git and terminal tools.</p>
-      <p><strong>Medium · 90 tasks:</strong> the previous 80 tasks (392–471: long context, reflection and feasibility) plus ten selected coupled workflows from wave 21 (512, 518, 520, 522–527 and 530).</p>
-      <p>Existing measurements are joined only when the model, harness and execution conditions match. Missing tasks are unmeasured, never failures. Historical 40-task results and wave 19-only results retain their original scope. Complete 90-task coverage is required for an overall score; partial configurations are ordered by coverage, not by a partial success rate.</p>
-      <p>Wave 21 was selected adaptively from calibration runs and reuses those results; it is a post-selection rescore, not a fresh held-out test. Graph-step limits and model-request limits remain separate configurations. Original waves 1–20, wave 20 controls and calibration measurements remain in the <a href="archive.html">archive</a> and <a href="wave21-measurements.html">wave 21 measurement history</a>.</p>
-      <p><a href="https://github.com/ai-forever/harness-bench-fast#readme">Run the benchmark</a> · <a href="medium90-results.json">Medium 90 data</a> · <a href="leaderboard-results.json">Historical &amp; Light data</a> · <a href="wave19-feasibility.md">Wave 19 protocol</a></p>
+      <p><strong>Medium · 80 tasks (392–471):</strong> long context (20), tool reflection (20) and feasibility (40). The table shows complete 80-task measurements. Earlier partial measurements remain in the archive.</p>
+      <p><a href="https://github.com/ai-forever/harness-bench-fast#readme">Run the benchmark</a> · <a href="leaderboard-results.json">Measurement data</a> · <a href="archive.html">Measurement archive</a></p>
     </details>
   </main>
   <footer><span>No LLM judge. Every task is checked mechanically.</span><a href="archive.html">Full measurement archive →</a></footer>

@@ -1,6 +1,6 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const { selectResults, selectMedium90, formatComponent, formatPassed, formatUsage } = require("../docs/leaderboard.js");
+const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboard.js");
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
@@ -171,8 +171,8 @@ assert.ok(!landing.includes('data-suite="hard"'));
 assert.equal((landing.match(/data-suite=/g) || []).length, 2);
 assert.ok(!landing.includes('id="medium-wave21"'));
 assert.ok(!landing.includes('Hard'));
-assert.ok(landing.includes('id="coverage-filter"'));
-assert.ok(landing.includes('wave21-measurements.html'));
+assert.ok(!landing.includes('id="coverage-filter"'));
+assert.ok(!landing.includes('wave21-measurements.html'));
 const wave21 = selectResults(data, "medium", "wave21", "");
 assert.equal(wave21.length, 8);
 assert.ok(wave21.every(row => row.result.total === 10));
@@ -185,21 +185,10 @@ assert.equal(wave21.find(row => row.id === "wave21-codex0163_deepseek41_unc_high
 assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.passed, 0);
 
 
-// Medium 90 preserves coverage and never manufactures a full denominator.
-const medium90Fixture = { rows: [
-  { id: "high-partial", model: "A", harness: "fixture", status: "partial", previous: { passed: 10, measured: 10, total: 80 }, wave21: null, measured_tasks: 10, overall_passed: null },
-  { id: "wide-partial", model: "B", harness: "fixture", status: "partial", previous: { passed: 1, measured: 80, total: 80 }, wave21: null, measured_tasks: 80, overall_passed: null },
-  { id: "complete", model: "C", harness: "fixture", status: "complete", previous: { passed: 40, measured: 80, total: 80 }, wave21: { passed: 5, measured: 10, total: 10 }, measured_tasks: 90, overall_passed: 45 },
-  { id: "opus-partial", model: "Opus", harness: "fixture", status: "partial", previous: null, wave21: { passed: 1, measured: 1, total: 10 }, measured_tasks: 1, overall_passed: null }
-] };
-assert.deepEqual(selectMedium90(medium90Fixture, "all", "").map(row => row.id), ["complete", "wide-partial", "high-partial", "opus-partial"]);
-assert.deepEqual(selectMedium90(medium90Fixture, "complete", "").map(row => row.id), ["complete"]);
-assert.deepEqual(selectMedium90(medium90Fixture, "wave21", " OPUS ").map(row => row.id), ["opus-partial"]);
-assert.equal(formatComponent(null), "—");
-assert.equal(formatComponent({ passed: 0, measured: 0, total: 80 }), "—");
-assert.equal(formatComponent({ passed: 9, measured: 40, total: 80 }), "9/40");
-assert.equal(formatComponent({ passed: 1, measured: 1, total: 10 }), "1/1");
-assert.ok(landing.includes("90 tasks"));
+// The landing temporarily displays complete historical Medium80 only.
+assert.ok(landing.includes("80 tasks"));
+assert.ok(!landing.includes("90 tasks"));
 assert.equal((landing.match(/<tbody/g) || []).length, 1);
-assert.ok(landing.includes("medium90-results.json"));
-console.log("Medium 90 coverage, partial ordering, scope and complete-only ranking checks passed.");
+assert.ok(!landing.includes("medium90-results.json"));
+assert.ok(!landing.includes('id="wave19-section"'));
+console.log("Clean historical Medium80 landing checks passed.");
