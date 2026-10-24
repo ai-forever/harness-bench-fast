@@ -82,6 +82,24 @@ if (typeof document !== "undefined") {
       tr.append(cell);
       return cell;
     }
+    function appendScoreBar(cell, percent) {
+      const bar = document.createElement("span");
+      bar.className = "score-bar";
+      bar.setAttribute("aria-hidden", "true");
+      const fill = document.createElement("span");
+      fill.style.width = percent + "%";
+      bar.append(fill);
+      cell.append(bar);
+    }
+    function componentCell(tr, component, label) {
+      const cell = textCell(tr, formatComponent(component), label);
+      if (component?.measured) {
+        const percent = 100 * component.passed / component.measured;
+        cell.title = label + ": " + percent.toFixed(1) + "% of " + component.measured + " measured tasks";
+        appendScoreBar(cell, percent);
+      }
+      return cell;
+    }
     function renderTable(rows, ranking) {
       body.replaceChildren();
       rows.forEach(row => {
@@ -101,14 +119,14 @@ if (typeof document !== "undefined") {
           (suite === "medium" ? " · " + (row.status === "complete" ? "complete" : (row.status === "unverified" || row.measurement_valid === false) ? "unverified measurement" : "partial coverage") : row.result.note ? " · " + row.result.note : "");
         who.append(link, harness);
         if (suite === "medium") {
-          const previous = textCell(tr, formatComponent(row.previous), "Earlier 80");
+          const previous = componentCell(tr, row.previous, "Earlier 80");
           if (row.previous?.scope_note) {
             const note = document.createElement("span");
             note.className = "usage-note";
             note.textContent = row.previous.scope_note;
             previous.append(note);
           }
-          textCell(tr, formatComponent(row.wave21), "Wave 21 / 10");
+          componentCell(tr, row.wave21, "Wave 21 / 10");
           textCell(tr, row.measured_tasks + "/90", "Coverage");
           textCell(tr, complete ? formatPassed(row.overall_passed) + "/90" : "—", "Overall / 90");
         } else {
@@ -127,15 +145,7 @@ if (typeof document !== "undefined") {
         scoreLabel.textContent = percent === null ? "—" : percent.toFixed(1) + "%";
         if (row.result?.wilson95) scoreLabel.title = "95% Wilson interval: " + row.result.wilson95.map(x => (100 * x).toFixed(1) + "%").join("–") + "; across tasks, not repeat variability";
         score.append(scoreLabel);
-        if (percent !== null) {
-          const bar = document.createElement("span");
-          bar.className = "score-bar";
-          bar.setAttribute("aria-hidden", "true");
-          const fill = document.createElement("span");
-          fill.style.width = percent + "%";
-          bar.append(fill);
-          score.append(bar);
-        }
+        if (percent !== null) appendScoreBar(score, percent);
         for (const metric of ["steps", "tokens"]) {
           const cell = textCell(tr, "", metric === "steps" ? "Steps" : "Tokens", "numeric usage-cell");
           const formatted = formatUsage(row.usage, metric);
