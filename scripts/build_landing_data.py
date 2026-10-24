@@ -15,6 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 APPEND_WAVE21 = runpy.run_path(str(ROOT / "scripts/wave21_landing_data.py"))["append_wave21"]
+APPEND_FRESH_ROWS = runpy.run_path(str(ROOT / "scripts/wave21_landing_data.py"))["append_fresh_rows"]
 
 
 class PublishedRows(HTMLParser):
@@ -443,6 +444,7 @@ def build():
     telemetry["rows"]["universal-agent-deepseek"] = ua_deepseek["subset_telemetry"]
     attach_telemetry(rows, telemetry)
     APPEND_WAVE21(rows, ROOT)
+    APPEND_FRESH_ROWS(rows, ROOT)
     return {
         "task_set_version": "0.19", "light_tasks": 391, "medium_tasks": 80,
         "wave21_task_set_version": "0.21.2", "wave21_tasks": 10,

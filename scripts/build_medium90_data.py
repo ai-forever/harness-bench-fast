@@ -112,7 +112,10 @@ def build(root=ROOT):
                 if row.get(key):
                     components.append(component(numbers, row[key], telemetry.get(key), row["source_version"], note))
         if row.get("wave21"):
-            components.append(component(SELECTED, row["wave21"], telemetry.get("wave21"), row["source_version"], "selected wave21"))
+            components.append(component(
+                SELECTED, row["wave21"], telemetry.get("wave21"),
+                row.get("wave21_source_version") or row["source_version"],
+                row["wave21"].get("note") or "selected wave21"))
         if not components:
             continue
         keys = ("id", "model", "harness", "runs", "source_version", "reasoning_effort", "measurement_type", "measurement_valid", "details_url")
@@ -146,7 +149,7 @@ def build(root=ROOT):
             "task_numbers": NUMBERS, "frozen_light_tasks": 391,
             "policy": {"combination": "Only disjoint components within the same published measured profile; display-name matches are not profile equivalence.",
                        "missing": "Unmeasured, never a failure. Partial rows have no overall score or rank.",
-                       "protocols": "Historical source versions and per-wave settings retained; these are reused measurements, not new complete runs.",
+                       "protocols": "Historical source versions and per-wave settings retained; these are reused measurements, not new complete runs. A wave21 component taken from a fresh run carries its own source version and profile note.",
                        "incompatible_pairs": "Historical DeepAgents GLM/DeepSeek enabled native subagents; new wave21 disabled them. Keep separate profiles. 80/160 graph steps and model API request caps are distinct.",
                        "controls": "Forty wave20 controls and ten unselected calibration tasks excluded from Medium90.",
                        "new_model_calls": 0},

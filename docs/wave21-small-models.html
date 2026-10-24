@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Small qwen and GPT-OSS · Wave 21 measurement</title><link rel="stylesheet" href="landing.css"></head>
+<body>
+<header><a class="brand" href="index.html">harness_bench_fast.</a><nav><a href="index.html#medium">Medium leaderboard →</a></nav></header>
+<main>
+<section class="intro"><p class="eyebrow">Task-set v0.21.3 · measured 24 October 2026</p>
+<h1>20–35B open models.<br>Wave 21.</h1>
+<p class="lead">Three complete configurations on the ten selected wave 21 tasks, run with the release profile from the wave 21 protocol: DeepAgents 0.6.12, 160 graph steps, no subagents.</p></section>
+
+<h2>Results</h2>
+<div class="table-wrap"><table class="measurement-results"><thead><tr><th>Model</th><th>Wave 21 · tasks 512–530</th><th>Score</th><th>95% Wilson interval</th><th>Steps</th><th>Tokens</th></tr></thead><tbody>
+<tr id="qwen3.8-27b"><td>Qwen 3.8 27B (default)</td><td>1/10</td><td>10.0%</td><td>1.8–40.4%</td><td>≥ 69 · 1/10 tasks</td><td>≥ 2,347,237 · 2/10 tasks</td></tr>
+<tr id="qwen3.6-35b-a3b"><td>Qwen 3.6 35B A3B (default)</td><td>0/10</td><td>0.0%</td><td>0.0–27.8%</td><td>— · 0/10 tasks</td><td>10,568,377 · 10/10 tasks</td></tr>
+<tr id="gpt-oss-20b"><td>GPT-OSS 20B (default)</td><td>0/10</td><td>0.0%</td><td>0.0–27.8%</td><td>130 · 10/10 tasks</td><td>396,881 · 10/10 tasks</td></tr>
+</tbody></table></div>
+<p>One scored attempt per task. Subset intervals describe variation across tasks, not repeat variability between runs. Budgets are the task contracts: 320 trusted host-service calls and 900 seconds per task, 160 graph steps, max output 16,384 tokens, provider-default sampling.</p>
+
+<h2>Failures</h2>
+<p>The ten tasks are coupled two-lane workflows: a delivered change on one side invalidates an obligation on the other, and a correction travels back. All three models failed most of them, each in its own way.</p>
+<p><strong>Qwen 3.8 27B</strong> is the only configuration with a verified pass (<code>task_518_restore_backup_feedback</code>, 830 s). Eight tasks reached the 900-second limit and one hit the 160-step graph limit. Steps were recorded for one task only and tokens for two, because timed-out workspaces returned no counters.</p>
+<p><strong>Qwen 3.6 35B A3B</strong> reached the 160-step graph limit on all ten tasks between 127 and 291 seconds, so every task is a normal scored failure rather than a timeout. It spent the most tokens of the three (10.6M) without producing a single verified finish.</p>
+<p><strong>GPT-OSS 20B</strong> stopped early on its own, after 10 to 58 seconds, leaving contract goals unfinished (<em>left: …</em>). It recorded the fewest steps and tokens. No task hit a budget.</p>
+<p>There were no infrastructure failures in any of the three runs: no provider errors, no harness failures, and all ten task IDs are present in every result. Gold verification of the frozen source passed 10/10 before the runs.</p>
+
+<h2>Comparison with the published wave 21 rows</h2>
+<p>The eight previously published wave 21 configurations are <em>post-selection rescores</em> of earlier calibration executions. These three are fresh runs on the selected set, so they are the first measurements that were not used for selection. They are not a held-out evaluation either: the selection was made with these tasks, and the profile here is the release profile rather than the calibration one.</p>
+<p>Sizes are close, capability is not: the two qwen models (27B dense, 35B with 3B active) and a 20B control still sit far below the 160-step frontier. Sonnet 5.5 at 160 steps scored 9/10 on the same subset with the same agent loop.</p>
+
+<h2>Protocol and provenance</h2>
+<p>Model IDs <code>qwen/qwen3.8-27b</code>, <code>qwen/qwen3.6-35b-a3b</code>, <code>openai/gpt-oss-20b</code>; reasoning effort not overridden; Chat Completions through an OpenAI-compatible gateway; Linux/bubblewrap; six concurrent workers; one attempt per task. Source <code>89d00f8315a2400f3eb6b88f7d5d1c4041c4014f</code>, task-set 0.21.3.</p>
+<p>The earlier 80 Medium tasks of the same three models were measured a day before under the v0.19.1 default profile, which keeps deepagents subagents enabled. The Medium 90 view therefore joins two profiles for these rows: 80 tasks with subagents, ten tasks without. The wave 21 component keeps its own source version and profile note in the machine-readable data.</p>
+<p>Raw requests and traces remain private. Result digests: qwen3.8-27b <code>334acdc233943ac2a6b2434ff6837db184f3999ec4bb5ca7d3d967b0d6679b0f</code>, qwen3.6-35b-a3b <code>9e9fd97b4eb226ea5e61c709da982b3c8d667fd4e0d1c52aedb33c36b9e178eb</code>, gpt-oss-20b <code>767c8942b607ae75c6ecdf00f7d60038efdb3cdc09321ba6b53bc15a7bc6dd76</code>.</p>
+<p><a href="wave21-small-models.json">Download outcomes and provenance</a> · <a href="index.html#medium">Medium results</a> · <a href="wave21-composite-hard.md">Wave 21 task protocol</a></p>
+</main></body></html>

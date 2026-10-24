@@ -19,8 +19,8 @@ def test_published_medium90_is_reproducible_and_exact_suite():
     data = build()
     assert json.loads((ROOT / "docs/medium90-results.json").read_text(encoding="utf-8")) == data
     assert data["task_numbers"] == [task_number(t.id) for t in SUITES["medium"]]
-    assert data["summary"] == {"rows": 117, "ranked_rows": 0, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19}}
-    assert all(r["score"] is None and r["rank"] is None for r in data["rows"])
+    assert data["summary"] == {"rows": 120, "ranked_rows": 3, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 3}}
+    assert all((r["score"] is None) == (r["measured_tasks"] != 90) for r in data["rows"])
     assert all(len(set(r["missing_task_numbers"])) + r["measured_tasks"] == 90 for r in data["rows"])
 
 
@@ -34,9 +34,11 @@ def test_profiles_preserved_without_name_based_joins_or_wave19_doublecount():
         assert row["measurement_valid"] == original.get("measurement_valid")
         if original.get("medium"):
             assert row["previous"]["passed"] == original["medium"]["passed"]
-            assert row["measured_tasks"] == 80
-        if original.get("wave21"):
+            assert row["measured_tasks"] == (90 if original.get("wave21") else 80)
+        if original.get("wave21") and not original.get("medium"):
             assert row["previous"] is None and row["measured_tasks"] == 10
+        if original.get("medium") and original.get("wave21"):
+            assert row["measured_tasks"] == 90 and row["components"][-1]["source_version"] == "0.21.3"
     opus = [r for r in rows.values() if r["measurement_type"] == "targeted_partial"]
     assert len(opus) == 1 and opus[0]["observed_passed"] == 1
     assert opus[0]["measured_tasks"] == 1 and opus[0]["wave21"]["measured"] == 1

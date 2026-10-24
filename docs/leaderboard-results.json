@@ -4487,6 +4487,291 @@
         }
       },
       "details_url": "wave21-measurements.html#codex0163_deepseek41_unc_high_160"
+    },
+    {
+      "id": "run-qwen3.8-27b-20261023",
+      "model": "Qwen 3.8 27B (default)",
+      "harness": "DeepAgents 0.6.12",
+      "runs": 1,
+      "measurement_type": "fresh_run",
+      "measurement_valid": true,
+      "source_version": "0.19.1",
+      "display_version": "0.21.3",
+      "measurement_date": "2026-10-23",
+      "reasoning_effort": "default",
+      "source_sha256": "8be3d7fbae5c6f6fed8c044e4db6bf473b841c17c72c775d2a092c89edbcb2e9",
+      "light": {
+        "passed": 374,
+        "total": 391
+      },
+      "medium": {
+        "passed": 37,
+        "total": 80
+      },
+      "medium_historical": null,
+      "wave19": null,
+      "wave21": {
+        "passed": 1,
+        "total": 10,
+        "note": "fresh run 2026-10-24 · no subagents, 160 steps"
+      },
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "sources_sha256": [
+            "8be3d7fbae5c6f6fed8c044e4db6bf473b841c17c72c775d2a092c89edbcb2e9"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial."
+          ],
+          "steps": {
+            "value": 5242,
+            "covered_tasks": 390,
+            "status": "partial",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 20087016,
+            "covered_tasks": 390,
+            "status": "partial"
+          }
+        },
+        "medium": {
+          "tasks": 80,
+          "observed_tasks": 80,
+          "sources_sha256": [
+            "8be3d7fbae5c6f6fed8c044e4db6bf473b841c17c72c775d2a092c89edbcb2e9"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial."
+          ],
+          "steps": {
+            "value": 6032,
+            "covered_tasks": 56,
+            "status": "partial",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 218439341,
+            "covered_tasks": 58,
+            "status": "partial"
+          }
+        },
+        "wave21": {
+          "tasks": 10,
+          "observed_tasks": 10,
+          "sources_sha256": [
+            "334acdc233943ac2a6b2434ff6837db184f3999ec4bb5ca7d3d967b0d6679b0f"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial."
+          ],
+          "steps": {
+            "value": 69,
+            "covered_tasks": 1,
+            "status": "partial",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 2347237,
+            "covered_tasks": 2,
+            "status": "partial"
+          }
+        }
+      },
+      "details_url": "wave21-small-models.html#qwen3.8-27b",
+      "wave21_source_version": "0.21.3"
+    },
+    {
+      "id": "run-qwen3.6-35b-a3b-20261023",
+      "model": "Qwen 3.6 35B A3B (default)",
+      "harness": "DeepAgents 0.6.12",
+      "runs": 1,
+      "measurement_type": "fresh_run",
+      "measurement_valid": true,
+      "source_version": "0.19.1",
+      "display_version": "0.21.3",
+      "measurement_date": "2026-10-23",
+      "reasoning_effort": "default",
+      "source_sha256": "561201ce673d3325938a14602dc7f3abd0716461c7379fdc91f3d7a1b846ab6b",
+      "light": {
+        "passed": 344,
+        "total": 391
+      },
+      "medium": {
+        "passed": 29,
+        "total": 80
+      },
+      "medium_historical": null,
+      "wave19": null,
+      "wave21": {
+        "passed": 0,
+        "total": 10,
+        "note": "fresh run 2026-10-24 · no subagents, 160 steps"
+      },
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "sources_sha256": [
+            "561201ce673d3325938a14602dc7f3abd0716461c7379fdc91f3d7a1b846ab6b"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial."
+          ],
+          "steps": {
+            "value": 5517,
+            "covered_tasks": 391,
+            "status": "complete",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 21554947,
+            "covered_tasks": 391,
+            "status": "complete"
+          }
+        },
+        "medium": {
+          "tasks": 80,
+          "observed_tasks": 80,
+          "sources_sha256": [
+            "561201ce673d3325938a14602dc7f3abd0716461c7379fdc91f3d7a1b846ab6b"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial."
+          ],
+          "steps": {
+            "value": 7513,
+            "covered_tasks": 66,
+            "status": "partial",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 414337452,
+            "covered_tasks": 74,
+            "status": "partial"
+          }
+        },
+        "wave21": {
+          "tasks": 10,
+          "observed_tasks": 10,
+          "sources_sha256": [
+            "9e9fd97b4eb226ea5e61c709da982b3c8d667fd4e0d1c52aedb33c36b9e178eb"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial."
+          ],
+          "steps": {
+            "value": 0,
+            "covered_tasks": 0,
+            "status": "unavailable",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 10568377,
+            "covered_tasks": 10,
+            "status": "complete"
+          }
+        }
+      },
+      "details_url": "wave21-small-models.html#qwen3.6-35b-a3b",
+      "wave21_source_version": "0.21.3"
+    },
+    {
+      "id": "run-gpt-oss-20b-20261023",
+      "model": "GPT-OSS 20B (default)",
+      "harness": "DeepAgents 0.6.12",
+      "runs": 1,
+      "measurement_type": "fresh_run",
+      "measurement_valid": true,
+      "source_version": "0.19.1",
+      "display_version": "0.21.3",
+      "measurement_date": "2026-10-23",
+      "reasoning_effort": "default",
+      "source_sha256": "a25530bcf20a9ff7231125c032d7cff978c2c56c193dab2ecc5cbbcbd00e97e5",
+      "light": {
+        "passed": 173,
+        "total": 391
+      },
+      "medium": {
+        "passed": 0,
+        "total": 80
+      },
+      "medium_historical": null,
+      "wave19": null,
+      "wave21": {
+        "passed": 0,
+        "total": 10,
+        "note": "fresh run 2026-10-24 · no subagents, 160 steps"
+      },
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "sources_sha256": [
+            "a25530bcf20a9ff7231125c032d7cff978c2c56c193dab2ecc5cbbcbd00e97e5"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial."
+          ],
+          "steps": {
+            "value": 2767,
+            "covered_tasks": 391,
+            "status": "complete",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 9855599,
+            "covered_tasks": 391,
+            "status": "complete"
+          }
+        },
+        "medium": {
+          "tasks": 80,
+          "observed_tasks": 80,
+          "sources_sha256": [
+            "a25530bcf20a9ff7231125c032d7cff978c2c56c193dab2ecc5cbbcbd00e97e5"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial."
+          ],
+          "steps": {
+            "value": 412,
+            "covered_tasks": 80,
+            "status": "complete",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 2396655,
+            "covered_tasks": 80,
+            "status": "complete"
+          }
+        },
+        "wave21": {
+          "tasks": 10,
+          "observed_tasks": 10,
+          "sources_sha256": [
+            "767c8942b607ae75c6ecdf00f7d60038efdb3cdc09321ba6b53bc15a7bc6dd76"
+          ],
+          "notes": [
+            "Selected execution only; missing counters null, observed subtotals explicitly partial."
+          ],
+          "steps": {
+            "value": 130,
+            "covered_tasks": 10,
+            "status": "complete",
+            "unit": "native_steps"
+          },
+          "tokens": {
+            "value": 396881,
+            "covered_tasks": 10,
+            "status": "complete"
+          }
+        }
+      },
+      "details_url": "wave21-small-models.html#gpt-oss-20b",
+      "wave21_source_version": "0.21.3"
     }
   ]
 }

@@ -99,23 +99,24 @@
   "policy": {
     "combination": "Only disjoint components within the same published measured profile; display-name matches are not profile equivalence.",
     "missing": "Unmeasured, never a failure. Partial rows have no overall score or rank.",
-    "protocols": "Historical source versions and per-wave settings retained; these are reused measurements, not new complete runs.",
+    "protocols": "Historical source versions and per-wave settings retained; these are reused measurements, not new complete runs. A wave21 component taken from a fresh run carries its own source version and profile note.",
     "incompatible_pairs": "Historical DeepAgents GLM/DeepSeek enabled native subagents; new wave21 disabled them. Keep separate profiles. 80/160 graph steps and model API request caps are distinct.",
     "controls": "Forty wave20 controls and ten unselected calibration tasks excluded from Medium90.",
     "new_model_calls": 0
   },
   "provenance": {
-    "legacy_results_sha256": "e60cc88918cb27d949c18e9d0140c7500d813bdbf1659e832c13f237b3b8ee5a",
+    "legacy_results_sha256": "df190ba93fafa798ec4144382b0186b5d8f56b595b43caf0d124325dff70fef3",
     "wave21_results_sha256": "1d35d5b2b0d9b28829b5d27d28f852d6f1f33d768e95df7581ffa0073d299803"
   },
   "summary": {
-    "rows": 117,
-    "ranked_rows": 0,
+    "rows": 120,
+    "ranked_rows": 3,
     "coverage": {
       "1": 1,
       "10": 8,
       "40": 89,
-      "80": 19
+      "80": 19,
+      "90": 3
     }
   },
   "rows": [
@@ -16376,7 +16377,7 @@
         "passed": 5,
         "measured": 10,
         "total": 10,
-        "scope_note": "selected wave21"
+        "scope_note": "calibration rescore"
       },
       "components": [
         {
@@ -16394,7 +16395,7 @@
           ],
           "passed": 5,
           "source_version": "0.21.0",
-          "note": "selected wave21"
+          "note": "calibration rescore"
         }
       ],
       "measured_tasks": 10,
@@ -16529,7 +16530,7 @@
         "passed": 0,
         "measured": 10,
         "total": 10,
-        "scope_note": "selected wave21"
+        "scope_note": "calibration rescore"
       },
       "components": [
         {
@@ -16547,7 +16548,7 @@
           ],
           "passed": 0,
           "source_version": "0.21.0",
-          "note": "selected wave21"
+          "note": "calibration rescore"
         }
       ],
       "measured_tasks": 10,
@@ -16681,7 +16682,7 @@
         "passed": 0,
         "measured": 10,
         "total": 10,
-        "scope_note": "selected wave21"
+        "scope_note": "calibration rescore"
       },
       "components": [
         {
@@ -16699,7 +16700,7 @@
           ],
           "passed": 0,
           "source_version": "0.21.0",
-          "note": "selected wave21"
+          "note": "calibration rescore"
         }
       ],
       "measured_tasks": 10,
@@ -16834,7 +16835,7 @@
         "passed": 0,
         "measured": 10,
         "total": 10,
-        "scope_note": "selected wave21"
+        "scope_note": "calibration rescore"
       },
       "components": [
         {
@@ -16852,7 +16853,7 @@
           ],
           "passed": 0,
           "source_version": "0.21.0",
-          "note": "selected wave21"
+          "note": "calibration rescore"
         }
       ],
       "measured_tasks": 10,
@@ -16987,7 +16988,7 @@
         "passed": 0,
         "measured": 10,
         "total": 10,
-        "scope_note": "selected wave21"
+        "scope_note": "calibration rescore"
       },
       "components": [
         {
@@ -17005,7 +17006,7 @@
           ],
           "passed": 0,
           "source_version": "0.21.0",
-          "note": "selected wave21"
+          "note": "calibration rescore"
         }
       ],
       "measured_tasks": 10,
@@ -17140,7 +17141,7 @@
         "passed": 0,
         "measured": 10,
         "total": 10,
-        "scope_note": "selected wave21"
+        "scope_note": "calibration rescore"
       },
       "components": [
         {
@@ -17158,7 +17159,7 @@
           ],
           "passed": 0,
           "source_version": "0.21.0",
-          "note": "selected wave21"
+          "note": "calibration rescore"
         }
       ],
       "measured_tasks": 10,
@@ -17292,7 +17293,7 @@
         "passed": 9,
         "measured": 10,
         "total": 10,
-        "scope_note": "selected wave21"
+        "scope_note": "calibration rescore"
       },
       "components": [
         {
@@ -17310,7 +17311,7 @@
           ],
           "passed": 9,
           "source_version": "0.21.1",
-          "note": "selected wave21"
+          "note": "calibration rescore"
         }
       ],
       "measured_tasks": 10,
@@ -17445,7 +17446,7 @@
         "passed": 9,
         "measured": 10,
         "total": 10,
-        "scope_note": "selected wave21"
+        "scope_note": "calibration rescore"
       },
       "components": [
         {
@@ -17463,7 +17464,7 @@
           ],
           "passed": 9,
           "source_version": "0.21.1",
-          "note": "selected wave21"
+          "note": "calibration rescore"
         }
       ],
       "measured_tasks": 10,
@@ -17578,6 +17579,501 @@
           "value": 19225827,
           "covered_tasks": 10,
           "status": "partial",
+          "lower_bound": false
+        }
+      }
+    },
+    {
+      "id": "run-qwen3.8-27b-20261023",
+      "model": "Qwen 3.8 27B (default)",
+      "harness": "DeepAgents 0.6.12",
+      "runs": 1,
+      "source_version": "0.19.1",
+      "reasoning_effort": "default",
+      "measurement_type": "fresh_run",
+      "measurement_valid": true,
+      "details_url": "wave21-small-models.html#qwen3.8-27b",
+      "profile_id": "run-qwen3.8-27b-20261023",
+      "previous": {
+        "passed": 37,
+        "measured": 80,
+        "total": 80,
+        "scope_note": "historical Medium80"
+      },
+      "wave21": {
+        "passed": 1,
+        "measured": 10,
+        "total": 10,
+        "scope_note": "fresh run 2026-10-24 · no subagents, 160 steps"
+      },
+      "components": [
+        {
+          "task_numbers": [
+            392,
+            393,
+            394,
+            395,
+            396,
+            397,
+            398,
+            399,
+            400,
+            401,
+            402,
+            403,
+            404,
+            405,
+            406,
+            407,
+            408,
+            409,
+            410,
+            411,
+            412,
+            413,
+            414,
+            415,
+            416,
+            417,
+            418,
+            419,
+            420,
+            421,
+            422,
+            423,
+            424,
+            425,
+            426,
+            427,
+            428,
+            429,
+            430,
+            431,
+            432,
+            433,
+            434,
+            435,
+            436,
+            437,
+            438,
+            439,
+            440,
+            441,
+            442,
+            443,
+            444,
+            445,
+            446,
+            447,
+            448,
+            449,
+            450,
+            451,
+            452,
+            453,
+            454,
+            455,
+            456,
+            457,
+            458,
+            459,
+            460,
+            461,
+            462,
+            463,
+            464,
+            465,
+            466,
+            467,
+            468,
+            469,
+            470,
+            471
+          ],
+          "passed": 37,
+          "source_version": "0.19.1",
+          "note": "historical Medium80"
+        },
+        {
+          "task_numbers": [
+            512,
+            518,
+            520,
+            522,
+            523,
+            524,
+            525,
+            526,
+            527,
+            530
+          ],
+          "passed": 1,
+          "source_version": "0.21.3",
+          "note": "fresh run 2026-10-24 · no subagents, 160 steps"
+        }
+      ],
+      "measured_tasks": 90,
+      "target_tasks": 90,
+      "missing_task_numbers": [],
+      "observed_passed": 38,
+      "overall_passed": 38,
+      "score": 0.4222222222222222,
+      "rank": 1,
+      "status": "complete",
+      "usage": {
+        "tasks": 90,
+        "observed_tasks": 90,
+        "notes": [
+          "Retained public measurement counters only. Missing tasks are unmeasured, not failures.",
+          "Task counts show counter availability, not full request-level accounting.",
+          "Selected execution only; missing counters null, observed subtotals explicitly partial.",
+          "Selected execution only; missing counters null, observed subtotals explicitly partial."
+        ],
+        "sources_sha256": [
+          "334acdc233943ac2a6b2434ff6837db184f3999ec4bb5ca7d3d967b0d6679b0f",
+          "8be3d7fbae5c6f6fed8c044e4db6bf473b841c17c72c775d2a092c89edbcb2e9"
+        ],
+        "steps": {
+          "value": 6101,
+          "covered_tasks": 57,
+          "status": "partial",
+          "lower_bound": false,
+          "unit": "native_steps"
+        },
+        "tokens": {
+          "value": 220786578,
+          "covered_tasks": 60,
+          "status": "partial",
+          "lower_bound": false
+        }
+      }
+    },
+    {
+      "id": "run-qwen3.6-35b-a3b-20261023",
+      "model": "Qwen 3.6 35B A3B (default)",
+      "harness": "DeepAgents 0.6.12",
+      "runs": 1,
+      "source_version": "0.19.1",
+      "reasoning_effort": "default",
+      "measurement_type": "fresh_run",
+      "measurement_valid": true,
+      "details_url": "wave21-small-models.html#qwen3.6-35b-a3b",
+      "profile_id": "run-qwen3.6-35b-a3b-20261023",
+      "previous": {
+        "passed": 29,
+        "measured": 80,
+        "total": 80,
+        "scope_note": "historical Medium80"
+      },
+      "wave21": {
+        "passed": 0,
+        "measured": 10,
+        "total": 10,
+        "scope_note": "fresh run 2026-10-24 · no subagents, 160 steps"
+      },
+      "components": [
+        {
+          "task_numbers": [
+            392,
+            393,
+            394,
+            395,
+            396,
+            397,
+            398,
+            399,
+            400,
+            401,
+            402,
+            403,
+            404,
+            405,
+            406,
+            407,
+            408,
+            409,
+            410,
+            411,
+            412,
+            413,
+            414,
+            415,
+            416,
+            417,
+            418,
+            419,
+            420,
+            421,
+            422,
+            423,
+            424,
+            425,
+            426,
+            427,
+            428,
+            429,
+            430,
+            431,
+            432,
+            433,
+            434,
+            435,
+            436,
+            437,
+            438,
+            439,
+            440,
+            441,
+            442,
+            443,
+            444,
+            445,
+            446,
+            447,
+            448,
+            449,
+            450,
+            451,
+            452,
+            453,
+            454,
+            455,
+            456,
+            457,
+            458,
+            459,
+            460,
+            461,
+            462,
+            463,
+            464,
+            465,
+            466,
+            467,
+            468,
+            469,
+            470,
+            471
+          ],
+          "passed": 29,
+          "source_version": "0.19.1",
+          "note": "historical Medium80"
+        },
+        {
+          "task_numbers": [
+            512,
+            518,
+            520,
+            522,
+            523,
+            524,
+            525,
+            526,
+            527,
+            530
+          ],
+          "passed": 0,
+          "source_version": "0.21.3",
+          "note": "fresh run 2026-10-24 · no subagents, 160 steps"
+        }
+      ],
+      "measured_tasks": 90,
+      "target_tasks": 90,
+      "missing_task_numbers": [],
+      "observed_passed": 29,
+      "overall_passed": 29,
+      "score": 0.32222222222222224,
+      "rank": 2,
+      "status": "complete",
+      "usage": {
+        "tasks": 90,
+        "observed_tasks": 90,
+        "notes": [
+          "Retained public measurement counters only. Missing tasks are unmeasured, not failures.",
+          "Task counts show counter availability, not full request-level accounting.",
+          "Selected execution only; missing counters null, observed subtotals explicitly partial.",
+          "Selected execution only; missing counters null, observed subtotals explicitly partial."
+        ],
+        "sources_sha256": [
+          "561201ce673d3325938a14602dc7f3abd0716461c7379fdc91f3d7a1b846ab6b",
+          "9e9fd97b4eb226ea5e61c709da982b3c8d667fd4e0d1c52aedb33c36b9e178eb"
+        ],
+        "steps": {
+          "value": 7513,
+          "covered_tasks": 66,
+          "status": "partial",
+          "lower_bound": false,
+          "unit": "native_steps"
+        },
+        "tokens": {
+          "value": 424905829,
+          "covered_tasks": 84,
+          "status": "partial",
+          "lower_bound": false
+        }
+      }
+    },
+    {
+      "id": "run-gpt-oss-20b-20261023",
+      "model": "GPT-OSS 20B (default)",
+      "harness": "DeepAgents 0.6.12",
+      "runs": 1,
+      "source_version": "0.19.1",
+      "reasoning_effort": "default",
+      "measurement_type": "fresh_run",
+      "measurement_valid": true,
+      "details_url": "wave21-small-models.html#gpt-oss-20b",
+      "profile_id": "run-gpt-oss-20b-20261023",
+      "previous": {
+        "passed": 0,
+        "measured": 80,
+        "total": 80,
+        "scope_note": "historical Medium80"
+      },
+      "wave21": {
+        "passed": 0,
+        "measured": 10,
+        "total": 10,
+        "scope_note": "fresh run 2026-10-24 · no subagents, 160 steps"
+      },
+      "components": [
+        {
+          "task_numbers": [
+            392,
+            393,
+            394,
+            395,
+            396,
+            397,
+            398,
+            399,
+            400,
+            401,
+            402,
+            403,
+            404,
+            405,
+            406,
+            407,
+            408,
+            409,
+            410,
+            411,
+            412,
+            413,
+            414,
+            415,
+            416,
+            417,
+            418,
+            419,
+            420,
+            421,
+            422,
+            423,
+            424,
+            425,
+            426,
+            427,
+            428,
+            429,
+            430,
+            431,
+            432,
+            433,
+            434,
+            435,
+            436,
+            437,
+            438,
+            439,
+            440,
+            441,
+            442,
+            443,
+            444,
+            445,
+            446,
+            447,
+            448,
+            449,
+            450,
+            451,
+            452,
+            453,
+            454,
+            455,
+            456,
+            457,
+            458,
+            459,
+            460,
+            461,
+            462,
+            463,
+            464,
+            465,
+            466,
+            467,
+            468,
+            469,
+            470,
+            471
+          ],
+          "passed": 0,
+          "source_version": "0.19.1",
+          "note": "historical Medium80"
+        },
+        {
+          "task_numbers": [
+            512,
+            518,
+            520,
+            522,
+            523,
+            524,
+            525,
+            526,
+            527,
+            530
+          ],
+          "passed": 0,
+          "source_version": "0.21.3",
+          "note": "fresh run 2026-10-24 · no subagents, 160 steps"
+        }
+      ],
+      "measured_tasks": 90,
+      "target_tasks": 90,
+      "missing_task_numbers": [],
+      "observed_passed": 0,
+      "overall_passed": 0,
+      "score": 0.0,
+      "rank": 3,
+      "status": "complete",
+      "usage": {
+        "tasks": 90,
+        "observed_tasks": 90,
+        "notes": [
+          "Retained public measurement counters only. Missing tasks are unmeasured, not failures.",
+          "Task counts show counter availability, not full request-level accounting.",
+          "Selected execution only; missing counters null, observed subtotals explicitly partial.",
+          "Selected execution only; missing counters null, observed subtotals explicitly partial."
+        ],
+        "sources_sha256": [
+          "767c8942b607ae75c6ecdf00f7d60038efdb3cdc09321ba6b53bc15a7bc6dd76",
+          "a25530bcf20a9ff7231125c032d7cff978c2c56c193dab2ecc5cbbcbd00e97e5"
+        ],
+        "steps": {
+          "value": 542,
+          "covered_tasks": 90,
+          "status": "complete",
+          "lower_bound": false,
+          "unit": "native_steps"
+        },
+        "tokens": {
+          "value": 2793536,
+          "covered_tasks": 90,
+          "status": "complete",
           "lower_bound": false
         }
       }
