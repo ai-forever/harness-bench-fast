@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Claude Haiku 5.5 · fresh Medium 90 measurements</title><link rel="stylesheet" href="landing.css"></head>
+<body><main><p><a href="index.html#medium">← Medium leaderboard</a></p>
+<section class="measurement-protocol"><p class="snapshot-label">26 October 2026 · task-set v0.21.3</p>
+<h1>Claude Haiku 5.5 · Medium 90</h1>
+<p>Two fresh runs cover exactly the canonical 90 Medium tasks. Each task has one retained scored attempt, including failures. Infrastructure recovery attempts are excluded from public scores and counters; verifier failures were not retried to select better answers. Both final artifacts report valid measurements, zero unresolved infrastructure failures and 90/90 task coverage. The completion audit passed. These are separate measured configurations; they are not combined with earlier Haiku results.</p>
+<div class="table-wrap"><table class="leaderboard-table"><thead><tr><th>Harness</th><th>Model</th><th>Passed</th><th>Score</th><th>Steps</th><th>Tokens</th></tr></thead><tbody>
+<tr id="mini"><td>mini-SWE-agent 2.4.6</td><td>Claude Haiku 5.5 (default)</td><td>63/90</td><td>70.0%</td><td>2,777 · partial 88/90</td><td>493,730,606 · partial 88/90</td></tr>
+<tr id="deepagents"><td>DeepAgents 0.6.12</td><td>Claude Haiku 5.5 (default)</td><td>60/90</td><td>66.7%</td><td>4,078 · partial 88/90</td><td>191,772,875 · partial 89/90</td></tr>
+</tbody></table></div>
+<h2>Protocol</h2>
+<p>Requested API model: <code>anthropic/claude-haiku-5.5</code>. Reasoning and sampling use provider defaults without overrides; the output limit is 16,384 tokens per response. Four concurrent tasks per harness; Linux/bubblewrap isolation and a host-owned trusted service. DeepAgents forwards reasoning history and enables its native subagents; mini-SWE-agent uses its native DefaultAgent. The base budget is 160 graph supersteps for DeepAgents or 160 model calls for mini-SWE-agent, raised by numeric task-specific floors. These units are different. Ordinary execution has a 3,600-second guard, long-context tasks retain their 7,200-second floor, and selected coupled workflows retain their 900-second limit and 320 service requests. Setup and verification are outside execution limits.</p>
+<h2>Accounting and limits</h2>
+<p>Published per-task outcomes and counters come from final retained attempts only. Superseded attempts and separate smoke checks are excluded. Counters are native recorded subtotals, not complete API spend: mini-SWE-agent has steps and tokens for 88/90 tasks; DeepAgents has steps for 88/90 and tokens for 89/90. Missing counters are null in the downloadable data. Request-level completeness has not been independently audited; the leaderboard marks these totals partial. Source fingerprints identify the private final artifacts and protocol without publishing raw prompts, responses, credentials or internal endpoints.</p>
+<p>One run per harness; no independent repeats or repeat-variability interval. The observed difference is three tasks, not evidence of causal harness superiority. Historical measurements keep their original scopes and profiles.</p>
+<p><a href="haiku-medium90.json">Public outcomes, native counters and source fingerprints</a> · <a href="medium90-protocol.html">Medium membership and comparison policy</a></p>
+</section></main></body></html>

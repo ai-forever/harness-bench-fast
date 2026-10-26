@@ -187,10 +187,21 @@ assert.equal(wave21.find(row => row.id === "wave21-codex0163_deepseek41_unc_high
 assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.passed, 0);
 
 
-// The landing temporarily displays complete historical Medium80 only.
-assert.ok(landing.includes("80 tasks"));
-assert.ok(!landing.includes("90 tasks"));
+// Current landing requires complete valid Medium90, preserving historical data separately.
+const medium90 = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/medium90-results.json")));
+const currentData = { ...data, medium90 };
+const ranked90 = selectResults(currentData, "medium", "current", "");
+assert.equal(ranked90.length, 5);
+assert.ok(ranked90.every(row => row.result.total === 90));
+assert.deepEqual(selectResults(currentData, "medium", "current", "haiku").map(row => row.result.passed), [63, 60]);
+assert.deepEqual(selectResults(currentData, "light", "current", ""), selectResults(data, "light", "current", ""));
+assert.equal(selectResults({ ...data, medium90: { rows: medium90.rows.filter(r => r.status !== "complete") } }, "medium", "current", "").length, 0);
+assert.ok(landing.includes("90 tasks"));
+assert.ok(!landing.includes("80 tasks"));
 assert.equal((landing.match(/<tbody/g) || []).length, 1);
-assert.ok(!landing.includes("medium90-results.json"));
+assert.ok(landing.includes("medium90-results.json"));
 assert.ok(!landing.includes('id="wave19-section"'));
-console.log("Clean historical Medium80 landing checks passed.");
+console.log("Current Medium90 complete coverage, ranking, search and Light preservation checks passed.");
+
+const invalidComplete = { ...medium90.rows.find(r => r.status === "complete"), measurement_valid: false };
+assert.equal(selectResults({ ...data, medium90: { rows: [invalidComplete] } }, "medium", "current", "").length, 0);

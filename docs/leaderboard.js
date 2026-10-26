@@ -3,6 +3,13 @@
 // Every view has one explicit denominator. Missing scores never fall back to a
 // full-run score, and unmeasured waves are never treated as failures.
 function selectResults(data, suite, coverage, search) {
+  if (suite === "medium" && coverage === "current" && data.medium90) {
+    const query = search.trim().toLocaleLowerCase();
+    return data.medium90.rows.filter(row => row.status === "complete" && row.measurement_valid === true && row.measured_tasks === 90 && row.target_tasks === 90 && Number.isFinite(row.score))
+      .filter(row => (row.model + " " + row.harness).toLocaleLowerCase().includes(query))
+      .map(row => ({ ...row, result: { passed: row.overall_passed, total: 90 }, usage: row.usage }))
+      .sort((a, b) => b.result.passed - a.result.passed || a.model.localeCompare(b.model) || a.harness.localeCompare(b.harness));
+  }
   const key = suite === "medium" && coverage === "wave21" ? "wave21" : suite === "light" ? "light" : coverage === "current" ? "medium" : coverage === "wave19" ? "wave19" : "medium_historical";
   const query = search.trim().toLocaleLowerCase();
   return data.rows.filter(row => row[key] !== null && row[key] !== undefined)
@@ -132,7 +139,7 @@ if (typeof document !== "undefined") {
       document.getElementById("suite-title").textContent = "harness_bench_fast " + suite;
       document.getElementById("coverage-note").textContent = suite === "light"
         ? "Light · 391 tasks · frozen suite."
-        : "Medium · 80 tasks · long context, tool reflection and feasibility.";
+        : "Medium · 90 tasks · complete measurements, including coupled workflows.";
       const rows = selectResults(data, suite, "current", search.value);
       const ranking = selectResults(data, suite, "current", "");
       renderTable(body, expanded ? rows : rows.slice(0, 12), ranking, "current");
@@ -146,6 +153,9 @@ if (typeof document !== "undefined") {
       const response = await fetch("leaderboard-results.json", { cache: "no-cache" });
       if (!response.ok) throw new Error("HTTP " + response.status);
       data = await response.json();
+      const mediumResponse = await fetch("medium90-results.json", { cache: "no-cache" });
+      if (!mediumResponse.ok) throw new Error("Medium data HTTP " + mediumResponse.status);
+      data.medium90 = await mediumResponse.json();
       render();
       if (Object.hasOwn(rowAnchors, location.hash)) {
         document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: "center" });
