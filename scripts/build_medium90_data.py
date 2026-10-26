@@ -139,6 +139,32 @@ def build(root=ROOT):
                     "measurement_type": "targeted_partial", "measurement_valid": True,
                     "details_url": "wave21-measurements.html#" + run["configuration_id"]}
         rows.append(assemble_row(identity, [component(numbers, {"total": len(numbers), "passed": run["passed"]}, usage, run["source_task_set_version"], "targeted wave21 follow-up")]))
+    fresh_path = root / "docs/haiku-medium90.json"
+    fresh = json.loads(fresh_path.read_text(encoding="utf-8"))
+    assert fresh["task_set_version"] == "0.21.3" and fresh["task_count"] == 90
+    for run in fresh["rows"]:
+        tasks = run["tasks"]
+        assert sorted(t["number"] for t in tasks) == sorted(NUMBERS)
+        assert sum(t["passed"] for t in tasks) == run["passed"]
+        components = []
+        for numbers, note in ((list(range(392, 472)), "fresh Medium90 run · historical80 subset"),
+                              (SELECTED, "fresh Medium90 run · selected wave21 subset")):
+            subset = [t for t in tasks if t["number"] in numbers]
+            usage = {"sources_sha256": [run["source_sha256"]], "notes": [
+                "One retained attempt per task; superseded infrastructure attempts excluded.",
+                "Native counters only; missing counters and request-level accounting are unaudited."]}
+            for metric, field in (("steps", "agent_steps"), ("tokens", "agent_total_tokens")):
+                values = [t[field] for t in subset if t[field] is not None]
+                usage[metric] = {"value": sum(values), "covered_tasks": len(values),
+                                 "status": "partial", "lower_bound": True}
+            usage["steps"]["unit"] = "native_steps"
+            components.append(component(numbers, {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
+                                        usage, fresh["task_set_version"], note))
+        identity = {"id": run["id"], "profile_id": run["id"], "model": "Claude Haiku 5.5 (default)",
+                    "harness": run["harness"], "runs": 1, "source_version": fresh["task_set_version"],
+                    "reasoning_effort": "default", "measurement_type": "fresh_medium90",
+                    "measurement_valid": run["measurement_valid"], "details_url": "haiku-medium90.html#" + run["profile"]}
+        rows.append(assemble_row(identity, components))
     assert len({r["id"] for r in rows}) == len(rows)
     complete = sorted((r for r in rows if r["score"] is not None), key=lambda r: -r["score"])
     for r in complete:
@@ -153,7 +179,7 @@ def build(root=ROOT):
                        "incompatible_pairs": "Historical DeepAgents GLM/DeepSeek enabled native subagents; new wave21 disabled them. Keep separate profiles. 80/160 graph steps and model API request caps are distinct.",
                        "controls": "Forty wave20 controls and ten unselected calibration tasks excluded from Medium90.",
                        "new_model_calls": 0},
-            "provenance": {"legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path)},
+            "provenance": {"legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path), "haiku_medium90_sha256": fingerprint(fresh_path)},
             "summary": {"rows": len(rows), "ranked_rows": len(complete),
                         "coverage": {str(n): sum(r["measured_tasks"] == n for r in rows) for n in sorted({r["measured_tasks"] for r in rows})}},
             "rows": rows}

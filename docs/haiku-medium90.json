@@ -1,0 +1,1129 @@
+{
+  "model": "anthropic/claude-haiku-5.5",
+  "reasoning": "provider default; no override",
+  "sampling": "provider default; no overrides",
+  "max_output_tokens": 16384,
+  "attempts": 1,
+  "task_count": 90,
+  "concurrency_per_harness": 4,
+  "deepagents": "0.6.12; native subagents enabled; reasoning history forwarded",
+  "mini": "2.4.6; native DefaultAgent",
+  "budget_policy": "base160, preserve numeric per-task floors; graph supersteps and mini model calls are distinct units",
+  "isolation": "bwrap; host-owned trusted service",
+  "retry_policy": "retry API/transport only; censor retained as failure; never retry verifier failures to select a better answer",
+  "task_set_version": "0.21.3",
+  "measurement_date": "2026-10-26",
+  "source_protocol_sha256": "b5c1d30141a738bbb93696666ab0bfccd3a1a8ffc7ecbde791c778add4ed2480",
+  "rows": [
+    {
+      "id": "haiku55-mini-medium90-20261026",
+      "harness": "mini-SWE-agent 2.4.6",
+      "profile": "mini",
+      "passed": 63,
+      "total": 90,
+      "steps": 2777,
+      "tokens": 493730606,
+      "step_metric_coverage": 88,
+      "token_metric_coverage": 88,
+      "measurement_valid": true,
+      "source_sha256": "ed1d6da5df291f9365a17d53bc685705de45dbf7caa1ab66e15a29e649bf58b2",
+      "tasks": [
+        {
+          "number": 392,
+          "passed": false,
+          "agent_steps": 78,
+          "agent_total_tokens": 21143641
+        },
+        {
+          "number": 393,
+          "passed": false,
+          "agent_steps": 52,
+          "agent_total_tokens": 8185660
+        },
+        {
+          "number": 394,
+          "passed": false,
+          "agent_steps": 27,
+          "agent_total_tokens": 4545824
+        },
+        {
+          "number": 395,
+          "passed": false,
+          "agent_steps": 41,
+          "agent_total_tokens": 9842786
+        },
+        {
+          "number": 396,
+          "passed": false,
+          "agent_steps": 92,
+          "agent_total_tokens": 13218991
+        },
+        {
+          "number": 397,
+          "passed": false,
+          "agent_steps": 107,
+          "agent_total_tokens": 64687276
+        },
+        {
+          "number": 398,
+          "passed": false,
+          "agent_steps": 39,
+          "agent_total_tokens": 13651864
+        },
+        {
+          "number": 399,
+          "passed": true,
+          "agent_steps": 46,
+          "agent_total_tokens": 3871907
+        },
+        {
+          "number": 400,
+          "passed": false,
+          "agent_steps": 100,
+          "agent_total_tokens": 18824218
+        },
+        {
+          "number": 401,
+          "passed": false,
+          "agent_steps": 112,
+          "agent_total_tokens": 38063933
+        },
+        {
+          "number": 402,
+          "passed": false,
+          "agent_steps": 113,
+          "agent_total_tokens": 29653831
+        },
+        {
+          "number": 403,
+          "passed": false,
+          "agent_steps": 75,
+          "agent_total_tokens": 35056129
+        },
+        {
+          "number": 404,
+          "passed": false,
+          "agent_steps": 59,
+          "agent_total_tokens": 12913336
+        },
+        {
+          "number": 405,
+          "passed": false,
+          "agent_steps": 120,
+          "agent_total_tokens": 71671476
+        },
+        {
+          "number": 406,
+          "passed": false,
+          "agent_steps": 36,
+          "agent_total_tokens": 8311400
+        },
+        {
+          "number": 407,
+          "passed": false,
+          "agent_steps": 37,
+          "agent_total_tokens": 10218504
+        },
+        {
+          "number": 408,
+          "passed": false,
+          "agent_steps": 59,
+          "agent_total_tokens": 9075441
+        },
+        {
+          "number": 409,
+          "passed": false,
+          "agent_steps": 47,
+          "agent_total_tokens": 14143291
+        },
+        {
+          "number": 410,
+          "passed": false,
+          "agent_steps": 131,
+          "agent_total_tokens": 42276775
+        },
+        {
+          "number": 411,
+          "passed": false,
+          "agent_steps": 95,
+          "agent_total_tokens": 25874304
+        },
+        {
+          "number": 412,
+          "passed": true,
+          "agent_steps": 12,
+          "agent_total_tokens": 96759
+        },
+        {
+          "number": 413,
+          "passed": true,
+          "agent_steps": 13,
+          "agent_total_tokens": 220128
+        },
+        {
+          "number": 414,
+          "passed": true,
+          "agent_steps": 11,
+          "agent_total_tokens": 113911
+        },
+        {
+          "number": 415,
+          "passed": true,
+          "agent_steps": 12,
+          "agent_total_tokens": 106781
+        },
+        {
+          "number": 416,
+          "passed": true,
+          "agent_steps": 14,
+          "agent_total_tokens": 151125
+        },
+        {
+          "number": 417,
+          "passed": false,
+          "agent_steps": 19,
+          "agent_total_tokens": 239620
+        },
+        {
+          "number": 418,
+          "passed": true,
+          "agent_steps": 29,
+          "agent_total_tokens": 644827
+        },
+        {
+          "number": 419,
+          "passed": true,
+          "agent_steps": 14,
+          "agent_total_tokens": 159633
+        },
+        {
+          "number": 420,
+          "passed": false,
+          "agent_steps": 47,
+          "agent_total_tokens": 2617176
+        },
+        {
+          "number": 421,
+          "passed": true,
+          "agent_steps": 18,
+          "agent_total_tokens": 252589
+        },
+        {
+          "number": 422,
+          "passed": false,
+          "agent_steps": 14,
+          "agent_total_tokens": 238774
+        },
+        {
+          "number": 423,
+          "passed": false,
+          "agent_steps": 18,
+          "agent_total_tokens": 396424
+        },
+        {
+          "number": 424,
+          "passed": true,
+          "agent_steps": 13,
+          "agent_total_tokens": 143277
+        },
+        {
+          "number": 425,
+          "passed": true,
+          "agent_steps": 10,
+          "agent_total_tokens": 140369
+        },
+        {
+          "number": 426,
+          "passed": true,
+          "agent_steps": 12,
+          "agent_total_tokens": 112979
+        },
+        {
+          "number": 427,
+          "passed": true,
+          "agent_steps": 20,
+          "agent_total_tokens": 260626
+        },
+        {
+          "number": 428,
+          "passed": true,
+          "agent_steps": 15,
+          "agent_total_tokens": 161452
+        },
+        {
+          "number": 429,
+          "passed": true,
+          "agent_steps": 12,
+          "agent_total_tokens": 206625
+        },
+        {
+          "number": 430,
+          "passed": true,
+          "agent_steps": 12,
+          "agent_total_tokens": 190050
+        },
+        {
+          "number": 431,
+          "passed": true,
+          "agent_steps": 17,
+          "agent_total_tokens": 254937
+        },
+        {
+          "number": 432,
+          "passed": true,
+          "agent_steps": 10,
+          "agent_total_tokens": 183115
+        },
+        {
+          "number": 433,
+          "passed": true,
+          "agent_steps": 30,
+          "agent_total_tokens": 1443863
+        },
+        {
+          "number": 434,
+          "passed": true,
+          "agent_steps": 12,
+          "agent_total_tokens": 405811
+        },
+        {
+          "number": 435,
+          "passed": true,
+          "agent_steps": 17,
+          "agent_total_tokens": 491159
+        },
+        {
+          "number": 436,
+          "passed": false,
+          "agent_steps": 7,
+          "agent_total_tokens": 125545
+        },
+        {
+          "number": 437,
+          "passed": true,
+          "agent_steps": 8,
+          "agent_total_tokens": 150574
+        },
+        {
+          "number": 438,
+          "passed": true,
+          "agent_steps": 14,
+          "agent_total_tokens": 383955
+        },
+        {
+          "number": 439,
+          "passed": true,
+          "agent_steps": 11,
+          "agent_total_tokens": 255195
+        },
+        {
+          "number": 440,
+          "passed": true,
+          "agent_steps": 15,
+          "agent_total_tokens": 393636
+        },
+        {
+          "number": 441,
+          "passed": true,
+          "agent_steps": 11,
+          "agent_total_tokens": 336188
+        },
+        {
+          "number": 442,
+          "passed": true,
+          "agent_steps": 39,
+          "agent_total_tokens": 1656616
+        },
+        {
+          "number": 443,
+          "passed": true,
+          "agent_steps": 8,
+          "agent_total_tokens": 131375
+        },
+        {
+          "number": 444,
+          "passed": true,
+          "agent_steps": 13,
+          "agent_total_tokens": 378859
+        },
+        {
+          "number": 445,
+          "passed": true,
+          "agent_steps": 12,
+          "agent_total_tokens": 223723
+        },
+        {
+          "number": 446,
+          "passed": true,
+          "agent_steps": 9,
+          "agent_total_tokens": 151810
+        },
+        {
+          "number": 447,
+          "passed": true,
+          "agent_steps": 28,
+          "agent_total_tokens": 1273811
+        },
+        {
+          "number": 448,
+          "passed": true,
+          "agent_steps": 27,
+          "agent_total_tokens": 1363511
+        },
+        {
+          "number": 449,
+          "passed": true,
+          "agent_steps": 10,
+          "agent_total_tokens": 219276
+        },
+        {
+          "number": 450,
+          "passed": true,
+          "agent_steps": 14,
+          "agent_total_tokens": 311937
+        },
+        {
+          "number": 451,
+          "passed": true,
+          "agent_steps": 7,
+          "agent_total_tokens": 121063
+        },
+        {
+          "number": 452,
+          "passed": true,
+          "agent_steps": 7,
+          "agent_total_tokens": 184448
+        },
+        {
+          "number": 453,
+          "passed": false,
+          "agent_steps": 24,
+          "agent_total_tokens": 888763
+        },
+        {
+          "number": 454,
+          "passed": true,
+          "agent_steps": 8,
+          "agent_total_tokens": 221432
+        },
+        {
+          "number": 455,
+          "passed": true,
+          "agent_steps": 10,
+          "agent_total_tokens": 221996
+        },
+        {
+          "number": 456,
+          "passed": true,
+          "agent_steps": 13,
+          "agent_total_tokens": 331205
+        },
+        {
+          "number": 457,
+          "passed": true,
+          "agent_steps": 7,
+          "agent_total_tokens": 122439
+        },
+        {
+          "number": 458,
+          "passed": true,
+          "agent_steps": 17,
+          "agent_total_tokens": 472528
+        },
+        {
+          "number": 459,
+          "passed": true,
+          "agent_steps": 53,
+          "agent_total_tokens": 2298990
+        },
+        {
+          "number": 460,
+          "passed": true,
+          "agent_steps": 18,
+          "agent_total_tokens": 562391
+        },
+        {
+          "number": 461,
+          "passed": true,
+          "agent_steps": 8,
+          "agent_total_tokens": 157006
+        },
+        {
+          "number": 462,
+          "passed": true,
+          "agent_steps": 30,
+          "agent_total_tokens": 1169366
+        },
+        {
+          "number": 463,
+          "passed": true,
+          "agent_steps": 15,
+          "agent_total_tokens": 561943
+        },
+        {
+          "number": 464,
+          "passed": true,
+          "agent_steps": 8,
+          "agent_total_tokens": 203062
+        },
+        {
+          "number": 465,
+          "passed": true,
+          "agent_steps": 11,
+          "agent_total_tokens": 227990
+        },
+        {
+          "number": 466,
+          "passed": true,
+          "agent_steps": 14,
+          "agent_total_tokens": 361823
+        },
+        {
+          "number": 467,
+          "passed": true,
+          "agent_steps": 8,
+          "agent_total_tokens": 223015
+        },
+        {
+          "number": 468,
+          "passed": true,
+          "agent_steps": 10,
+          "agent_total_tokens": 254570
+        },
+        {
+          "number": 469,
+          "passed": true,
+          "agent_steps": 15,
+          "agent_total_tokens": 454694
+        },
+        {
+          "number": 470,
+          "passed": true,
+          "agent_steps": 8,
+          "agent_total_tokens": 148956
+        },
+        {
+          "number": 471,
+          "passed": true,
+          "agent_steps": 12,
+          "agent_total_tokens": 317841
+        },
+        {
+          "number": 512,
+          "passed": true,
+          "agent_steps": 51,
+          "agent_total_tokens": 1605153
+        },
+        {
+          "number": 518,
+          "passed": true,
+          "agent_steps": 42,
+          "agent_total_tokens": 1295080
+        },
+        {
+          "number": 520,
+          "passed": true,
+          "agent_steps": 45,
+          "agent_total_tokens": 1356320
+        },
+        {
+          "number": 522,
+          "passed": true,
+          "agent_steps": 48,
+          "agent_total_tokens": 1507818
+        },
+        {
+          "number": 523,
+          "passed": true,
+          "agent_steps": 65,
+          "agent_total_tokens": 2120286
+        },
+        {
+          "number": 524,
+          "passed": false,
+          "agent_steps": null,
+          "agent_total_tokens": null
+        },
+        {
+          "number": 525,
+          "passed": true,
+          "agent_steps": 32,
+          "agent_total_tokens": 1097388
+        },
+        {
+          "number": 526,
+          "passed": true,
+          "agent_steps": 46,
+          "agent_total_tokens": 1307509
+        },
+        {
+          "number": 527,
+          "passed": false,
+          "agent_steps": null,
+          "agent_total_tokens": null
+        },
+        {
+          "number": 530,
+          "passed": true,
+          "agent_steps": 52,
+          "agent_total_tokens": 2116923
+        }
+      ]
+    },
+    {
+      "id": "haiku55-deepagents-medium90-20261026",
+      "harness": "DeepAgents 0.6.12",
+      "profile": "deepagents",
+      "passed": 60,
+      "total": 90,
+      "steps": 4078,
+      "tokens": 191772875,
+      "step_metric_coverage": 88,
+      "token_metric_coverage": 89,
+      "measurement_valid": true,
+      "source_sha256": "21d120162e5634e29c1f7da66bba13bb1a640a1c29a07c41481c2cf29f297b5e",
+      "tasks": [
+        {
+          "number": 392,
+          "passed": false,
+          "agent_steps": 123,
+          "agent_total_tokens": 11780215
+        },
+        {
+          "number": 393,
+          "passed": false,
+          "agent_steps": 66,
+          "agent_total_tokens": 2265403
+        },
+        {
+          "number": 394,
+          "passed": true,
+          "agent_steps": 50,
+          "agent_total_tokens": 4290909
+        },
+        {
+          "number": 395,
+          "passed": false,
+          "agent_steps": 67,
+          "agent_total_tokens": 2474566
+        },
+        {
+          "number": 396,
+          "passed": false,
+          "agent_steps": 161,
+          "agent_total_tokens": 51349941
+        },
+        {
+          "number": 397,
+          "passed": false,
+          "agent_steps": 111,
+          "agent_total_tokens": 14124430
+        },
+        {
+          "number": 398,
+          "passed": false,
+          "agent_steps": 35,
+          "agent_total_tokens": 574713
+        },
+        {
+          "number": 399,
+          "passed": false,
+          "agent_steps": 35,
+          "agent_total_tokens": 647733
+        },
+        {
+          "number": 400,
+          "passed": false,
+          "agent_steps": 55,
+          "agent_total_tokens": 12497574
+        },
+        {
+          "number": 401,
+          "passed": false,
+          "agent_steps": 79,
+          "agent_total_tokens": 1985086
+        },
+        {
+          "number": 402,
+          "passed": true,
+          "agent_steps": 146,
+          "agent_total_tokens": 14657463
+        },
+        {
+          "number": 403,
+          "passed": false,
+          "agent_steps": 69,
+          "agent_total_tokens": 9774019
+        },
+        {
+          "number": 404,
+          "passed": false,
+          "agent_steps": 414,
+          "agent_total_tokens": 15669951
+        },
+        {
+          "number": 405,
+          "passed": false,
+          "agent_steps": 38,
+          "agent_total_tokens": 964059
+        },
+        {
+          "number": 406,
+          "passed": false,
+          "agent_steps": 47,
+          "agent_total_tokens": 1586717
+        },
+        {
+          "number": 407,
+          "passed": false,
+          "agent_steps": 92,
+          "agent_total_tokens": 4179900
+        },
+        {
+          "number": 408,
+          "passed": false,
+          "agent_steps": 25,
+          "agent_total_tokens": 589592
+        },
+        {
+          "number": 409,
+          "passed": false,
+          "agent_steps": 89,
+          "agent_total_tokens": 2957943
+        },
+        {
+          "number": 410,
+          "passed": true,
+          "agent_steps": 56,
+          "agent_total_tokens": 7303275
+        },
+        {
+          "number": 411,
+          "passed": true,
+          "agent_steps": 30,
+          "agent_total_tokens": 1596011
+        },
+        {
+          "number": 412,
+          "passed": true,
+          "agent_steps": 21,
+          "agent_total_tokens": 154522
+        },
+        {
+          "number": 413,
+          "passed": true,
+          "agent_steps": 29,
+          "agent_total_tokens": 208861
+        },
+        {
+          "number": 414,
+          "passed": true,
+          "agent_steps": 12,
+          "agent_total_tokens": 89542
+        },
+        {
+          "number": 415,
+          "passed": false,
+          "agent_steps": 26,
+          "agent_total_tokens": 171477
+        },
+        {
+          "number": 416,
+          "passed": true,
+          "agent_steps": 20,
+          "agent_total_tokens": 169070
+        },
+        {
+          "number": 417,
+          "passed": false,
+          "agent_steps": 27,
+          "agent_total_tokens": 200585
+        },
+        {
+          "number": 418,
+          "passed": false,
+          "agent_steps": 37,
+          "agent_total_tokens": 341454
+        },
+        {
+          "number": 419,
+          "passed": true,
+          "agent_steps": 31,
+          "agent_total_tokens": 266207
+        },
+        {
+          "number": 420,
+          "passed": true,
+          "agent_steps": 56,
+          "agent_total_tokens": 618434
+        },
+        {
+          "number": 421,
+          "passed": true,
+          "agent_steps": 33,
+          "agent_total_tokens": 279171
+        },
+        {
+          "number": 422,
+          "passed": true,
+          "agent_steps": 21,
+          "agent_total_tokens": 150027
+        },
+        {
+          "number": 423,
+          "passed": true,
+          "agent_steps": 21,
+          "agent_total_tokens": 196416
+        },
+        {
+          "number": 424,
+          "passed": true,
+          "agent_steps": 31,
+          "agent_total_tokens": 244944
+        },
+        {
+          "number": 425,
+          "passed": true,
+          "agent_steps": 22,
+          "agent_total_tokens": 174351
+        },
+        {
+          "number": 426,
+          "passed": false,
+          "agent_steps": 13,
+          "agent_total_tokens": 88935
+        },
+        {
+          "number": 427,
+          "passed": true,
+          "agent_steps": 15,
+          "agent_total_tokens": 138326
+        },
+        {
+          "number": 428,
+          "passed": true,
+          "agent_steps": 30,
+          "agent_total_tokens": 279198
+        },
+        {
+          "number": 429,
+          "passed": true,
+          "agent_steps": 25,
+          "agent_total_tokens": 162209
+        },
+        {
+          "number": 430,
+          "passed": true,
+          "agent_steps": 23,
+          "agent_total_tokens": 200361
+        },
+        {
+          "number": 431,
+          "passed": false,
+          "agent_steps": 38,
+          "agent_total_tokens": 358975
+        },
+        {
+          "number": 432,
+          "passed": true,
+          "agent_steps": 9,
+          "agent_total_tokens": 89042
+        },
+        {
+          "number": 433,
+          "passed": true,
+          "agent_steps": 29,
+          "agent_total_tokens": 662555
+        },
+        {
+          "number": 434,
+          "passed": true,
+          "agent_steps": 37,
+          "agent_total_tokens": 403676
+        },
+        {
+          "number": 435,
+          "passed": true,
+          "agent_steps": 20,
+          "agent_total_tokens": 255460
+        },
+        {
+          "number": 436,
+          "passed": true,
+          "agent_steps": 17,
+          "agent_total_tokens": 149336
+        },
+        {
+          "number": 437,
+          "passed": false,
+          "agent_steps": 3,
+          "agent_total_tokens": 44782
+        },
+        {
+          "number": 438,
+          "passed": true,
+          "agent_steps": 29,
+          "agent_total_tokens": 276326
+        },
+        {
+          "number": 439,
+          "passed": true,
+          "agent_steps": 16,
+          "agent_total_tokens": 234494
+        },
+        {
+          "number": 440,
+          "passed": false,
+          "agent_steps": 38,
+          "agent_total_tokens": 485808
+        },
+        {
+          "number": 441,
+          "passed": true,
+          "agent_steps": 17,
+          "agent_total_tokens": 208371
+        },
+        {
+          "number": 442,
+          "passed": true,
+          "agent_steps": 59,
+          "agent_total_tokens": 1051624
+        },
+        {
+          "number": 443,
+          "passed": false,
+          "agent_steps": 18,
+          "agent_total_tokens": 169462
+        },
+        {
+          "number": 444,
+          "passed": true,
+          "agent_steps": 36,
+          "agent_total_tokens": 347113
+        },
+        {
+          "number": 445,
+          "passed": true,
+          "agent_steps": 21,
+          "agent_total_tokens": 176335
+        },
+        {
+          "number": 446,
+          "passed": true,
+          "agent_steps": 9,
+          "agent_total_tokens": 136191
+        },
+        {
+          "number": 447,
+          "passed": true,
+          "agent_steps": 44,
+          "agent_total_tokens": 548973
+        },
+        {
+          "number": 448,
+          "passed": true,
+          "agent_steps": 35,
+          "agent_total_tokens": 836297
+        },
+        {
+          "number": 449,
+          "passed": true,
+          "agent_steps": 29,
+          "agent_total_tokens": 293608
+        },
+        {
+          "number": 450,
+          "passed": true,
+          "agent_steps": 27,
+          "agent_total_tokens": 249692
+        },
+        {
+          "number": 451,
+          "passed": true,
+          "agent_steps": 12,
+          "agent_total_tokens": 111904
+        },
+        {
+          "number": 452,
+          "passed": false,
+          "agent_steps": 8,
+          "agent_total_tokens": 64028
+        },
+        {
+          "number": 453,
+          "passed": true,
+          "agent_steps": 26,
+          "agent_total_tokens": 393423
+        },
+        {
+          "number": 454,
+          "passed": true,
+          "agent_steps": 26,
+          "agent_total_tokens": 241805
+        },
+        {
+          "number": 455,
+          "passed": true,
+          "agent_steps": 24,
+          "agent_total_tokens": 205730
+        },
+        {
+          "number": 456,
+          "passed": true,
+          "agent_steps": 22,
+          "agent_total_tokens": 263919
+        },
+        {
+          "number": 457,
+          "passed": true,
+          "agent_steps": 23,
+          "agent_total_tokens": 223139
+        },
+        {
+          "number": 458,
+          "passed": true,
+          "agent_steps": 26,
+          "agent_total_tokens": 295911
+        },
+        {
+          "number": 459,
+          "passed": false,
+          "agent_steps": 39,
+          "agent_total_tokens": 757405
+        },
+        {
+          "number": 460,
+          "passed": false,
+          "agent_steps": null,
+          "agent_total_tokens": null
+        },
+        {
+          "number": 461,
+          "passed": true,
+          "agent_steps": 19,
+          "agent_total_tokens": 192339
+        },
+        {
+          "number": 462,
+          "passed": true,
+          "agent_steps": 41,
+          "agent_total_tokens": 1006484
+        },
+        {
+          "number": 463,
+          "passed": true,
+          "agent_steps": 27,
+          "agent_total_tokens": 265117
+        },
+        {
+          "number": 464,
+          "passed": true,
+          "agent_steps": 16,
+          "agent_total_tokens": 164896
+        },
+        {
+          "number": 465,
+          "passed": true,
+          "agent_steps": 27,
+          "agent_total_tokens": 258571
+        },
+        {
+          "number": 466,
+          "passed": true,
+          "agent_steps": 23,
+          "agent_total_tokens": 271988
+        },
+        {
+          "number": 467,
+          "passed": true,
+          "agent_steps": 25,
+          "agent_total_tokens": 251514
+        },
+        {
+          "number": 468,
+          "passed": true,
+          "agent_steps": 17,
+          "agent_total_tokens": 198888
+        },
+        {
+          "number": 469,
+          "passed": true,
+          "agent_steps": 19,
+          "agent_total_tokens": 200349
+        },
+        {
+          "number": 470,
+          "passed": true,
+          "agent_steps": 17,
+          "agent_total_tokens": 173986
+        },
+        {
+          "number": 471,
+          "passed": true,
+          "agent_steps": 28,
+          "agent_total_tokens": 296090
+        },
+        {
+          "number": 512,
+          "passed": true,
+          "agent_steps": 83,
+          "agent_total_tokens": 1284198
+        },
+        {
+          "number": 518,
+          "passed": true,
+          "agent_steps": 101,
+          "agent_total_tokens": 1660443
+        },
+        {
+          "number": 520,
+          "passed": true,
+          "agent_steps": 89,
+          "agent_total_tokens": 1182429
+        },
+        {
+          "number": 522,
+          "passed": true,
+          "agent_steps": 102,
+          "agent_total_tokens": 1666524
+        },
+        {
+          "number": 523,
+          "passed": false,
+          "agent_steps": null,
+          "agent_total_tokens": 1569876
+        },
+        {
+          "number": 524,
+          "passed": false,
+          "agent_steps": 56,
+          "agent_total_tokens": 834879
+        },
+        {
+          "number": 525,
+          "passed": true,
+          "agent_steps": 86,
+          "agent_total_tokens": 1341988
+        },
+        {
+          "number": 526,
+          "passed": true,
+          "agent_steps": 101,
+          "agent_total_tokens": 1329153
+        },
+        {
+          "number": 527,
+          "passed": false,
+          "agent_steps": 58,
+          "agent_total_tokens": 727082
+        },
+        {
+          "number": 530,
+          "passed": true,
+          "agent_steps": 125,
+          "agent_total_tokens": 1957107
+        }
+      ]
+    }
+  ]
+}

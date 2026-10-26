@@ -33,6 +33,8 @@ Those controls are outside the public Medium score. `medium-historical80` select
 only IDs 392–471 for reproducing the older Medium scope. No task definitions,
 formal resource budgets or historical outcomes changed in task-set v0.21.3.
 
+The live Medium leaderboard now ranks complete valid 90-task measurements, including the [fresh Claude Haiku 5.5 runs](docs/haiku-medium90.html) on 26 October 2026: mini-SWE-agent 63/90 and DeepAgents 60/90. Their native usage counters are partial; see the protocol for coverage.
+
 Existing measurements are rescored offline on the new membership. Historical
 source versions, protocols, reasoning levels and budgets remain visible;
 results are combined only for compatible configurations. **A Medium score is

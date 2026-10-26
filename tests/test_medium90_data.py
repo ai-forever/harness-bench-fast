@@ -19,7 +19,7 @@ def test_published_medium90_is_reproducible_and_exact_suite():
     data = build()
     assert json.loads((ROOT / "docs/medium90-results.json").read_text(encoding="utf-8")) == data
     assert data["task_numbers"] == [task_number(t.id) for t in SUITES["medium"]]
-    assert data["summary"] == {"rows": 120, "ranked_rows": 3, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 3}}
+    assert data["summary"] == {"rows": 122, "ranked_rows": 5, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 5}}
     assert all((r["score"] is None) == (r["measured_tasks"] != 90) for r in data["rows"])
     assert all(len(set(r["missing_task_numbers"])) + r["measured_tasks"] == 90 for r in data["rows"])
 
@@ -58,7 +58,7 @@ def test_complete_compatible_components_score_but_missing_or_unverified_do_not()
 
 def test_payload_provenance_is_portable_across_line_endings(tmp_path):
     (tmp_path / "docs").mkdir()
-    for name in ("leaderboard-results.json", "wave21-results.json"):
+    for name in ("leaderboard-results.json", "wave21-results.json", "haiku-medium90.json"):
         content = (ROOT / "docs" / name).read_text(encoding="utf-8")
         (tmp_path / "docs" / name).write_bytes(content.replace("\n", "\r\n").encode("utf-8"))
     assert build(tmp_path) == build()
@@ -79,3 +79,18 @@ def test_incomplete_request_accounting_remains_partial_even_with_full_task_cover
     sonnet = next(r for r in build()["rows"] if r["id"] == "sonnet55-pi-medium")
     assert sonnet["usage"]["tokens"]["unmetered_requests"] == 4
     assert sonnet["usage"]["tokens"]["lower_bound"] is True
+
+
+def test_fresh_haiku_has_exact_outcomes_and_partial_retained_counters():
+    data = build()
+    expected = {"mini": (63, 2777, 493730606, 88), "deepagents": (60, 4078, 191772875, 89)}
+    for profile, (passed, steps, tokens, token_coverage) in expected.items():
+        row = next(r for r in data["rows"] if r["id"] == f"haiku55-{profile}-medium90-20261026")
+        assert row["measurement_type"] == "fresh_medium90"
+        assert row["overall_passed"] == passed and row["score"] == passed / 90
+        assert row["previous"]["passed"] + row["wave21"]["passed"] == passed
+        assert row["usage"]["steps"]["value"] == steps
+        assert row["usage"]["tokens"]["value"] == tokens
+        assert row["usage"]["tokens"]["covered_tasks"] == token_coverage
+        assert row["usage"]["tokens"]["status"] == "partial"
+        assert row["usage"]["tokens"]["lower_bound"] is True
