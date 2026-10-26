@@ -110,8 +110,8 @@ assert.equal(formatUsage({ tasks: 40, steps: { value: 0, covered_tasks: 40, stat
 assert.equal(formatUsage({ tasks: 80, steps: { value: 17, covered_tasks: 3, status: "raw" } }, "steps").note, "Raw · 3/80 tasks");
 assert.equal(selectResults(data, "medium", "current", "").find(r => r.id === "run-19").usage.steps.value, null);
 assert.equal(selectResults(data, "light", "current", "Codex").find(r => r.id !== "secret-sft-codex-v019").usage, null);
-assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 1);
-assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 1);
+assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 2);
+assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 2);
 console.log("Subset usage, exact totals, incomplete counters and real zero checks passed.");
 
 const codex = selectResults(data, "light", "current", "secret sft Codex")[0];
@@ -197,11 +197,20 @@ assert.deepEqual(selectResults(currentData, "medium", "current", "haiku").map(ro
 assert.deepEqual(selectResults(currentData, "light", "current", ""), selectResults(data, "light", "current", ""));
 assert.equal(selectResults({ ...data, medium90: { rows: medium90.rows.filter(r => r.status !== "complete") } }, "medium", "current", "").length, 0);
 assert.ok(landing.includes("90 tasks"));
-assert.ok(!landing.includes("80 tasks"));
-assert.equal((landing.match(/<tbody/g) || []).length, 1);
+assert.ok(landing.includes("Historical Medium · 80 tasks"));
+assert.equal((landing.match(/<tbody/g) || []).length, 2);
 assert.ok(landing.includes("medium90-results.json"));
 assert.ok(!landing.includes('id="wave19-section"'));
 console.log("Current Medium90 complete coverage, ranking, search and Light preservation checks passed.");
 
 const invalidComplete = { ...medium90.rows.find(r => r.status === "complete"), measurement_valid: false };
 assert.equal(selectResults({ ...data, medium90: { rows: [invalidComplete] } }, "medium", "current", "").length, 0);
+
+const historical80 = selectResults(currentData, "medium", "medium80", "");
+assert.equal(historical80.length, 22);
+assert.ok(historical80.every(row => row.result.total === 80));
+assert.deepEqual(historical80, selectResults(data, "medium", "current", ""));
+assert.equal(selectResults(currentData, "medium", "medium80", "haiku").length, 6);
+assert.equal(selectResults(currentData, "medium", "medium80", "no-such-model").length, 0);
+assert.ok(landing.indexOf('id="medium80-section"') > landing.indexOf('id="results"'));
+console.log("Historical Medium80 below Medium90: exact denominator, independent ranking and search passed.");

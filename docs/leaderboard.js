@@ -10,10 +10,11 @@ function selectResults(data, suite, coverage, search) {
       .map(row => ({ ...row, result: { passed: row.overall_passed, total: 90 }, usage: row.usage }))
       .sort((a, b) => b.result.passed - a.result.passed || a.model.localeCompare(b.model) || a.harness.localeCompare(b.harness));
   }
-  const key = suite === "medium" && coverage === "wave21" ? "wave21" : suite === "light" ? "light" : coverage === "current" ? "medium" : coverage === "wave19" ? "wave19" : "medium_historical";
+  const key = suite === "medium" && coverage === "wave21" ? "wave21" : suite === "light" ? "light" : (coverage === "current" || coverage === "medium80") ? "medium" : coverage === "wave19" ? "wave19" : "medium_historical";
   const query = search.trim().toLocaleLowerCase();
   return data.rows.filter(row => row[key] !== null && row[key] !== undefined)
     .filter(row => key !== "wave21" || row[key].total === 10)
+    .filter(row => coverage !== "medium80" || row[key].total === 80)
     .filter(row => (row.model + " " + row.harness).toLocaleLowerCase().includes(query))
     .map(row => ({ ...row, result: row[key], usage: row.telemetry?.[key] || null }))
     .sort((a, b) => b.result.passed / b.result.total - a.result.passed / a.result.total ||
@@ -80,7 +81,7 @@ if (typeof document !== "undefined") {
         link.textContent = row.model;
         const harness = document.createElement("span");
         harness.className = "harness";
-        const compositeView = row.measurement_type === "historical_plus_wave19" && suite === "medium" && scope === "current";
+        const compositeView = row.measurement_type === "historical_plus_wave19" && suite === "medium" && ["current", "medium80"].includes(scope);
         harness.textContent = row.harness + " · " + (compositeView ? "historical + wave 19" : row.runs + (row.runs === 1 ? " run" : " runs")) +
           (suite === "medium" && scope === "wave19" ? " · wave 19 only" : "") +
           (row.result.note ? " · " + row.result.note : "");
@@ -148,6 +149,13 @@ if (typeof document !== "undefined") {
       more.textContent = "Show all " + rows.length + " results";
       empty.hidden = rows.length > 0;
       empty.textContent = "No results match your search.";
+      const historicalSection = document.getElementById("medium80-section");
+      historicalSection.hidden = suite !== "medium";
+      const historicalRows = suite === "medium" ? selectResults(data, "medium", "medium80", search.value) : [];
+      renderTable(document.getElementById("medium80-results"), historicalRows,
+        selectResults(data, "medium", "medium80", ""), "medium80");
+      document.getElementById("medium80-count").textContent = historicalRows.length + (historicalRows.length === 1 ? " configuration" : " configurations");
+      document.getElementById("medium80-empty").hidden = historicalRows.length > 0;
     }
     try {
       const response = await fetch("leaderboard-results.json", { cache: "no-cache" });
