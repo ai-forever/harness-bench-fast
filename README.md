@@ -35,6 +35,8 @@ formal resource budgets or historical outcomes changed in task-set v0.21.3.
 
 The live Medium leaderboard now ranks complete valid 90-task measurements, including the [fresh Claude Haiku 5.5 runs](docs/haiku-medium90.html) on 26 October 2026: mini-SWE-agent 63/90 and DeepAgents 60/90. Their native usage counters are partial; see the protocol for coverage.
 
+A [fresh configured Codex + DeepSeek Medium90 run](docs/codex-deepseek-medium90.html) on 27 October 2026 scored 78/90 (86.7%). It covers all 90 tasks without combining historical model or harness results; exact budgets and counter coverage are recorded in its protocol.
+
 Existing measurements are rescored offline on the new membership. Historical
 source versions, protocols, reasoning levels and budgets remain visible;
 results are combined only for compatible configurations. **A Medium score is
