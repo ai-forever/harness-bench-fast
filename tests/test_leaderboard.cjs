@@ -191,7 +191,7 @@ assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.pa
 const medium90 = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/medium90-results.json")));
 const currentData = { ...data, medium90 };
 const ranked90 = selectResults(currentData, "medium", "current", "");
-assert.equal(ranked90.length, 7);
+assert.equal(ranked90.length, 8);
 assert.ok(ranked90.every(row => row.result.total === 90));
 assert.deepEqual(selectResults(currentData, "medium", "current", "haiku").map(row => row.result.passed), [63, 60]);
 assert.deepEqual(selectResults(currentData, "light", "current", ""), selectResults(data, "light", "current", ""));
@@ -228,3 +228,11 @@ assert.equal(mini90.result.passed, mini90Source.passed);
 assert.equal(mini90.result.total, 90);
 assert.equal(mini90.usage.tokens.value, mini90Source.tokens);
 assert.equal(mini90.usage.steps.value, mini90Source.steps);
+
+const sonnetCode90 = ranked90.find(row => row.id === "claudecode-sonnet-medium90-20261027");
+const sonnetCode90Source = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/claudecode-sonnet-medium90-20261027.json")));
+assert.equal(sonnetCode90.result.passed, sonnetCode90Source.passed);
+assert.equal(sonnetCode90.result.total, 90);
+assert.equal(sonnetCode90.usage.tokens.value, sonnetCode90Source.tokens);
+assert.equal(sonnetCode90.usage.steps.value, sonnetCode90Source.steps);
+assert.equal(sonnetCode90.usage.tokens.status, "complete");
