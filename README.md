@@ -39,6 +39,8 @@ A [fresh configured Codex + DeepSeek Medium90 run](docs/codex-deepseek-medium90.
 
 A [fresh MiniSWE + DeepSeek Medium90 run](docs/miniswe-deepseek-medium90.html) on 27 October 2026 scored 70/90 (77.8%). It uses the same checkpoint and frozen tasks as the preceding Codex run; its native harness and reasoning-history compatibility adapter are documented in the protocol.
 
+A [fresh Claude Code + Sonnet 5.5 Medium90 run](docs/claudecode-sonnet-medium90.html) on 27 October 2026 scored 62/90 (68.9%) with high reasoning and sixteen concurrent tasks. Retained API usage is complete for all 90 tasks; the protocol documents native settings, transport and infrastructure replacement policy.
+
 Existing measurements are rescored offline on the new membership. Historical
 source versions, protocols, reasoning levels and budgets remain visible;
 results are combined only for compatible configurations. **A Medium score is
