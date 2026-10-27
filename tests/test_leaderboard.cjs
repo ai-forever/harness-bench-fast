@@ -191,7 +191,7 @@ assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.pa
 const medium90 = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/medium90-results.json")));
 const currentData = { ...data, medium90 };
 const ranked90 = selectResults(currentData, "medium", "current", "");
-assert.equal(ranked90.length, 6);
+assert.equal(ranked90.length, 7);
 assert.ok(ranked90.every(row => row.result.total === 90));
 assert.deepEqual(selectResults(currentData, "medium", "current", "haiku").map(row => row.result.passed), [63, 60]);
 assert.deepEqual(selectResults(currentData, "light", "current", ""), selectResults(data, "light", "current", ""));
@@ -220,4 +220,11 @@ const codex90Source = JSON.parse(fs.readFileSync(require("node:path").join(__dir
 assert.equal(codex90.result.passed, codex90Source.passed);
 assert.equal(codex90.result.total, 90);
 assert.equal(codex90.usage.tokens.value, codex90Source.tokens);
-assert.equal(selectResults(currentData, "medium", "current", "UNCENSORED").length, 1);
+assert.equal(selectResults(currentData, "medium", "current", "UNCENSORED").length, 2);
+
+const mini90 = ranked90.find(row => row.id === "miniswe-deepseek-medium90-20261027");
+const mini90Source = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/miniswe-deepseek-medium90-20261027.json")));
+assert.equal(mini90.result.passed, mini90Source.passed);
+assert.equal(mini90.result.total, 90);
+assert.equal(mini90.usage.tokens.value, mini90Source.tokens);
+assert.equal(mini90.usage.steps.value, mini90Source.steps);

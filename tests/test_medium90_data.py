@@ -19,7 +19,7 @@ def test_published_medium90_is_reproducible_and_exact_suite():
     data = build()
     assert json.loads((ROOT / "docs/medium90-results.json").read_text(encoding="utf-8")) == data
     assert data["task_numbers"] == [task_number(t.id) for t in SUITES["medium"]]
-    assert data["summary"] == {"rows": 123, "ranked_rows": 6, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 6}}
+    assert data["summary"] == {"rows": 124, "ranked_rows": 7, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 7}}
     assert all((r["score"] is None) == (r["measured_tasks"] != 90) for r in data["rows"])
     assert all(len(set(r["missing_task_numbers"])) + r["measured_tasks"] == 90 for r in data["rows"])
 
@@ -58,7 +58,7 @@ def test_complete_compatible_components_score_but_missing_or_unverified_do_not()
 
 def test_payload_provenance_is_portable_across_line_endings(tmp_path):
     (tmp_path / "docs").mkdir()
-    for name in ("leaderboard-results.json", "wave21-results.json", "haiku-medium90.json", "codex-deepseek-medium90-20261027.json"):
+    for name in ("leaderboard-results.json", "wave21-results.json", "haiku-medium90.json", "codex-deepseek-medium90-20261027.json", "miniswe-deepseek-medium90-20261027.json"):
         content = (ROOT / "docs" / name).read_text(encoding="utf-8")
         (tmp_path / "docs" / name).write_bytes(content.replace("\n", "\r\n").encode("utf-8"))
     assert build(tmp_path) == build()
@@ -99,6 +99,18 @@ def test_fresh_haiku_has_exact_outcomes_and_partial_retained_counters():
 def test_fresh_codex90_uses_disjoint_audited_subsets_and_retained_counters():
     row = next(r for r in build()["rows"] if r["id"] == "codex-deepseek-medium90-20261027")
     source = json.loads((ROOT / "docs/codex-deepseek-medium90-20261027.json").read_text())
+    assert row["overall_passed"] == source["passed"] and row["score"] == source["passed"] / 90
+    assert row["previous"]["passed"] + row["wave21"]["passed"] == source["passed"]
+    assert row["previous"]["measured"] == 80 and row["wave21"]["measured"] == 10
+    assert row["usage"]["tokens"]["value"] == source["tokens"]
+    assert row["usage"]["tokens"]["covered_tasks"] == source["token_coverage"]
+    assert row["usage"]["steps"]["value"] == source["steps"]
+    assert row["source_version"] == "0.21.3" and row["reasoning_effort"] == "high"
+
+
+def test_fresh_miniswe90_uses_disjoint_audited_subsets_and_retained_counters():
+    row = next(r for r in build()["rows"] if r["id"] == "miniswe-deepseek-medium90-20261027")
+    source = json.loads((ROOT / "docs/miniswe-deepseek-medium90-20261027.json").read_text())
     assert row["overall_passed"] == source["passed"] and row["score"] == source["passed"] / 90
     assert row["previous"]["passed"] + row["wave21"]["passed"] == source["passed"]
     assert row["previous"]["measured"] == 80 and row["wave21"]["measured"] == 10

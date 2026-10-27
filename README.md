@@ -37,6 +37,8 @@ The live Medium leaderboard now ranks complete valid 90-task measurements, inclu
 
 A [fresh configured Codex + DeepSeek Medium90 run](docs/codex-deepseek-medium90.html) on 27 October 2026 scored 78/90 (86.7%). It covers all 90 tasks without combining historical model or harness results; exact budgets and counter coverage are recorded in its protocol.
 
+A [fresh MiniSWE + DeepSeek Medium90 run](docs/miniswe-deepseek-medium90.html) on 27 October 2026 scored 70/90 (77.8%). It uses the same checkpoint and frozen tasks as the preceding Codex run; its native harness and reasoning-history compatibility adapter are documented in the protocol.
+
 Existing measurements are rescored offline on the new membership. Historical
 source versions, protocols, reasoning levels and budgets remain visible;
 results are combined only for compatible configurations. **A Medium score is
