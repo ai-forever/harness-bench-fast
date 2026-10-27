@@ -196,6 +196,37 @@ def build(root=ROOT):
                 "measurement_type": "fresh_medium90", "measurement_valid": True,
                 "details_url": "codex-deepseek-medium90.html"}
     rows.append(assemble_row(identity, components))
+    miniswe90_path = root / "docs/miniswe-deepseek-medium90-20261027.json"
+    miniswe = json.loads(miniswe90_path.read_text(encoding="utf-8"))
+    assert miniswe["measurement_valid"] and miniswe["total"] == 90
+    assert [r["number"] for r in miniswe["outcomes"]] == sorted(NUMBERS)
+    assert sum(r["passed"] for r in miniswe["outcomes"]) == miniswe["passed"]
+    components = []
+    for numbers, note in ((list(range(392, 472)), "fresh Medium90 run · earlier80 subset"),
+                          (SELECTED, "fresh Medium90 run · selected wave21 subset")):
+        subset = [r for r in miniswe["outcomes"] if r["number"] in numbers]
+        usage = {"sources_sha256": [miniswe["source_digest"]], "notes": [
+            "One fresh90 cohort; first retained clean attempt per task, including failures. Superseded transport attempts excluded.",
+            "Tokens are captured API input + output usage; cached input and reasoning output are counted once."]}
+        for metric, field in (("steps", "agent_steps"), ("tokens", "agent_total_tokens")):
+            values = [r[field] for r in subset if r[field] is not None]
+            covered = len(values) if metric == "steps" else sum(r["token_usage_present"] for r in subset)
+            partial = covered != len(subset) or (metric == "tokens" and not all(r["token_usage_complete"] for r in subset))
+            usage[metric] = {"value": sum(values), "covered_tasks": covered,
+                             "status": "unavailable" if not values else "partial" if partial else "complete", "lower_bound": partial}
+        usage["steps"]["unit"] = "native_steps"
+        usage["tokens"]["unmetered_requests"] = sum(r["unmetered_requests"] for r in subset)
+        usage["tokens"]["completed_responses"] = sum(r["completed_responses"] for r in subset)
+        usage["tokens"]["input_tokens"] = sum(r["input_tokens"] or 0 for r in subset)
+        usage["tokens"]["output_tokens"] = sum(r["output_tokens"] or 0 for r in subset)
+        components.append(component(numbers, {"total": len(subset), "passed": sum(r["passed"] for r in subset)},
+                                    usage, miniswe["task_set_version"], note))
+    identity = {"id": "miniswe-deepseek-medium90-20261027", "profile_id": "miniswe-deepseek-medium90-20261027",
+                "model": miniswe["model"], "harness": miniswe["harness"], "runs": 1,
+                "source_version": miniswe["task_set_version"], "reasoning_effort": "high",
+                "measurement_type": "fresh_medium90", "measurement_valid": True,
+                "details_url": "miniswe-deepseek-medium90.html"}
+    rows.append(assemble_row(identity, components))
     assert len({r["id"] for r in rows}) == len(rows)
     complete = sorted((r for r in rows if r["score"] is not None), key=lambda r: -r["score"])
     for r in complete:
@@ -210,7 +241,7 @@ def build(root=ROOT):
                        "incompatible_pairs": "Historical DeepAgents GLM/DeepSeek enabled native subagents; new wave21 disabled them. Keep separate profiles. 80/160 graph steps and model API request caps are distinct.",
                        "controls": "Forty wave20 controls and ten unselected calibration tasks excluded from Medium90.",
                        "new_model_calls": 0},
-            "provenance": {"legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path), "haiku_medium90_sha256": fingerprint(fresh_path), "codex_medium90_sha256": fingerprint(codex90_path)},
+            "provenance": {"legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path), "haiku_medium90_sha256": fingerprint(fresh_path), "codex_medium90_sha256": fingerprint(codex90_path), "miniswe_medium90_sha256": fingerprint(miniswe90_path)},
             "summary": {"rows": len(rows), "ranked_rows": len(complete),
                         "coverage": {str(n): sum(r["measured_tasks"] == n for r in rows) for n in sorted({r["measured_tasks"] for r in rows})}},
             "rows": rows}
