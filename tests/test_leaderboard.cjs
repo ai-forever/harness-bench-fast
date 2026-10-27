@@ -191,7 +191,7 @@ assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.pa
 const medium90 = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/medium90-results.json")));
 const currentData = { ...data, medium90 };
 const ranked90 = selectResults(currentData, "medium", "current", "");
-assert.equal(ranked90.length, 5);
+assert.equal(ranked90.length, 6);
 assert.ok(ranked90.every(row => row.result.total === 90));
 assert.deepEqual(selectResults(currentData, "medium", "current", "haiku").map(row => row.result.passed), [63, 60]);
 assert.deepEqual(selectResults(currentData, "light", "current", ""), selectResults(data, "light", "current", ""));
@@ -214,3 +214,10 @@ assert.equal(selectResults(currentData, "medium", "medium80", "haiku").length, 6
 assert.equal(selectResults(currentData, "medium", "medium80", "no-such-model").length, 0);
 assert.ok(landing.indexOf('id="medium80-section"') > landing.indexOf('id="results"'));
 console.log("Historical Medium80 below Medium90: exact denominator, independent ranking and search passed.");
+
+const codex90 = ranked90.find(row => row.id === "codex-deepseek-medium90-20261027");
+const codex90Source = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/codex-deepseek-medium90-20261027.json")));
+assert.equal(codex90.result.passed, codex90Source.passed);
+assert.equal(codex90.result.total, 90);
+assert.equal(codex90.usage.tokens.value, codex90Source.tokens);
+assert.equal(selectResults(currentData, "medium", "current", "UNCENSORED").length, 1);
