@@ -191,7 +191,7 @@ assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.pa
 const medium90 = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/medium90-results.json")));
 const currentData = { ...data, medium90 };
 const ranked90 = selectResults(currentData, "medium", "current", "");
-assert.equal(ranked90.length, 10);
+assert.equal(ranked90.length, 11);
 assert.ok(ranked90.every(row => row.result.total === 90));
 assert.deepEqual(selectResults(currentData, "medium", "current", "haiku").map(row => row.result.passed), [63, 60]);
 assert.deepEqual(selectResults(currentData, "light", "current", ""), selectResults(data, "light", "current", ""));
@@ -250,3 +250,11 @@ assert.deepEqual(selectResults(currentData, "medium", "current", "SecretModel-11
 assert.ok(landing.includes('id="show-secret-models" type="checkbox"'));
 assert.equal(selectResults(currentData, "medium", "medium80", "secret", false).length, 0);
 assert.equal(selectResults(currentData, "medium", "current", "SecretModel-1114", true)[0].result.note, "provisional · HTTP 400");
+
+const pi0731 = selectResults(currentData, "medium", "current", "0731");
+assert.equal(pi0731.length, 1);
+assert.equal(pi0731[0].result.passed, 65);
+assert.equal(pi0731[0].harness, "Pi 1.5.2");
+assert.equal(pi0731[0].usage.tokens.value, 445223867);
+assert.equal(pi0731[0].usage.tokens.lower_bound, true);
+assert.ok(formatUsage(pi0731[0].usage, "tokens").text.startsWith("≥ "));

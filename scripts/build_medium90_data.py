@@ -258,6 +258,33 @@ def build(root=ROOT):
                 "measurement_type": "fresh_medium90", "measurement_valid": True,
                 "details_url": "claudecode-sonnet-medium90.html"}
     rows.append(assemble_row(identity, components))
+    pi0731_path = root / "docs/pi-deepseek0731-medium90-20261114.json"
+    pi0731 = json.loads(pi0731_path.read_text(encoding="utf-8"))
+    assert pi0731["measurement_valid"] and pi0731["total"] == 90
+    assert [r["number"] for r in pi0731["outcomes"]] == sorted(NUMBERS)
+    assert sum(r["passed"] for r in pi0731["outcomes"]) == pi0731["passed"]
+    components = []
+    for numbers, note in ((list(range(392, 472)), "fresh Medium90 run · earlier80 subset"),
+                          (SELECTED, "fresh Medium90 run · selected wave21 subset")):
+        subset = [r for r in pi0731["outcomes"] if r["number"] in numbers]
+        usage = {"sources_sha256": [pi0731["source_digest"]], "notes": [pi0731["counter_note"]]}
+        for metric, field in (("steps", "agent_steps"), ("tokens", "agent_total_tokens")):
+            partial = metric == "tokens" and not all(r["token_usage_complete"] for r in subset)
+            usage[metric] = {"value": sum(r[field] for r in subset), "covered_tasks": len(subset),
+                             "status": "partial" if partial else "complete", "lower_bound": partial}
+        usage["steps"]["unit"] = "native_tool_calls"
+        usage["tokens"]["unmetered_requests"] = sum(r["missing_usage_responses"] for r in subset)
+        usage["tokens"]["completed_responses"] = sum(r["native_assistant_responses"] - r["provider_error_responses"] for r in subset)
+        usage["tokens"]["input_tokens"] = sum(r["input_tokens"] for r in subset)
+        usage["tokens"]["output_tokens"] = sum(r["output_tokens"] for r in subset)
+        components.append(component(numbers, {"total": len(subset), "passed": sum(r["passed"] for r in subset)},
+                                    usage, pi0731["task_set_version"], note))
+    identity = {"id": "pi-deepseek0731-medium90-20261114", "profile_id": "pi-deepseek0731-medium90-20261114",
+                "model": pi0731["model"], "harness": pi0731["harness"], "runs": 1,
+                "source_version": pi0731["task_set_version"], "reasoning_effort": "high",
+                "measurement_type": "fresh_medium90", "measurement_valid": True,
+                "details_url": "pi-deepseek0731-medium90.html", "result_note": "includes 1 provider refusal"}
+    rows.append(assemble_row(identity, components))
     secret_path = root / "docs/secretmodel-1114.json"
     secret = json.loads(secret_path.read_text(encoding="utf-8"))
     for measurement in secret["measurements"]:
@@ -301,7 +328,7 @@ def build(root=ROOT):
                        "incompatible_pairs": "Historical DeepAgents GLM/DeepSeek enabled native subagents; new wave21 disabled them. Keep separate profiles. 80/160 graph steps and model API request caps are distinct.",
                        "controls": "Forty wave20 controls and ten unselected calibration tasks excluded from Medium90.",
                        "new_model_calls": 0},
-            "provenance": {"legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path), "haiku_medium90_sha256": fingerprint(fresh_path), "codex_medium90_sha256": fingerprint(codex90_path), "miniswe_medium90_sha256": fingerprint(miniswe90_path), "claudecode_sonnet_medium90_sha256": fingerprint(claudecode_sonnet90_path)},
+            "provenance": {"legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path), "haiku_medium90_sha256": fingerprint(fresh_path), "codex_medium90_sha256": fingerprint(codex90_path), "miniswe_medium90_sha256": fingerprint(miniswe90_path), "claudecode_sonnet_medium90_sha256": fingerprint(claudecode_sonnet90_path), "pi_deepseek0731_medium90_sha256": fingerprint(pi0731_path)},
             "summary": {"rows": len(rows), "ranked_rows": len(complete),
                         "coverage": {str(n): sum(r["measured_tasks"] == n for r in rows) for n in sorted({r["measured_tasks"] for r in rows})}},
             "rows": rows}

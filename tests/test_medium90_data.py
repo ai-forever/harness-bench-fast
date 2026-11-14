@@ -19,7 +19,7 @@ def test_published_medium90_is_reproducible_and_exact_suite():
     data = build()
     assert json.loads((ROOT / "docs/medium90-results.json").read_text(encoding="utf-8")) == data
     assert data["task_numbers"] == [task_number(t.id) for t in SUITES["medium"]]
-    assert data["summary"] == {"rows": 127, "ranked_rows": 10, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 10}}
+    assert data["summary"] == {"rows": 128, "ranked_rows": 11, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 11}}
     assert all((r["score"] is None) == (r["measured_tasks"] != 90) for r in data["rows"])
     assert all(len(set(r["missing_task_numbers"])) + r["measured_tasks"] == 90 for r in data["rows"])
 
@@ -58,7 +58,7 @@ def test_complete_compatible_components_score_but_missing_or_unverified_do_not()
 
 def test_payload_provenance_is_portable_across_line_endings(tmp_path):
     (tmp_path / "docs").mkdir()
-    for name in ("secretmodel-1114.json", "leaderboard-results.json", "wave21-results.json", "haiku-medium90.json", "codex-deepseek-medium90-20261027.json", "miniswe-deepseek-medium90-20261027.json", "claudecode-sonnet-medium90-20261027.json"):
+    for name in ("pi-deepseek0731-medium90-20261114.json", "secretmodel-1114.json", "leaderboard-results.json", "wave21-results.json", "haiku-medium90.json", "codex-deepseek-medium90-20261027.json", "miniswe-deepseek-medium90-20261027.json", "claudecode-sonnet-medium90-20261027.json"):
         content = (ROOT / "docs" / name).read_text(encoding="utf-8")
         (tmp_path / "docs" / name).write_bytes(content.replace("\n", "\r\n").encode("utf-8"))
     assert build(tmp_path) == build()
@@ -130,3 +130,19 @@ def test_fresh_claudecode_sonnet90_uses_disjoint_audited_subsets_and_retained_co
     assert row["usage"]["tokens"]["covered_tasks"] == source["token_coverage"]
     assert row["usage"]["steps"]["value"] == source["steps"]
     assert row["source_version"] == "0.21.3" and row["reasoning_effort"] == "high"
+
+
+def test_fresh_pi_deepseek0731_preserves_score_refusal_and_lower_bound():
+    source = json.loads((ROOT / "docs/pi-deepseek0731-medium90-20261114.json").read_text())
+    row = next(r for r in build()["rows"] if r["id"] == "pi-deepseek0731-medium90-20261114")
+    assert row["overall_passed"] == source["passed"] == 65
+    assert row["previous"]["passed"] == 56 and row["wave21"]["passed"] == 9
+    assert row["measured_tasks"] == 90 and row["source_version"] == "0.21.3"
+    assert row["harness"] == "Pi 1.5.2" and row["reasoning_effort"] == "high"
+    assert row["usage"]["steps"]["value"] == source["steps"] == 4542
+    assert row["usage"]["tokens"]["value"] == source["tokens"] == 445223867
+    assert row["usage"]["tokens"]["lower_bound"] and row["usage"]["tokens"]["status"] == "partial"
+    assert row["usage"]["tokens"]["unmetered_requests"] == 10
+    refusal = next(t for t in source["outcomes"] if t["number"] == 404)
+    assert not refusal["passed"] and refusal["classification"] == "provider_refusal"
+    assert source["provider_policy_blocks"] == 1 and source["timeouts"] == 10
