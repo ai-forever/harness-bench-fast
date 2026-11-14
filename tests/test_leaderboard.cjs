@@ -4,7 +4,7 @@ const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboar
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 96);
+assert.equal(light.length, 98);
 assert.equal(medium.length, 79);
 assert.equal(selectResults(data, "medium", "current", "").length, 22);
 for (const rows of [light, medium]) {
@@ -191,7 +191,7 @@ assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.pa
 const medium90 = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/medium90-results.json")));
 const currentData = { ...data, medium90 };
 const ranked90 = selectResults(currentData, "medium", "current", "");
-assert.equal(ranked90.length, 8);
+assert.equal(ranked90.length, 10);
 assert.ok(ranked90.every(row => row.result.total === 90));
 assert.deepEqual(selectResults(currentData, "medium", "current", "haiku").map(row => row.result.passed), [63, 60]);
 assert.deepEqual(selectResults(currentData, "light", "current", ""), selectResults(data, "light", "current", ""));
@@ -236,3 +236,17 @@ assert.equal(sonnetCode90.result.total, 90);
 assert.equal(sonnetCode90.usage.tokens.value, sonnetCode90Source.tokens);
 assert.equal(sonnetCode90.usage.steps.value, sonnetCode90Source.steps);
 assert.equal(sonnetCode90.usage.tokens.status, "complete");
+
+// Secret rows stay out of every landing view, search, counts and ranking until opted in.
+for (const suite of ["light", "medium"]) {
+  const hidden = selectResults(currentData, suite, "current", "", false);
+  assert.ok(hidden.every(row => !/^secret/i.test(row.model)));
+  assert.equal(selectResults(currentData, suite, "current", "SecretModel-1114", false).length, 0);
+  const shown = selectResults(currentData, suite, "current", "SecretModel-1114", true);
+  assert.equal(shown.length, 2);
+  assert.ok(shown.every(row => row.result.total === (suite === "light" ? 391 : 90)));
+}
+assert.deepEqual(selectResults(currentData, "medium", "current", "SecretModel-1114", true).map(r => r.result.passed), [40, 21]);
+assert.ok(landing.includes('id="show-secret-models" type="checkbox"'));
+assert.equal(selectResults(currentData, "medium", "medium80", "secret", false).length, 0);
+assert.equal(selectResults(currentData, "medium", "current", "SecretModel-1114", true)[0].result.note, "provisional · HTTP 400");

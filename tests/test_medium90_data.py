@@ -19,7 +19,7 @@ def test_published_medium90_is_reproducible_and_exact_suite():
     data = build()
     assert json.loads((ROOT / "docs/medium90-results.json").read_text(encoding="utf-8")) == data
     assert data["task_numbers"] == [task_number(t.id) for t in SUITES["medium"]]
-    assert data["summary"] == {"rows": 125, "ranked_rows": 8, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 8}}
+    assert data["summary"] == {"rows": 127, "ranked_rows": 10, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 10}}
     assert all((r["score"] is None) == (r["measured_tasks"] != 90) for r in data["rows"])
     assert all(len(set(r["missing_task_numbers"])) + r["measured_tasks"] == 90 for r in data["rows"])
 
@@ -58,7 +58,7 @@ def test_complete_compatible_components_score_but_missing_or_unverified_do_not()
 
 def test_payload_provenance_is_portable_across_line_endings(tmp_path):
     (tmp_path / "docs").mkdir()
-    for name in ("leaderboard-results.json", "wave21-results.json", "haiku-medium90.json", "codex-deepseek-medium90-20261027.json", "miniswe-deepseek-medium90-20261027.json", "claudecode-sonnet-medium90-20261027.json"):
+    for name in ("secretmodel-1114.json", "leaderboard-results.json", "wave21-results.json", "haiku-medium90.json", "codex-deepseek-medium90-20261027.json", "miniswe-deepseek-medium90-20261027.json", "claudecode-sonnet-medium90-20261027.json"):
         content = (ROOT / "docs" / name).read_text(encoding="utf-8")
         (tmp_path / "docs" / name).write_bytes(content.replace("\n", "\r\n").encode("utf-8"))
     assert build(tmp_path) == build()
