@@ -110,17 +110,18 @@
     "haiku_medium90_sha256": "6049aec374fdfddd1488c7daa740956246e354e325b456d4b5e9e9e79d07e7e0",
     "codex_medium90_sha256": "11d8d93639ca7dc291b1d22e3a85d511e4a282a128b32b54b269892e7ad0cb25",
     "miniswe_medium90_sha256": "3102410c5b7f96e16f793f6f4a0dae5268b2ea60d4e657a51cf09f8d70bfd3bc",
-    "claudecode_sonnet_medium90_sha256": "e86d2d4062ea4291c95e19119683ad7600eba73343ff19e4fb55339e17479b44"
+    "claudecode_sonnet_medium90_sha256": "e86d2d4062ea4291c95e19119683ad7600eba73343ff19e4fb55339e17479b44",
+    "pi_deepseek0731_medium90_sha256": "bcce79bb9238cb1b396af802f70786e6f25d0048f8d00b1fd5e2a7cfd051c112"
   },
   "summary": {
-    "rows": 127,
-    "ranked_rows": 10,
+    "rows": 128,
+    "ranked_rows": 11,
     "coverage": {
       "1": 1,
       "10": 8,
       "40": 89,
       "80": 19,
-      "90": 10
+      "90": 11
     }
   },
   "rows": [
@@ -17722,7 +17723,7 @@
       "observed_passed": 38,
       "overall_passed": 38,
       "score": 0.4222222222222222,
-      "rank": 7,
+      "rank": 8,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -17887,7 +17888,7 @@
       "observed_passed": 29,
       "overall_passed": 29,
       "score": 0.32222222222222224,
-      "rank": 8,
+      "rank": 9,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -18052,7 +18053,7 @@
       "observed_passed": 0,
       "overall_passed": 0,
       "score": 0.0,
-      "rank": 10,
+      "rank": 11,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -18366,7 +18367,7 @@
       "observed_passed": 63,
       "overall_passed": 63,
       "score": 0.7,
-      "rank": 3,
+      "rank": 4,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -18532,7 +18533,7 @@
       "observed_passed": 60,
       "overall_passed": 60,
       "score": 0.6666666666666666,
-      "rank": 5,
+      "rank": 6,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -19046,7 +19047,7 @@
       "observed_passed": 62,
       "overall_passed": 62,
       "score": 0.6888888888888889,
-      "rank": 4,
+      "rank": 5,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -19081,6 +19082,179 @@
           "completed_responses": 1227,
           "completed_responses_accounting_complete": true,
           "unmetered_requests": 0,
+          "unmetered_requests_accounting_complete": true
+        }
+      }
+    },
+    {
+      "id": "pi-deepseek0731-medium90-20261114",
+      "profile_id": "pi-deepseek0731-medium90-20261114",
+      "model": "DeepSeek V4 Flash 0731 (high)",
+      "harness": "Pi 1.5.2",
+      "runs": 1,
+      "source_version": "0.21.3",
+      "reasoning_effort": "high",
+      "measurement_type": "fresh_medium90",
+      "measurement_valid": true,
+      "details_url": "pi-deepseek0731-medium90.html",
+      "result_note": "includes 1 provider refusal",
+      "previous": {
+        "passed": 56,
+        "measured": 80,
+        "total": 80,
+        "scope_note": "fresh Medium90 run · earlier80 subset"
+      },
+      "wave21": {
+        "passed": 9,
+        "measured": 10,
+        "total": 10,
+        "scope_note": "fresh Medium90 run · selected wave21 subset"
+      },
+      "components": [
+        {
+          "task_numbers": [
+            392,
+            393,
+            394,
+            395,
+            396,
+            397,
+            398,
+            399,
+            400,
+            401,
+            402,
+            403,
+            404,
+            405,
+            406,
+            407,
+            408,
+            409,
+            410,
+            411,
+            412,
+            413,
+            414,
+            415,
+            416,
+            417,
+            418,
+            419,
+            420,
+            421,
+            422,
+            423,
+            424,
+            425,
+            426,
+            427,
+            428,
+            429,
+            430,
+            431,
+            432,
+            433,
+            434,
+            435,
+            436,
+            437,
+            438,
+            439,
+            440,
+            441,
+            442,
+            443,
+            444,
+            445,
+            446,
+            447,
+            448,
+            449,
+            450,
+            451,
+            452,
+            453,
+            454,
+            455,
+            456,
+            457,
+            458,
+            459,
+            460,
+            461,
+            462,
+            463,
+            464,
+            465,
+            466,
+            467,
+            468,
+            469,
+            470,
+            471
+          ],
+          "passed": 56,
+          "source_version": "0.21.3",
+          "note": "fresh Medium90 run · earlier80 subset"
+        },
+        {
+          "task_numbers": [
+            512,
+            518,
+            520,
+            522,
+            523,
+            524,
+            525,
+            526,
+            527,
+            530
+          ],
+          "passed": 9,
+          "source_version": "0.21.3",
+          "note": "fresh Medium90 run · selected wave21 subset"
+        }
+      ],
+      "measured_tasks": 90,
+      "target_tasks": 90,
+      "missing_task_numbers": [],
+      "observed_passed": 65,
+      "overall_passed": 65,
+      "score": 0.7222222222222222,
+      "rank": 3,
+      "status": "complete",
+      "usage": {
+        "tasks": 90,
+        "observed_tasks": 90,
+        "notes": [
+          "Retained public measurement counters only. Missing tasks are unmeasured, not failures.",
+          "Task counts show counter availability, not full request-level accounting.",
+          "Recovered from final retained stdout JSONL. Steps count unique native assistant toolCall IDs; input includes reported cache reads/writes, output includes reasoning once. Streaming updates, smoke and superseded attempts excluded. Failed responses without usage and interrupted responses can be unmetered; token totals are a lower bound. Runner aggregate fields were missing because it searched a different session directory.",
+          "Recovered from final retained stdout JSONL. Steps count unique native assistant toolCall IDs; input includes reported cache reads/writes, output includes reasoning once. Streaming updates, smoke and superseded attempts excluded. Failed responses without usage and interrupted responses can be unmetered; token totals are a lower bound. Runner aggregate fields were missing because it searched a different session directory."
+        ],
+        "sources_sha256": [
+          "7110f3acb2539d819a74297e854f786f64578466b26d89845b6e15ad8851c80d"
+        ],
+        "steps": {
+          "value": 4542,
+          "covered_tasks": 90,
+          "status": "complete",
+          "lower_bound": false,
+          "unit": "native_tool_calls"
+        },
+        "tokens": {
+          "value": 445223867,
+          "covered_tasks": 90,
+          "status": "partial",
+          "lower_bound": true,
+          "input_tokens": 440706415,
+          "input_tokens_accounting_complete": true,
+          "output_tokens": 4517452,
+          "output_tokens_accounting_complete": true,
+          "completed_responses": 3588,
+          "completed_responses_accounting_complete": true,
+          "unmetered_requests": 10,
           "unmetered_requests_accounting_complete": true
         }
       }
@@ -19222,7 +19396,7 @@
       "observed_passed": 40,
       "overall_passed": 40,
       "score": 0.4444444444444444,
-      "rank": 6,
+      "rank": 7,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -19384,7 +19558,7 @@
       "observed_passed": 21,
       "overall_passed": 21,
       "score": 0.23333333333333334,
-      "rank": 9,
+      "rank": 10,
       "status": "complete",
       "usage": {
         "tasks": 90,

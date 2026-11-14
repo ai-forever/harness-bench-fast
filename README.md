@@ -41,6 +41,8 @@ A [fresh MiniSWE + DeepSeek Medium90 run](docs/miniswe-deepseek-medium90.html) o
 
 A [fresh Claude Code + Sonnet 5.5 Medium90 run](docs/claudecode-sonnet-medium90.html) on 27 October 2026 scored 62/90 (68.9%) with high reasoning and sixteen concurrent tasks. Retained API usage is complete for all 90 tasks; the protocol documents native settings, transport and infrastructure replacement policy.
 
+A [fresh Pi 1.5.2 + DeepSeek V4 Flash 0731 Medium90 run](docs/pi-deepseek0731-medium90.html) on 14 November 2026 scored **65/90 (72.2%)** with high reasoning and sixteen concurrent tasks. It includes all ten timeouts and one provider refusal as failures. Retained native counters are 4,542 tool calls and at least 445,223,867 tokens; the protocol records the incomplete response accounting.
+
 Existing measurements are rescored offline on the new membership. Historical
 source versions, protocols, reasoning levels and budgets remain visible;
 results are combined only for compatible configurations. **A Medium score is
