@@ -28,7 +28,7 @@ The block below is **generated** by `scripts/build_fork_results.py` from `result
 Do not edit by hand — change the script/JSON and rebuild.
 
 <!-- FORK:RESULTS:BEGIN -->
-Auto-sync: 78 runs
+Auto-sync: 88 runs
 
 | Harness | Suite | Profile | Model | Result | % | Time | Steps | Tokens (cost) |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -50,11 +50,15 @@ Auto-sync: 78 runs
 | OpenClaw | Shot List (52) | thinking: high | GPT-5.5 (thinking: high) | 50/52 | 96.2% | 37.0m | 334 | 3 117 683 (2 904₽) |
 | OpenClaw | Shot List (52) | thinking: off | GPT-5.5 (thinking: off) | 51/52 | 98.1% | 30.5m | 267 | 2 756 135 (2 523₽) |
 | OpenClaw | Shot List (52) | — | GPT-OSS-120B | 17/52 | 32.7% | 205.2m | 120 | 1 261 870 (786₽) |
+| OpenClaw | Shot List (52) | thinking: off | GigaChat 3.5 Reasoning (thinking: off) | 25/52 | 48.1% | 48.1m | 429 | 6 585 042 (208₽) |
+| OpenClaw | Shot List (52) | thinking: ultra | GigaChat 3.5 Reasoning (thinking: ultra) | 20/52 | 38.5% | 49.5m | 473 | 8 819 332 (39₽) |
 | OpenClaw | Shot List (52) | thinking: medium | MiniMax-M3 (thinking: medium) | 47/52 | 90.4% | 306.9m | 328 | 4 052 449 (1 119₽) |
 | OpenClaw | Shot List (52) | thinking: off | MiniMax-M3 (thinking: off) | 48/52 | 92.3% | 295.4m | 312 | 3 650 102 (972₽) |
 | OpenClaw | Shot List (52) | thinking: ultra | MiniMax-M3 (thinking: ultra) | 46/52 | 88.5% | 52.1m | 305 | 3 892 497 (1 068₽) |
 | OpenClaw | Shot List (52) | — | Qwen3.6-35B-A3B | 40/52 | 76.9% | 195.2m | 328 | 2 109 433 (2 079₽) |
 | OpenClaw | Light (391) | — | — | 378/391 | 96.7% | 1473.3m | — | 0 (0₽) |
+| OpenClaw | Medium (392-471) | — | — | 0/6 | 0.0% | 40.3m | 326 | 22 645 277 (142₽) |
+| OpenClaw | Medium (392-471) | — | — | 0/6 | 0.0% | 22.0m | 173 | 7 195 797 (31₽) |
 | OpenClaw | Medium (392-471) | thinking: high | DeepSeek-V4.1-Flash (thinking: high) | 38/40 | 95.0% | 105.0m | 783 | 25 623 769 (509₽) |
 | OpenClaw | Medium (392-471) | thinking: high | DeepSeek-V4.1-Flash (thinking: high) | 17/20 | 85.0% | 81.5m | 406 | 14 660 719 (276₽) |
 | OpenClaw | Medium (392-471) | thinking: high | DeepSeek-V4.1-Flash (thinking: high) | 3/6 | 50.0% | 128.2m | 183 | 8 929 176 (169₽) |
@@ -68,6 +72,12 @@ Auto-sync: 78 runs
 | OpenClaw | Medium (392-471) | thinking: off | GPT-5.5 (thinking: off) | 38/40 | 95.0% | 61.9m | 473 | 10 786 591 (9 860₽) |
 | OpenClaw | Medium (392-471) | thinking: off | GPT-5.5 (thinking: off) | 12/20 | 60.0% | 35.1m | 264 | 3 987 306 (3 846₽) |
 | OpenClaw | Medium (392-471) | thinking: off | GPT-5.5 (thinking: off) | 1/6 | 16.7% | 43.2m | 209 | 14 469 503 (12 926₽) |
+| OpenClaw | Medium (392-471) | thinking: off | GigaChat 3.5 Reasoning (thinking: off) | 1/40 | 2.5% | 49.0m | 279 | 9 226 537 (380₽) |
+| OpenClaw | Medium (392-471) | thinking: off | GigaChat 3.5 Reasoning (thinking: off) | 0/6 | 0.0% | 40.3m | 326 | 22 645 277 (142₽) |
+| OpenClaw | Medium (392-471) | thinking: off | GigaChat 3.5 Reasoning (thinking: off) | 0/20 | 0.0% | 84.6m | 935 | 17 827 537 (217₽) |
+| OpenClaw | Medium (392-471) | thinking: ultra | GigaChat 3.5 Reasoning (thinking: ultra) | 0/40 | 0.0% | 62.6m | 369 | 15 557 817 (78₽) |
+| OpenClaw | Medium (392-471) | thinking: ultra | GigaChat 3.5 Reasoning (thinking: ultra) | 0/6 | 0.0% | 22.0m | 173 | 7 195 797 (31₽) |
+| OpenClaw | Medium (392-471) | thinking: ultra | GigaChat 3.5 Reasoning (thinking: ultra) | 0/20 | 0.0% | 20.1m | 259 | 4 749 821 (17₽) |
 | OpenClaw | Medium (392-471) | thinking: medium | MiniMax-M3 (thinking: medium) | 26/40 | 65.0% | 385.8m | 1 329 | 50 707 607 (13 173₽) |
 | OpenClaw | Medium (392-471) | thinking: medium | MiniMax-M3 (thinking: medium) | 11/20 | 55.0% | 109.4m | 623 | 10 614 066 (2 960₽) |
 | OpenClaw | Medium (392-471) | thinking: medium | MiniMax-M3 (thinking: medium) | 0/6 | 0.0% | 154.9m | 284 | 14 488 379 (3 707₽) |

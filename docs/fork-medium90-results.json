@@ -310,6 +310,110 @@
       ]
     },
     {
+      "id": "openclaw-gigachat-3-5-reasoning-thinking-off",
+      "details_url": "fork-run-openclaw-gigachat-3-5-reasoning-thinking-off.html",
+      "harness": "OpenClaw",
+      "model": "GigaChat 3.5 Reasoning",
+      "profile": "thinking: off",
+      "harness_version": "OpenClaw 2026.11.2 (b556fdf)",
+      "runs": 3,
+      "suites": {
+        "long": {
+          "passed": 0,
+          "total": 6,
+          "measurement": "partial"
+        },
+        "reflect": {
+          "passed": 0,
+          "total": 20,
+          "measurement": "complete"
+        },
+        "feasibility": {
+          "passed": 1,
+          "total": 40,
+          "measurement": "complete"
+        },
+        "composite_hard": null
+      },
+      "usage": {
+        "seconds": 10437.7,
+        "steps": 1540,
+        "tokens": 49699351,
+        "cost_rub": 738.9
+      },
+      "wilson": {
+        "long": [
+          0.115,
+          0.275
+        ],
+        "reflect": [
+          0.063,
+          0.099
+        ],
+        "feasibility": [
+          0.057,
+          0.076
+        ]
+      },
+      "sources": [
+        "oc_medium_feasibility_giga35_off_20261113.json",
+        "oc_medium_long_giga35_off_20261113.json",
+        "oc_medium_reflect_giga35_off_20261113.json"
+      ]
+    },
+    {
+      "id": "openclaw-gigachat-3-5-reasoning-thinking-ultra",
+      "details_url": "fork-run-openclaw-gigachat-3-5-reasoning-thinking-ultra.html",
+      "harness": "OpenClaw",
+      "model": "GigaChat 3.5 Reasoning",
+      "profile": "thinking: ultra",
+      "harness_version": "OpenClaw 2026.11.2 (b556fdf)",
+      "runs": 3,
+      "suites": {
+        "long": {
+          "passed": 0,
+          "total": 6,
+          "measurement": "partial"
+        },
+        "reflect": {
+          "passed": 0,
+          "total": 20,
+          "measurement": "complete"
+        },
+        "feasibility": {
+          "passed": 0,
+          "total": 40,
+          "measurement": "complete"
+        },
+        "composite_hard": null
+      },
+      "usage": {
+        "seconds": 6279.7,
+        "steps": 801,
+        "tokens": 27503435,
+        "cost_rub": 126.4
+      },
+      "wilson": {
+        "long": [
+          0.115,
+          0.275
+        ],
+        "reflect": [
+          0.063,
+          0.099
+        ],
+        "feasibility": [
+          0.037,
+          0.051
+        ]
+      },
+      "sources": [
+        "oc_medium_feasibility_giga35_ultra_20261114.json",
+        "oc_medium_long_giga35_ultra_20261114.json",
+        "oc_medium_reflect_giga35_ultra_20261114.json"
+      ]
+    },
+    {
       "id": "openclaw-minimax-m3-thinking-medium",
       "details_url": "fork-run-openclaw-minimax-m3-thinking-medium.html",
       "harness": "OpenClaw",
