@@ -4772,6 +4772,80 @@
       },
       "details_url": "wave21-small-models.html#gpt-oss-20b",
       "wave21_source_version": "0.21.3"
+    },
+    {
+      "id": "secretmodel-1114-pi",
+      "model": "SecretModel-1114",
+      "harness": "pi-mono",
+      "secret_model": true,
+      "runs": 1,
+      "reasoning_effort": "high",
+      "source_version": "0.21.3",
+      "measurement_valid": true,
+      "details_url": "secretmodel-1114.html",
+      "light": {
+        "passed": 387,
+        "total": 391
+      },
+      "medium": null,
+      "medium_historical": null,
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "notes": [
+            "Counters cover final retained attempts only."
+          ],
+          "steps": {
+            "value": null,
+            "covered_tasks": 0,
+            "status": "unavailable",
+            "lower_bound": false
+          },
+          "tokens": {
+            "value": null,
+            "covered_tasks": 0,
+            "status": "unavailable",
+            "lower_bound": false
+          }
+        }
+      }
+    },
+    {
+      "id": "secretmodel-1114-mini-swe",
+      "model": "SecretModel-1114",
+      "harness": "mini-SWE-agent",
+      "secret_model": true,
+      "runs": 1,
+      "reasoning_effort": "high",
+      "source_version": "0.21.3",
+      "measurement_valid": true,
+      "details_url": "secretmodel-1114.html",
+      "light": {
+        "passed": 387,
+        "total": 391
+      },
+      "medium": null,
+      "medium_historical": null,
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "notes": [
+            "Counters cover final retained attempts only."
+          ],
+          "steps": {
+            "value": 4480,
+            "covered_tasks": 389,
+            "status": "partial",
+            "lower_bound": true
+          },
+          "tokens": {
+            "value": 23067946,
+            "covered_tasks": 389,
+            "status": "partial",
+            "lower_bound": true
+          }
+        }
+      }
     }
   ]
 }

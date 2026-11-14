@@ -445,6 +445,20 @@ def build():
     attach_telemetry(rows, telemetry)
     APPEND_WAVE21(rows, ROOT)
     APPEND_FRESH_ROWS(rows, ROOT)
+    secret = json.loads((ROOT / "docs/secretmodel-1114.json").read_text(encoding="utf-8"))
+    for measurement in secret["measurements"]:
+        if measurement["suite"] != "light":
+            continue
+        suffix = "pi" if measurement["harness"] == "pi-mono" else "mini-swe"
+        rows.append({
+            "id": "secretmodel-1114-" + suffix, "model": secret["model"],
+            "harness": measurement["harness"], "secret_model": True, "runs": 1,
+            "reasoning_effort": secret["reasoning_effort"], "source_version": secret["task_set_version"],
+            "measurement_valid": True, "details_url": "secretmodel-1114.html",
+            "light": {"passed": measurement["passed"], "total": measurement["total"]},
+            "medium": None, "medium_historical": None,
+            "telemetry": {"light": measurement["usage"]},
+        })
     return {
         "task_set_version": "0.19", "light_tasks": 391, "medium_tasks": 80,
         "wave21_task_set_version": "0.21.2", "wave21_tasks": 10,

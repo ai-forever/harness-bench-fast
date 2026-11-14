@@ -258,6 +258,35 @@ def build(root=ROOT):
                 "measurement_type": "fresh_medium90", "measurement_valid": True,
                 "details_url": "claudecode-sonnet-medium90.html"}
     rows.append(assemble_row(identity, components))
+    secret_path = root / "docs/secretmodel-1114.json"
+    secret = json.loads(secret_path.read_text(encoding="utf-8"))
+    for measurement in secret["measurements"]:
+        if measurement["suite"] != "medium":
+            continue
+        tasks = measurement["tasks"]
+        assert sorted(t["number"] for t in tasks) == sorted(NUMBERS)
+        assert sum(t["passed"] for t in tasks) == measurement["passed"]
+        suffix = "pi" if measurement["harness"] == "pi-mono" else "mini-swe"
+        identity = {"id": "secretmodel-1114-" + suffix, "profile_id": "secretmodel-1114-" + suffix,
+                    "model": secret["model"], "harness": measurement["harness"], "secret_model": True,
+                    "runs": 1, "source_version": secret["task_set_version"],
+                    "reasoning_effort": secret["reasoning_effort"], "measurement_type": "fresh_medium90",
+                    "measurement_valid": True, "details_url": "secretmodel-1114.html"}
+        if suffix == "pi":
+            identity["result_note"] = "provisional · HTTP 400"
+        components = []
+        for numbers, note in ((list(range(392, 472)), "fresh Medium90 run · earlier80 subset"),
+                              (SELECTED, "fresh Medium90 run · selected wave21 subset")):
+            subset = [t for t in tasks if t["number"] in numbers]
+            usage = {"sources_sha256": [measurement["source_sha256"]]}
+            for metric, field in (("steps", "agent_steps"), ("tokens", "agent_total_tokens")):
+                values = [t[field] for t in subset if t[field] is not None]
+                usage[metric] = {"value": sum(values) if values else None, "covered_tasks": len(values),
+                                 "status": "complete" if len(values) == len(subset) else "partial" if values else "unavailable",
+                                 "lower_bound": bool(values) and len(values) < len(subset)}
+            components.append(component(numbers, {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
+                                        usage, secret["task_set_version"], note))
+        rows.append(assemble_row(identity, components))
     assert len({r["id"] for r in rows}) == len(rows)
     complete = sorted((r for r in rows if r["score"] is not None), key=lambda r: -r["score"])
     for r in complete:
