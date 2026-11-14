@@ -673,13 +673,14 @@ def build():
 
 def _rows_html(rows):
     tr = []
-    for r in rows:
+    for i, r in enumerate(rows, 1):
         d = r.get("detail")
         attrs = f' class="detail-row" data-detail="{html.escape(d)}"' if d else ""
         harness = (f'<a href="{html.escape(d)}">{html.escape(r["harness"])}</a>'
                    if d else html.escape(r['harness']))
         tr.append(
             f"<tr{attrs}>"
+            f'<td class="numeric place">{i}</td>'
             f"<td>{harness}</td>"
             f"<td>{html.escape(r['profile'])}</td>"
             f"<td>{html.escape(r['model'])}</td>"
@@ -695,16 +696,17 @@ def _rows_html(rows):
 
 
 HEAD = """<tr>
-  <th scope="col">Harness</th><th scope="col">Profile</th><th scope="col">Model</th>
-  <th scope="col" class="numeric">Result</th><th scope="col" class="numeric">%</th>
-  <th scope="col" class="numeric">Time</th><th scope="col" class="numeric">Steps</th>
-  <th scope="col" class="numeric">Tokens (cost)</th><th scope="col">Version</th>
+  <th scope="col" class="numeric place">#</th>
+  <th scope="col" class="sortable" data-sort="text">Harness</th><th scope="col" class="sortable" data-sort="text">Profile</th><th scope="col" class="sortable" data-sort="text">Model</th>
+  <th scope="col" class="numeric sortable" data-sort="ratio">Result</th><th scope="col" class="numeric sortable" data-sort="number">%</th>
+  <th scope="col" class="numeric sortable" data-sort="number">Time</th><th scope="col" class="numeric sortable" data-sort="number">Steps</th>
+  <th scope="col" class="numeric sortable" data-sort="number">Tokens (cost)</th><th scope="col" class="sortable" data-sort="text">Version</th>
 </tr>"""
 
 
 def _table(rows, group_ours):
     parts = ['<table class="leaderboard-table"><thead>' + HEAD + '</thead><tbody>',
-             f'<tr class="group"><td colspan="9"><strong>{html.escape(group_ours)}</strong></td></tr>',
+             f'<tr class="group"><td colspan="10"><strong>{html.escape(group_ours)}</strong></td></tr>',
              _rows_html(rows)]
     parts.append('</tbody></table>')
     return "\n".join(parts)
@@ -712,10 +714,10 @@ def _table(rows, group_ours):
 
 def _table_groups(ours, upstream, g_ours, g_up):
     parts = ['<table class="leaderboard-table"><thead>' + HEAD + '</thead><tbody>',
-             f'<tr class="group"><td colspan="9"><strong>{html.escape(g_ours)}</strong></td></tr>',
+             f'<tr class="group"><td colspan="10"><strong>{html.escape(g_ours)}</strong></td></tr>',
              _rows_html(ours)]
     if upstream:
-        parts.append(f'<tr class="group"><td colspan="9"><strong>{html.escape(g_up)}</strong></td></tr>')
+        parts.append(f'<tr class="group"><td colspan="10"><strong>{html.escape(g_up)}</strong></td></tr>')
         parts.append(_rows_html(upstream))
     parts.append('</tbody></table>')
     return "\n".join(parts)
@@ -741,18 +743,19 @@ def _waves_html(rows, locale=DEFAULT_LOCALE):
 
 
 SAMPLE_HEAD = """<tr>
-  <th scope="col">Harness</th><th scope="col">Profile</th><th scope="col">Model</th>
-  <th scope="col">Subset</th><th scope="col" class="numeric">Result</th>
-  <th scope="col" class="numeric">%</th><th scope="col" class="numeric">Coverage</th>
-  <th scope="col" class="numeric">Time</th><th scope="col" class="numeric">Steps</th>
-  <th scope="col" class="numeric">Tokens (cost)</th>
-  <th scope="col">Status</th>
+  <th scope="col" class="numeric place">#</th>
+  <th scope="col" class="sortable" data-sort="text">Harness</th><th scope="col" class="sortable" data-sort="text">Profile</th><th scope="col" class="sortable" data-sort="text">Model</th>
+  <th scope="col" class="sortable" data-sort="text">Subset</th><th scope="col" class="numeric sortable" data-sort="ratio">Result</th>
+  <th scope="col" class="numeric sortable" data-sort="number">%</th><th scope="col" class="numeric sortable" data-sort="ratio">Coverage</th>
+  <th scope="col" class="numeric sortable" data-sort="number">Time</th><th scope="col" class="numeric sortable" data-sort="number">Steps</th>
+  <th scope="col" class="numeric sortable" data-sort="number">Tokens (cost)</th>
+  <th scope="col" class="sortable" data-sort="text">Status</th>
 </tr>"""
 
 
 def _sample_rows_html(rows, locale=DEFAULT_LOCALE):
     tr = []
-    for r in rows:
+    for i, r in enumerate(rows, 1):
         d = r.get("detail")
         attrs = f' class="detail-row" data-detail="{html.escape(d)}"' if d else ""
         harness = (f'<a href="{html.escape(d)}">{html.escape(r["harness"])}</a>'
@@ -761,6 +764,7 @@ def _sample_rows_html(rows, locale=DEFAULT_LOCALE):
         status = t(locale, r["status_key"])
         tr.append(
             f"<tr{attrs}>"
+            f'<td class="numeric place">{i}</td>'
             f"<td>{harness}</td>"
             f"<td>{html.escape(r['profile'])}</td>"
             f"<td>{html.escape(r['model'])}</td>"
@@ -779,10 +783,10 @@ def _sample_rows_html(rows, locale=DEFAULT_LOCALE):
 
 def _sample_table(rows, upstream=None, locale=DEFAULT_LOCALE):
     parts = ['<table class="leaderboard-table"><thead>' + SAMPLE_HEAD + '</thead><tbody>',
-             f'<tr class="group"><td colspan="11"><strong>{html.escape(t(locale, "group_sample_ours"))}</strong></td></tr>',
+             f'<tr class="group"><td colspan="12"><strong>{html.escape(t(locale, "group_sample_ours"))}</strong></td></tr>',
              _sample_rows_html(rows, locale)]
     if upstream:
-        parts.append(f'<tr class="group"><td colspan="11"><strong>{html.escape(t(locale, "group_sample_upstream"))}</strong></td></tr>')
+        parts.append(f'<tr class="group"><td colspan="12"><strong>{html.escape(t(locale, "group_sample_upstream"))}</strong></td></tr>')
         parts.append(_sample_rows_html(upstream, locale))
     parts.append("</tbody></table>")
     return "\n".join(parts)
@@ -821,9 +825,15 @@ STYLE = """<style>
   .filters{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;margin:.9rem 0}
   .filters .search{display:flex;gap:.5rem;align-items:center}
   #row-count{font-size:.9em;opacity:.8}
+  th.sortable{cursor:pointer;user-select:none;white-space:nowrap}
+  th.sortable:hover{text-decoration:underline}
+  th.sortable::after{content:"↕";opacity:.3;font-size:.85em;margin-left:.3em}
+  th.sortable.asc::after{content:"↑";opacity:.9}
+  th.sortable.desc::after{content:"↓";opacity:.9}
+  td.place{opacity:.6;font-variant-numeric:tabular-nums}
 </style>"""
 
-SCRIPT = """<script>
+SCRIPT = r"""<script>
 (function(){
   var btns=[].slice.call(document.querySelectorAll('.suite-switch button'));
   var panels=[].slice.call(document.querySelectorAll('[data-suite-panel]'));
@@ -863,6 +873,74 @@ SCRIPT = """<script>
     tr.addEventListener('click',function(e){
       if(e.target.closest('a')) return;
       location.href=tr.dataset.detail;
+    });
+  });
+  // --- place numbering + column sorting ---
+  function numDataRows(table){
+    var tbody=table.querySelector('tbody'); if(!tbody) return;
+    var n=0;
+    [].slice.call(tbody.children).forEach(function(r){
+      if(r.tagName!=='TR'||r.classList.contains('group')) return;
+      n++; var c=r.querySelector('td.place'); if(c) c.textContent=n;
+    });
+  }
+  function parseVal(td, type){
+    if(!td) return null;
+    var s=(td.textContent||'').trim();
+    if(!s||s==='—'||s==='-'||s==='–') return null;
+    if(type==='text') return s.toLocaleLowerCase();
+    if(type==='ratio'){
+      var parts=s.split('/');
+      if(parts.length===2){
+        var a=parseFloat(parts[0].replace(/[^0-9.,-]/g,'').replace(',','.'));
+        var b=parseFloat(parts[1].replace(/[^0-9.,-]/g,'').replace(',','.'));
+        if(!isNaN(a)&&!isNaN(b)&&b) return a/b;
+        if(!isNaN(a)) return a;
+        return null;
+      }
+    }
+    var m=s.match(/[0-9][0-9 .,]*/);
+    if(!m) return null;
+    var t=m[0].replace(/ /g,'').replace(',','.');
+    return parseFloat(t);
+  }
+  function sortTable(table, idx, type, dir){
+    var tbody=table.querySelector('tbody'); if(!tbody) return;
+    var out=[], seg=[];
+    function flush(){
+      if(!seg.length) return;
+      seg.sort(function(a,b){
+        var va=parseVal(a.children[idx],type), vb=parseVal(b.children[idx],type);
+        if(va===null&&vb===null) return 0;
+        if(va===null) return 1;
+        if(vb===null) return -1;
+        if(va<vb) return dir==='asc'?-1:1;
+        if(va>vb) return dir==='asc'?1:-1;
+        return 0;
+      });
+      out=out.concat(seg); seg=[];
+    }
+    [].slice.call(tbody.children).forEach(function(r){
+      if(r.tagName!=='TR') return;
+      if(r.classList.contains('group')){ flush(); out.push(r); }
+      else seg.push(r);
+    });
+    flush();
+    out.forEach(function(r){ tbody.appendChild(r); });
+    numDataRows(table);
+  }
+  [].slice.call(document.querySelectorAll('table.leaderboard-table')).forEach(function(table){
+    numDataRows(table);
+    var ths=[].slice.call(table.querySelectorAll('thead th'));
+    ths.forEach(function(th, idx){
+      var type=th.getAttribute('data-sort'); if(!type) return;
+      th.addEventListener('click',function(){
+        var dir=th.getAttribute('data-dir')==='asc'?'desc':'asc';
+        ths.forEach(function(o){o.removeAttribute('data-dir');o.classList.remove('asc','desc');});
+        th.setAttribute('data-dir',dir);
+        th.classList.add(dir);
+        sortTable(table, idx, type, dir);
+      });
     });
   });
   activate(keyFromHash());
