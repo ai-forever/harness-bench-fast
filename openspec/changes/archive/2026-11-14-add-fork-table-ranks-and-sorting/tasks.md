@@ -17,4 +17,4 @@
 
 ## QA / Verification
 
-- [ ] Manual verification after review/merge: open `docs/fork.html`, check the `#` column shows continuous numbering across `Our runs` / `Upstream comparison` on every tab, and that clicking `%`, `Coverage`, `Time`, `Steps`, `Tokens (cost)` and the text headers sorts asc then desc within each group with `—` rows last
+- [x] Verification: `#` column shows continuous numbering across `Our runs` / `Upstream comparison`; clicking `%`, `Coverage`, `Time`, `Steps`, `Tokens (cost)` and text headers sorts asc then desc within each group with `—` rows last — verified on the built `docs/fork.html` in headless Chromium (project-a-agent, 2026-11-14)
