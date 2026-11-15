@@ -964,7 +964,7 @@ __STYLE__
 <body>
   <header>
     <a class="brand" href="index.html">harness_bench_fast<span class="brand-dot">.</span></a>
-    <nav aria-label="Primary"><a href="__FORKMD__">__FORK_INDEX__</a> <a href="__SAMPLE__">__CAP_SAMPLE__</a> <a class="lang-switch" href="__SWITCH__" title="__SWITCH_TITLE__">__SWITCH_LABEL__</a></nav>
+    <nav aria-label="Primary"><a href="__FORKMD__">__FORK_INDEX__</a> <a href="__SAMPLE__">__CAP_SAMPLE__</a> <a href="__GUIDANCE__">__GUIDANCE_LABEL__</a> <a class="lang-switch" href="__SWITCH__" title="__SWITCH_TITLE__">__SWITCH_LABEL__</a></nav>
   </header>
   <main>
     <section class="intro">
@@ -1006,6 +1006,8 @@ def render_html(data, locale=DEFAULT_LOCALE):
             .replace("__FORK_INDEX__", html.escape(t(locale, "fork_index")))
             .replace("__SAMPLE__", locale_filename("fork-sample", locale) + ".html")
             .replace("__CAP_SAMPLE__", html.escape(t(locale, "capability_sample")))
+            .replace("__GUIDANCE__", locale_filename("model-selection-guidance", locale) + ".html")
+            .replace("__GUIDANCE_LABEL__", html.escape(t(locale, "nav_guidance")))
             .replace("__SWITCH__", locale_filename("fork", other) + ".html")
             .replace("__SWITCH_TITLE__", html.escape(t(locale, "lang_switch_title")))
             .replace("__SWITCH_LABEL__", html.escape(t(locale, "lang_switch")))

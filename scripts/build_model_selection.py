@@ -31,6 +31,8 @@ from fork_metadata import classify_harness, collect_paths  # noqa: E402
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DOC_RU = REPO_ROOT / "docs" / "model-selection-guidance.md"
 DOC_EN = REPO_ROOT / "docs" / "model-selection-guidance.en.md"
+HTML_RU = REPO_ROOT / "docs" / "model-selection-guidance.html"
+HTML_EN = REPO_ROOT / "docs" / "model-selection-guidance.en.html"
 MATRIX = REPO_ROOT / "docs" / "model-selection-matrix.json"
 
 BEGIN_MARKER = "<!-- MSEL:BEGIN -->"
@@ -304,6 +306,178 @@ def render_block(rows: list[dict], locale: str = "ru") -> str:
     return "\n".join(out)
 
 
+def _esc(value) -> str:
+    return (str(value if value is not None else DASH)
+            .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            .replace('"', "&quot;"))
+
+
+GUIDANCE_TEXT = {
+    "ru": {
+        "title": "Выбор модели/харнесса — что × чем × когда · harness_bench_fast",
+        "eyebrow": "Руководство по выбору · форк",
+        "h1": "Что × чем × когда: выбор модели и харнесса",
+        "lead": (
+            "Практическое руководство по выбору <strong>харнесса × модели</strong> для задач "
+            "harness-bench-fast, построенное <strong>только на уже выполненных прогонах</strong>. "
+            "Для премиум-моделей ₽ — <strong>факт биллинга провайдера</strong>, а не оценка по тарифу."
+        ),
+        "back": "Результаты форка",
+        "matrix_note": ("Автосинк из <code>results/*.json</code> генератором "
+                        "<code>scripts/build_model_selection.py</code>. Тиры — по ₽/решённую задачу "
+                        "(терцили p33/p66). ✅ — точка на фронте Парето внутри бакета."),
+        "h2_matrix": "Матрица рекомендаций",
+        "h2_anti": "Anti-patterns — переплата без выигрыша",
+        "h2_cov": "Покрытие и уверенность",
+        "h2_method": "Методология",
+        "anti_note": ("Премиум-модели, доминируемые более дешёвой конфигурацией с тем же/лучшим "
+                      "результатом (полные наборы). Рядом — конфигурация-доминанта."),
+        "cov": [
+            "Плотно сравним только <code>shot-list</code> (4 харнесса); <code>long</code> покрыт частично (6/20); "
+            "<code>Light-391</code> — 3 прогона; <code>wave21 (hard-coupled)</code> не измерен (unmeasured, не fail).",
+            "<code>cost_per_solved</code> = ₽ / число решённых задач; <code>coverage.full</code> — полный ли набор измерен.",
+        ],
+        "method": [
+            "Источник — <code>results/*.json</code>; для премиум-лестницы ₽ из биллинга провайдера (<code>results/reconciled/</code>).",
+            "Классификация — общий модуль <code>scripts/fork_metadata.py</code> (стемы совпадают с форк-таблицами).",
+            "Фронт Парето — внутри каждого бакета по <code>(pass ↑, cost_per_solved ↓)</code>; доминируемые → anti-patterns.",
+            "Правило «premium оправдан»: не доминируем и (≥ +3 п.п. pass или закрыта ≥1 floor/boundary-задача).",
+            "Сравнение только внутри одной task-set версии; partial = unmeasured.",
+        ],
+        "fine": "Без LLM-судьи; числа пере-выведены из артефактов прогонов.",
+        "footer": "harness_bench_fast · форк Alex-Kul777",
+        "fork_index": "Индекс форка",
+        "switch_label": "EN",
+    },
+    "en": {
+        "title": "Model/harness selection — what × with what × when · harness_bench_fast",
+        "eyebrow": "Selection guidance · fork",
+        "h1": "What × with what × when: choosing a model and harness",
+        "lead": (
+            "Practical guidance for choosing a <strong>harness × model</strong> for "
+            "harness-bench-fast tasks, built <strong>only from completed runs</strong>. "
+            "For premium models the ₽ figures are <strong>actual provider billing</strong>, not tariff estimates."
+        ),
+        "back": "Fork results",
+        "matrix_note": ("Auto-sync from <code>results/*.json</code> by "
+                        "<code>scripts/build_model_selection.py</code>. Tiers by ₽/solved "
+                        "(terciles p33/p66). ✅ — Pareto-optimal within the bucket."),
+        "h2_matrix": "Recommendation matrix",
+        "h2_anti": "Anti-patterns — paying without winning",
+        "h2_cov": "Coverage & confidence",
+        "h2_method": "Methodology",
+        "anti_note": ("Premium models dominated by a cheaper config with equal/better result "
+                      "(full suites). The dominating config is shown."),
+        "cov": [
+            "Only <code>shot-list</code> is densely comparable (4 harnesses); <code>long</code> is partial (6/20); "
+            "<code>Light-391</code> has 3 runs; <code>wave21 (hard-coupled)</code> is unmeasured (not a fail).",
+            "<code>cost_per_solved</code> = ₽ / solved tasks; <code>coverage.full</code> = whether the full suite was measured.",
+        ],
+        "method": [
+            "Source — <code>results/*.json</code>; premium-ladder ₽ from provider billing (<code>results/reconciled/</code>).",
+            "Classification — shared <code>scripts/fork_metadata.py</code> (stems match the fork tables).",
+            "Pareto frontier — within each bucket over <code>(pass ↑, cost_per_solved ↓)</code>; dominated → anti-patterns.",
+            "\"Premium justified\" rule: not dominated and (≥ +3 pp pass or closes ≥1 floor/boundary task).",
+            "Comparison only within one task-set version; partial = unmeasured.",
+        ],
+        "fine": "No LLM judge; figures re-derived from run artifacts.",
+        "footer": "harness_bench_fast · Alex-Kul777 fork",
+        "fork_index": "Fork index",
+        "switch_label": "RU",
+    },
+}
+
+HTML_CSS = (
+    ".msel-wrap{overflow-x:auto} .msel-wrap table{border-collapse:collapse;width:100%}"
+    " .msel-wrap th,.msel-wrap td{border:1px solid #d8d8d8;padding:.35rem .5rem;"
+    "text-align:left;font-size:.88rem;white-space:nowrap}"
+    " .msel-wrap td.num{text-align:right} .msel-wrap code{font-size:.82rem}"
+    " .anti li{margin:.15rem 0} .pareto{color:#0a8a2a;font-weight:700}"
+)
+
+
+def render_html(rows: list[dict], locale: str) -> str:
+    x = GUIDANCE_TEXT[locale]
+    other = "en" if locale == "ru" else "ru"
+    switch = f"model-selection-guidance{'.en' if other == 'en' else ''}.html"
+    out = [
+        "<!doctype html>",
+        f'<html lang="{"ru" if locale == "ru" else "en"}">',
+        "<head>",
+        '  <meta charset="utf-8">',
+        '  <meta name="viewport" content="width=device-width, initial-scale=1">',
+        f"  <title>{_esc(x['title'])}</title>",
+        '  <link rel="stylesheet" href="landing.css">',
+        f"  <style>{HTML_CSS}</style>",
+        "</head>",
+        "<body>",
+        "  <header>",
+        '    <a class="brand" href="index.html">harness_bench_fast<span class="brand-dot">.</span></a>',
+        f'    <nav aria-label="Primary"><a href="fork{'.en' if locale == 'en' else ''}.html">← {_esc(x["back"])}</a> '
+        f'<a class="lang-switch" href="{switch}">{_esc(x["switch_label"])}</a></nav>',
+        "  </header>",
+        "  <main>",
+        '    <section class="intro">',
+        f'      <p class="eyebrow">{_esc(x["eyebrow"])}</p>',
+        f'      <h1>{_esc(x["h1"])}</h1>',
+        f'      <p class="lead">{x["lead"]}</p>',
+        "    </section>",
+        f'    <h2>{_esc(x["h2_matrix"])}</h2>',
+        f'    <p class="fine-print">{x["matrix_note"]}</p>',
+        '    <div class="msel-wrap"><table><thead><tr>',
+        "      <th>Bucket</th><th>Harness</th><th>Model</th><th>Reasoning</th>"
+        "<th class=\"num\">Result</th><th class=\"num\">%</th>"
+        "<th class=\"num\">Cost/solved</th><th>Pareto</th><th>Stem</th>",
+        "    </tr></thead><tbody>",
+    ]
+    for r in rows:
+        pareto = '<span class="pareto">✅</span>' if r["pareto"] else DASH
+        out.append(
+            "<tr>"
+            f'<td>{_esc(BUCKET_LABEL[r["situation_bucket"]])}</td>'
+            f'<td>{_esc(r["harness"])}</td>'
+            f'<td>{_esc(r["model"])}</td>'
+            f'<td>{_esc(r["reasoning"])}</td>'
+            f'<td class="num">{_fmt_result(r)}</td>'
+            f'<td class="num">{_fmt_pct(r)}</td>'
+            f'<td class="num">{_fmt_cps(r)}</td>'
+            f'<td>{pareto}</td>'
+            f'<td><code>{_esc(r["stem"])}</code></td>'
+            "</tr>"
+        )
+    out += ["    </tbody></table></div>"]
+
+    anti = [r for r in rows if _is_premium(r) and not r["pareto"]
+            and r["dominated_by"] and r["coverage"]["full"]]
+    out.append(f'    <h2>{_esc(x["h2_anti"])}</h2>')
+    out.append(f'    <p class="fine-print">{x["anti_note"]}</p>')
+    if anti:
+        out.append('    <ul class="anti">')
+        for r in sorted(anti, key=lambda r: -r["cost_per_solved"])[:12]:
+            out.append(f'      <li><code>{_esc(r["model"])}</code> @ {_fmt_cps(r)} '
+                       f'({_esc(r["situation_bucket"])}) ← <code>{_esc(r["dominated_by"][0])}</code></li>')
+        out.append("    </ul>")
+    else:
+        out.append(f"    <p>{DASH}</p>")
+
+    out.append(f'    <h2>{_esc(x["h2_cov"])}</h2>')
+    out.append("    <ul>")
+    out += [f"      <li>{i}</li>" for i in x["cov"]]
+    out.append("    </ul>")
+    out.append(f'    <h2>{_esc(x["h2_method"])}</h2>')
+    out.append("    <ol>")
+    out += [f"      <li>{i}</li>" for i in x["method"]]
+    out.append("    </ol>")
+    out.append(f'    <p class="fine-print">{_esc(x["fine"])} '
+               f'<a href="fork{'.en' if locale == 'en' else ''}.html">{_esc(x["back"])}</a></p>')
+    out.append("  </main>")
+    out.append(f'  <footer><span>{_esc(x["footer"])}</span>'
+               f'<a href="FORK{".en" if locale == "en" else ""}.md">{_esc(x["fork_index"])}</a></footer>')
+    out.append("</body>")
+    out.append("</html>")
+    return "\n".join(out) + "\n"
+
+
 def render_matrix(rows: list[dict], terciles: dict) -> str:
     payload = {
         "generated": "auto",
@@ -386,6 +560,18 @@ def main(argv: list[str]) -> int:
             print(f"{path.name}: updated ({len(rows)} rows)")
         else:
             print(f"{path.name}: up to date ({len(rows)} rows)")
+
+    for path, locale in ((HTML_RU, "ru"), (HTML_EN, "en")):
+        html_text = render_html(rows, locale)
+        current = path.read_text(encoding="utf-8") if path.exists() else None
+        if check:
+            if current != html_text:
+                stale.append(path.name)
+        elif current != html_text:
+            path.write_text(html_text, encoding="utf-8")
+            print(f"{path.name}: updated (html)")
+        else:
+            print(f"{path.name}: up to date (html)")
 
     if check:
         if stale:

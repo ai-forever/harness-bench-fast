@@ -37,6 +37,7 @@ CATALOG: dict[str, dict[str, str]] = {
         "lang_switch_title": "Switch to English",
         "fork_index": "Индекс форка",
         "capability_sample": "Capability sample (20)",
+        "nav_guidance": "Выбор модели",
         "brand_home": "harness_bench_fast",
         # ---- fork.html ----
         "home_title": "harness_bench_fast · Результаты форка",
@@ -143,6 +144,7 @@ CATALOG: dict[str, dict[str, str]] = {
         "lang_switch_title": "Переключить на русский",
         "fork_index": "Fork index",
         "capability_sample": "Capability sample (20)",
+        "nav_guidance": "Model selection",
         "brand_home": "harness_bench_fast",
         # ---- fork.html ----
         "home_title": "harness_bench_fast · Fork results",
