@@ -348,6 +348,9 @@ GUIDANCE_TEXT = {
         "footer": "harness_bench_fast · форк Alex-Kul777",
         "fork_index": "Индекс форка",
         "switch_label": "EN",
+        "repos_label": "Репозитории:",
+        "repo_fork": "Форк ↗",
+        "repo_upstream": "Upstream ↗",
     },
     "en": {
         "title": "Model/harness selection — what × with what × when · harness_bench_fast",
@@ -384,6 +387,9 @@ GUIDANCE_TEXT = {
         "footer": "harness_bench_fast · Alex-Kul777 fork",
         "fork_index": "Fork index",
         "switch_label": "RU",
+        "repos_label": "Repositories:",
+        "repo_fork": "Fork ↗",
+        "repo_upstream": "Upstream ↗",
     },
 }
 
@@ -393,6 +399,8 @@ HTML_CSS = (
     "text-align:left;font-size:.88rem;white-space:nowrap}"
     " .msel-wrap td.num{text-align:right} .msel-wrap code{font-size:.82rem}"
     " .anti li{margin:.15rem 0} .pareto{color:#0a8a2a;font-weight:700}"
+    " footer{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;align-items:center}"
+    " .repos a{margin-left:.6rem}"
 )
 
 
@@ -472,6 +480,9 @@ def render_html(rows: list[dict], locale: str) -> str:
                f'<a href="fork{'.en' if locale == 'en' else ''}.html">{_esc(x["back"])}</a></p>')
     out.append("  </main>")
     out.append(f'  <footer><span>{_esc(x["footer"])}</span>'
+               f'<span class="repos">{_esc(x["repos_label"])}'
+               f'<a href="https://github.com/Alex-Kul777/harness-bench-fast" target="_blank" rel="noopener">{_esc(x["repo_fork"])}</a>'
+               f'<a href="https://github.com/ai-forever/harness-bench-fast" target="_blank" rel="noopener">{_esc(x["repo_upstream"])}</a></span>'
                f'<a href="FORK{".en" if locale == "en" else ""}.md">{_esc(x["fork_index"])}</a></footer>')
     out.append("</body>")
     out.append("</html>")

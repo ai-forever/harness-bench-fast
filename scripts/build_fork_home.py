@@ -835,6 +835,8 @@ STYLE = """<style>
   th.sortable.asc::after{content:"↑";opacity:.9}
   th.sortable.desc::after{content:"↓";opacity:.9}
   td.place{opacity:.6;font-variant-numeric:tabular-nums}
+  footer{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;align-items:center}
+  .repos a{margin-left:.6rem}
 </style>"""
 
 SCRIPT = r"""<script>
@@ -986,7 +988,7 @@ __PANELS__
     <p id="empty" role="status" hidden>__EMPTY__</p>
     <p class="fine-print">__FINE__ <a href="__FORKMD__">__FORK_INDEX__</a> · <a href="__TABLES__">__FORK_TABLES__</a></p>
   </main>
-  <footer><span>__FOOTER_NOTE__</span><a href="__FORKMD__">__FOOTER_LINK__</a></footer>
+  <footer><span>__FOOTER_NOTE__</span><span class="repos">__REPOS_LABEL__<a href="https://github.com/Alex-Kul777/harness-bench-fast" target="_blank" rel="noopener">__REPO_FORK__</a><a href="https://github.com/ai-forever/harness-bench-fast" target="_blank" rel="noopener">__REPO_UPSTREAM__</a></span><a href="__FORKMD__">__FOOTER_LINK__</a></footer>
 __SCRIPT__
 <script>document.querySelectorAll('a.lang-switch').forEach(function(a){if(location.hash)a.href+=location.hash;});</script>
 </body>
@@ -1026,6 +1028,9 @@ def render_html(data, locale=DEFAULT_LOCALE):
             .replace("__TABLES__", locale_filename("fork-results", locale) + ".md")
             .replace("__FORK_TABLES__", html.escape(t(locale, "link_fork_tables")))
             .replace("__FOOTER_NOTE__", html.escape(t(locale, "footer_note")))
+            .replace("__REPOS_LABEL__", html.escape(t(locale, "repos_label")))
+            .replace("__REPO_FORK__", html.escape(t(locale, "repo_fork")))
+            .replace("__REPO_UPSTREAM__", html.escape(t(locale, "repo_upstream")))
             .replace("__FOOTER_LINK__", html.escape(t(locale, "footer_link")))
             .replace("__SCRIPT__", SCRIPT))
 

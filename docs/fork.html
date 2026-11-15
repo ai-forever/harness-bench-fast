@@ -22,6 +22,8 @@
   th.sortable.asc::after{content:"↑";opacity:.9}
   th.sortable.desc::after{content:"↓";opacity:.9}
   td.place{opacity:.6;font-variant-numeric:tabular-nums}
+  footer{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;align-items:center}
+  .repos a{margin-left:.6rem}
 </style>
 </head>
 <body>
@@ -309,7 +311,7 @@
     <p id="empty" role="status" hidden>Нет строк по запросу.</p>
     <p class="fine-print">Без LLM-судьи. Каждая задача проверена механически. Прочерк — нет замера, а не провал. <code>Version</code> = версия тасксета для наших прогонов, <code>source_version</code> апстрима — для upstream-строк. <a href="../FORK.md">Индекс форка</a> · <a href="fork-results.md">Таблицы форка →</a></p>
   </main>
-  <footer><span>Без LLM-судьи. Каждая задача проверена механически.</span><a href="../FORK.md">Индекс форка →</a></footer>
+  <footer><span>Без LLM-судьи. Каждая задача проверена механически.</span><span class="repos">Репозитории:<a href="https://github.com/Alex-Kul777/harness-bench-fast" target="_blank" rel="noopener">Форк ↗</a><a href="https://github.com/ai-forever/harness-bench-fast" target="_blank" rel="noopener">Upstream ↗</a></span><a href="../FORK.md">Индекс форка →</a></footer>
 <script>
 (function(){
   var btns=[].slice.call(document.querySelectorAll('.suite-switch button'));

@@ -38,6 +38,9 @@ CATALOG: dict[str, dict[str, str]] = {
         "fork_index": "Индекс форка",
         "capability_sample": "Capability sample (20)",
         "nav_guidance": "Выбор модели",
+        "repos_label": "Репозитории:",
+        "repo_fork": "Форк ↗",
+        "repo_upstream": "Upstream ↗",
         "brand_home": "harness_bench_fast",
         # ---- fork.html ----
         "home_title": "harness_bench_fast · Результаты форка",
@@ -145,6 +148,9 @@ CATALOG: dict[str, dict[str, str]] = {
         "fork_index": "Fork index",
         "capability_sample": "Capability sample (20)",
         "nav_guidance": "Model selection",
+        "repos_label": "Repositories:",
+        "repo_fork": "Fork ↗",
+        "repo_upstream": "Upstream ↗",
         "brand_home": "harness_bench_fast",
         # ---- fork.html ----
         "home_title": "harness_bench_fast · Fork results",
