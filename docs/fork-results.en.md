@@ -27,6 +27,9 @@ incomplete coverage) and [`docs/fork.html#medium-sample`](fork.html#medium-sampl
 The block below is **generated** by `scripts/build_fork_results.py` from `results/*.json`.
 Do not edit by hand — change the script/JSON and rebuild.
 
+> ℹ️ The premium-ladder `Claude …` rows (Shot List, key `kap-hermes`) are **reconciled with the
+> provider's actual billing**: their ₽ column is the billed amount, not a tariff estimate.
+
 <!-- FORK:RESULTS:BEGIN -->
 Auto-sync: 90 runs
 
@@ -84,13 +87,13 @@ Auto-sync: 90 runs
 | OpenClaw | Medium (392-471) | thinking: off | MiniMax-M3 (thinking: off) | 33/40 | 82.5% | 266.4m | 989 | 33 114 679 (8 636₽) |
 | OpenClaw | Medium (392-471) | thinking: off | MiniMax-M3 (thinking: off) | 13/20 | 65.0% | 162.0m | 698 | 12 178 668 (3 426₽) |
 | OpenClaw | Medium (392-471) | thinking: off | MiniMax-M3 (thinking: off) | 0/6 | 0.0% | 363.2m | 276 | 7 360 375 (1 913₽) |
-| Pi | Shot List (52) | — | Claude Fable 5 | 46/52 | 88.5% | 13.9m | 712 | 1 665 021 (461₽) |
-| Pi | Shot List (52) | — | Claude Fable 5.1 | 47/52 | 90.4% | 19.6m | 752 | 1 932 366 (535₽) |
-| Pi | Shot List (52) | — | Claude Opus 4.8 | 49/52 | 94.2% | 12.3m | 808 | 2 155 722 (584₽) |
-| Pi | Shot List (52) | — | Claude Opus 5.5 | 48/52 | 92.3% | 13.3m | 720 | 1 785 909 (499₽) |
-| Pi | Shot List (52) | — | Claude Sonnet 4.5 | 51/52 | 98.1% | 25.7m | 1 352 | 4 526 346 (1 195₽) |
+| Pi | Shot List (52) | — | Claude Fable 5 | 46/52 | 88.5% | 13.9m | 712 | 549 550 (1 263₽) |
+| Pi | Shot List (52) | — | Claude Fable 5.1 | 47/52 | 90.4% | 19.6m | 752 | 644 155 (1 485₽) |
+| Pi | Shot List (52) | — | Claude Opus 4.8 | 49/52 | 94.2% | 12.3m | 808 | 718 602 (764₽) |
+| Pi | Shot List (52) | — | Claude Opus 5.5 | 48/52 | 92.3% | 13.3m | 720 | 595 335 (556₽) |
+| Pi | Shot List (52) | — | Claude Sonnet 4.5 | 51/52 | 98.1% | 25.7m | 1 352 | 1 508 795 (1 060₽) |
 | Pi | Shot List (52) | — | Claude Sonnet 4.6 | 50/52 | 96.2% | 14.6m | 1 060 | 2 657 016 (758₽) |
-| Pi | Shot List (52) | — | Claude Sonnet 4.6 | 49/52 | 94.2% | 14.0m | 996 | 2 439 192 (697₽) |
+| Pi | Shot List (52) | — | Claude Sonnet 4.6 | 49/52 | 94.2% | 14.0m | 996 | 813 109 (653₽) |
 | Pi | Shot List (52) | thinking: medium | Claude Sonnet 4.6 (thinking: medium) | 50/52 | 96.2% | 14.3m | 1 056 | 2 632 875 (749₽) |
 | Pi | Shot List (52) | thinking: off | Claude Sonnet 4.6 (thinking: off) | 49/52 | 94.2% | 12.8m | 1 152 | 3 038 157 (819₽) |
 | Pi | Shot List (52) | — | DeepSeek-V4.1-Flash | 49/52 | 94.2% | 21.3m | 330 | 1 438 179 (42₽) |

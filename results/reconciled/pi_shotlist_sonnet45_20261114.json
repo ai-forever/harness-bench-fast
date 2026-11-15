@@ -1,0 +1,9 @@
+{
+  "model": "anthropic/claude-sonnet-4.5",
+  "input_tokens": 1435313,
+  "output_tokens": 73482,
+  "cost_rub": 1060.5,
+  "token": "sonnet45",
+  "run_date": "20261114",
+  "rows": 339
+}

@@ -19,6 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from fork_i18n import t  # noqa: E402
 from fork_metrics import steps_from_json  # noqa: E402
+from fork_ladder_override import apply as _ladder_apply  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DOC_PATH = REPO_ROOT / "docs" / "fork-results.md"
@@ -184,6 +185,10 @@ def build_rows() -> list[dict]:
         if not isinstance(summary, dict):
             print(f"[skip] {name}: no summary object", file=sys.stderr)
             continue
+        # Reconciled ladder runs: replace published tokens/₽ with provider billing.
+        tokens, cost = _ladder_apply(
+            stem, summary.get("total_tokens"), summary.get("estimated_cost_rub")
+        )
         rows.append(
             {
                 "harness": classify_harness(stem),
@@ -194,8 +199,8 @@ def build_rows() -> list[dict]:
                 "pct": fmt_pct(summary.get("pass_rate")),
                 "time": fmt_time(summary.get("total_seconds")),
                 "steps": fmt_int(steps_from_json(data)),
-                "tokens": fmt_int(summary.get("total_tokens")),
-                "cost": fmt_cost(summary.get("estimated_cost_rub")),
+                "tokens": fmt_int(tokens),
+                "cost": fmt_cost(cost),
                 "_passed": summary.get("passed") or 0,
             }
         )

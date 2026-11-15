@@ -1,0 +1,9 @@
+{
+  "model": "anthropic/claude-fable-5",
+  "input_tokens": 509403,
+  "output_tokens": 40147,
+  "cost_rub": 1263.14,
+  "token": "fable5",
+  "run_date": "20261114",
+  "rows": 178
+}

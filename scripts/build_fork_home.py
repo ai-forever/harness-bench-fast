@@ -27,6 +27,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from fork_i18n import DEFAULT_LOCALE, LOCALES, locale_filename, other_locale, t  # noqa: E402
 from fork_metrics import steps_from_json  # noqa: E402
+from fork_ladder_override import apply as _ladder_apply  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DOCS = REPO_ROOT / "docs"
@@ -277,11 +278,15 @@ def _from_summary_file(harness, profile, model, path: Path, source="ours", date_
     if rate is None and s.get("passed") is not None and s.get("total"):
         rate = s["passed"] / s["total"]
     date = _date_from_sessions(d) or _date_from_name(path.name) or date_hint
+    # Reconciled ladder runs: replace published tokens/₽ with provider billing.
+    tokens, cost = _ladder_apply(
+        path.stem, s.get("total_tokens", d.get("tokens")), s.get("estimated_cost_rub")
+    )
     row = _row(_with_version(harness, _harness_version(d)), _with_date(profile, date),
                _with_reasoning(model, profile),
                s.get("passed", d.get("passed")), s.get("total", d.get("total")),
                rate, s.get("total_seconds"), steps_from_json(d),
-               s.get("total_tokens", d.get("tokens")), s.get("estimated_cost_rub"),
+               tokens, cost,
                d.get("task_set_version"), source, detail=detail)
     if detail:
         _DETAIL_JOBS.append((detail, suite, row, d))

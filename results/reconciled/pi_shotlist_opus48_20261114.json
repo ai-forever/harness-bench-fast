@@ -1,0 +1,9 @@
+{
+  "model": "anthropic/claude-opus-4.8",
+  "input_tokens": 674166,
+  "output_tokens": 44436,
+  "cost_rub": 764.49,
+  "token": "opus48",
+  "run_date": "20261114",
+  "rows": 204
+}
