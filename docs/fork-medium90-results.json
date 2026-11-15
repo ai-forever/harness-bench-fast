@@ -594,9 +594,19 @@
       "model": "Claude Sonnet 4.6",
       "profile": "thinking: off",
       "harness_version": null,
-      "runs": 2,
+      "runs": 3,
       "suites": {
-        "long": null,
+        "long": {
+          "passed": 1,
+          "total": 6,
+          "measurement": "partial",
+          "duration": {
+            "n": 6,
+            "mean": 1194.4,
+            "median": 778.4,
+            "max": 2581.1
+          }
+        },
         "reflect": {
           "passed": 15,
           "total": 20,
@@ -622,12 +632,16 @@
         "composite_hard": null
       },
       "usage": {
-        "seconds": 17025.1,
-        "steps": 4867,
-        "tokens": 148283633,
-        "cost_rub": 36922.2
+        "seconds": 24191.2,
+        "steps": 7585,
+        "tokens": 376592972,
+        "cost_rub": 92203.2
       },
       "wilson": {
+        "long": [
+          0.188,
+          0.406
+        ],
         "reflect": [
           0.67,
           0.75
@@ -639,6 +653,7 @@
       },
       "sources": [
         "pi_medium_feasibility_sonnet46_off_20261113.json",
+        "pi_medium_long_sonnet46_off_20261113.json",
         "pi_medium_reflect_sonnet46_off_20261113.json"
       ]
     },
@@ -929,9 +944,9 @@
     "long": [
       {
         "label": "Pi (ours)",
-        "n": 36,
-        "mean": 1487.6,
-        "median": 959.8,
+        "n": 42,
+        "mean": 1445.7,
+        "median": 938.0,
         "max": 7262.0
       },
       {

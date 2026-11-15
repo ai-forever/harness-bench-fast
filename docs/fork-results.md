@@ -29,7 +29,7 @@ Upstream-методика и upstream-строки — в [`../README.md`](../RE
 Руками не редактировать — правь скрипт/JSON и пересобирай.
 
 <!-- FORK:RESULTS:BEGIN -->
-Автосинк: 88 прогонов
+Автосинк: 90 прогонов
 
 | Harness | Suite | Profile | Model | Result | % | Time | Steps | Tokens (cost) |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -92,6 +92,7 @@ Upstream-методика и upstream-строки — в [`../README.md`](../RE
 | Pi | Shot List (52) | — | Claude Sonnet 4.5 | 51/52 | 98.1% | 25.7m | 1 352 | 4 526 346 (1 195₽) |
 | Pi | Shot List (52) | — | Claude Sonnet 4.6 | 50/52 | 96.2% | 14.6m | 1 060 | 2 657 016 (758₽) |
 | Pi | Shot List (52) | — | Claude Sonnet 4.6 | 49/52 | 94.2% | 14.0m | 996 | 2 439 192 (697₽) |
+| Pi | Shot List (52) | thinking: medium | Claude Sonnet 4.6 (thinking: medium) | 50/52 | 96.2% | 14.3m | 1 056 | 2 632 875 (749₽) |
 | Pi | Shot List (52) | thinking: off | Claude Sonnet 4.6 (thinking: off) | 49/52 | 94.2% | 12.8m | 1 152 | 3 038 157 (819₽) |
 | Pi | Shot List (52) | — | DeepSeek-V4.1-Flash | 49/52 | 94.2% | 21.3m | 330 | 1 438 179 (42₽) |
 | Pi | Shot List (52) | thinking: off | GLM-5.2 (thinking: off) | 49/52 | 94.2% | 102.8m | 388 | 1 913 439 (377₽) |
@@ -108,6 +109,7 @@ Upstream-методика и upstream-строки — в [`../README.md`](../RE
 | Pi | Medium (392-471) | thinking: medium | Claude Sonnet 4.6 (thinking: medium) | 0/6 | 0.0% | 103.2m | 1 004 | 63 667 285 (5 018₽) |
 | Pi | Medium (392-471) | thinking: off | Claude Sonnet 4.6 (thinking: off) | 20/40 | 50.0% | 250.3m | 3 031 | 131 943 515 (32 800₽) |
 | Pi | Medium (392-471) | thinking: off | Claude Sonnet 4.6 (thinking: off) | 15/20 | 75.0% | 33.4m | 1 836 | 16 340 118 (4 122₽) |
+| Pi | Medium (392-471) | thinking: off | Claude Sonnet 4.6 (thinking: off) | 1/6 | 16.7% | 119.4m | 2 718 | 228 309 339 (55 281₽) |
 | Pi | Medium (392-471) | — | DeepSeek-V4.1-Flash | 11/15 | 73.3% | 137.3m | 1 124 | 15 124 377 (360₽) |
 | Pi | Medium (392-471) | — | DeepSeek-V4.1-Flash | 5/5 | 100.0% | 32.0m | 336 | 2 949 354 (86₽) |
 | Pi | Medium (392-471) | — | DeepSeek-V4.1-Flash | 0/3 | 0.0% | 288.7m | 1 650 | 78 233 678 (1 201₽) |
