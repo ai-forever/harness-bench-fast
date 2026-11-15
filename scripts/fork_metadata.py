@@ -53,6 +53,7 @@ MODEL_TOKENS: tuple[tuple[str, str], ...] = (
     ("gpt55",        "GPT-5.5"),
     ("gigachat3pro", "GigaChat 3 Pro"),
     ("minimaxm3",    "MiniMax-M3"),
+    ("giga35base",   "GigaChat 3.5-432B-A28B"),
     ("giga35",       "GigaChat 3.5 Reasoning"),
     ("glm53",        "GLM-5.3"),
     ("glm52",        "GLM-5.2"),

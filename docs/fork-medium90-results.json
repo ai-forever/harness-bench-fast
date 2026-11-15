@@ -310,10 +310,10 @@
       ]
     },
     {
-      "id": "openclaw-gigachat-3-5-reasoning-thinking-off",
-      "details_url": "fork-run-openclaw-gigachat-3-5-reasoning-thinking-off.html",
+      "id": "openclaw-gigachat-3-5-432b-a28b-thinking-off",
+      "details_url": "fork-run-openclaw-gigachat-3-5-432b-a28b-thinking-off.html",
       "harness": "OpenClaw",
-      "model": "GigaChat 3.5 Reasoning",
+      "model": "GigaChat 3.5-432B-A28B",
       "profile": "thinking: off",
       "harness_version": "OpenClaw 2026.11.2 (b556fdf)",
       "runs": 3,
@@ -356,16 +356,16 @@
         ]
       },
       "sources": [
-        "oc_medium_feasibility_giga35_off_20261113.json",
-        "oc_medium_long_giga35_off_20261113.json",
-        "oc_medium_reflect_giga35_off_20261113.json"
+        "oc_medium_feasibility_giga35base_off_20261113.json",
+        "oc_medium_long_giga35base_off_20261113.json",
+        "oc_medium_reflect_giga35base_off_20261113.json"
       ]
     },
     {
-      "id": "openclaw-gigachat-3-5-reasoning-thinking-ultra",
-      "details_url": "fork-run-openclaw-gigachat-3-5-reasoning-thinking-ultra.html",
+      "id": "openclaw-gigachat-3-5-432b-a28b-thinking-ultra",
+      "details_url": "fork-run-openclaw-gigachat-3-5-432b-a28b-thinking-ultra.html",
       "harness": "OpenClaw",
-      "model": "GigaChat 3.5 Reasoning",
+      "model": "GigaChat 3.5-432B-A28B",
       "profile": "thinking: ultra",
       "harness_version": "OpenClaw 2026.11.2 (b556fdf)",
       "runs": 3,
@@ -408,9 +408,9 @@
         ]
       },
       "sources": [
-        "oc_medium_feasibility_giga35_ultra_20261114.json",
-        "oc_medium_long_giga35_ultra_20261114.json",
-        "oc_medium_reflect_giga35_ultra_20261114.json"
+        "oc_medium_feasibility_giga35base_ultra_20261114.json",
+        "oc_medium_long_giga35base_ultra_20261114.json",
+        "oc_medium_reflect_giga35base_ultra_20261114.json"
       ]
     },
     {

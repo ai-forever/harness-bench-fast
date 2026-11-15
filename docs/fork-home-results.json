@@ -501,7 +501,7 @@
         {
           "harness": "OpenClaw 2026.11.2 (b556fdf)",
           "profile": "thinking: off (2026-11-13)",
-          "model": "GigaChat 3.5 Reasoning (cloud.ru) (thinking: off)",
+          "model": "GigaChat 3.5-432B-A28B (cloud.ru) (thinking: off)",
           "result": "25/52",
           "pct": "48.1%",
           "time": "48.1m",
@@ -510,12 +510,12 @@
           "version": "0.16.0",
           "source": "ours",
           "waves": null,
-          "detail": "fork-detail-oc_shotlist_giga35_off_20261113.html"
+          "detail": "fork-detail-oc_shotlist_giga35base_off_20261113.html"
         },
         {
           "harness": "OpenClaw 2026.11.2 (b556fdf)",
           "profile": "thinking: ultra (2026-11-14)",
-          "model": "GigaChat 3.5 Reasoning (cloud.ru) (thinking: ultra)",
+          "model": "GigaChat 3.5-432B-A28B (cloud.ru) (thinking: ultra)",
           "result": "20/52",
           "pct": "38.5%",
           "time": "49.5m",
@@ -524,7 +524,7 @@
           "version": "0.16.0",
           "source": "ours",
           "waves": null,
-          "detail": "fork-detail-oc_shotlist_giga35_ultra_20261114.html"
+          "detail": "fork-detail-oc_shotlist_giga35base_ultra_20261114.html"
         },
         {
           "harness": "OpenClaw",
@@ -2261,7 +2261,7 @@
         {
           "harness": "OpenClaw 2026.11.2 (b556fdf)",
           "profile": "thinking: off (2026-11-13)",
-          "model": "GigaChat 3.5 Reasoning (cloud.ru) (thinking: off)",
+          "model": "GigaChat 3.5-432B-A28B (cloud.ru) (thinking: off)",
           "result": "1/66 (partial 66/90)",
           "pct": "1.5%",
           "time": "174.0m",
@@ -2287,13 +2287,13 @@
               "total": null
             }
           },
-          "detail": "fork-run-openclaw-gigachat-3-5-reasoning-thinking-off.html",
+          "detail": "fork-run-openclaw-gigachat-3-5-432b-a28b-thinking-off.html",
           "coverage": "66/90"
         },
         {
           "harness": "OpenClaw 2026.11.2 (b556fdf)",
           "profile": "thinking: ultra (2026-11-14)",
-          "model": "GigaChat 3.5 Reasoning (cloud.ru) (thinking: ultra)",
+          "model": "GigaChat 3.5-432B-A28B (cloud.ru) (thinking: ultra)",
           "result": "0/66 (partial 66/90)",
           "pct": "0.0%",
           "time": "104.7m",
@@ -2319,7 +2319,7 @@
               "total": null
             }
           },
-          "detail": "fork-run-openclaw-gigachat-3-5-reasoning-thinking-ultra.html",
+          "detail": "fork-run-openclaw-gigachat-3-5-432b-a28b-thinking-ultra.html",
           "coverage": "66/90"
         },
         {
@@ -2793,7 +2793,7 @@
           "kind": "coverage",
           "harness": "OpenClaw 2026.11.2 (b556fdf)",
           "profile": "thinking: off (2026-11-13)",
-          "model": "GigaChat 3.5 Reasoning (cloud.ru) (thinking: off)",
+          "model": "GigaChat 3.5-432B-A28B (cloud.ru) (thinking: off)",
           "subset_key": "subset_our_runs",
           "subset_args": {
             "n": 66
@@ -2805,13 +2805,13 @@
           "steps": "1 540",
           "tokens_cost": "49 699 351 (739₽)",
           "status_key": "status_partial",
-          "detail": "fork-run-openclaw-gigachat-3-5-reasoning-thinking-off.html"
+          "detail": "fork-run-openclaw-gigachat-3-5-432b-a28b-thinking-off.html"
         },
         {
           "kind": "coverage",
           "harness": "OpenClaw 2026.11.2 (b556fdf)",
           "profile": "thinking: ultra (2026-11-14)",
-          "model": "GigaChat 3.5 Reasoning (cloud.ru) (thinking: ultra)",
+          "model": "GigaChat 3.5-432B-A28B (cloud.ru) (thinking: ultra)",
           "subset_key": "subset_our_runs",
           "subset_args": {
             "n": 66
@@ -2823,7 +2823,7 @@
           "steps": "801",
           "tokens_cost": "27 503 435 (126₽)",
           "status_key": "status_partial",
-          "detail": "fork-run-openclaw-gigachat-3-5-reasoning-thinking-ultra.html"
+          "detail": "fork-run-openclaw-gigachat-3-5-432b-a28b-thinking-ultra.html"
         },
         {
           "kind": "coverage",
