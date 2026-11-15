@@ -19,4 +19,4 @@
 - [x] `uv run ruff check .` exits 0
 - [x] `python3 scripts/build_fork_results.py --check`, `build_fork_pages.py --check`, `build_fork_home.py --check` all green
 - [x] `uv run pytest -q` passes
-- [ ] CI job "Quality" green on the PR before merge
+- [x] CI job "Quality" green on the PR before merge (ubuntu + windows + validate all SUCCESS, PR #10)
