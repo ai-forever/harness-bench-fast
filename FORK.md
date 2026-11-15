@@ -20,6 +20,7 @@ Hermes и замеры wave 19. Всё, что относится к самом�
 upstream-строки) — остаётся в основном [`README.md`](README.md) и не дублируется здесь.
 
 - 📊 **Детальные таблицы форка:** [`docs/fork-results.md`](docs/fork-results.md)
+- 🧭 **Руководство по выбору модели/харнесса:** [`docs/model-selection-guidance.md`](docs/model-selection-guidance.md) (EN: [`docs/model-selection-guidance.en.md`](docs/model-selection-guidance.en.md)) — что × чем × когда, по уже выполненным прогонам
 - 🔬 **Live-лейаут:** <https://ai-forever.github.io/harness-bench-fast/>
 - 🧭 **Наша форк-страница результатов:** <https://alex-kul777.github.io/harness-bench-fast/fork.html> (табы Shot List / Light / **Medium (90)** / **Medium sample**; данные: `docs/fork-home-results.json`, генератор `scripts/build_fork_home.py`)
   - `#medium` — полные **90** задач (historical 80 + wave21); наши строки помечены `partial`.

@@ -19,6 +19,7 @@ Hermes runs and wave-19 measurements. Everything about the benchmark itself (tas
 methodology, upstream rows) stays in the main [`README.md`](README.md) and is not duplicated here.
 
 - 📊 **Detailed fork tables:** [`docs/fork-results.en.md`](docs/fork-results.en.md)
+- 🧭 **Model/harness selection guidance:** [`docs/model-selection-guidance.en.md`](docs/model-selection-guidance.en.md) (RU: [`docs/model-selection-guidance.md`](docs/model-selection-guidance.md)) — what × with what × when, from completed runs
 - 🔬 **Live layout:** <https://ai-forever.github.io/harness-bench-fast/>
 - 🧭 **Our fork results page:** <https://alex-kul777.github.io/harness-bench-fast/fork.en.html> (tabs Shot List / Light / **Medium (90)** / **Medium sample**; data: `docs/fork-home-results.json`, generator `scripts/build_fork_home.py`)
   - `#medium` — the full **90** tasks (historical 80 + wave21); our rows are marked `partial`.
