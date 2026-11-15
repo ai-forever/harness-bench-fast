@@ -11,7 +11,13 @@ import sys
 from pathlib import Path
 
 _BENCH_DIR = Path(__file__).resolve().parents[1]  # harness-bench-fast/
-_RUNNER_PATH = _BENCH_DIR.parent / "run_pi_bench.py"
+# The Pi runner lives at the repo root (it was moved into this repo); keep a
+# fallback to the legacy "one level above the checkout" layout.
+_RUNNER_CANDIDATES = (
+    _BENCH_DIR / "run_pi_bench.py",
+    _BENCH_DIR.parent / "run_pi_bench.py",
+)
+_RUNNER_PATH = next((p for p in _RUNNER_CANDIDATES if p.exists()), _RUNNER_CANDIDATES[0])
 
 # Make the shared package importable regardless of the invocation cwd.
 if str(_BENCH_DIR) not in sys.path:

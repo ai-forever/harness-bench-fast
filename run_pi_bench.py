@@ -14,13 +14,14 @@ Usage:
 """
 
 import argparse
+import contextlib
 import json
 import math
 import os
-import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -35,11 +36,11 @@ sys.path.insert(0, str(BENCH_DIR))
 
 SHOT_LIST_FILE = BENCH_DIR / "shot_list.txt"
 
-from harness_bench.tasks import ALL_TASKS, SUITES, get_task
-from harness_bench.cost_resolver import resolve_model_rates, compute_cost_rub
-from harness_bench.core import effective_task_timeout
 from harness_bench.artifact_metadata import artifact_metadata, resolve_harness_version  # noqa: E402
 from harness_bench.bench_credentials import resolve_bench_api_key  # noqa: E402
+from harness_bench.core import effective_task_timeout  # noqa: E402
+from harness_bench.cost_resolver import compute_cost_rub, resolve_model_rates  # noqa: E402
+from harness_bench.tasks import SUITES, get_task  # noqa: E402
 
 DEFAULT_MODEL = "zai-org/GLM-5.2"
 DEFAULT_TIMEOUT = 660
@@ -84,10 +85,8 @@ def _docker_kill(container_name):
     reg. orphan containers).
     """
     for args in (["docker", "kill", container_name], ["docker", "rm", "-f", container_name]):
-        try:
+        with contextlib.suppress(Exception):
             subprocess.run(args, capture_output=True, timeout=30)
-        except Exception:
-            pass
 
 
 def _extract_usage(obj, acc):
@@ -204,7 +203,7 @@ def run_one_task(task, *, model=DEFAULT_MODEL, timeout=DEFAULT_TIMEOUT, keep_wor
 
     try:
         if keep_workspace:
-            workspace_path = Path(f"/tmp/pi_bench_{task.id}")
+            workspace_path = Path(tempfile.gettempdir()) / f"pi_bench_{task.id}"
             shutil.rmtree(workspace_path, ignore_errors=True)
             workspace_path.mkdir(parents=True, exist_ok=True)
         else:
@@ -260,7 +259,7 @@ def run_one_task(task, *, model=DEFAULT_MODEL, timeout=DEFAULT_TIMEOUT, keep_wor
         #    kill the container by name on timeout (Fix A).
         agent_error = None
         result = None
-        out_path = Path(f"/tmp/pi_bench_out_{task.id}_{int(started)}.ndjson")
+        out_path = Path(tempfile.gettempdir()) / f"pi_bench_out_{task.id}_{int(started)}.ndjson"
         try:
             run_env = os.environ.copy()
             with open(out_path, "w", encoding="utf-8") as out_file:
@@ -601,10 +600,10 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    json_output = args.json_output or f"/tmp/pi_bench_{int(time.time())}.json"
-    status_file = args.status_file or "/tmp/pi_bench_status.json"
+    json_output = args.json_output or str(Path(tempfile.gettempdir()) / f"pi_bench_{int(time.time())}.json")
+    status_file = args.status_file or str(Path(tempfile.gettempdir()) / "pi_bench_status.json")
 
-    print(f"Pi Benchmark Runner (Docker + Cloud.ru)")
+    print("Pi Benchmark Runner (Docker + Cloud.ru)")
     print(f"  Model: cloud-ru/{args.model}")
     print(f"  Tasks: {len(task_ids)}")
     print(f"  Concurrency: {args.concurrency}")

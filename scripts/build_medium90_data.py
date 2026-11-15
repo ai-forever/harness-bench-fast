@@ -259,6 +259,6 @@ if __name__ == "__main__":
         payload = build()
     except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
-        raise SystemExit(1)
+        raise SystemExit(1) from exc
     target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(target)

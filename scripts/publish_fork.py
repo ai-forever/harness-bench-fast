@@ -26,8 +26,11 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from fork_metadata import RESULT_DIRS, collect_paths  # noqa: E402
-from fork_metadata import classify_harness, classify_model  # noqa: E402
+from fork_metadata import (  # noqa: E402
+    classify_harness,
+    classify_model,
+    collect_paths,  # noqa: E402
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DOCS = REPO_ROOT / "docs"
@@ -82,12 +85,7 @@ def _is_incomplete(data: dict) -> bool:
         # No summary at all: old-format; generators skip it silently.
         return False
     # In-flight markers in summary keys or values
-    for key in summary:
-        if any(m in str(key).lower() for m in IN_FLIGHT_MARKERS):
-            return True
-    # A summary that is missing expected fields may indicate a partial write
-    # but we don't hard-fail on that here — generators emit [skip] for it.
-    return False
+    return any(any(m in str(key).lower() for m in IN_FLIGHT_MARKERS) for key in summary)
 
 
 def check_incomplete_runs(result_dirs: list[Path] | None = None) -> list[str]:
@@ -108,7 +106,7 @@ def check_unresolvable_stems(result_dirs: list[Path] | None = None) -> list[str]
     """Return list of stems that cannot be resolved to (harness, model)."""
     paths = collect_paths(result_dirs)
     unresolvable = []
-    for name, path in paths.items():
+    for _name, path in paths.items():
         stem = path.stem
         h = classify_harness(stem)
         m = classify_model(stem)
@@ -213,7 +211,7 @@ def run_generator(script: str, extra: list[str], dry_run: bool) -> int:
     cmd = [sys.executable, str(REPO_ROOT / script)] + extra
     print(f"  {' '.join(cmd)}")
     if dry_run:
-        print(f"  [dry-run] skipped")
+        print("  [dry-run] skipped")
         return 0
     result = subprocess.run(cmd, cwd=str(REPO_ROOT))
     return result.returncode
@@ -347,8 +345,8 @@ def poll_pages(url: str = PAGES_URL, timeout: int = PAGES_POLL_TIMEOUT,
         print(f"[dry-run] would poll {url}")
         return True
     try:
-        import urllib.request
         import urllib.error
+        import urllib.request
     except ImportError:
         print("[pages] urllib not available, skip poll", file=sys.stderr)
         return False
@@ -361,9 +359,9 @@ def poll_pages(url: str = PAGES_URL, timeout: int = PAGES_POLL_TIMEOUT,
         try:
             with urllib.request.urlopen(poll_url, timeout=10) as resp:
                 if resp.status == 200:
-                    print(f"[pages] 200 OK")
+                    print("[pages] 200 OK")
                     return True
-        except Exception as exc:
+        except Exception:
             pass
         time.sleep(interval)
     print(f"[pages] timed out after {timeout}s", file=sys.stderr)

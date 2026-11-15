@@ -25,9 +25,9 @@ for _p in (str(_ROOT), str(_SCRIPTS)):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from harness_bench.cost_resolver import compute_cost_rub  # noqa: E402
-import backfill_cost_rub as bcr  # noqa: E402
 from backfill_cost_rub import _detect_model, _detect_model_from_name, _recompute_file  # noqa: E402
+
+from harness_bench.cost_resolver import compute_cost_rub  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Hermetic catalog cache (values verified against the live Cloud.ru catalog)

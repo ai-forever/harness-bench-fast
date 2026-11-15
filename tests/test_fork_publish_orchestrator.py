@@ -9,10 +9,7 @@ from __future__ import annotations
 
 import json
 import sys
-import tempfile
 from pathlib import Path
-
-import pytest
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
@@ -22,15 +19,14 @@ from fork_metadata import (  # noqa: E402
     classify_harness,
     classify_model,
     classify_profile,
-    classify_suite,
     collect_paths,
     resolve_stem,
-    HARNESS_PREFIXES,
-    MODEL_TOKENS,
-    THINKING_LEVEL_RE,
 )
-from publish_fork import _is_incomplete, check_incomplete_runs, check_unresolvable_stems  # noqa: E402
-
+from publish_fork import (  # noqa: E402
+    _is_incomplete,
+    check_incomplete_runs,
+    check_unresolvable_stems,
+)
 
 # ---------------------------------------------------------------------------
 # fork_metadata: basic classification
@@ -136,11 +132,6 @@ def _stems_from_results() -> list[str]:
 
 def test_metadata_dedup_parity_harness():
     """fork_metadata.classify_harness agrees with build_fork_pages for all repo stems."""
-    import importlib.util
-
-    spec = importlib.util.spec_from_file_location(
-        "build_fork_pages", SCRIPTS / "build_fork_pages.py"
-    )
     # We just need to check that the imported classify_harness in build_fork_pages
     # IS fork_metadata.classify_harness (same object after refactor)
     import build_fork_pages as bfp  # already on sys.path via SCRIPTS insert
@@ -245,8 +236,10 @@ def test_check_unresolvable_stems_clean(tmp_path):
 
 def test_collect_paths_first_wins(tmp_path):
     """First result_dir wins on name clash."""
-    d1 = tmp_path / "d1"; d1.mkdir()
-    d2 = tmp_path / "d2"; d2.mkdir()
+    d1 = tmp_path / "d1"
+    d1.mkdir()
+    d2 = tmp_path / "d2"
+    d2.mkdir()
     (d1 / "run.json").write_text("d1", encoding="utf-8")
     (d2 / "run.json").write_text("d2", encoding="utf-8")
 

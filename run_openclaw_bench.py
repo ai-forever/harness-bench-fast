@@ -18,20 +18,20 @@ import json
 import os
 import subprocess
 import sys
-import time
 import threading
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Add harness-bench-fast to path
 BENCH_DIR = Path(os.environ.get("BENCH_DIR", str(Path(__file__).parent)))
 sys.path.insert(0, str(BENCH_DIR))
 
-from harness_bench.tasks import ALL_TASKS, SUITES, get_task
-from harness_bench.cost_resolver import resolve_model_rates, compute_cost_rub
 from harness_bench.artifact_metadata import artifact_metadata  # noqa: E402
 from harness_bench.bench_credentials import resolve_bench_api_key  # noqa: E402
+from harness_bench.cost_resolver import compute_cost_rub, resolve_model_rates  # noqa: E402
+from harness_bench.tasks import ALL_TASKS, SUITES, get_task  # noqa: E402
 
 # Dedicated benchmark credential (all models × harnesses bill the bench
 # account). `openclaw agent exec` resolves the provider key from the
@@ -464,7 +464,7 @@ def resolve_task_ids(args):
         return [t.id for t in ALL_TASKS]
     if args.shot_list:
         shot_file = BENCH_DIR / "shot_list.txt"
-        return [l.strip() for l in shot_file.read_text().splitlines() if l.strip() and not l.startswith("#")]
+        return [line.strip() for line in shot_file.read_text().splitlines() if line.strip() and not line.startswith("#")]
     return None
 
 
@@ -522,7 +522,7 @@ def main():
     harness_version = resolve_harness_version(args.harness_version)
     command = "python run_openclaw_bench.py " + " ".join(sys.argv[1:])
 
-    print(f"🧪 OpenClaw Benchmark Runner")
+    print("🧪 OpenClaw Benchmark Runner")
     print(f"   Model: {args.model}")
     print(f"   Tasks: {len(task_ids)}")
     print(f"   Concurrency: {args.concurrency}")

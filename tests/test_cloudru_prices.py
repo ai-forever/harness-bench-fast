@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -88,7 +88,7 @@ def config_path(tmp_path):
 def cache_path(tmp_path):
     """A catalog cache containing the two verified models."""
     cache = {
-        "fetched_at": datetime.now(timezone.utc).isoformat(),
+        "fetched_at": datetime.now(UTC).isoformat(),
         "models": sync.parse_catalog(_CATALOG_PAYLOAD),
     }
     return str(_write_json(tmp_path / "cloudru-prices.json", cache))
@@ -170,7 +170,7 @@ def test_sync_writes_cache(monkeypatch, tmp_path):
 
 def test_sync_ttl_skips_fetch_when_fresh(monkeypatch, tmp_path):
     out = _write_json(tmp_path / "cloudru-prices.json", {
-        "fetched_at": datetime.now(timezone.utc).isoformat(),
+        "fetched_at": datetime.now(UTC).isoformat(),
         "models": {"a/b": {"input": 1.0, "output": 2.0, "cache_read": 0.0, "is_billable": True}},
     })
     _patch_httpx(monkeypatch, exc=AssertionError("network must not be touched"))
@@ -180,7 +180,7 @@ def test_sync_ttl_skips_fetch_when_fresh(monkeypatch, tmp_path):
 
 
 def test_sync_ttl_expiry_triggers_fetch(monkeypatch, tmp_path):
-    old = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
+    old = (datetime.now(UTC) - timedelta(hours=2)).isoformat()
     out = _write_json(tmp_path / "cloudru-prices.json", {"fetched_at": old, "models": {}})
     assert sync.cache_is_fresh(out, ttl=3600) is False
     _patch_httpx(monkeypatch, payload=_CATALOG_PAYLOAD)
@@ -191,7 +191,7 @@ def test_sync_ttl_expiry_triggers_fetch(monkeypatch, tmp_path):
 
 def test_sync_cache_age_seconds(tmp_path):
     out = _write_json(tmp_path / "c.json", {
-        "fetched_at": (datetime.now(timezone.utc) - timedelta(seconds=120)).isoformat(),
+        "fetched_at": (datetime.now(UTC) - timedelta(seconds=120)).isoformat(),
         "models": {},
     })
     age = sync.cache_age_seconds(out)

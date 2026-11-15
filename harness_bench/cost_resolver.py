@@ -27,7 +27,6 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Optional
 
 # Default fallback rates (GLM-5.2 / Cloud.ru, August 2026)
 _FALLBACK_RATES: dict = {
@@ -56,7 +55,7 @@ _FILENAME_MODEL_HINTS: tuple[tuple[str, str], ...] = (
 )
 
 
-def model_hint_from_filename(filename: Optional[str]) -> Optional[str]:
+def model_hint_from_filename(filename: str | None) -> str | None:
     """Infer a canonical model id from an artifact filename/stem, or None.
 
     Matches the artifact stem case-insensitively against ``_FILENAME_MODEL_HINTS``;
@@ -85,19 +84,19 @@ def _load_json(path: Path, what: str) -> dict:
         return {}
 
 
-def _load_config(config_path: Optional[str | Path] = None) -> dict:
+def _load_config(config_path: str | Path | None = None) -> dict:
     """Load openclaw.json; return empty dict on any error."""
     path = Path(config_path or os.environ.get("OPENCLAW_CONFIG", "") or _DEFAULT_CONFIG_PATH)
     return _load_json(path, "config")
 
 
-def _catalog_cache_path(cache_path: Optional[str | Path] = None) -> Path:
+def _catalog_cache_path(cache_path: str | Path | None = None) -> Path:
     return Path(
         cache_path or os.environ.get("CLOUDRU_PRICES_CACHE", "") or _DEFAULT_CACHE_PATH
     ).expanduser()
 
 
-def _load_catalog_cache(cache_path: Optional[str | Path] = None) -> dict:
+def _load_catalog_cache(cache_path: str | Path | None = None) -> dict:
     """Return the ``models`` mapping of the catalog cache, or {} if unavailable."""
     path = _catalog_cache_path(cache_path)
     data = _load_json(path, "catalog cache")
@@ -105,7 +104,7 @@ def _load_catalog_cache(cache_path: Optional[str | Path] = None) -> dict:
     return models if isinstance(models, dict) else {}
 
 
-def _rates_from_cache(model_id: str, cache: dict) -> Optional[dict]:
+def _rates_from_cache(model_id: str, cache: dict) -> dict | None:
     """Return rates for *model_id* from the catalog cache, or None.
 
     Matches the full model id exactly, or via suffix when the runner passes a
@@ -130,7 +129,7 @@ def _rates_from_cache(model_id: str, cache: dict) -> Optional[dict]:
     }
 
 
-def _rates_from_config(model_id: str, cfg: dict) -> Optional[dict]:
+def _rates_from_config(model_id: str, cfg: dict) -> dict | None:
     """Return rates for *model_id* from openclaw.json ``cost`` blocks, or None."""
     providers: dict = (cfg.get("models") or {}).get("providers") or {}
     for provider_name, provider_data in providers.items():
@@ -141,7 +140,7 @@ def _rates_from_config(model_id: str, cfg: dict) -> Optional[dict]:
                 continue
             entry_id: str = entry.get("id", "")
             compound = f"{provider_name}/{entry_id}"
-            if model_id == compound or model_id == entry_id:
+            if model_id in (compound, entry_id):
                 cost = entry.get("cost")
                 if isinstance(cost, dict):
                     return {
@@ -185,7 +184,7 @@ def _note_cache_tariff(model_id: str, rates: dict) -> None:
 # "synthetic" from the ratio alone would mis-price them.  Overrides are therefore
 # added per model, only after the published rate is shown to disagree with actual
 # provider billing -- auditable and safe for every other model.
-CACHE_RATE_OVERRIDES: dict[str, "str | float"] = {
+CACHE_RATE_OVERRIDES: dict[str, str | float] = {
     # Cloud.ru bills gpt-5.5 as ``input*854 + output*5124`` with ``input`` = the
     # FULL prompt including the cached prefix (verified +-0.02% against the
     # provider export).  The catalog's ``cache_read = 85.4`` (= input/10) is
@@ -194,7 +193,7 @@ CACHE_RATE_OVERRIDES: dict[str, "str | float"] = {
 }
 
 
-def resolve_cache_rate_override(model_id: str) -> "str | float | None":
+def resolve_cache_rate_override(model_id: str) -> str | float | None:
     """Return the cache-rate override for *model_id*, or None.
 
     Matches the full id exactly, or via a ``/``-suffix when the runner passes a
@@ -241,9 +240,9 @@ def _finalize_rates(model_id: str, rates: dict) -> dict:
 
 def resolve_model_rates(
     model_id: str,
-    config_path: Optional[str | Path] = None,
-    cache_path: Optional[str | Path] = None,
-    filename: Optional[str] = None,
+    config_path: str | Path | None = None,
+    cache_path: str | Path | None = None,
+    filename: str | None = None,
 ) -> dict:
     """Return cost rates dict for *model_id*.
 

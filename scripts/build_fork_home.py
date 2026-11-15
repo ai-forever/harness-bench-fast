@@ -42,13 +42,12 @@ GENERATED_BY = "scripts/build_fork_home.py"
 RUB = "\u20bd"
 
 from fork_metadata import (  # noqa: E402
+    DASH,
     HARNESS_PREFIXES,
     MODEL_TOKENS,
-    THINKING_LEVEL_RE,
     PROFILE_RULES,
     RESULT_DIRS,
-    EXCLUDE_KEYWORDS as EXCLUDE_KEYWORDS_META,
-    DASH,
+    THINKING_LEVEL_RE,
 )
 
 # Upstream writes the reasoning level inside the Model cell, e.g.
@@ -204,10 +203,10 @@ def _date_from_name(name):
 def _date_from_sessions(data):
     dates = []
     for key in ("tasks", "results"):
-        for t in (data.get(key) or []):
-            if not isinstance(t, dict):
+        for task in (data.get(key) or []):
+            if not isinstance(task, dict):
                 continue
-            m = _SESSION_RE.match(t.get("session_id") or "")
+            m = _SESSION_RE.match(task.get("session_id") or "")
             if m:
                 dates.append(m.group(1))
     if not dates:
@@ -554,12 +553,12 @@ _TASK_NUM_RE = re.compile(r"task_(\d+)")
 
 def _task_numbers(data):
     nums = set()
-    for t in (data.get("results") or data.get("tasks") or []):
-        if not isinstance(t, dict):
+    for task in (data.get("results") or data.get("tasks") or []):
+        if not isinstance(task, dict):
             continue
-        n = t.get("number")
+        n = task.get("number")
         if n is None:
-            m = _TASK_NUM_RE.search(str(t.get("task_id") or ""))
+            m = _TASK_NUM_RE.search(str(task.get("task_id") or ""))
             n = int(m.group(1)) if m else None
         if n is not None:
             nums.add(int(n))
@@ -606,13 +605,13 @@ def _haiku_maps():
     d = json.loads(p.read_text(encoding="utf-8"))
     for r in d.get("rows") or []:
         m = {}
-        for t in r.get("tasks") or []:
-            n = t.get("number")
+        for task in r.get("tasks") or []:
+            n = task.get("number")
             if n is None:
-                mm = _TASK_NUM_RE.search(str(t.get("task_id") or ""))
+                mm = _TASK_NUM_RE.search(str(task.get("task_id") or ""))
                 n = int(mm.group(1)) if mm else None
             if n is not None:
-                m[int(n)] = bool(t.get("passed"))
+                m[int(n)] = bool(task.get("passed"))
         out[r.get("harness")] = m or None
     return out
 
@@ -1065,6 +1064,13 @@ __ROWS__
 """
 
 
+def _task_message(text):
+    """Render a task message/error for the detail pages (escaped)."""
+    if not text:
+        return DASH
+    return html.escape(str(text))
+
+
 def render_detail(suite, row, data, base, locale=DEFAULT_LOCALE):
     tasks = [x for x in (data.get("tasks") or data.get("results") or []) if isinstance(x, dict)]
     body = []
@@ -1122,7 +1128,7 @@ def main(argv):
     pages = {loc: render_html(data, loc) for loc in LOCALES}
     details: dict[str, str] = {}
     for loc in LOCALES:
-        for detail, suite, row, d in _DETAIL_JOBS:
+        for detail, suite, row, _d in _DETAIL_JOBS:
             base = detail[:-5] if detail.endswith(".html") else detail
             name = locale_filename(base, loc) + ".html"
             details[name] = render_detail(suite, row, data, base, loc)

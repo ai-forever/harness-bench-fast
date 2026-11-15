@@ -9,7 +9,6 @@ filename hint map must resolve ``gigachat3pro`` -> ``GigaChat/GigaChat-3-Pro``.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 

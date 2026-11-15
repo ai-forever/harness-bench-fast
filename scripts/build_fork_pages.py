@@ -93,17 +93,13 @@ REQUIRED_SUMMARY_FIELDS = (
 
 # Metadata constants and classifiers imported from the single-source module.
 from fork_metadata import (  # noqa: E402
-    HARNESS_PREFIXES,
-    MODEL_TOKENS,
-    THINKING_LEVEL_RE,
-    PROFILE_RULES,
+    DASH,
     EXCLUDE_KEYWORDS,
     RESULT_DIRS,
     classify_harness,
     classify_model,
     classify_profile,
     collect_paths,
-    DASH,
     harness_version,
 )
 

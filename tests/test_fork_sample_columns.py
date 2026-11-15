@@ -72,12 +72,12 @@ def test_with_reasoning_provider_and_level():
 def test_sample_head_and_rows_have_steps_column():
     head = HOME["SAMPLE_HEAD"]
     assert ">Steps</th>" in head
-    assert head.count("<th") == 11, head
+    assert head.count("<th") == 12, head
 
     body = HOME["_sample_rows_html"](sample_rows())
     first = body.splitlines()[0]
     assert first.startswith("<tr")
-    assert first.count("<td") == 11, first
+    assert first.count("<td") == 12, first
 
 
 # ---- 3.2 pilot Time/Tokens from the manifest --------------------------------
@@ -139,7 +139,7 @@ def _sample_cells(path: Path):
     rows = []
     for m in re.finditer(r"<tr[^>]*>(.*?)</tr>", chunk, re.S):
         tds = re.findall(r"<td[^>]*>(.*?)</td>", m.group(1), re.S)
-        if len(tds) == 11:  # skip the <thead> (no <td>) and group rows (colspan)
+        if len(tds) == 12:  # skip the <thead> (no <td>) and group rows (colspan)
             rows.append([_strip(c) for c in tds])
     return rows
 
@@ -149,9 +149,11 @@ def test_ru_en_sample_rows_parity():
     en = _sample_cells(ROOT / "docs/fork.en.html")
     assert ru and en, "sample table missing from a locale page"
     assert len(ru) == len(en), (ru, en)
-    # Subset (3) and Status (10) are localized; the canonical cells must match.
-    canonical = [0, 1, 2, 4, 5, 6, 7, 8, 9]
-    for a, b in zip(ru, en):
-        assert len(a) == 11 and len(b) == 11, (a, b)
+    # Columns: 0 #, 1 Harness, 2 Profile, 3 Model, 4 Subset, 5 Result, 6 %,
+    # 7 Coverage, 8 Time, 9 Steps, 10 Tokens (cost), 11 Status.
+    # Subset (4) and Status (11) are localized; the canonical cells must match.
+    canonical = [0, 1, 2, 3, 5, 6, 7, 8, 9, 10]
+    for a, b in zip(ru, en, strict=True):
+        assert len(a) == 12 and len(b) == 12, (a, b)
         for i in canonical:
             assert a[i] == b[i], (i, a, b)

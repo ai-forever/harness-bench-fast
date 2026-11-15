@@ -25,20 +25,20 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import sys
 import tempfile
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Optional
 
 DEFAULT_OUT = Path.home() / ".openclaw" / "cloudru-prices.json"
 DEFAULT_TTL = 24 * 3600  # seconds
 DEFAULT_URL = "https://foundation-models.api.cloud.ru/v1/models"
 
 
-def api_key() -> Optional[str]:
+def api_key() -> str | None:
     """Return the Cloud.ru API key from the environment, if set."""
     return (
         os.environ.get("CLOUD_RU_API_KEY")
@@ -96,14 +96,12 @@ def _atomic_write(path: Path, payload: dict) -> None:
             fh.write("\n")
         os.replace(tmp, path)
     except BaseException:
-        try:
+        with contextlib.suppress(OSError):
             os.unlink(tmp)
-        except OSError:
-            pass
         raise
 
 
-def cache_age_seconds(path: Path, now: Optional[datetime] = None) -> Optional[float]:
+def cache_age_seconds(path: Path, now: datetime | None = None) -> float | None:
     """Return age of the cache in seconds, or None if unreadable/undated."""
     try:
         with open(path, encoding="utf-8") as fh:
@@ -118,17 +116,17 @@ def cache_age_seconds(path: Path, now: Optional[datetime] = None) -> Optional[fl
     except ValueError:
         return None
     if ts.tzinfo is None:
-        ts = ts.replace(tzinfo=timezone.utc)
-    now = now or datetime.now(timezone.utc)
+        ts = ts.replace(tzinfo=UTC)
+    now = now or datetime.now(UTC)
     return (now - ts).total_seconds()
 
 
-def cache_is_fresh(path: Path, ttl: int, now: Optional[datetime] = None) -> bool:
+def cache_is_fresh(path: Path, ttl: int, now: datetime | None = None) -> bool:
     age = cache_age_seconds(path, now=now)
     return age is not None and age < ttl
 
 
-def main(argv: Optional[list] = None) -> int:
+def main(argv: list | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Sync Cloud.ru Foundation Models prices to a local cache JSON."
     )
@@ -169,7 +167,7 @@ def main(argv: Optional[list] = None) -> int:
         return 1
 
     cache = {
-        "fetched_at": datetime.now(timezone.utc).isoformat(),
+        "fetched_at": datetime.now(UTC).isoformat(),
         "models": models,
     }
     try:

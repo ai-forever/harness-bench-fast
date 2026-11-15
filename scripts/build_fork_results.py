@@ -33,12 +33,8 @@ END_MARKER = "<!-- FORK:RESULTS:END -->"
 # de-duplicated by file name (the checkout's own copy wins on a tie).
 
 from fork_metadata import (  # noqa: E402
-    HARNESS_PREFIXES,
     MODEL_TOKENS,
     THINKING_LEVEL_RE,
-    PROFILE_RULES as _PROFILE_RULES_META,
-    RESULT_DIRS,
-
     classify_harness,
     classify_profile,
     collect_paths,

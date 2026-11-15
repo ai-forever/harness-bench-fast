@@ -1,0 +1,11 @@
+{
+  "models": {
+    "deepseek-ai/DeepSeek-V4.1-Flash": {
+      "input": 64.94,
+      "output": 194.81,
+      "cache_read": 6.5,
+      "cache_write": 0.0,
+      "is_billable": true
+    }
+  }
+}

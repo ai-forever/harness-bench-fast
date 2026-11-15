@@ -41,7 +41,6 @@ from harness_bench.cost_resolver import (
     resolve_model_rates,
 )
 
-
 # Filename/family -> canonical model id. Used ONLY when the artifact exposes no
 # model field at all (Pi artifacts carry just ``results`` + ``summary``). Ordered:
 # the first matching token wins. Keep this list small and explicit -- add a family

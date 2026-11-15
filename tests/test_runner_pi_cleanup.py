@@ -15,7 +15,6 @@ Run: python3 -m pytest tests/test_runner_pi_cleanup.py -q
 import json
 import subprocess
 import sys
-import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock

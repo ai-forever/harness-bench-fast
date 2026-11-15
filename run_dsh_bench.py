@@ -23,7 +23,6 @@ Usage:
 
 import argparse
 import json
-import math
 import os
 import shutil
 import subprocess
@@ -41,11 +40,11 @@ sys.path.insert(0, str(BENCH_DIR))
 
 SHOT_LIST_FILE = BENCH_DIR / "shot_list.txt"
 
-from harness_bench.tasks import ALL_TASKS, SUITES, get_task
-from harness_bench.cost_resolver import resolve_model_rates, compute_cost_rub
-from harness_bench.core import effective_task_timeout
 from harness_bench.artifact_metadata import artifact_metadata, resolve_harness_version  # noqa: E402
 from harness_bench.bench_credentials import resolve_bench_api_key  # noqa: E402
+from harness_bench.core import effective_task_timeout  # noqa: E402
+from harness_bench.cost_resolver import compute_cost_rub, resolve_model_rates  # noqa: E402
+from harness_bench.tasks import ALL_TASKS, SUITES, get_task  # noqa: E402
 
 DEFAULT_MODEL = "deepseek-ai/DeepSeek-V4.1-Flash"
 DEFAULT_TIMEOUT = 660

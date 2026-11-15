@@ -37,10 +37,10 @@ sys.path.insert(0, str(BENCH_DIR))
 
 SHOT_LIST_FILE = BENCH_DIR / "shot_list.txt"
 
-from harness_bench.tasks import ALL_TASKS, get_task
-from harness_bench.cost_resolver import resolve_model_rates, compute_cost_rub
 from harness_bench.artifact_metadata import artifact_metadata, resolve_harness_version  # noqa: E402
 from harness_bench.bench_credentials import resolve_bench_api_key  # noqa: E402
+from harness_bench.cost_resolver import compute_cost_rub, resolve_model_rates  # noqa: E402
+from harness_bench.tasks import ALL_TASKS, get_task  # noqa: E402
 
 DEFAULT_MODEL = "zai-org/GLM-5.2"
 DEFAULT_TIMEOUT = 660
@@ -596,7 +596,7 @@ def main():
     json_output = args.json_output or f"/tmp/hermes_bench_{int(time.time())}.json"
     status_file = args.status_file or "/tmp/hermes_bench_status.json"
 
-    print(f"Hermes Benchmark Runner")
+    print("Hermes Benchmark Runner")
     print(f"  Model: {args.model}")
     print(f"  Thinking: {thinking_level or 'default'}")
     print(f"  Tasks: {len(task_ids)}")

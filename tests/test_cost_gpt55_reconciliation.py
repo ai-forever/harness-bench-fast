@@ -94,7 +94,7 @@ def test_all_gpt55_artifacts_reconcile_with_combined_provider():
     (residual = runs not captured in the published artifacts)."""
     combined = sum(_fixture_totals(k)[2] for k in ACCOUNT_FOR_HARNESS.values())
     ours = 0.0
-    for h, prefix in PREFIX_FOR_HARNESS.items():
+    for _h, prefix in PREFIX_FOR_HARNESS.items():
         ours += sum(_billed_rub(*_buckets(a)) for a in _artifacts(prefix))
     assert abs(ours - combined) / combined <= 0.10, (
         f"combined {ours:.2f} ₽ vs provider {combined:.2f} ₽")
