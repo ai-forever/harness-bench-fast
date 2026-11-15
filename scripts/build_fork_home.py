@@ -26,8 +26,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from fork_i18n import DEFAULT_LOCALE, LOCALES, locale_filename, other_locale, t  # noqa: E402
-from fork_metrics import steps_from_json  # noqa: E402
 from fork_ladder_override import apply as _ladder_apply  # noqa: E402
+from fork_metrics import steps_from_json  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DOCS = REPO_ROOT / "docs"
