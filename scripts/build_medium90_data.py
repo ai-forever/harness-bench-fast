@@ -306,11 +306,20 @@ def build(root=ROOT):
                               (SELECTED, "fresh Medium90 run · selected wave21 subset")):
             subset = [t for t in tasks if t["number"] in numbers]
             usage = {"sources_sha256": [measurement["source_sha256"]]}
+            if measurement.get("usage_audit_sha256"):
+                usage["notes"] = measurement["usage"]["notes"]
+                usage["sources_sha256"].append(measurement["usage_audit_sha256"])
             for metric, field in (("steps", "agent_steps"), ("tokens", "agent_total_tokens")):
                 values = [t[field] for t in subset if t[field] is not None]
+                partial = len(values) < len(subset) or (
+                    metric == "tokens" and any(t.get("token_usage_complete") is False for t in subset))
                 usage[metric] = {"value": sum(values) if values else None, "covered_tasks": len(values),
-                                 "status": "complete" if len(values) == len(subset) else "partial" if values else "unavailable",
-                                 "lower_bound": bool(values) and len(values) < len(subset)}
+                                 "status": "partial" if values and partial else "complete" if values else "unavailable",
+                                 "lower_bound": bool(values) and partial}
+                if metric == "tokens" and measurement.get("usage_audit_sha256"):
+                    for key in ("input_tokens", "output_tokens", "unmetered_requests"):
+                        usage[metric][key] = sum(t[key] for t in subset)
+                    usage[metric]["completed_responses"] = sum(t["usage_responses"] for t in subset)
             components.append(component(numbers, {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
                                         usage, secret["task_set_version"], note))
         rows.append(assemble_row(identity, components))
