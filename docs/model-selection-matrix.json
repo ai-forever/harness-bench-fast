@@ -35,6 +35,7 @@
    },
    "stem": "oc_shotlist_ds41flash_medium_20261107",
    "tokens": 2935013,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": true,
    "dominated_by": [],
@@ -60,6 +61,7 @@
    },
    "stem": "dsh_shotlist_ds41flash_off_20261111",
    "tokens": 1975401,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": true,
    "dominated_by": [],
@@ -85,6 +87,7 @@
    },
    "stem": "oc_shotlist_ds41flash_high_20261107",
    "tokens": 2926226,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -112,7 +115,8 @@
    },
    "stem": "pi_shotlist_sonnet45_20261114",
    "tokens": 1508795,
-   "tier": "Balanced",
+   "basis": "billing",
+   "tier": "Premium",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -141,7 +145,8 @@
    },
    "stem": "oc_shotlist_gpt55_off_20261110",
    "tokens": 2756135,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Premium",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -171,6 +176,7 @@
    },
    "stem": "oc_shotlist_ds41flash_off_20261107",
    "tokens": 2718375,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -198,6 +204,7 @@
    },
    "stem": "oc_shotlist_ds41flash",
    "tokens": 2814749,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -228,6 +235,7 @@
    },
    "stem": "pi_sonnet46_shotlist_medium_20261114",
    "tokens": 2632875,
+   "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
@@ -259,6 +267,7 @@
    },
    "stem": "pi_sonnet46_shotlist_20261113",
    "tokens": 2657016,
+   "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
@@ -291,6 +300,7 @@
    },
    "stem": "oc_shotlist_gpt55_high_20261110",
    "tokens": 3117683,
+   "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
    "dominated_by": [
@@ -326,6 +336,7 @@
    },
    "stem": "pi_shotlist_ds41flash",
    "tokens": 1438179,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -353,6 +364,7 @@
    },
    "stem": "pi_shotlist_glm53",
    "tokens": 1764093,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -385,6 +397,7 @@
    },
    "stem": "hermes_shotlist_ds41flash_off_20261111",
    "tokens": 4030565,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -418,6 +431,7 @@
    },
    "stem": "pi_shotlist_glm52_thinking_off",
    "tokens": 1913439,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -452,7 +466,8 @@
    },
    "stem": "pi_shotlist_gpt55_high_20261110",
    "tokens": 467135,
-   "tier": "Default",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -487,6 +502,7 @@
    },
    "stem": "pi_shotlist_sonnet46_20261114",
    "tokens": 813109,
+   "basis": "billing",
    "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
@@ -523,6 +539,7 @@
    },
    "stem": "pi_shotlist_opus48_20261114",
    "tokens": 718602,
+   "basis": "billing",
    "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
@@ -562,6 +579,7 @@
    },
    "stem": "pi_shotlist_sonnet46_off_20261113",
    "tokens": 3038157,
+   "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
@@ -602,7 +620,8 @@
    },
    "stem": "pi_shotlist_gpt55_off_20261110",
    "tokens": 433896,
-   "tier": "Default",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -637,7 +656,8 @@
    },
    "stem": "pi_shotlist_opus55_20261114",
    "tokens": 595335,
-   "tier": "Default",
+   "basis": "billing",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -673,6 +693,7 @@
    },
    "stem": "oc_shotlist_minimaxm3_off_20261109",
    "tokens": 3650102,
+   "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
@@ -716,7 +737,8 @@
    },
    "stem": "oc_shotlist_minimaxm3_medium_20261109",
    "tokens": 4052449,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Premium",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -761,7 +783,8 @@
    },
    "stem": "oc_shotlist_thinking_off",
    "tokens": 1777320,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Premium",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -807,7 +830,8 @@
    },
    "stem": "pi_shotlist_fable51_20261114",
    "tokens": 644155,
-   "tier": "Balanced",
+   "basis": "billing",
+   "tier": "Premium",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -854,7 +878,8 @@
    },
    "stem": "oc_shotlist_minimaxm3_ultra_20261109",
    "tokens": 3892497,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Premium",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -899,7 +924,8 @@
    },
    "stem": "pi_shotlist_fable5_20261114",
    "tokens": 549550,
-   "tier": "Balanced",
+   "basis": "billing",
+   "tier": "Premium",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -946,7 +972,8 @@
    },
    "stem": "hermes_shotlist_thinking_off",
    "tokens": 6209159,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Premium",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -996,6 +1023,7 @@
    },
    "stem": "oc_shotlist_glm53",
    "tokens": 1955767,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -1027,6 +1055,7 @@
    },
    "stem": "pi_shotlist_qwen36",
    "tokens": 1318346,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -1062,6 +1091,7 @@
    },
    "stem": "oc_shotlist_qwen36",
    "tokens": 2109433,
+   "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
    "dominated_by": [
@@ -1116,7 +1146,8 @@
    },
    "stem": "hermes_shotlist_qwen36",
    "tokens": 6961237,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Premium",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -1169,7 +1200,8 @@
    },
    "stem": "pi_shotlist_giga35_reasoning_low_20261107",
    "tokens": 3041748,
-   "tier": "Default",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -1206,7 +1238,8 @@
    },
    "stem": "pi_shotlist_giga35_reasoning_medium_20261107",
    "tokens": 2974629,
-   "tier": "Default",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -1245,7 +1278,8 @@
    },
    "stem": "pi_shotlist_giga35_reasoning_high_20261107",
    "tokens": 3796473,
-   "tier": "Default",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -1287,6 +1321,7 @@
    },
    "stem": "hermes_shotlist_oss120b",
    "tokens": 8833747,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -1321,7 +1356,8 @@
    },
    "stem": "oc_shotlist_giga35base_off_20261113",
    "tokens": 6585042,
-   "tier": "Default",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -1359,6 +1395,7 @@
    },
    "stem": "oc_shotlist_giga35base_ultra_20261114",
    "tokens": 8819332,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -1390,7 +1427,8 @@
    },
    "stem": "oc_shotlist_oss120b",
    "tokens": 1261870,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Premium",
    "pareto": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
@@ -1450,6 +1488,7 @@
    },
    "stem": "pi_shotlist_gigachat3pro",
    "tokens": 12883705,
+   "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
    "dominated_by": [
@@ -1495,6 +1534,32 @@
    "confidence": "medium (single run, full suite)"
   },
   {
+   "harness": "Pi",
+   "model": "DeepSeek-V4.1-Flash (thinking: —)",
+   "reasoning": "—",
+   "suite": "Medium (392-471) · reflect",
+   "situation_bucket": "medium-reflect",
+   "passed": 5,
+   "total": 5,
+   "pass_rate": 1.0,
+   "cost_rub": 85.54,
+   "cost_per_solved": 17.108,
+   "time_min": 32.0,
+   "steps": 336,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": null
+   },
+   "stem": "pi_reflect_ds41flash_20261106",
+   "tokens": 2949354,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": true,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
    "harness": "OpenClaw",
    "model": "DeepSeek-V4.1-Flash (thinking: high)",
    "reasoning": "high",
@@ -1514,7 +1579,8 @@
    },
    "stem": "oc_medium_reflect_ds41flash_high_20261108",
    "tokens": 14660719,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Default",
    "pareto": true,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
@@ -1539,10 +1605,37 @@
    },
    "stem": "dsh_medium_reflect_ds41flash_off_20261111",
    "tokens": 8316142,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": true,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
+  },
+  {
+   "harness": "Pi",
+   "model": "DeepSeek-V4.1-Flash (thinking: —)",
+   "reasoning": "—",
+   "suite": "Medium (392-471) · reflect",
+   "situation_bucket": "medium-reflect",
+   "passed": 11,
+   "total": 15,
+   "pass_rate": 0.7333,
+   "cost_rub": 360.25,
+   "cost_per_solved": 32.75,
+   "time_min": 137.33,
+   "steps": 1124,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": null
+   },
+   "stem": "pi_reflect_ds41flash_b_20261106",
+   "tokens": 15124377,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": true,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
   },
   {
    "harness": "OpenClaw",
@@ -1564,7 +1657,8 @@
    },
    "stem": "oc_medium_reflect_ds41flash_medium_20261108",
    "tokens": 11144179,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Default",
    "pareto": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111"
@@ -1591,6 +1685,7 @@
    },
    "stem": "pi_medium_reflect_sonnet46_off_20261113",
    "tokens": 16340118,
+   "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
    "dominated_by": [
@@ -1620,7 +1715,8 @@
    },
    "stem": "pi_medium_reflect_sonnet46_medium_20261113",
    "tokens": 11603358,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111",
@@ -1649,7 +1745,8 @@
    },
    "stem": "pi_medium_reflect_gpt55_off_20261110",
    "tokens": 1544688,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111",
@@ -1679,7 +1776,8 @@
    },
    "stem": "oc_medium_reflect_minimaxm3_off_20261109",
    "tokens": 12178668,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111",
@@ -1710,6 +1808,7 @@
    },
    "stem": "oc_medium_reflect_ds41flash_off_20261108",
    "tokens": 10009328,
+   "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
@@ -1739,6 +1838,7 @@
    },
    "stem": "oc_medium_reflect_gpt55_off_20261110",
    "tokens": 3987306,
+   "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
    "dominated_by": [
@@ -1752,36 +1852,6 @@
     "pi_medium_reflect_sonnet46_off_20261113"
    ],
    "confidence": "medium (single run, full suite)"
-  },
-  {
-   "harness": "Pi",
-   "model": "DeepSeek-V4.1-Flash (thinking: —)",
-   "reasoning": "—",
-   "suite": "Medium (392-471) · reflect",
-   "situation_bucket": "medium-reflect",
-   "passed": 11,
-   "total": 15,
-   "pass_rate": 0.7333,
-   "cost_rub": 360.25,
-   "cost_per_solved": 32.75,
-   "time_min": 137.33,
-   "steps": 1124,
-   "coverage": {
-    "runs": 1,
-    "full": false,
-    "version": null
-   },
-   "stem": "pi_reflect_ds41flash_b_20261106",
-   "tokens": 15124377,
-   "tier": "Balanced",
-   "pareto": false,
-   "dominated_by": [
-    "dsh_medium_reflect_ds41flash_off_20261111",
-    "oc_medium_reflect_ds41flash_high_20261108",
-    "oc_medium_reflect_ds41flash_medium_20261108",
-    "oc_medium_reflect_ds41flash_off_20261108"
-   ],
-   "confidence": "low (single run, partial suite)"
   },
   {
    "harness": "OpenClaw",
@@ -1803,6 +1873,7 @@
    },
    "stem": "oc_medium_reflect_minimaxm3_medium_20261109",
    "tokens": 10614066,
+   "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
    "dominated_by": [
@@ -1812,39 +1883,9 @@
     "oc_medium_reflect_ds41flash_off_20261108",
     "oc_medium_reflect_minimaxm3_off_20261109",
     "pi_medium_reflect_gpt55_off_20261110",
-    "pi_medium_reflect_sonnet46_medium_20261113",
-    "pi_reflect_ds41flash_b_20261106"
+    "pi_medium_reflect_sonnet46_medium_20261113"
    ],
    "confidence": "medium (single run, full suite)"
-  },
-  {
-   "harness": "Pi",
-   "model": "DeepSeek-V4.1-Flash (thinking: —)",
-   "reasoning": "—",
-   "suite": "Medium (392-471) · reflect",
-   "situation_bucket": "medium-reflect",
-   "passed": 5,
-   "total": 5,
-   "pass_rate": 1.0,
-   "cost_rub": 85.54,
-   "cost_per_solved": 17.108,
-   "time_min": 32.0,
-   "steps": 336,
-   "coverage": {
-    "runs": 1,
-    "full": false,
-    "version": null
-   },
-   "stem": "pi_reflect_ds41flash_20261106",
-   "tokens": 2949354,
-   "tier": "Balanced",
-   "pareto": false,
-   "dominated_by": [
-    "dsh_medium_reflect_ds41flash_off_20261111",
-    "oc_medium_reflect_ds41flash_high_20261108",
-    "oc_medium_reflect_ds41flash_medium_20261108"
-   ],
-   "confidence": "low (single run, partial suite)"
   },
   {
    "harness": "Pi",
@@ -1866,6 +1907,7 @@
    },
    "stem": "pi_medium_reflect_giga35_low_20261107",
    "tokens": 31410934,
+   "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
    "dominated_by": [
@@ -1878,10 +1920,86 @@
     "oc_medium_reflect_minimaxm3_off_20261109",
     "pi_medium_reflect_gpt55_off_20261110",
     "pi_medium_reflect_sonnet46_medium_20261113",
-    "pi_medium_reflect_sonnet46_off_20261113",
-    "pi_reflect_ds41flash_20261106",
-    "pi_reflect_ds41flash_b_20261106"
+    "pi_medium_reflect_sonnet46_off_20261113"
    ],
+   "confidence": "medium (single run, full suite)"
+  },
+  {
+   "harness": "OpenClaw",
+   "model": "GigaChat 3.5-432B-A28B (thinking: off)",
+   "reasoning": "off",
+   "suite": "Medium (392-471) · reflect",
+   "situation_bucket": "medium-reflect",
+   "passed": 0,
+   "total": 20,
+   "pass_rate": 0.0,
+   "cost_rub": 216.64,
+   "cost_per_solved": null,
+   "time_min": 84.632,
+   "steps": 935,
+   "coverage": {
+    "runs": 1,
+    "full": true,
+    "version": "0.16.0"
+   },
+   "stem": "oc_medium_reflect_giga35base_off_20261113",
+   "tokens": 17827537,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "medium (single run, full suite)"
+  },
+  {
+   "harness": "OpenClaw",
+   "model": "GigaChat 3.5-432B-A28B (thinking: ultra)",
+   "reasoning": "ultra",
+   "suite": "Medium (392-471) · reflect",
+   "situation_bucket": "medium-reflect",
+   "passed": 0,
+   "total": 20,
+   "pass_rate": 0.0,
+   "cost_rub": 17.4,
+   "cost_per_solved": null,
+   "time_min": 20.053,
+   "steps": 259,
+   "coverage": {
+    "runs": 1,
+    "full": true,
+    "version": "0.16.0"
+   },
+   "stem": "oc_medium_reflect_giga35base_ultra_20261114",
+   "tokens": 4749821,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "medium (single run, full suite)"
+  },
+  {
+   "harness": "Pi",
+   "model": "GigaChat 3 Pro (thinking: —)",
+   "reasoning": "—",
+   "suite": "Medium (392-471) · reflect",
+   "situation_bucket": "medium-reflect",
+   "passed": 0,
+   "total": 20,
+   "pass_rate": 0.0,
+   "cost_rub": 1894.5,
+   "cost_per_solved": null,
+   "time_min": 31.577,
+   "steps": 2948,
+   "coverage": {
+    "runs": 1,
+    "full": true,
+    "version": null
+   },
+   "stem": "pi_medium_reflect_gigachat3pro_20261109",
+   "tokens": 25638927,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
   {
@@ -1904,7 +2022,8 @@
    },
    "stem": "dsh_medium_long_ds41flash_off_20261111",
    "tokens": 74296407,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": null,
    "pareto": true,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
@@ -1929,7 +2048,8 @@
    },
    "stem": "oc_medium_long_ds41flash_high_20261109",
    "tokens": 8929176,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": null,
    "pareto": true,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
@@ -1954,7 +2074,8 @@
    },
    "stem": "oc_medium_long_ds41flash_medium_20261109",
    "tokens": 303527,
-   "tier": "Default",
+   "basis": "estimate",
+   "tier": null,
    "pareto": true,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
@@ -1979,7 +2100,8 @@
    },
    "stem": "oc_medium_long_ds41flash_off_20261109",
    "tokens": 8425060,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": null,
    "pareto": false,
    "dominated_by": [
     "oc_medium_long_ds41flash_high_20261109",
@@ -2007,7 +2129,8 @@
    },
    "stem": "oc_medium_long_gpt55_off_20261110",
    "tokens": 14469503,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": null,
    "pareto": false,
    "dominated_by": [
     "dsh_medium_long_ds41flash_off_20261111",
@@ -2037,7 +2160,8 @@
    },
    "stem": "pi_medium_long_gpt55_off_20261110",
    "tokens": 17986241,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": null,
    "pareto": false,
    "dominated_by": [
     "dsh_medium_long_ds41flash_off_20261111",
@@ -2068,7 +2192,8 @@
    },
    "stem": "pi_medium_long_sonnet46_off_20261113",
    "tokens": 228309339,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": null,
    "pareto": false,
    "dominated_by": [
     "dsh_medium_long_ds41flash_off_20261111",
@@ -2078,6 +2203,292 @@
     "oc_medium_long_gpt55_off_20261110",
     "pi_medium_long_gpt55_off_20261110"
    ],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
+   "harness": "OpenClaw",
+   "model": "—",
+   "reasoning": "—",
+   "suite": "Medium (392-471) · long",
+   "situation_bucket": "long-context",
+   "passed": 0,
+   "total": 6,
+   "pass_rate": 0.0,
+   "cost_rub": 142.22,
+   "cost_per_solved": null,
+   "time_min": 40.283,
+   "steps": 326,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": "0.16.0"
+   },
+   "stem": "oc_m66-plain-long_20261113",
+   "tokens": 22645277,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
+   "harness": "OpenClaw",
+   "model": "—",
+   "reasoning": "—",
+   "suite": "Medium (392-471) · long",
+   "situation_bucket": "long-context",
+   "passed": 0,
+   "total": 6,
+   "pass_rate": 0.0,
+   "cost_rub": 30.87,
+   "cost_per_solved": null,
+   "time_min": 22.003,
+   "steps": 173,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": "0.16.0"
+   },
+   "stem": "oc_m66-ultra-long_20261114",
+   "tokens": 7195797,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
+   "harness": "OpenClaw",
+   "model": "DeepSeek-V4.1-Flash (thinking: off)",
+   "reasoning": "off",
+   "suite": "Medium (392-471) · long",
+   "situation_bucket": "long-context",
+   "passed": 0,
+   "total": 2,
+   "pass_rate": 0.0,
+   "cost_rub": 201.62,
+   "cost_per_solved": null,
+   "time_min": 45.635,
+   "steps": 4,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": "0.16.0"
+   },
+   "stem": "oc_medium_long_ds41flash_off_20261108",
+   "tokens": 9429226,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
+   "harness": "OpenClaw",
+   "model": "GigaChat 3.5-432B-A28B (thinking: off)",
+   "reasoning": "off",
+   "suite": "Medium (392-471) · long",
+   "situation_bucket": "long-context",
+   "passed": 0,
+   "total": 6,
+   "pass_rate": 0.0,
+   "cost_rub": 142.22,
+   "cost_per_solved": null,
+   "time_min": 40.283,
+   "steps": 326,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": "0.16.0"
+   },
+   "stem": "oc_medium_long_giga35base_off_20261113",
+   "tokens": 22645277,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
+   "harness": "OpenClaw",
+   "model": "GigaChat 3.5-432B-A28B (thinking: ultra)",
+   "reasoning": "ultra",
+   "suite": "Medium (392-471) · long",
+   "situation_bucket": "long-context",
+   "passed": 0,
+   "total": 6,
+   "pass_rate": 0.0,
+   "cost_rub": 30.87,
+   "cost_per_solved": null,
+   "time_min": 22.003,
+   "steps": 173,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": "0.16.0"
+   },
+   "stem": "oc_medium_long_giga35base_ultra_20261114",
+   "tokens": 7195797,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
+   "harness": "OpenClaw",
+   "model": "MiniMax-M3 (thinking: medium)",
+   "reasoning": "medium",
+   "suite": "Medium (392-471) · long",
+   "situation_bucket": "long-context",
+   "passed": 0,
+   "total": 6,
+   "pass_rate": 0.0,
+   "cost_rub": 3706.58,
+   "cost_per_solved": null,
+   "time_min": 154.858,
+   "steps": 284,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": "0.16.0"
+   },
+   "stem": "oc_medium_long_minimaxm3_medium_20261109",
+   "tokens": 14488379,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
+   "harness": "OpenClaw",
+   "model": "MiniMax-M3 (thinking: off)",
+   "reasoning": "off",
+   "suite": "Medium (392-471) · long",
+   "situation_bucket": "long-context",
+   "passed": 0,
+   "total": 6,
+   "pass_rate": 0.0,
+   "cost_rub": 1912.73,
+   "cost_per_solved": null,
+   "time_min": 363.187,
+   "steps": 276,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": "0.16.0"
+   },
+   "stem": "oc_medium_long_minimaxm3_off_20261109",
+   "tokens": 7360375,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
+   "harness": "Pi",
+   "model": "DeepSeek-V4.1-Flash (thinking: —)",
+   "reasoning": "—",
+   "suite": "Medium (392-471) · long",
+   "situation_bucket": "long-context",
+   "passed": 0,
+   "total": 3,
+   "pass_rate": 0.0,
+   "cost_rub": 1200.57,
+   "cost_per_solved": null,
+   "time_min": 288.688,
+   "steps": 1650,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": null
+   },
+   "stem": "pi_long_ds41flash_20261106",
+   "tokens": 78233678,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
+   "harness": "Pi",
+   "model": "GigaChat 3.5 Reasoning (thinking: low)",
+   "reasoning": "low",
+   "suite": "Medium (392-471) · long",
+   "situation_bucket": "long-context",
+   "passed": 0,
+   "total": 6,
+   "pass_rate": 0.0,
+   "cost_rub": 6470.22,
+   "cost_per_solved": null,
+   "time_min": 62.158,
+   "steps": 1419,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": null
+   },
+   "stem": "pi_medium_long_giga35_low_20261107",
+   "tokens": 65534148,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
+   "harness": "Pi",
+   "model": "GigaChat 3 Pro (thinking: —)",
+   "reasoning": "—",
+   "suite": "Medium (392-471) · long",
+   "situation_bucket": "long-context",
+   "passed": 0,
+   "total": 6,
+   "pass_rate": 0.0,
+   "cost_rub": 1694.72,
+   "cost_per_solved": null,
+   "time_min": 23.522,
+   "steps": 1020,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": null
+   },
+   "stem": "pi_medium_long_gigachat3pro_20261109",
+   "tokens": 22942929,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
+  },
+  {
+   "harness": "Pi",
+   "model": "Claude Sonnet 4.6 (thinking: medium)",
+   "reasoning": "medium",
+   "suite": "Medium (392-471) · long",
+   "situation_bucket": "long-context",
+   "passed": 0,
+   "total": 6,
+   "pass_rate": 0.0,
+   "cost_rub": 5017.57,
+   "cost_per_solved": null,
+   "time_min": 103.172,
+   "steps": 1004,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": null
+   },
+   "stem": "pi_medium_long_sonnet46_medium_20261113",
+   "tokens": 63667285,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
   {
@@ -2100,6 +2511,7 @@
    },
    "stem": "oc_medium_feasibility_ds41flash_medium_20261108",
    "tokens": 24275573,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": true,
    "dominated_by": [],
@@ -2125,6 +2537,7 @@
    },
    "stem": "dsh_medium_feasibility_ds41flash_off_20261111",
    "tokens": 20621016,
+   "basis": "estimate",
    "tier": "Default",
    "pareto": false,
    "dominated_by": [
@@ -2152,7 +2565,8 @@
    },
    "stem": "oc_medium_feasibility_ds41flash_high_20261108",
    "tokens": 25623769,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Default",
    "pareto": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
@@ -2180,7 +2594,8 @@
    },
    "stem": "oc_medium_feasibility_gpt55_off_20261110",
    "tokens": 10786591,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
@@ -2209,7 +2624,8 @@
    },
    "stem": "pi_medium_feasibility_gpt55_off_20261110",
    "tokens": 11850369,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
@@ -2239,7 +2655,8 @@
    },
    "stem": "oc_medium_feasibility_ds41flash_off_20261108",
    "tokens": 29641266,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Default",
    "pareto": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
@@ -2268,7 +2685,8 @@
    },
    "stem": "oc_medium_feasibility_minimaxm3_off_20261109",
    "tokens": 33114679,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
@@ -2299,6 +2717,7 @@
    },
    "stem": "oc_medium_feasibility_minimaxm3_medium_20261109",
    "tokens": 50707607,
+   "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
    "dominated_by": [
@@ -2332,6 +2751,7 @@
    },
    "stem": "pi_medium_feasibility_sonnet46_medium_20261113",
    "tokens": 84810504,
+   "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
    "dominated_by": [
@@ -2365,6 +2785,7 @@
    },
    "stem": "pi_medium_feasibility_sonnet46_off_20261113",
    "tokens": 131943515,
+   "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
    "dominated_by": [
@@ -2400,6 +2821,7 @@
    },
    "stem": "pi_medium_feasibility_giga35_low_20261107",
    "tokens": 94222758,
+   "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
    "dominated_by": [
@@ -2435,7 +2857,8 @@
    },
    "stem": "oc_medium_feasibility_giga35base_off_20261113",
    "tokens": 9226537,
-   "tier": "Premium",
+   "basis": "estimate",
+   "tier": "Balanced",
    "pareto": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
@@ -2446,6 +2869,58 @@
     "oc_medium_feasibility_minimaxm3_off_20261109",
     "pi_medium_feasibility_gpt55_off_20261110"
    ],
+   "confidence": "medium (single run, full suite)"
+  },
+  {
+   "harness": "OpenClaw",
+   "model": "GigaChat 3.5-432B-A28B (thinking: ultra)",
+   "reasoning": "ultra",
+   "suite": "Medium (392-471) · feasibility",
+   "situation_bucket": "wave19-feasibility",
+   "passed": 0,
+   "total": 40,
+   "pass_rate": 0.0,
+   "cost_rub": 78.16,
+   "cost_per_solved": null,
+   "time_min": 62.605,
+   "steps": 369,
+   "coverage": {
+    "runs": 1,
+    "full": true,
+    "version": "0.16.0"
+   },
+   "stem": "oc_medium_feasibility_giga35base_ultra_20261114",
+   "tokens": 15557817,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
+   "confidence": "medium (single run, full suite)"
+  },
+  {
+   "harness": "Pi",
+   "model": "GigaChat 3 Pro (thinking: —)",
+   "reasoning": "—",
+   "suite": "Medium (392-471) · feasibility",
+   "situation_bucket": "wave19-feasibility",
+   "passed": 0,
+   "total": 40,
+   "pass_rate": 0.0,
+   "cost_rub": 2009.22,
+   "cost_per_solved": null,
+   "time_min": 15.03,
+   "steps": 1408,
+   "coverage": {
+    "runs": 1,
+    "full": true,
+    "version": null
+   },
+   "stem": "pi_medium_feasibility_gigachat3pro_20261109",
+   "tokens": 27408162,
+   "basis": "estimate",
+   "tier": null,
+   "pareto": false,
+   "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
   {
@@ -2468,7 +2943,8 @@
    },
    "stem": "hermes_full_391",
    "tokens": 31770687,
-   "tier": "Balanced",
+   "basis": "estimate",
+   "tier": "Default",
    "pareto": true,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"

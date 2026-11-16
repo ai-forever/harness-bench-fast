@@ -60,6 +60,11 @@ jobs:
       - name: Check leaderboard selection
         run: node tests/test_leaderboard.cjs
 
+      - name: Check model-selection guidance is in sync
+        run: |
+          uv run python scripts/build_model_selection.py --lint
+          uv run python scripts/build_model_selection.py --check
+
       - name: Verify harness gold solutions
         run: uv run python .github/scripts/verify_gold_with_annotations.py
 

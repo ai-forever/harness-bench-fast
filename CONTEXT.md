@@ -114,11 +114,16 @@ docs ↔ `results/*.json` не ловится (у fork-генераторов г
 Дефекты F-D1…F-D9 (данные/стоимость/инфра) и F-UX1… (шапка без выводов, дубли столбцов,
 `—` перегружен). Ниже — открытые решения.
 
-## Decisions — Round 3 (open, grilling 2026-11-16)
-- **Q1 Tier scope:** глобально vs **пер-бакет** — OPEN.
-- **Q2 Pareto metric:** `pass_rate` vs absolute `passed` — OPEN.
-- **Q3 Zero-solved:** показывать `0/N` vs оставить `unmeasured` — OPEN.
-- **Q4 Cost basis:** унифицировать (billing-preferred) vs две колонки — OPEN.
-- **Q5 HTML parity:** рендерить TL;DR/«как читать» из общего источника — OPEN.
-- **Q6 Columns/presentation:** убрать дубли, добавить `Tier`, ссылки, формат — OPEN.
-- **Q7 Delivery & CI gate:** ветка/PR + `--check/--lint` в CI — OPEN.
+## Decisions — Round 3 (accepted 2026-11-16)
+Источник: ревью страницы (`docs/reviews/2026-11-16-model-selection-guidance-review.md`) → grilling (grill-with-docs).
+- **Q1 Tier scope = пер-бакет.** Терцили ₽/решённую задачу считаются внутри бакета и только по полному
+  набору; неполные/0/N строки — без тира (F-D1/F-D5).
+- **Q2 Pareto metric = `pass_rate`** и только внутри одного набора (`bucket × total`). Абсолютный
+  `passed` — только для отображения x/y (F-D2).
+- **Q3 Zero-solved → показывать `0/N`** как провал; `unmeasured` — только реально не запущенные (F-D3).
+- **Q4 Cost basis:** один столбец `Cost/solved` + видимый признак `Basis` (`billing` / `est.`) (F-D4).
+- **Q5 HTML parity:** TL;DR и «Как читать» рендерятся в HTML из `.md` (единый источник) (F-UX1).
+- **Q6 Columns:** убраны дубли (`%`, `Reasoning`), добавлен `Tier`; `Bucket` — групповые строки;
+  `Stem` — ссылка на `fork-detail-<stem>.html`; разряды в числах; `—` = не Pareto, `н/д` = нет данных.
+- **Q7 Delivery:** ветка `feat/guidance-v2`; CI-гейт `--lint` + `--check` (F-D9).
+- ADR: `docs/adr/0007-model-selection-guidance-v2.md`.
