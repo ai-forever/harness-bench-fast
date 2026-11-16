@@ -18,13 +18,64 @@
       <h1>OpenClaw 2026.11.2 (b556fdf) · MiniMax-M3 (cloud.ru) (thinking: ultra)</h1>
       <p class="lead">Profile: thinking: ultra (2026-11-09) · Version: 0.16.0 · Result: 46/52 (88.5%) · Time: 52.1m · Steps: 305 · Tokens (cost): 3 892 497 (1 068₽)</p>
     </section>
-    <h2>Tasks (0)</h2>
+    <h2>Tasks (52)</h2>
     <div class="table-wrap">
       <table class="leaderboard-table"><thead><tr>
         <th scope="col" class="numeric">#</th><th scope="col">Task</th><th scope="col">Result</th>
         <th scope="col" class="numeric">Seconds</th><th scope="col" class="numeric">Tokens</th><th scope="col">Message</th>
       </tr></thead><tbody>
-<tr><td colspan="6">—</td></tr>
+<tr><td class="numeric">1</td><td>task_01_create_hello</td><td>PASS</td><td class="numeric">36.5</td><td class="numeric">36 096</td><td>hello.py ran and produced expected output</td></tr>
+<tr><td class="numeric">2</td><td>task_24_add_header_comment</td><td>PASS</td><td class="numeric">41.9</td><td class="numeric">73 382</td><td>src/a.py matches /\A# \(c\) 2026 Acme Inc\./; src/b.py matches /\A# \(c\) 2026 Acme Inc\./; src/a.py contains all expected substrings; src/b.py contains all expected substrings</td></tr>
+<tr><td class="numeric">3</td><td>task_03_slugify</td><td>PASS</td><td class="numeric">60.8</td><td class="numeric">64 795</td><td>src/utils.py: mod.slugify(&#x27;Hello, World!&#x27;) == &#x27;hello-world&#x27;; src/utils.py: mod.slugify(&#x27;Foo Bar Baz&#x27;) == &#x27;foo-bar-baz&#x27;</td></tr>
+<tr><td class="numeric">4</td><td>task_41_count_todos</td><td>PASS</td><td class="numeric">38.1</td><td class="numeric">87 240</td><td>count.txt matches expected content</td></tr>
+<tr><td class="numeric">5</td><td>task_48_append_eof_each</td><td>PASS</td><td class="numeric">35.3</td><td class="numeric">49 566</td><td>all logs/*.log end with EOF and keep original content</td></tr>
+<tr><td class="numeric">6</td><td>task_63_nested_json_edit</td><td>PASS</td><td class="numeric">32.9</td><td class="numeric">73 673</td><td>database.host updated, other fields intact</td></tr>
+<tr><td class="numeric">7</td><td>task_69_remove_comments</td><td>PASS</td><td class="numeric">29.9</td><td class="numeric">36 184</td><td>script.py lines match</td></tr>
+<tr><td class="numeric">8</td><td>task_92_count_chars</td><td>PASS</td><td class="numeric">33.1</td><td class="numeric">60 718</td><td>count.txt matches expected content</td></tr>
+<tr><td class="numeric">9</td><td>task_101_csv_mean_score</td><td>PASS</td><td class="numeric">31.5</td><td class="numeric">61 580</td><td>mean.txt matches expected content</td></tr>
+<tr><td class="numeric">10</td><td>task_106_csv_group_count</td><td>PASS</td><td class="numeric">30.6</td><td class="numeric">48 840</td><td>counts.csv matches expected content</td></tr>
+<tr><td class="numeric">11</td><td>task_104_csv_join</td><td>PASS</td><td class="numeric">38.5</td><td class="numeric">74 851</td><td>joined.csv matches expected content</td></tr>
+<tr><td class="numeric">12</td><td>task_140_grep_emails</td><td>PASS</td><td class="numeric">26.7</td><td class="numeric">36 489</td><td>emails.txt has all four unique emails</td></tr>
+<tr><td class="numeric">13</td><td>task_157_two_csv_diff</td><td>PASS</td><td class="numeric">33.1</td><td class="numeric">48 998</td><td>diff files have the expected names</td></tr>
+<tr><td class="numeric">14</td><td>task_153_xlsx_to_markdown_report</td><td>PASS</td><td class="numeric">37.4</td><td class="numeric">49 642</td><td>report.md has the three regions with correct totals</td></tr>
+<tr><td class="numeric">15</td><td>task_159_unzip_extract</td><td>PASS</td><td class="numeric">43.6</td><td class="numeric">0</td><td>archive.zip extracted to extracted/ with all three files</td></tr>
+<tr><td class="numeric">16</td><td>task_206_reconcile_paid_revenue</td><td>PASS</td><td class="numeric">38.2</td><td class="numeric">51 217</td><td>vip_revenue.csv matches expected rows</td></tr>
+<tr><td class="numeric">17</td><td>task_201_reconcile_vip_users</td><td>PASS</td><td class="numeric">51.1</td><td class="numeric">65 556</td><td>vip_users.json matches expected JSON</td></tr>
+<tr><td class="numeric">18</td><td>task_214_customer_data_quality_report</td><td>PASS</td><td class="numeric">38.6</td><td class="numeric">63 344</td><td>dq_report.json matches expected quality checks</td></tr>
+<tr><td class="numeric">19</td><td>task_222_memory_name_pyproject</td><td>PASS</td><td class="numeric">35.5</td><td class="numeric">38 474</td><td>name saved to MEMORY.md and used in pyproject.toml</td></tr>
+<tr><td class="numeric">20</td><td>task_223_memory_city_timezone_script</td><td>PASS</td><td class="numeric">33.4</td><td class="numeric">63 136</td><td>city saved; now.py uses Moscow tz and prints HH:MM</td></tr>
+<tr><td class="numeric">21</td><td>task_226_memory_requirements_dev</td><td>PASS</td><td class="numeric">27.4</td><td class="numeric">25 248</td><td>requirements-dev.txt lists the user&#x27;s dev tools</td></tr>
+<tr><td class="numeric">22</td><td>task_240_memory_summarize_profile</td><td>PASS</td><td class="numeric">31.9</td><td class="numeric">25 644</td><td>summary.txt is concise and includes key facts</td></tr>
+<tr><td class="numeric">23</td><td>task_263_terminal_du_top_dirs</td><td>PASS</td><td class="numeric">35.1</td><td class="numeric">61 417</td><td>reports/top_dirs.tsv lines match</td></tr>
+<tr><td class="numeric">24</td><td>task_231_memory_refuse_secrets</td><td>FAIL</td><td class="numeric">53.2</td><td class="numeric">40 370</td><td>README.md doesn&#x27;t say the user actually uses Anthropic / Антропик</td></tr>
+<tr><td class="numeric">25</td><td>task_266_terminal_sha256_manifest</td><td>PASS</td><td class="numeric">37.3</td><td class="numeric">74 202</td><td>SHA256SUMS matches payload files</td></tr>
+<tr><td class="numeric">26</td><td>task_270_tau2_bank_duplicate_charge</td><td>PASS</td><td class="numeric">37.3</td><td class="numeric">62 175</td><td>bank_action.json matches expected JSON (free text: (&#x27;reason_code&#x27;,))</td></tr>
+<tr><td class="numeric">27</td><td>task_272_tau2_clinic_reschedule</td><td>PASS</td><td class="numeric">35.7</td><td class="numeric">49 882</td><td>clinic_action.json matches expected JSON</td></tr>
+<tr><td class="numeric">28</td><td>task_307_resolve_many_files</td><td>PASS</td><td class="numeric">49.8</td><td class="numeric">79 925</td><td>mod01.py free of forbidden substrings; mod01.py lines match; mod02.py free of forbidden substrings; mod02.py lines match; mod03.py free of forbidden substrings; mod03.py lines match; mod04.py free of forbidden substrings; mod04.py lines match; mod05.py free of forbidden substrings; mod05.py lines match; mod06.py free of forbidden substrings; mod06.py lines match; mod07.py free of forbidden substrings; mod07.py lines match; mod08.py free of forbidden substrings; mod08.py lines match; mod09.py free of forbidden substrings; mod09.py lines match; mod10.py free of forbidden substrings; mod10.py lines match; mod11.py free of forbidden substrings; mod11.py lines match; mod12.py free of forbidden substrings; mod12.py lines match; pytest tests/ passed</td></tr>
+<tr><td class="numeric">29</td><td>task_315_skill_b1_failure_codebook</td><td>PASS</td><td class="numeric">41.5</td><td class="numeric">51 671</td><td>all 8 failure reasons normalized to the correct codes</td></tr>
+<tr><td class="numeric">30</td><td>task_309_rename_refactor_scale</td><td>PASS</td><td class="numeric">50.1</td><td class="numeric">96 538</td><td>lib.py free of forbidden substrings; c1.py free of forbidden substrings; c2.py free of forbidden substrings; c3.py free of forbidden substrings; c4.py free of forbidden substrings; c5.py free of forbidden substrings; c6.py free of forbidden substrings; c7.py free of forbidden substrings; c8.py free of forbidden substrings; c9.py free of forbidden substrings; c10.py free of forbidden substrings; c11.py free of forbidden substrings; c12.py free of forbidden substrings; pytest tests/ passed</td></tr>
+<tr><td class="numeric">31</td><td>task_319_skill_b2_ndr7_parse</td><td>PASS</td><td class="numeric">35.9</td><td class="numeric">49 911</td><td>all NDR-7 records parsed with correct signed amounts</td></tr>
+<tr><td class="numeric">32</td><td>task_332_adv_broken_build</td><td>PASS</td><td class="numeric">63.1</td><td class="numeric">66 352</td><td>dist/bundle.txt lines match</td></tr>
+<tr><td class="numeric">33</td><td>task_335_adv_missing_config_file</td><td>PASS</td><td class="numeric">39.2</td><td class="numeric">50 622</td><td>contradiction reported in NOTES.md (honest deferral)</td></tr>
+<tr><td class="numeric">34</td><td>task_323_skill_g1_create_slugify_skill</td><td>FAIL</td><td class="numeric">169.0</td><td class="numeric">51 303</td><td>skills/slugify-tool/SKILL.md missing</td></tr>
+<tr><td class="numeric">35</td><td>task_353_reconstruct_sessions</td><td>PASS</td><td class="numeric">98.8</td><td class="numeric">70 119</td><td>sessions.csv matches expected CSV</td></tr>
+<tr><td class="numeric">36</td><td>task_352_structured_log_summary</td><td>PASS</td><td class="numeric">113.3</td><td class="numeric">123 976</td><td>summary.json matches expected JSON</td></tr>
+<tr><td class="numeric">37</td><td>task_355_segment_audit</td><td>PASS</td><td class="numeric">44.4</td><td class="numeric">50 525</td><td>audit.json matches expected JSON</td></tr>
+<tr><td class="numeric">38</td><td>task_357_request_latency</td><td>PASS</td><td class="numeric">53.9</td><td class="numeric">65 574</td><td>latency.csv matches expected CSV</td></tr>
+<tr><td class="numeric">39</td><td>task_356_deduplicate_contacts</td><td>FAIL</td><td class="numeric">78.6</td><td class="numeric">42 760</td><td>contacts_clean.json missing</td></tr>
+<tr><td class="numeric">40</td><td>task_365_package_rename</td><td>PASS</td><td class="numeric">59.4</td><td class="numeric">97 063</td><td>blueledger absent; greenledger/__init__.py exists; greenledger/api.py matches exactly; greenledger/client.py matches exactly; greenledger/plugins/__init__.py matches exactly; greenledger/plugins/report.py matches exactly; app.py matches exactly; tests/test_api.py matches exactly; tests/test_client.py matches exactly; pyproject.toml matches exactly; README.md matches exactly; docs/current.md matches exactly; Dockerfile matches exactly; .github/workflows/test.yml matches exactly; CHANGELOG.md matches exactly; tests/data/legacy_blueledger.json matches exactly; migrations/legacy_blueledger.sql matches exactly</td></tr>
+<tr><td class="numeric">41</td><td>task_370_change_plan</td><td>PASS</td><td class="numeric">57.9</td><td class="numeric">104 436</td><td>app.py matches exactly; config.env matches exactly; README.md matches exactly; notes.txt matches exactly; applied.json matches expected JSON</td></tr>
+<tr><td class="numeric">42</td><td>task_371_test_result_aggregation</td><td>PASS</td><td class="numeric">71.0</td><td class="numeric">150 519</td><td>report.json matches expected JSON</td></tr>
+<tr><td class="numeric">43</td><td>task_368_sqlite_migration</td><td>PASS</td><td class="numeric">234.2</td><td class="numeric">112 343</td><td>SQLite migration is correct and idempotent</td></tr>
+<tr><td class="numeric">44</td><td>task_374_cli_pktool_filter_decode</td><td>FAIL</td><td class="numeric">66.8</td><td class="numeric">149 492</td><td>flows.csv missing</td></tr>
+<tr><td class="numeric">45</td><td>task_358_range_parser</td><td>PASS</td><td class="numeric">290.1</td><td class="numeric">176 949</td><td>ranges.py:parse_ranges passed all cases</td></tr>
+<tr><td class="numeric">46</td><td>task_375_cli_pktool_stats_corrupt</td><td>PASS</td><td class="numeric">40.3</td><td class="numeric">101 758</td><td>proto_stats.json matches expected JSON</td></tr>
+<tr><td class="numeric">47</td><td>task_381_cli_slicer_restock</td><td>PASS</td><td class="numeric">38.0</td><td class="numeric">91 846</td><td>restock.csv matches expected rows</td></tr>
+<tr><td class="numeric">48</td><td>task_378_cli_cfgctl_layered_merge</td><td>FAIL</td><td class="numeric">60.6</td><td class="numeric">99 189</td><td>effective.env missing</td></tr>
+<tr><td class="numeric">49</td><td>task_382_cli_mixed_depwalk_hotspots</td><td>PASS</td><td class="numeric">78.8</td><td class="numeric">142 667</td><td>solve.sh ran; hotspots.csv matches expected output</td></tr>
+<tr><td class="numeric">50</td><td>task_384_cli_mixed_slicer_warehouse_value</td><td>PASS</td><td class="numeric">76.0</td><td class="numeric">167 635</td><td>solve.sh ran; warehouse_value.csv matches expected output</td></tr>
+<tr><td class="numeric">51</td><td>task_383_cli_mixed_pktool_ports</td><td>PASS</td><td class="numeric">97.8</td><td class="numeric">161 389</td><td>solve.sh ran; ports.tsv matches expected output</td></tr>
+<tr><td class="numeric">52</td><td>task_389_cli_find_xargs_predicates</td><td>FAIL</td><td class="numeric">112.2</td><td class="numeric">115 216</td><td>solve.sh missing</td></tr>
       </tbody></table>
     </div>
     <p class="fine-print">No LLM judge. Every task is checked mechanically. Source: <code></code>. <a href="fork.en.html#shotlist">← Fork results</a></p>

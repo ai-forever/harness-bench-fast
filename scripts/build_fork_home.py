@@ -1138,16 +1138,27 @@ def render_detail(suite, row, data, base, locale=DEFAULT_LOCALE):
             .replace("__SWITCH_LABEL__", html.escape(t(locale, "lang_switch"))))
 
 
+def render_details(locale: str = DEFAULT_LOCALE) -> dict[str, str]:
+    """Render every collected per-run detail page for *locale* (name -> HTML).
+
+    Each page must render its OWN run payload (the ``data`` slot of the
+    ``_DETAIL_JOBS`` entry), never the aggregated fork-home model: reading the
+    aggregate drops every per-task row and publishes empty tables.
+    """
+    out: dict[str, str] = {}
+    for detail, suite, row, run_data in _DETAIL_JOBS:
+        base = detail[:-5] if detail.endswith(".html") else detail
+        out[locale_filename(base, locale) + ".html"] = render_detail(suite, row, run_data, base, locale)
+    return out
+
+
 def main(argv):
     data = build()
     blob = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
     pages = {loc: render_html(data, loc) for loc in LOCALES}
     details: dict[str, str] = {}
     for loc in LOCALES:
-        for detail, suite, row, _d in _DETAIL_JOBS:
-            base = detail[:-5] if detail.endswith(".html") else detail
-            name = locale_filename(base, loc) + ".html"
-            details[name] = render_detail(suite, row, data, base, loc)
+        details.update(render_details(loc))
     if "--check" in argv:
         stale = [OUT_JSON.name] if not OUT_JSON.exists() or OUT_JSON.read_text(encoding="utf-8") != blob else []
         for loc in LOCALES:

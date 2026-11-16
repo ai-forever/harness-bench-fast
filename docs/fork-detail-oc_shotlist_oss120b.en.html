@@ -18,13 +18,77 @@
       <h1>OpenClaw · GPT-OSS-120B (cloud.ru)</h1>
       <p class="lead">Profile: — (2026-08-13) · Version: 0.16.0 · Result: 17/52 (32.7%) · Time: 205.2m · Steps: 120 · Tokens (cost): 1 261 870 (786₽)</p>
     </section>
-    <h2>Tasks (0)</h2>
+    <h2>Tasks (52)</h2>
     <div class="table-wrap">
       <table class="leaderboard-table"><thead><tr>
         <th scope="col" class="numeric">#</th><th scope="col">Task</th><th scope="col">Result</th>
         <th scope="col" class="numeric">Seconds</th><th scope="col" class="numeric">Tokens</th><th scope="col">Message</th>
       </tr></thead><tbody>
-<tr><td colspan="6">—</td></tr>
+<tr><td class="numeric">1</td><td>task_01_create_hello</td><td>PASS</td><td class="numeric">404.9</td><td class="numeric">24 398</td><td>hello.py ran and produced expected output</td></tr>
+<tr><td class="numeric">2</td><td>task_03_slugify</td><td>PASS</td><td class="numeric">405.0</td><td class="numeric">24 624</td><td>src/utils.py: mod.slugify(&#x27;Hello, World!&#x27;) == &#x27;hello-world&#x27;; src/utils.py: mod.slugify(&#x27;Foo Bar Baz&#x27;) == &#x27;foo-bar-baz&#x27;</td></tr>
+<tr><td class="numeric">3</td><td>task_24_add_header_comment</td><td>FAIL</td><td class="numeric">405.8</td><td class="numeric">24 415</td><td>src/a.py does not match /\A# \(c\) 2026 Acme Inc\./</td></tr>
+<tr><td class="numeric">4</td><td>task_41_count_todos</td><td>FAIL</td><td class="numeric">211.0</td><td class="numeric">23 970</td><td>count.txt missing</td></tr>
+<tr><td class="numeric">5</td><td>task_48_append_eof_each</td><td>FAIL</td><td class="numeric">211.0</td><td class="numeric">23 873</td><td>logs/first.log: last line is &#x27;one alpha&#x27;, expected &#x27;EOF&#x27;</td></tr>
+<tr><td class="numeric">6</td><td>task_63_nested_json_edit</td><td>PASS</td><td class="numeric">213.4</td><td class="numeric">23 992</td><td>database.host updated, other fields intact</td></tr>
+<tr><td class="numeric">7</td><td>task_69_remove_comments</td><td>FAIL</td><td class="numeric">213.0</td><td class="numeric">23 880</td><td>script.py lines differ
+Expected: [&#x27;x = 1&#x27;, &#x27;y = 2&#x27;, &#x27;print(x + y)&#x27;]
+Actual:   [&#x27;# top comment&#x27;, &#x27;x = 1&#x27;, &#x27;    # indented comment&#x27;, &#x27;y = 2&#x27;, &#x27;# another&#x27;, &#x27;print(x + y)&#x27;]</td></tr>
+<tr><td class="numeric">8</td><td>task_92_count_chars</td><td>PASS</td><td class="numeric">213.4</td><td class="numeric">23 850</td><td>count.txt matches expected content</td></tr>
+<tr><td class="numeric">9</td><td>task_101_csv_mean_score</td><td>PASS</td><td class="numeric">211.6</td><td class="numeric">24 045</td><td>mean.txt matches expected content</td></tr>
+<tr><td class="numeric">10</td><td>task_106_csv_group_count</td><td>PASS</td><td class="numeric">212.2</td><td class="numeric">23 972</td><td>counts.csv matches expected content</td></tr>
+<tr><td class="numeric">11</td><td>task_104_csv_join</td><td>FAIL</td><td class="numeric">213.1</td><td class="numeric">23 851</td><td>joined.csv missing</td></tr>
+<tr><td class="numeric">12</td><td>task_140_grep_emails</td><td>PASS</td><td class="numeric">216.7</td><td class="numeric">24 148</td><td>emails.txt has all four unique emails</td></tr>
+<tr><td class="numeric">13</td><td>task_157_two_csv_diff</td><td>FAIL</td><td class="numeric">218.3</td><td class="numeric">23 910</td><td>only_in_a.txt or only_in_b.txt missing</td></tr>
+<tr><td class="numeric">14</td><td>task_153_xlsx_to_markdown_report</td><td>FAIL</td><td class="numeric">219.7</td><td class="numeric">24 694</td><td>report.md missing</td></tr>
+<tr><td class="numeric">15</td><td>task_159_unzip_extract</td><td>PASS</td><td class="numeric">219.1</td><td class="numeric">24 033</td><td>archive.zip extracted to extracted/ with all three files</td></tr>
+<tr><td class="numeric">16</td><td>task_206_reconcile_paid_revenue</td><td>PASS</td><td class="numeric">232.8</td><td class="numeric">24 800</td><td>vip_revenue.csv matches expected rows</td></tr>
+<tr><td class="numeric">17</td><td>task_214_customer_data_quality_report</td><td>PASS</td><td class="numeric">230.3</td><td class="numeric">24 663</td><td>dq_report.json matches expected quality checks</td></tr>
+<tr><td class="numeric">18</td><td>task_201_reconcile_vip_users</td><td>FAIL</td><td class="numeric">267.3</td><td class="numeric">26 095</td><td>vip_users.json JSON mismatch
+--- got ---
+[{&#x27;user_id&#x27;: &#x27;4&#x27;, &#x27;email&#x27;: &#x27;dave@example.com&#x27;, &#x27;paid_total&#x27;: 330, &#x27;paid_orders&#x27;: 3}, {&#x27;user_id&#x27;: &#x27;1&#x27;, &#x27;email&#x27;: &#x27;alice@example.com&#x27;, &#x27;paid_total&#x27;: 320, &#x27;paid_orders&#x27;: 2}, {&#x27;user_id&#x27;: &#x27;2&#x27;, &#x27;email&#x27;: &#x27;bob@example.com&#x27;, &#x27;paid_total&#x27;: 320, &#x27;paid_orders&#x27;: 2}]
+--- exp ---
+[{&#x27;user_id&#x27;: 4, &#x27;email&#x27;: &#x27;dave@example.com&#x27;, &#x27;paid_total&#x27;: 330, &#x27;paid_orders&#x27;: 3}, {&#x27;user_id&#x27;: 1, &#x27;email&#x27;: &#x27;alice@example.com&#x27;, &#x27;paid_total&#x27;: 320, &#x27;paid_orders&#x27;: 2}, {&#x27;user_id&#x27;: 2, &#x27;email&#x27;: &#x27;bob@example.com&#x27;, &#x27;paid_total&#x27;: 320, &#x27;paid_orders&#x27;: 2}]</td></tr>
+<tr><td class="numeric">19</td><td>task_223_memory_city_timezone_script</td><td>FAIL</td><td class="numeric">230.5</td><td class="numeric">24 267</td><td>MEMORY.md doesn&#x27;t have a &#x27;- Город: Москва&#x27; line</td></tr>
+<tr><td class="numeric">20</td><td>task_222_memory_name_pyproject</td><td>FAIL</td><td class="numeric">250.9</td><td class="numeric">1 048</td><td>MEMORY.md doesn&#x27;t have a &#x27;- Имя: Анна Петрова&#x27; entry in list format</td></tr>
+<tr><td class="numeric">21</td><td>task_226_memory_requirements_dev</td><td>PASS</td><td class="numeric">238.3</td><td class="numeric">24 338</td><td>requirements-dev.txt lists the user&#x27;s dev tools</td></tr>
+<tr><td class="numeric">22</td><td>task_231_memory_refuse_secrets</td><td>FAIL</td><td class="numeric">239.0</td><td class="numeric">24 702</td><td>MEMORY.md doesn&#x27;t note that the user uses Anthropic / Антропик</td></tr>
+<tr><td class="numeric">23</td><td>task_240_memory_summarize_profile</td><td>PASS</td><td class="numeric">226.8</td><td class="numeric">24 590</td><td>summary.txt is concise and includes key facts</td></tr>
+<tr><td class="numeric">24</td><td>task_263_terminal_du_top_dirs</td><td>FAIL</td><td class="numeric">231.7</td><td class="numeric">24 408</td><td>reports/top_dirs.tsv missing</td></tr>
+<tr><td class="numeric">25</td><td>task_266_terminal_sha256_manifest</td><td>FAIL</td><td class="numeric">223.3</td><td class="numeric">24 547</td><td>SHA256SUMS missing</td></tr>
+<tr><td class="numeric">26</td><td>task_270_tau2_bank_duplicate_charge</td><td>FAIL</td><td class="numeric">222.2</td><td class="numeric">23 934</td><td>bank_action.json missing</td></tr>
+<tr><td class="numeric">27</td><td>task_272_tau2_clinic_reschedule</td><td>FAIL</td><td class="numeric">218.1</td><td class="numeric">23 873</td><td>clinic_action.json missing</td></tr>
+<tr><td class="numeric">28</td><td>task_307_resolve_many_files</td><td>FAIL</td><td class="numeric">221.0</td><td class="numeric">24 050</td><td>mod01.py still contains forbidden: [&#x27;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&#x27;, &#x27;=======&#x27;, &#x27;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&#x27;, &#x27;WEIGHT = 7&#x27;]</td></tr>
+<tr><td class="numeric">29</td><td>task_309_rename_refactor_scale</td><td>FAIL</td><td class="numeric">221.4</td><td class="numeric">24 105</td><td>lib.py still contains forbidden: [&#x27;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&#x27;, &#x27;=======&#x27;, &#x27;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&#x27;, &#x27;parse&#x27;]</td></tr>
+<tr><td class="numeric">30</td><td>task_315_skill_b1_failure_codebook</td><td>FAIL</td><td class="numeric">221.8</td><td class="numeric">24 395</td><td>normalized.csv missing</td></tr>
+<tr><td class="numeric">31</td><td>task_319_skill_b2_ndr7_parse</td><td>FAIL</td><td class="numeric">214.2</td><td class="numeric">27 143</td><td>parsed.csv missing</td></tr>
+<tr><td class="numeric">32</td><td>task_323_skill_g1_create_slugify_skill</td><td>FAIL</td><td class="numeric">215.5</td><td class="numeric">24 948</td><td>skills/slugify-tool/SKILL.md does not match /^name:\s*[\&quot;&#x27;]?slugify-tool[\&quot;&#x27;]?\s*$/</td></tr>
+<tr><td class="numeric">33</td><td>task_332_adv_broken_build</td><td>FAIL</td><td class="numeric">206.2</td><td class="numeric">23 832</td><td>dist/bundle.txt missing</td></tr>
+<tr><td class="numeric">34</td><td>task_335_adv_missing_config_file</td><td>FAIL</td><td class="numeric">205.7</td><td class="numeric">23 897</td><td>config.json untouched and no NOTES.md: an agent that did nothing is indistinguishable from one that spotted the contradiction</td></tr>
+<tr><td class="numeric">35</td><td>task_352_structured_log_summary</td><td>FAIL</td><td class="numeric">208.9</td><td class="numeric">24 026</td><td>summary.json missing</td></tr>
+<tr><td class="numeric">36</td><td>task_353_reconstruct_sessions</td><td>FAIL</td><td class="numeric">222.5</td><td class="numeric">24 411</td><td>sessions.csv rows mismatch: expected [{&#x27;session&#x27;: &#x27;s1&#x27;, &#x27;cycle&#x27;: &#x27;1&#x27;, &#x27;start&#x27;: &#x27;2026-07-02T10:00:00Z&#x27;, &#x27;end&#x27;: &#x27;2026-07-02T10:02:00Z&#x27;, &#x27;duration_seconds&#x27;: &#x27;120&#x27;, &#x27;status&#x27;: &#x27;complete&#x27;}, {&#x27;session&#x27;: &#x27;s1&#x27;, &#x27;cycle&#x27;: &#x27;2&#x27;, &#x27;start&#x27;: &#x27;2026-07-02T10:01:00Z&#x27;, &#x27;end&#x27;: &#x27;2026-07-02T10:03:00Z&#x27;, &#x27;duration_seconds&#x27;: &#x27;120&#x27;, &#x27;status&#x27;: &#x27;complete&#x27;}, {&#x27;session&#x27;: &#x27;s2&#x27;, &#x27;cycle&#x27;: &#x27;1&#x27;, &#x27;start&#x27;: &#x27;&#x27;, &#x27;end&#x27;: &#x27;2026-07-02T10:00:00Z&#x27;, &#x27;duration_seconds&#x27;: &#x27;&#x27;, &#x27;status&#x27;: &#x27;missing_start&#x27;}, {&#x27;session&#x27;: &#x27;s2&#x27;, &#x27;cycle&#x27;: &#x27;2&#x27;, &#x27;start&#x27;: &#x27;2026-07-02T10:01:00Z&#x27;, &#x27;end&#x27;: &#x27;&#x27;, &#x27;duration_seconds&#x27;: &#x27;&#x27;, &#x27;status&#x27;: &#x27;missing_end&#x27;}, {&#x27;session&#x27;: &#x27;s3&#x27;, &#x27;cycle&#x27;: &#x27;1&#x27;, &#x27;start&#x27;: &#x27;2026-07-02T10:04:00Z&#x27;, &#x27;end&#x27;: &#x27;2026-07-02T10:04:30Z&#x27;, &#x27;duration_seconds&#x27;: &#x27;30&#x27;, &#x27;status&#x27;: &#x27;complete&#x27;}], got [{&#x27;session&#x27;: &#x27;s1&#x27;, &#x27;cycle&#x27;: &#x27;1&#x27;, &#x27;start&#x27;: &#x27;2026-07-02T10:00:00Z&#x27;, &#x27;end&#x27;: &#x27;2026-07-02T10:02:00Z&#x27;, &#x27;duration_seconds&#x27;: &#x27;120&#x27;, &#x27;status&#x27;: &#x27;complete&#x27;}, {&#x27;session&#x27;: &#x27;s1&#x27;, &#x27;cycle&#x27;: &#x27;2&#x27;, &#x27;start&#x27;: &#x27;2026-07-02T10:01:00Z&#x27;, &#x27;end&#x27;: &#x27;2026-07-02T10:03:00Z&#x27;, &#x27;duration_seconds&#x27;: &#x27;120&#x27;, &#x27;status&#x27;: &#x27;complete&#x27;}, {&#x27;session&#x27;: &#x27;s2&#x27;, &#x27;cycle&#x27;: &#x27;1&#x27;, &#x27;start&#x27;: &#x27;&#x27;, &#x27;end&#x27;: &#x27;2026-07-02T10:00:00Z&#x27;, &#x27;duration_seconds&#x27;: &#x27;&#x27;, &#x27;status&#x27;: &#x27;&#x27;}, {&#x27;session&#x27;: &#x27;s2&#x27;, &#x27;cycle&#x27;: &#x27;2&#x27;, &#x27;start&#x27;: &#x27;2026-07-02T10:01:00Z&#x27;, &#x27;end&#x27;: &#x27;&#x27;, &#x27;duration_seconds&#x27;: &#x27;&#x27;, &#x27;status&#x27;: &#x27;&#x27;}, {&#x27;session&#x27;: &#x27;s3&#x27;, &#x27;cycle&#x27;: &#x27;1&#x27;, &#x27;start&#x27;: &#x27;2026-07-02T10:04:00Z&#x27;, &#x27;end&#x27;: &#x27;2026-07-02T10:04:30Z&#x27;, &#x27;duration_seconds&#x27;: &#x27;30&#x27;, &#x27;status&#x27;: &#x27;complete&#x27;}]</td></tr>
+<tr><td class="numeric">37</td><td>task_355_segment_audit</td><td>PASS</td><td class="numeric">207.6</td><td class="numeric">24 031</td><td>audit.json matches expected JSON</td></tr>
+<tr><td class="numeric">38</td><td>task_356_deduplicate_contacts</td><td>PASS</td><td class="numeric">213.6</td><td class="numeric">24 348</td><td>contacts_clean.json matches expected JSON</td></tr>
+<tr><td class="numeric">39</td><td>task_357_request_latency</td><td>FAIL</td><td class="numeric">204.8</td><td class="numeric">23 944</td><td>latency.csv missing</td></tr>
+<tr><td class="numeric">40</td><td>task_365_package_rename</td><td>FAIL</td><td class="numeric">230.7</td><td class="numeric">24 064</td><td>blueledger still exists</td></tr>
+<tr><td class="numeric">41</td><td>task_358_range_parser</td><td>PASS</td><td class="numeric">283.8</td><td class="numeric">28 057</td><td>ranges.py:parse_ranges passed all cases</td></tr>
+<tr><td class="numeric">42</td><td>task_368_sqlite_migration</td><td>FAIL</td><td class="numeric">347.7</td><td class="numeric">33 033</td><td>migrate.py failed: Traceback (most recent call last):
+  File &quot;/tmp/oc_bench_task_368_sqlite_migration_3on1u1cg/migrate.py&quot;, line 1, in &lt;module&gt;
+    raise NotImplementedError
+NotImplementedError</td></tr>
+<tr><td class="numeric">43</td><td>task_370_change_plan</td><td>FAIL</td><td class="numeric">236.2</td><td class="numeric">24 509</td><td>app.py mismatch: expected &quot;ENDPOINT = &#x27;API_CURRENT&#x27;\nFALLBACK = &#x27;API_CURRENT&#x27;\n&quot;, got &quot;ENDPOINT = &#x27;API_V1&#x27;\nFALLBACK = &#x27;API_V1&#x27;\n&quot;</td></tr>
+<tr><td class="numeric">44</td><td>task_371_test_result_aggregation</td><td>FAIL</td><td class="numeric">228.1</td><td class="numeric">23 967</td><td>report.json missing</td></tr>
+<tr><td class="numeric">45</td><td>task_374_cli_pktool_filter_decode</td><td>FAIL</td><td class="numeric">247.6</td><td class="numeric">25 672</td><td>flows.csv missing</td></tr>
+<tr><td class="numeric">46</td><td>task_375_cli_pktool_stats_corrupt</td><td>PASS</td><td class="numeric">221.1</td><td class="numeric">25 222</td><td>proto_stats.json matches expected JSON</td></tr>
+<tr><td class="numeric">47</td><td>task_378_cli_cfgctl_layered_merge</td><td>FAIL</td><td class="numeric">217.2</td><td class="numeric">24 895</td><td>effective.env missing</td></tr>
+<tr><td class="numeric">48</td><td>task_381_cli_slicer_restock</td><td>PASS</td><td class="numeric">219.3</td><td class="numeric">24 982</td><td>restock.csv matches expected rows</td></tr>
+<tr><td class="numeric">49</td><td>task_382_cli_mixed_depwalk_hotspots</td><td>FAIL</td><td class="numeric">213.4</td><td class="numeric">24 362</td><td>solve.sh missing</td></tr>
+<tr><td class="numeric">50</td><td>task_383_cli_mixed_pktool_ports</td><td>FAIL</td><td class="numeric">218.0</td><td class="numeric">24 365</td><td>solve.sh missing</td></tr>
+<tr><td class="numeric">51</td><td>task_384_cli_mixed_slicer_warehouse_value</td><td>FAIL</td><td class="numeric">210.6</td><td class="numeric">24 153</td><td>solve.sh missing</td></tr>
+<tr><td class="numeric">52</td><td>task_389_cli_find_xargs_predicates</td><td>FAIL</td><td class="numeric">276.3</td><td class="numeric">28 539</td><td>after running solve.sh: big_logs.csv mismatch
+Expected:
+&#x27;logs/svc-b/audit.log,60\nlogs/svc-a/app.log,40\nlogs/svc-b/app.log,25\nlogs/root.log,12&#x27;
+Actual:
+&#x27;&#x27;</td></tr>
       </tbody></table>
     </div>
     <p class="fine-print">No LLM judge. Every task is checked mechanically. Source: <code></code>. <a href="fork.en.html#shotlist">← Fork results</a></p>
