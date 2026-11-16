@@ -8,6 +8,10 @@ jobs:
   quality:
     name: Quality (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    # Defensive guard: the ubuntu leg runs the full pytest suite + the 531-task
+    # gold verification (~14-18 min). Without a cap a truly hung step would burn
+    # the GitHub default 360 min before cancellation; fail fast instead.
+    timeout-minutes: 30
 
     env:
       PYTHONUTF8: "1"
