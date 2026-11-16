@@ -182,3 +182,22 @@ def test_ouroboros_usage_matches_last_attempts_without_cache_double_count():
     for number, attempt in ((437, 8), (442, 4), (443, 8), (449, 5), (454, 5)):
         assert by_number[number]["selected_attempt"] == attempt
     assert not any(by_number[n]["passed"] for n in (437, 442, 449))
+
+
+def test_secret_pi_usage_preserves_score_and_marks_missing_native_episodes():
+    source = json.loads((ROOT / "docs/secretmodel-1114.json").read_text())
+    measurement = next(m for m in source["measurements"] if m["harness"] == "pi-mono" and m["suite"] == "medium")
+    row = next(r for r in build()["rows"] if r["id"] == "secretmodel-1114-pi")
+    assert row["overall_passed"] == 40 and row["measured_tasks"] == 90
+    assert row["usage"]["tokens"]["value"] == measurement["tokens"] == 271297256
+    assert sum(t["agent_total_tokens"] for t in measurement["tasks"]) == 271297256
+    assert row["usage"]["tokens"]["input_tokens"] == 267790775
+    assert row["usage"]["tokens"]["output_tokens"] == 3506481
+    assert row["usage"]["tokens"]["covered_tasks"] == 90
+    assert row["usage"]["tokens"]["status"] == "partial"
+    assert row["usage"]["tokens"]["lower_bound"]
+    assert row["usage"]["tokens"]["unmetered_requests"] == 14
+    assert row["usage"]["tokens"]["completed_responses"] == 3314
+    assert row["usage"]["steps"]["status"] == "unavailable"
+    assert sum(t["token_usage_complete"] for t in measurement["tasks"]) == 76
+    assert all(t["agent_total_tokens"] == t["input_tokens"] + t["output_tokens"] for t in measurement["tasks"])

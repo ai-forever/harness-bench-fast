@@ -19403,10 +19403,17 @@
         "observed_tasks": 90,
         "notes": [
           "Retained public measurement counters only. Missing tasks are unmeasured, not failures.",
-          "Task counts show counter availability, not full request-level accounting."
+          "Task counts show counter availability, not full request-level accounting.",
+          "Latest retained execution of each task in the original published Pi 40/90 run; separate selected-retest runs excluded.",
+          "Pi input is normalized as input + cacheRead + cacheWrite; output includes reasoning. Count assistant message_end once, excluding streaming snapshots.",
+          "3314 metered of 3328 observable native assistant episodes; 14 unmetered. Hidden SDK retries may not be observable without wire capture. Totals are a lower bound, not a monetary bill.",
+          "Latest retained execution of each task in the original published Pi 40/90 run; separate selected-retest runs excluded.",
+          "Pi input is normalized as input + cacheRead + cacheWrite; output includes reasoning. Count assistant message_end once, excluding streaming snapshots.",
+          "3314 metered of 3328 observable native assistant episodes; 14 unmetered. Hidden SDK retries may not be observable without wire capture. Totals are a lower bound, not a monetary bill."
         ],
         "sources_sha256": [
-          "3c8a5a2227dfd30c5d6bf25c1bfe49dd376c290d823a59daf93e0ebb3c7786a8"
+          "3c8a5a2227dfd30c5d6bf25c1bfe49dd376c290d823a59daf93e0ebb3c7786a8",
+          "5dbb10d63d08bc52660e83c4c79e6cf6f1f59462f8c257b327e79bd03707b60f"
         ],
         "steps": {
           "value": null,
@@ -19415,10 +19422,18 @@
           "lower_bound": false
         },
         "tokens": {
-          "value": null,
-          "covered_tasks": 0,
-          "status": "unavailable",
-          "lower_bound": false
+          "value": 271297256,
+          "covered_tasks": 90,
+          "status": "partial",
+          "lower_bound": true,
+          "input_tokens": 267790775,
+          "input_tokens_accounting_complete": true,
+          "output_tokens": 3506481,
+          "output_tokens_accounting_complete": true,
+          "completed_responses": 3314,
+          "completed_responses_accounting_complete": true,
+          "unmetered_requests": 14,
+          "unmetered_requests_accounting_complete": true
         }
       }
     },
