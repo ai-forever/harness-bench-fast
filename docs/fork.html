@@ -24,12 +24,18 @@
   td.place{opacity:.6;font-variant-numeric:tabular-nums}
   footer{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;align-items:center}
   .repos a{margin-left:.6rem}
+  nav.pagenav{display:flex;flex-wrap:wrap;gap:.55rem;align-items:stretch}
+  nav.pagenav a{display:flex;flex-direction:column;justify-content:center;line-height:1.15;padding:.35rem .6rem;border:1px solid rgba(127,127,127,.4);border-radius:.55rem;text-decoration:none}
+  nav.pagenav a:hover{border-color:currentColor;background:rgba(127,127,127,.08);text-decoration:none}
+  nav.pagenav a span{font-weight:600}
+  nav.pagenav a small{font-size:.72em;opacity:.75}
+  nav.pagenav a.lang-switch{flex-direction:row;align-items:center}
 </style>
 </head>
 <body>
   <header>
     <a class="brand" href="index.html">harness_bench_fast<span class="brand-dot">.</span></a>
-    <nav aria-label="Primary"><a href="../FORK.md">Индекс форка</a> <a href="fork-sample.html">Capability sample (20)</a> <a href="model-selection-guidance.html">Выбор модели</a> <a class="lang-switch" href="fork.en.html" title="Switch to English">EN</a></nav>
+    <nav aria-label="Primary" class="pagenav"><a href="../FORK.md"><span>Индекс форка</span><small>обзор наших прогонов</small></a> <a href="fork-sample.html"><span>Capability sample (20)</span><small>20 задач · урезанный охват</small></a> <a href="model-selection-guidance.html"><span>Выбор модели</span><small>что × чем × когда</small></a> <a class="lang-switch" href="fork.en.html" title="Switch to English">EN</a></nav>
   </header>
   <main>
     <section class="intro">

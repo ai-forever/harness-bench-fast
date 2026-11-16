@@ -837,6 +837,12 @@ STYLE = """<style>
   td.place{opacity:.6;font-variant-numeric:tabular-nums}
   footer{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;align-items:center}
   .repos a{margin-left:.6rem}
+  nav.pagenav{display:flex;flex-wrap:wrap;gap:.55rem;align-items:stretch}
+  nav.pagenav a{display:flex;flex-direction:column;justify-content:center;line-height:1.15;padding:.35rem .6rem;border:1px solid rgba(127,127,127,.4);border-radius:.55rem;text-decoration:none}
+  nav.pagenav a:hover{border-color:currentColor;background:rgba(127,127,127,.08);text-decoration:none}
+  nav.pagenav a span{font-weight:600}
+  nav.pagenav a small{font-size:.72em;opacity:.75}
+  nav.pagenav a.lang-switch{flex-direction:row;align-items:center}
 </style>"""
 
 SCRIPT = r"""<script>
@@ -966,7 +972,7 @@ __STYLE__
 <body>
   <header>
     <a class="brand" href="index.html">harness_bench_fast<span class="brand-dot">.</span></a>
-    <nav aria-label="Primary"><a href="__FORKMD__">__FORK_INDEX__</a> <a href="__SAMPLE__">__CAP_SAMPLE__</a> <a href="__GUIDANCE__">__GUIDANCE_LABEL__</a> <a class="lang-switch" href="__SWITCH__" title="__SWITCH_TITLE__">__SWITCH_LABEL__</a></nav>
+    <nav aria-label="Primary" class="pagenav"><a href="__FORKMD__"><span>__FORK_INDEX__</span><small>__CAP_FORK_INDEX__</small></a> <a href="__SAMPLE__"><span>__CAP_SAMPLE__</span><small>__CAP_SAMPLE_CAP__</small></a> <a href="__GUIDANCE__"><span>__GUIDANCE_LABEL__</span><small>__CAP_GUIDANCE__</small></a> <a class="lang-switch" href="__SWITCH__" title="__SWITCH_TITLE__">__SWITCH_LABEL__</a></nav>
   </header>
   <main>
     <section class="intro">
@@ -1008,6 +1014,9 @@ def render_html(data, locale=DEFAULT_LOCALE):
             .replace("__FORK_INDEX__", html.escape(t(locale, "fork_index")))
             .replace("__SAMPLE__", locale_filename("fork-sample", locale) + ".html")
             .replace("__CAP_SAMPLE__", html.escape(t(locale, "capability_sample")))
+            .replace("__CAP_FORK_INDEX__", html.escape(t(locale, "cap_fork_index")))
+            .replace("__CAP_SAMPLE_CAP__", html.escape(t(locale, "cap_sample")))
+            .replace("__CAP_GUIDANCE__", html.escape(t(locale, "cap_guidance")))
             .replace("__GUIDANCE__", locale_filename("model-selection-guidance", locale) + ".html")
             .replace("__GUIDANCE_LABEL__", html.escape(t(locale, "nav_guidance")))
             .replace("__SWITCH__", locale_filename("fork", other) + ".html")

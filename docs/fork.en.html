@@ -24,12 +24,18 @@
   td.place{opacity:.6;font-variant-numeric:tabular-nums}
   footer{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;align-items:center}
   .repos a{margin-left:.6rem}
+  nav.pagenav{display:flex;flex-wrap:wrap;gap:.55rem;align-items:stretch}
+  nav.pagenav a{display:flex;flex-direction:column;justify-content:center;line-height:1.15;padding:.35rem .6rem;border:1px solid rgba(127,127,127,.4);border-radius:.55rem;text-decoration:none}
+  nav.pagenav a:hover{border-color:currentColor;background:rgba(127,127,127,.08);text-decoration:none}
+  nav.pagenav a span{font-weight:600}
+  nav.pagenav a small{font-size:.72em;opacity:.75}
+  nav.pagenav a.lang-switch{flex-direction:row;align-items:center}
 </style>
 </head>
 <body>
   <header>
     <a class="brand" href="index.html">harness_bench_fast<span class="brand-dot">.</span></a>
-    <nav aria-label="Primary"><a href="../FORK.en.md">Fork index</a> <a href="fork-sample.en.html">Capability sample (20)</a> <a href="model-selection-guidance.en.html">Model selection</a> <a class="lang-switch" href="fork.html" title="Переключить на русский">RU</a></nav>
+    <nav aria-label="Primary" class="pagenav"><a href="../FORK.en.md"><span>Fork index</span><small>our run overview</small></a> <a href="fork-sample.en.html"><span>Capability sample (20)</span><small>20 tasks · partial coverage</small></a> <a href="model-selection-guidance.en.html"><span>Model selection</span><small>what × with what × when</small></a> <a class="lang-switch" href="fork.html" title="Переключить на русский">RU</a></nav>
   </header>
   <main>
     <section class="intro">
