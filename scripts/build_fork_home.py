@@ -972,7 +972,7 @@ __STYLE__
 <body>
   <header>
     <a class="brand" href="index.html">harness_bench_fast<span class="brand-dot">.</span></a>
-    <nav aria-label="Primary" class="pagenav"><a href="__FORKMD__"><span>__FORK_INDEX__</span><small>__CAP_FORK_INDEX__</small></a> <a href="__SAMPLE__"><span>__CAP_SAMPLE__</span><small>__CAP_SAMPLE_CAP__</small></a> <a href="__GUIDANCE__"><span>__GUIDANCE_LABEL__</span><small>__CAP_GUIDANCE__</small></a> <a class="lang-switch" href="__SWITCH__" title="__SWITCH_TITLE__">__SWITCH_LABEL__</a></nav>
+    <nav aria-label="Primary" class="pagenav"><a href="__FORKMD__"><span>__FORK_INDEX__</span><small>__CAP_FORK_INDEX__</small></a> <a href="__SAMPLE__"><span>__CAP_SAMPLE__</span><small>__CAP_SAMPLE_CAP__</small></a> <a href="__GUIDANCE__"><span>__GUIDANCE_LABEL__</span><small>__CAP_GUIDANCE__</small></a> <a href="__ARCHIVE__"><span>__NAV_ARCHIVE__</span><small>__CAP_ARCHIVE__</small></a> <a class="lang-switch" href="__SWITCH__" title="__SWITCH_TITLE__">__SWITCH_LABEL__</a></nav>
   </header>
   <main>
     <section class="intro">
@@ -1017,6 +1017,9 @@ def render_html(data, locale=DEFAULT_LOCALE):
             .replace("__CAP_FORK_INDEX__", html.escape(t(locale, "cap_fork_index")))
             .replace("__CAP_SAMPLE_CAP__", html.escape(t(locale, "cap_sample")))
             .replace("__CAP_GUIDANCE__", html.escape(t(locale, "cap_guidance")))
+            .replace("__ARCHIVE__", "archive.ru.html")
+            .replace("__NAV_ARCHIVE__", html.escape(t(locale, "nav_archive")))
+            .replace("__CAP_ARCHIVE__", html.escape(t(locale, "cap_archive")))
             .replace("__GUIDANCE__", locale_filename("model-selection-guidance", locale) + ".html")
             .replace("__GUIDANCE_LABEL__", html.escape(t(locale, "nav_guidance")))
             .replace("__SWITCH__", locale_filename("fork", other) + ".html")

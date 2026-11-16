@@ -20,6 +20,7 @@ methodology, upstream rows) stays in the main [`README.md`](README.md) and is no
 
 - 📊 **Detailed fork tables:** [`docs/fork-results.en.md`](docs/fork-results.en.md)
 - 🧭 **Model/harness selection guidance:** [`docs/model-selection-guidance.en.html`](docs/model-selection-guidance.en.html) (RU: [`docs/model-selection-guidance.html`](docs/model-selection-guidance.html); source — [`docs/model-selection-guidance.en.md`](docs/model-selection-guidance.en.md)) — what × with what × when, from completed runs
+- 🗂️ **Measurement archive (RU):** [`docs/archive.ru.html`](docs/archive.ru.html) — Russian mirror of the archive page (EN source: `docs/archive.html`)
 - 🔬 **Live layout:** <https://ai-forever.github.io/harness-bench-fast/>
 - 🧭 **Our fork results page:** <https://alex-kul777.github.io/harness-bench-fast/fork.en.html> (tabs Shot List / Light / **Medium (90)** / **Medium sample**; data: `docs/fork-home-results.json`, generator `scripts/build_fork_home.py`)
   - `#medium` — the full **90** tasks (historical 80 + wave21); our rows are marked `partial`.
