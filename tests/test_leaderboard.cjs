@@ -246,7 +246,7 @@ for (const suite of ["light", "medium"]) {
   assert.equal(shown.length, suite === "light" ? 2 : 3);
   assert.ok(shown.every(row => row.result.total === (suite === "light" ? 391 : 90)));
 }
-assert.deepEqual(selectResults(currentData, "medium", "current", "SecretModel-1114", true).map(r => r.result.passed), [40, 28, 21]);
+assert.deepEqual(selectResults(currentData, "medium", "current", "SecretModel-1114", true).map(r => r.result.passed), [40, 25, 21]);
 assert.ok(landing.includes('id="show-secret-models" type="checkbox"'));
 assert.equal(selectResults(currentData, "medium", "medium80", "secret", false).length, 0);
 assert.equal(selectResults(currentData, "medium", "current", "SecretModel-1114", true)[0].result.note, "provisional · HTTP 400");
@@ -259,4 +259,8 @@ assert.equal(pi0731[0].usage.tokens.value, 445223867);
 assert.equal(pi0731[0].usage.tokens.lower_bound, true);
 assert.ok(formatUsage(pi0731[0].usage, "tokens").text.startsWith("≥ "));
 assert.equal(selectResults(currentData, "medium", "current", "Ouroboros", true).length, 1);
-assert.ok(medium90.rows.some(r => r.id === "secretmodel-1114-ouroboros" && r.observed_passed === 28 && r.status === "complete"));
+assert.ok(medium90.rows.some(r => r.id === "secretmodel-1114-ouroboros" && r.observed_passed === 25 && r.status === "complete"));
+
+const ouroboros = selectResults(currentData, "medium", "current", "Ouroboros", true)[0];
+assert.ok(ouroboros.usage.tokens.value > 0 && ouroboros.usage.tokens.lower_bound);
+assert.ok(formatUsage(ouroboros.usage, "tokens").text.startsWith("≥ "));
