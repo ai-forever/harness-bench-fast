@@ -258,3 +258,5 @@ assert.equal(pi0731[0].harness, "Pi 1.5.2");
 assert.equal(pi0731[0].usage.tokens.value, 445223867);
 assert.equal(pi0731[0].usage.tokens.lower_bound, true);
 assert.ok(formatUsage(pi0731[0].usage, "tokens").text.startsWith("≥ "));
+assert.equal(selectResults(currentData, "medium", "current", "Ouroboros", true).length, 0);
+assert.ok(medium90.rows.some(r => r.id === "secretmodel-1114-ouroboros" && r.observed_passed === 28 && r.status === "partial"));

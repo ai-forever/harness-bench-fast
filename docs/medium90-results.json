@@ -114,12 +114,13 @@
     "pi_deepseek0731_medium90_sha256": "bcce79bb9238cb1b396af802f70786e6f25d0048f8d00b1fd5e2a7cfd051c112"
   },
   "summary": {
-    "rows": 128,
+    "rows": 129,
     "ranked_rows": 11,
     "coverage": {
       "1": 1,
       "10": 8,
       "40": 89,
+      "77": 1,
       "80": 19,
       "90": 11
     }
@@ -19581,6 +19582,172 @@
           "covered_tasks": 57,
           "status": "partial",
           "lower_bound": true
+        }
+      }
+    },
+    {
+      "id": "secretmodel-1114-ouroboros",
+      "profile_id": "secretmodel-1114-ouroboros",
+      "model": "SecretModel-1114",
+      "harness": "Ouroboros",
+      "secret_model": true,
+      "runs": 1,
+      "source_version": "0.21.3",
+      "reasoning_effort": "medium",
+      "measurement_type": "adjudicated_partial_medium90",
+      "measurement_valid": null,
+      "details_url": "secretmodel-1114-ouroboros.html",
+      "result_note": "partial · 13 unresolved HTTP 400 protocol errors",
+      "previous": {
+        "passed": 28,
+        "measured": 67,
+        "total": 80,
+        "scope_note": "first authoritative retained outcomes; incomplete run"
+      },
+      "wave21": {
+        "passed": 0,
+        "measured": 10,
+        "total": 10,
+        "scope_note": "first authoritative retained outcomes; incomplete run"
+      },
+      "components": [
+        {
+          "task_numbers": [
+            392,
+            393,
+            394,
+            395,
+            397,
+            398,
+            399,
+            402,
+            404,
+            405,
+            407,
+            408,
+            410,
+            411,
+            412,
+            413,
+            414,
+            415,
+            416,
+            417,
+            418,
+            419,
+            420,
+            421,
+            422,
+            423,
+            424,
+            425,
+            426,
+            427,
+            428,
+            429,
+            430,
+            431,
+            432,
+            435,
+            436,
+            437,
+            438,
+            439,
+            440,
+            441,
+            442,
+            443,
+            444,
+            445,
+            446,
+            447,
+            448,
+            449,
+            450,
+            451,
+            452,
+            454,
+            455,
+            458,
+            459,
+            460,
+            461,
+            462,
+            463,
+            464,
+            466,
+            467,
+            468,
+            470,
+            471
+          ],
+          "passed": 28,
+          "source_version": "0.21.3",
+          "note": "first authoritative retained outcomes; incomplete run"
+        },
+        {
+          "task_numbers": [
+            512,
+            518,
+            520,
+            522,
+            523,
+            524,
+            525,
+            526,
+            527,
+            530
+          ],
+          "passed": 0,
+          "source_version": "0.21.3",
+          "note": "first authoritative retained outcomes; incomplete run"
+        }
+      ],
+      "measured_tasks": 77,
+      "target_tasks": 90,
+      "missing_task_numbers": [
+        396,
+        400,
+        401,
+        403,
+        406,
+        409,
+        433,
+        434,
+        453,
+        456,
+        457,
+        465,
+        469
+      ],
+      "observed_passed": 28,
+      "overall_passed": null,
+      "score": null,
+      "rank": null,
+      "status": "partial",
+      "usage": {
+        "tasks": 90,
+        "observed_tasks": 77,
+        "notes": [
+          "Retained public measurement counters only. Missing tasks are unmeasured, not failures.",
+          "Task counts show counter availability, not full request-level accounting.",
+          "Counters unavailable for the retained task subset; zero means absent, not zero expenditure. All-attempt usage is excluded.",
+          "Counters unavailable for the retained task subset; zero means absent, not zero expenditure. All-attempt usage is excluded."
+        ],
+        "sources_sha256": [
+          "42bf1de09b242454322fbe10e704ae3888563e78840b9e5a756fceb77bd5aedb"
+        ],
+        "steps": {
+          "value": null,
+          "covered_tasks": 0,
+          "status": "unavailable",
+          "lower_bound": false
+        },
+        "tokens": {
+          "value": null,
+          "covered_tasks": 0,
+          "status": "unavailable",
+          "lower_bound": false
         }
       }
     }
