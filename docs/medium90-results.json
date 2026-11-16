@@ -115,14 +115,13 @@
   },
   "summary": {
     "rows": 129,
-    "ranked_rows": 11,
+    "ranked_rows": 12,
     "coverage": {
       "1": 1,
       "10": 8,
       "40": 89,
-      "77": 1,
       "80": 19,
-      "90": 11
+      "90": 12
     }
   },
   "rows": [
@@ -18054,7 +18053,7 @@
       "observed_passed": 0,
       "overall_passed": 0,
       "score": 0.0,
-      "rank": 11,
+      "rank": 12,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -19559,7 +19558,7 @@
       "observed_passed": 21,
       "overall_passed": 21,
       "score": 0.23333333333333334,
-      "rank": 10,
+      "rank": 11,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -19594,21 +19593,21 @@
       "runs": 1,
       "source_version": "0.21.3",
       "reasoning_effort": "medium",
-      "measurement_type": "adjudicated_partial_medium90",
-      "measurement_valid": null,
+      "measurement_type": "adjudicated_medium90",
+      "measurement_valid": true,
       "details_url": "secretmodel-1114-ouroboros.html",
-      "result_note": "partial · 13 unresolved HTTP 400 protocol errors",
+      "result_note": "includes 13 harness protocol failures",
       "previous": {
         "passed": 28,
-        "measured": 67,
+        "measured": 80,
         "total": 80,
-        "scope_note": "first authoritative retained outcomes; incomplete run"
+        "scope_note": "retained outcomes; harness protocol errors count as failures"
       },
       "wave21": {
         "passed": 0,
         "measured": 10,
         "total": 10,
-        "scope_note": "first authoritative retained outcomes; incomplete run"
+        "scope_note": "retained outcomes; harness protocol errors count as failures"
       },
       "components": [
         {
@@ -19617,14 +19616,20 @@
             393,
             394,
             395,
+            396,
             397,
             398,
             399,
+            400,
+            401,
             402,
+            403,
             404,
             405,
+            406,
             407,
             408,
+            409,
             410,
             411,
             412,
@@ -19648,6 +19653,8 @@
             430,
             431,
             432,
+            433,
+            434,
             435,
             436,
             437,
@@ -19666,8 +19673,11 @@
             450,
             451,
             452,
+            453,
             454,
             455,
+            456,
+            457,
             458,
             459,
             460,
@@ -19675,15 +19685,17 @@
             462,
             463,
             464,
+            465,
             466,
             467,
             468,
+            469,
             470,
             471
           ],
           "passed": 28,
           "source_version": "0.21.3",
-          "note": "first authoritative retained outcomes; incomplete run"
+          "note": "retained outcomes; harness protocol errors count as failures"
         },
         {
           "task_numbers": [
@@ -19700,34 +19712,20 @@
           ],
           "passed": 0,
           "source_version": "0.21.3",
-          "note": "first authoritative retained outcomes; incomplete run"
+          "note": "retained outcomes; harness protocol errors count as failures"
         }
       ],
-      "measured_tasks": 77,
+      "measured_tasks": 90,
       "target_tasks": 90,
-      "missing_task_numbers": [
-        396,
-        400,
-        401,
-        403,
-        406,
-        409,
-        433,
-        434,
-        453,
-        456,
-        457,
-        465,
-        469
-      ],
+      "missing_task_numbers": [],
       "observed_passed": 28,
-      "overall_passed": null,
-      "score": null,
-      "rank": null,
-      "status": "partial",
+      "overall_passed": 28,
+      "score": 0.3111111111111111,
+      "rank": 10,
+      "status": "complete",
       "usage": {
         "tasks": 90,
-        "observed_tasks": 77,
+        "observed_tasks": 90,
         "notes": [
           "Retained public measurement counters only. Missing tasks are unmeasured, not failures.",
           "Task counts show counter availability, not full request-level accounting.",

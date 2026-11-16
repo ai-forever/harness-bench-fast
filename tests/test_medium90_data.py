@@ -19,7 +19,7 @@ def test_published_medium90_is_reproducible_and_exact_suite():
     data = build()
     assert json.loads((ROOT / "docs/medium90-results.json").read_text(encoding="utf-8")) == data
     assert data["task_numbers"] == [task_number(t.id) for t in SUITES["medium"]]
-    assert data["summary"] == {"rows": 129, "ranked_rows": 11, "coverage": {"1": 1, "10": 8, "40": 89, "77": 1, "80": 19, "90": 11}}
+    assert data["summary"] == {"rows": 129, "ranked_rows": 12, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 12}}
     assert all((r["score"] is None) == (r["measured_tasks"] != 90) for r in data["rows"])
     assert all(len(set(r["missing_task_numbers"])) + r["measured_tasks"] == 90 for r in data["rows"])
 
@@ -44,20 +44,21 @@ def test_profiles_preserved_without_name_based_joins_or_wave19_doublecount():
     assert opus[0]["measured_tasks"] == 1 and opus[0]["wave21"]["measured"] == 1
 
 
-def test_ouroboros_partial_secret_result_has_no_full_score_or_rank():
+def test_ouroboros_harness_errors_count_as_failures_in_full_suite():
     source = json.loads((ROOT / "docs/secretmodel-1114-ouroboros.json").read_text())
     row = next(r for r in build()["rows"] if r["id"] == "secretmodel-1114-ouroboros")
     assert row["secret_model"] and row["model"] == "SecretModel-1114"
     assert row["reasoning_effort"] == "medium"
-    assert len(source["tasks"]) == row["measured_tasks"] == 77
-    assert sum(t["passed"] for t in source["tasks"]) == row["observed_passed"] == 28
-    assert row["missing_task_numbers"] == source["blocked_task_numbers"]
-    assert len(row["missing_task_numbers"]) == 13
-    assert row["status"] == "partial"
-    assert row["score"] is row["rank"] is row["overall_passed"] is None
+    assert len(source["tasks"]) == row["measured_tasks"] == 90
+    assert sum(t["passed"] for t in source["tasks"]) == row["overall_passed"] == 28
+    errors = [t for t in source["tasks"] if t.get("classification") == "harness_error"]
+    assert len(errors) == 13 and not any(t["passed"] for t in errors)
+    assert [t["number"] for t in errors] == source["harness_error_task_numbers"]
+    assert row["missing_task_numbers"] == [] and row["status"] == "complete"
+    assert row["score"] == 28 / 90 and row["rank"] is not None
     assert row["usage"]["tokens"]["status"] == "unavailable"
-    assert row["usage"]["sources_sha256"] == [source["source_sha256"]]
-    assert all(set(t) == {"number", "passed"} for t in source["tasks"])
+    assert source["scoring_revision"]["new_model_calls"] == 0
+    assert source["scoring_revision"]["previous_measured_tasks"] == 77
 
 
 def test_complete_compatible_components_score_but_missing_or_unverified_do_not():
