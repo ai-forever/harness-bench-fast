@@ -376,10 +376,10 @@ def _inject_chrome(text: str) -> str:
     banner = (
         '<div class="fork-banner" lang="ru">'
         '<span>Перевод; источник — англоязычная версия апстрима '
-        f'(<a href="archive.html">archive.html</a>). '
-        f'Форк: <a href="fork.html">fork.html</a></span>'
-        f'<span class="langchip"><span class="active">RU</span>'
-        f'<a href="archive.html" hreflang="en">EN</a></span>'
+        '(<a href="archive.html">archive.html</a>). '
+        'Форк: <a href="fork.html">fork.html</a></span>'
+        '<span class="langchip"><span class="active">RU</span>'
+        '<a href="archive.html" hreflang="en">EN</a></span>'
         "</div>"
     )
     text = text.replace("</head>", BANNER_CSS + "\n  </head>", 1)
