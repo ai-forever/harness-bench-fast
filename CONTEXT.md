@@ -127,3 +127,36 @@ docs ↔ `results/*.json` не ловится (у fork-генераторов г
   `Stem` — ссылка на `fork-detail-<stem>.html`; разряды в числах; `—` = не Pareto, `н/д` = нет данных.
 - **Q7 Delivery:** ветка `feat/guidance-v2`; CI-гейт `--lint` + `--check` (F-D9).
 - ADR: `docs/adr/0007-model-selection-guidance-v2.md`.
+
+## Review findings v2 (2026-11-16)
+Второе ревью — по **v2-странице**: `docs/reviews/2026-11-16-model-selection-guidance-v2-review.md`
+(PR #25, merged `d5591dd`). Дефекты F1–F8: F1 шапка обещает billing для всех premium
+(факт 6/43); F2 одиночная подгруппа → ✅ тривиально; F3 `Tier` пуст 25/88; F4 дубли
+anti-patterns по семействам; F5 `—` перегружен (reasoning vs Pareto); F6 a11y (нет
+`caption`/`scope`, ✅ только символом); F7 `time_min`/`steps` не показаны; F8 асимметрия
+фильтра сопоставимости между Pareto и anti-patterns.
+
+## Terms — дополнения v2
+### Lone task set (singleton)
+Сравнимый набор (`bucket × total`), в котором всего **один** прогон. Недоминируем
+**тривиально** → НЕ фронт и НЕ ✅; помечается `—` (lone set).
+
+### Recommended pick (★)
+Самый дешёвый **фронт**-прогон бакета на полном сравнимом наборе (не singleton).
+Помечается `★ рекомендуем`.
+
+### Tier (обновление v2)
+Терцили ₽/решённую задачу считаются **внутри сравнимого набора** (`bucket × total`), а не
+по «полному `total`» — поэтому partial-волны (long 6/20, reflect 5/15) тоже получают тир.
+
+## Decisions — Round 4 (accepted 2026-11-16)
+Источник: ревью v2 → grilling (grill-with-docs), фронтир Q1–Q7.
+- **Q1 (F1)** Текст шапки/legend/методологии: ₽ = биллинг **там, где есть reconciled-сайдкар**,
+  иначе оценка по тарифу (столбец `Basis`). Данные/числа не меняются.
+- **Q2 (F2)** Одиночные наборы (singleton) не получают ✅; пометка `—` (lone set).
+- **Q3 (F3)** Тиры — по сравнимому набору (`bucket × total`), а не по «полному `total`».
+- **Q4** Базис ₽ — оставить **смешанный** (billing/est.) с видимым `Basis`; в legend/TL;DR описать охват.
+- **Q5 (F8, F4)** Единый фильтр сопоставимости для Pareto и anti-patterns; дедуп anti-patterns по модели.
+- **Q6 (F5, F6, F7)** `n/a` для reasoning; `<caption>`/`scope`/aria для ✅; столбцы `Min`/`Steps`;
+  метка `(partial)`; локализация RU-заголовков; бейдж `★`; фильтр/сортировка (лёгкий JS).
+- **Q7** Доставка: PR #25 (ревью) смержен; реализация — `feat/guidance-v3`; ADR-0008.

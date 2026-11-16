@@ -42,12 +42,14 @@ def test_no_cross_task_set_dominance():
             assert other["pass_rate"] >= r["pass_rate"], (r["stem"], dom)
 
 
-def test_perfect_run_is_not_dominated():
+def test_lone_set_is_not_a_frontier_point():
+    """A lone (bucket × total) member is trivially non-dominated → not ✅ (F2)."""
     rows = _rows()
-    best = [r for r in rows if r["pass_rate"] == 1.0 and r["total"] == 5]
-    assert best, "expected the 5/5 reflect run in the measured set"
-    for r in best:
-        assert r["pareto"] is True, r["stem"]
+    lone = [r for r in rows if r.get("singleton")]
+    assert lone, "expected at least one lone task set"
+    for r in lone:
+        assert r["pareto"] is False, r["stem"]
+        assert r["dominated_by"] == [], r["stem"]
 
 
 def test_zero_solved_runs_are_kept():
@@ -60,13 +62,30 @@ def test_zero_solved_runs_are_kept():
         assert r["tier"] is None
 
 
-def test_tiers_only_for_full_comparable_sets():
+def test_tiers_are_per_comparable_subset():
+    """Tiers come from terciles within a (bucket × total) set, so partial waves get
+    their own tiers instead of "no tier" (F3)."""
     rows = _rows()
+    assert any(r["tier"] is not None
+               and r["total"] != bms.BUCKET_FULL[r["situation_bucket"]] for r in rows), \
+        "partial waves should now carry a tier"
     for r in rows:
-        if r["tier"] is None:
-            continue
-        assert r["total"] == bms.BUCKET_FULL[r["situation_bucket"]], r["stem"]
-        assert r["cost_per_solved"] is not None, r["stem"]
+        if r["tier"] is not None:
+            assert r["cost_per_solved"] is not None, r["stem"]
+
+
+def test_recommended_pick_per_full_bucket():
+    rows = _rows()
+    rec = [r for r in rows if r.get("recommended")]
+    assert rec, "expected at least one recommended pick"
+    for r in rec:
+        assert r["pareto"] and r["coverage"]["full"] and not r["singleton"], r["stem"]
+
+
+def test_reasoning_uses_na_placeholder():
+    rows = _rows()
+    assert not any("(thinking: \u2014)" in (r["model"] or "") for r in rows)
+    assert any("(thinking: n/a)" in (r["model"] or "") for r in rows)
 
 
 def test_basis_is_billing_or_estimate():

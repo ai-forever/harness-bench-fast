@@ -38,6 +38,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": true,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
@@ -64,6 +66,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": true,
+   "singleton": false,
+   "recommended": true,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
@@ -90,6 +94,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111"
    ],
@@ -97,7 +103,7 @@
   },
   {
    "harness": "Pi",
-   "model": "Claude Sonnet 4.5 (thinking: —)",
+   "model": "Claude Sonnet 4.5 (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -118,6 +124,8 @@
    "basis": "billing",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash_high_20261107",
@@ -148,6 +156,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash_high_20261107",
@@ -179,6 +189,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111"
    ],
@@ -186,7 +198,7 @@
   },
   {
    "harness": "OpenClaw",
-   "model": "DeepSeek-V4.1-Flash (thinking: —)",
+   "model": "DeepSeek-V4.1-Flash (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -207,6 +219,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash_high_20261107",
@@ -238,6 +252,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -249,7 +265,7 @@
   },
   {
    "harness": "Pi",
-   "model": "Claude Sonnet 4.6 (thinking: —)",
+   "model": "Claude Sonnet 4.6 (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -270,6 +286,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -303,6 +321,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -318,7 +338,7 @@
   },
   {
    "harness": "Pi",
-   "model": "DeepSeek-V4.1-Flash (thinking: —)",
+   "model": "DeepSeek-V4.1-Flash (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -339,6 +359,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111"
    ],
@@ -346,7 +368,7 @@
   },
   {
    "harness": "Pi",
-   "model": "GLM-5.3 (thinking: —)",
+   "model": "GLM-5.3 (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -367,6 +389,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -400,6 +424,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -434,6 +460,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -469,6 +497,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -484,7 +514,7 @@
   },
   {
    "harness": "Pi",
-   "model": "Claude Sonnet 4.6 (thinking: —)",
+   "model": "Claude Sonnet 4.6 (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -505,6 +535,8 @@
    "basis": "billing",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -521,7 +553,7 @@
   },
   {
    "harness": "Pi",
-   "model": "Claude Opus 4.8 (thinking: —)",
+   "model": "Claude Opus 4.8 (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -542,6 +574,8 @@
    "basis": "billing",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -582,6 +616,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -623,6 +659,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -638,7 +676,7 @@
   },
   {
    "harness": "Pi",
-   "model": "Claude Opus 5.5 (thinking: —)",
+   "model": "Claude Opus 5.5 (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -659,6 +697,8 @@
    "basis": "billing",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -696,6 +736,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -740,6 +782,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -786,6 +830,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -812,7 +858,7 @@
   },
   {
    "harness": "Pi",
-   "model": "Claude Fable 5.1 (thinking: —)",
+   "model": "Claude Fable 5.1 (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -833,6 +879,8 @@
    "basis": "billing",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -881,6 +929,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -906,7 +956,7 @@
   },
   {
    "harness": "Pi",
-   "model": "Claude Fable 5 (thinking: —)",
+   "model": "Claude Fable 5 (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -927,6 +977,8 @@
    "basis": "billing",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -975,6 +1027,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -1005,7 +1059,7 @@
   },
   {
    "harness": "OpenClaw",
-   "model": "GLM-5.3 (thinking: —)",
+   "model": "GLM-5.3 (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -1026,6 +1080,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash_high_20261107",
@@ -1037,7 +1093,7 @@
   },
   {
    "harness": "Pi",
-   "model": "Qwen3.6-35B-A3B (thinking: —)",
+   "model": "Qwen3.6-35B-A3B (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -1058,6 +1114,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -1073,7 +1131,7 @@
   },
   {
    "harness": "OpenClaw",
-   "model": "Qwen3.6-35B-A3B (thinking: —)",
+   "model": "Qwen3.6-35B-A3B (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -1094,6 +1152,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -1128,7 +1188,7 @@
   },
   {
    "harness": "Hermes",
-   "model": "Qwen3.6-35B-A3B (thinking: —)",
+   "model": "Qwen3.6-35B-A3B (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -1149,6 +1209,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -1203,6 +1265,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -1241,6 +1305,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -1281,6 +1347,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -1303,7 +1371,7 @@
   },
   {
    "harness": "Hermes",
-   "model": "GPT-OSS-120B (thinking: —)",
+   "model": "GPT-OSS-120B (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -1324,6 +1392,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -1359,6 +1429,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -1398,6 +1470,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash_high_20261107",
@@ -1409,7 +1483,7 @@
   },
   {
    "harness": "OpenClaw",
-   "model": "GPT-OSS-120B (thinking: —)",
+   "model": "GPT-OSS-120B (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -1430,6 +1504,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -1470,7 +1546,7 @@
   },
   {
    "harness": "Pi",
-   "model": "GigaChat 3 Pro (thinking: —)",
+   "model": "GigaChat 3 Pro (thinking: n/a)",
    "reasoning": "—",
    "suite": "Shot List (52)",
    "situation_bucket": "shot-list",
@@ -1491,6 +1567,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
@@ -1534,32 +1612,6 @@
    "confidence": "medium (single run, full suite)"
   },
   {
-   "harness": "Pi",
-   "model": "DeepSeek-V4.1-Flash (thinking: —)",
-   "reasoning": "—",
-   "suite": "Medium (392-471) · reflect",
-   "situation_bucket": "medium-reflect",
-   "passed": 5,
-   "total": 5,
-   "pass_rate": 1.0,
-   "cost_rub": 85.54,
-   "cost_per_solved": 17.108,
-   "time_min": 32.0,
-   "steps": 336,
-   "coverage": {
-    "runs": 1,
-    "full": false,
-    "version": null
-   },
-   "stem": "pi_reflect_ds41flash_20261106",
-   "tokens": 2949354,
-   "basis": "estimate",
-   "tier": null,
-   "pareto": true,
-   "dominated_by": [],
-   "confidence": "low (single run, partial suite)"
-  },
-  {
    "harness": "OpenClaw",
    "model": "DeepSeek-V4.1-Flash (thinking: high)",
    "reasoning": "high",
@@ -1582,6 +1634,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": true,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
@@ -1608,32 +1662,36 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": true,
+   "singleton": false,
+   "recommended": true,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
   {
    "harness": "Pi",
-   "model": "DeepSeek-V4.1-Flash (thinking: —)",
+   "model": "DeepSeek-V4.1-Flash (thinking: n/a)",
    "reasoning": "—",
    "suite": "Medium (392-471) · reflect",
    "situation_bucket": "medium-reflect",
-   "passed": 11,
-   "total": 15,
-   "pass_rate": 0.7333,
-   "cost_rub": 360.25,
-   "cost_per_solved": 32.75,
-   "time_min": 137.33,
-   "steps": 1124,
+   "passed": 5,
+   "total": 5,
+   "pass_rate": 1.0,
+   "cost_rub": 85.54,
+   "cost_per_solved": 17.108,
+   "time_min": 32.0,
+   "steps": 336,
    "coverage": {
     "runs": 1,
     "full": false,
     "version": null
    },
-   "stem": "pi_reflect_ds41flash_b_20261106",
-   "tokens": 15124377,
+   "stem": "pi_reflect_ds41flash_20261106",
+   "tokens": 2949354,
    "basis": "estimate",
-   "tier": null,
-   "pareto": true,
+   "tier": "Default",
+   "pareto": false,
+   "singleton": true,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -1660,6 +1718,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111"
    ],
@@ -1688,12 +1748,42 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111",
     "oc_medium_reflect_ds41flash_high_20261108",
     "oc_medium_reflect_ds41flash_medium_20261108"
    ],
    "confidence": "medium (single run, full suite)"
+  },
+  {
+   "harness": "Pi",
+   "model": "DeepSeek-V4.1-Flash (thinking: n/a)",
+   "reasoning": "—",
+   "suite": "Medium (392-471) · reflect",
+   "situation_bucket": "medium-reflect",
+   "passed": 11,
+   "total": 15,
+   "pass_rate": 0.7333,
+   "cost_rub": 360.25,
+   "cost_per_solved": 32.75,
+   "time_min": 137.33,
+   "steps": 1124,
+   "coverage": {
+    "runs": 1,
+    "full": false,
+    "version": null
+   },
+   "stem": "pi_reflect_ds41flash_b_20261106",
+   "tokens": 15124377,
+   "basis": "estimate",
+   "tier": "Default",
+   "pareto": false,
+   "singleton": true,
+   "recommended": false,
+   "dominated_by": [],
+   "confidence": "low (single run, partial suite)"
   },
   {
    "harness": "Pi",
@@ -1718,6 +1808,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111",
     "oc_medium_reflect_ds41flash_high_20261108",
@@ -1748,6 +1840,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111",
     "oc_medium_reflect_ds41flash_high_20261108",
@@ -1779,6 +1873,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111",
     "oc_medium_reflect_ds41flash_high_20261108",
@@ -1811,6 +1907,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111",
     "oc_medium_reflect_ds41flash_high_20261108",
@@ -1841,6 +1939,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111",
     "oc_medium_reflect_ds41flash_high_20261108",
@@ -1876,6 +1976,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111",
     "oc_medium_reflect_ds41flash_high_20261108",
@@ -1910,6 +2012,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_reflect_ds41flash_off_20261111",
     "oc_medium_reflect_ds41flash_high_20261108",
@@ -1947,6 +2051,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
@@ -1973,12 +2079,14 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
   {
    "harness": "Pi",
-   "model": "GigaChat 3 Pro (thinking: —)",
+   "model": "GigaChat 3 Pro (thinking: n/a)",
    "reasoning": "—",
    "suite": "Medium (392-471) · reflect",
    "situation_bucket": "medium-reflect",
@@ -1999,6 +2107,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
@@ -2023,8 +2133,10 @@
    "stem": "dsh_medium_long_ds41flash_off_20261111",
    "tokens": 74296407,
    "basis": "estimate",
-   "tier": null,
+   "tier": "Balanced",
    "pareto": true,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2049,8 +2161,10 @@
    "stem": "oc_medium_long_ds41flash_high_20261109",
    "tokens": 8929176,
    "basis": "estimate",
-   "tier": null,
+   "tier": "Default",
    "pareto": true,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2075,8 +2189,10 @@
    "stem": "oc_medium_long_ds41flash_medium_20261109",
    "tokens": 303527,
    "basis": "estimate",
-   "tier": null,
+   "tier": "Default",
    "pareto": true,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2101,8 +2217,10 @@
    "stem": "oc_medium_long_ds41flash_off_20261109",
    "tokens": 8425060,
    "basis": "estimate",
-   "tier": null,
+   "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "oc_medium_long_ds41flash_high_20261109",
     "oc_medium_long_ds41flash_medium_20261109"
@@ -2130,8 +2248,10 @@
    "stem": "oc_medium_long_gpt55_off_20261110",
    "tokens": 14469503,
    "basis": "estimate",
-   "tier": null,
+   "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_long_ds41flash_off_20261111",
     "oc_medium_long_ds41flash_high_20261109",
@@ -2161,8 +2281,10 @@
    "stem": "pi_medium_long_gpt55_off_20261110",
    "tokens": 17986241,
    "basis": "estimate",
-   "tier": null,
+   "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_long_ds41flash_off_20261111",
     "oc_medium_long_ds41flash_high_20261109",
@@ -2193,8 +2315,10 @@
    "stem": "pi_medium_long_sonnet46_off_20261113",
    "tokens": 228309339,
    "basis": "estimate",
-   "tier": null,
+   "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_long_ds41flash_off_20261111",
     "oc_medium_long_ds41flash_high_20261109",
@@ -2228,6 +2352,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2254,6 +2380,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2280,6 +2408,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2306,6 +2436,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2332,6 +2464,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2358,6 +2492,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2384,12 +2520,14 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
   {
    "harness": "Pi",
-   "model": "DeepSeek-V4.1-Flash (thinking: —)",
+   "model": "DeepSeek-V4.1-Flash (thinking: n/a)",
    "reasoning": "—",
    "suite": "Medium (392-471) · long",
    "situation_bucket": "long-context",
@@ -2410,6 +2548,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2436,12 +2576,14 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
   {
    "harness": "Pi",
-   "model": "GigaChat 3 Pro (thinking: —)",
+   "model": "GigaChat 3 Pro (thinking: n/a)",
    "reasoning": "—",
    "suite": "Medium (392-471) · long",
    "situation_bucket": "long-context",
@@ -2462,6 +2604,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2488,6 +2632,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "low (single run, partial suite)"
   },
@@ -2514,6 +2660,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": true,
+   "singleton": false,
+   "recommended": true,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
@@ -2540,6 +2688,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "oc_medium_feasibility_ds41flash_medium_20261108"
    ],
@@ -2568,6 +2718,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
     "oc_medium_feasibility_ds41flash_medium_20261108"
@@ -2597,6 +2749,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
     "oc_medium_feasibility_ds41flash_high_20261108",
@@ -2627,6 +2781,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
     "oc_medium_feasibility_ds41flash_high_20261108",
@@ -2658,6 +2814,8 @@
    "basis": "estimate",
    "tier": "Default",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
     "oc_medium_feasibility_ds41flash_high_20261108",
@@ -2688,6 +2846,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
     "oc_medium_feasibility_ds41flash_high_20261108",
@@ -2720,6 +2880,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
     "oc_medium_feasibility_ds41flash_high_20261108",
@@ -2754,6 +2916,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
     "oc_medium_feasibility_ds41flash_high_20261108",
@@ -2788,6 +2952,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
     "oc_medium_feasibility_ds41flash_high_20261108",
@@ -2824,6 +2990,8 @@
    "basis": "estimate",
    "tier": "Premium",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
     "oc_medium_feasibility_ds41flash_high_20261108",
@@ -2860,6 +3028,8 @@
    "basis": "estimate",
    "tier": "Balanced",
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [
     "dsh_medium_feasibility_ds41flash_off_20261111",
     "oc_medium_feasibility_ds41flash_high_20261108",
@@ -2894,12 +3064,14 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
   {
    "harness": "Pi",
-   "model": "GigaChat 3 Pro (thinking: —)",
+   "model": "GigaChat 3 Pro (thinking: n/a)",
    "reasoning": "—",
    "suite": "Medium (392-471) · feasibility",
    "situation_bucket": "wave19-feasibility",
@@ -2920,6 +3092,8 @@
    "basis": "estimate",
    "tier": null,
    "pareto": false,
+   "singleton": false,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   },
@@ -2945,7 +3119,9 @@
    "tokens": 31770687,
    "basis": "estimate",
    "tier": "Default",
-   "pareto": true,
+   "pareto": false,
+   "singleton": true,
+   "recommended": false,
    "dominated_by": [],
    "confidence": "medium (single run, full suite)"
   }

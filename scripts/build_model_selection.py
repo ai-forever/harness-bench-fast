@@ -70,7 +70,7 @@ BUCKET_LABEL = {
 PREMIUM_LABELS = ("Claude", "GPT-5.5", "GigaChat 3 Pro", "GPT-OSS-120B", "MiniMax", "GLM-5.2")
 
 REQUIRED_COLUMNS = ["Bucket", "Harness", "Model", "Tier", "Result",
-                    "Cost/solved", "Basis", "Pareto", "Stem"]
+                    "Cost/solved", "Basis", "Min", "Steps", "Pareto", "Stem"]
 
 VERSION_KEYS = ("task_set_version", "taskset_version", "suite_version", "version")
 
@@ -179,21 +179,19 @@ def build_rows() -> list[dict]:
         seen.setdefault(key, r)
     rows = list(seen.values())
 
-    # tiers by cost/solved terciles, computed PER BUCKET over comparable rows
-    # only (full suite, same denominator). Denominators differ across buckets, so
-    # a single global tercile is misleading (F-D1/F-D5).
+    # tiers by cost/solved terciles, computed PER COMPARABLE SUBSET (bucket × total
+    # = one task set). Denominators differ across sets, so one global tercile is
+    # misleading (F-D1/F-D5/F3). Partial waves (e.g. long 6/20) now get their own
+    # tiers instead of "no tier".
     for r in rows:
         r["tier"] = None
-    for bucket in BUCKET_ORDER:
-        full_total = BUCKET_FULL.get(bucket)
-        cell = [r for r in rows
-                if r["situation_bucket"] == bucket
-                and r["cost_per_solved"] is not None
-                and r["total"] == full_total]
+    tier_groups: dict[tuple, list] = {}
+    for r in rows:
+        if r["cost_per_solved"] is not None:
+            tier_groups.setdefault((r["situation_bucket"], r["total"]), []).append(r)
+    for cell in tier_groups.values():
         vals = sorted(r["cost_per_solved"] for r in cell)
         n = len(vals)
-        if not n:
-            continue
         p33 = vals[max(0, int(n / 3) - 1)]
         p66 = vals[max(0, int(2 * n / 3) - 1)]
         for r in cell:
@@ -210,6 +208,8 @@ def build_rows() -> list[dict]:
     # frontier.
     for r in rows:
         r["pareto"] = r["cost_per_solved"] is not None
+        r["singleton"] = False
+        r["recommended"] = False
         r["dominated_by"] = []
     groups: dict[tuple, list] = {}
     for r in rows:
@@ -217,6 +217,13 @@ def build_rows() -> list[dict]:
             continue
         groups.setdefault((r["situation_bucket"], r["total"]), []).append(r)
     for cell in groups.values():
+        # a lone member of a task set is trivially non-dominated: it is NOT a
+        # frontier point and must not be shown as ✅ (F2). Singleton sets stay
+        # visible but are excluded from the frontier and from anti-patterns.
+        if len(cell) == 1:
+            cell[0]["pareto"] = False
+            cell[0]["singleton"] = True
+            continue
         for a in cell:
             for b in cell:
                 if a is b:
@@ -225,6 +232,13 @@ def build_rows() -> list[dict]:
                         and (b["pass_rate"] > a["pass_rate"] or b["cost_per_solved"] < a["cost_per_solved"])):
                     a["pareto"] = False
                     a["dominated_by"].append(b["stem"])
+    # recommended row per bucket = cheapest frontier point on a full, comparable set
+    for bucket in BUCKET_ORDER:
+        cands = [r for r in rows
+                 if r["situation_bucket"] == bucket and r["pareto"]
+                 and r["coverage"]["full"]]
+        if cands:
+            min(cands, key=lambda r: r["cost_per_solved"])["recommended"] = True
     for r in rows:
         r["dominated_by"] = sorted(set(r["dominated_by"]))
         r["confidence"] = _confidence(r["coverage"]["runs"], r["coverage"]["full"])
@@ -258,9 +272,10 @@ def _model_label(stem: str) -> str:
     if "thinking_off" in stem:
         return "GLM-5.2 (thinking: off)"
     level = _reasoning(stem)
+    label = "n/a" if level == DASH else level
     for token, model in MODEL_TOKENS:
         if token in stem:
-            return f"{model} (thinking: {level})" if level else model
+            return f"{model} (thinking: {label})"
     return DASH
 
 
@@ -271,7 +286,20 @@ def _reasoning(stem: str) -> str:
 
 
 def _fmt_result(r: dict) -> str:
-    return f"{r['passed']}/{r['total']}"
+    text = f"{r['passed']}/{r['total']}"
+    if not r["coverage"]["full"]:
+        text += " (partial)"
+    return text
+
+
+def _fmt_min(r: dict) -> str:
+    t = r.get("time_min")
+    return f"{t:.1f}" if isinstance(t, (int, float)) else NA
+
+
+def _fmt_steps(r: dict) -> str:
+    s = r.get("steps")
+    return str(s) if isinstance(s, int) and s > 0 else NA
 
 
 def _fmt_pct(r: dict) -> str:
@@ -296,19 +324,24 @@ def _fmt_tier(r: dict) -> str:
     return r.get("tier") or NA
 
 
-COLUMNS_MD = ("| Bucket | Harness | Model | Tier | Result | Cost/solved | Basis | Pareto | Stem |"
-              "\n| --- | --- | --- | :-: | ---: | ---: | :-: | :-: | --- |")
+COLUMNS_MD = ("| Bucket | Harness | Model | Tier | Result | Cost/solved | Basis | Min | Steps | Pareto | Stem |"
+              "\n| --- | --- | --- | :-: | ---: | ---: | :-: | ---: | ---: | :-: | --- |")
 
 
 def _row_cells(r: dict) -> list[str]:
+    model = r["model"] or NA
+    if r.get("recommended"):
+        model += " \u2605"
     return [
         BUCKET_LABEL[r["situation_bucket"]],
         r["harness"] or NA,
-        r["model"] or NA,
+        model,
         _fmt_tier(r),
         _fmt_result(r),
         _fmt_cps(r),
         _fmt_basis(r),
+        _fmt_min(r),
+        _fmt_steps(r),
         "\u2705" if r["pareto"] else DASH,
         f"`{r['stem']}`",
     ]
@@ -335,7 +368,7 @@ def render_block(rows: list[dict], locale: str = "ru") -> str:
     # anti-patterns: premium, priced, dominated on a full (comparable) suite.
     # One row per model (the most expensive offender) keeps the list meaningful.
     anti = [r for r in rows if _is_premium(r) and not r["pareto"]
-            and r["dominated_by"] and r["coverage"]["full"]
+            and not r["singleton"] and r["dominated_by"]
             and r["cost_per_solved"] is not None]
     if anti:
         out.append("")
@@ -347,7 +380,7 @@ def render_block(rows: list[dict], locale: str = "ru") -> str:
         out.append("")
         best: dict[str, dict] = {}
         for r in sorted(anti, key=lambda r: -r["cost_per_solved"]):
-            best.setdefault(r["model"], r)
+            best.setdefault((r["model"] or "").split(" (")[0], r)
         for r in list(best.values())[:12]:
             dom = r["dominated_by"][0]
             out.append(f"- `{r['model']}` @ {_fmt_cps(r)} ({r['situation_bucket']}) "
@@ -369,20 +402,33 @@ GUIDANCE_TEXT = {
         "lead": (
             "Практическое руководство по выбору <strong>харнесса × модели</strong> для задач "
             "harness-bench-fast, построенное <strong>только на уже выполненных прогонах</strong>. "
-            "Для премиум-моделей ₽ — <strong>факт биллинга провайдера</strong>, а не оценка по тарифу."
+            "₽ — <strong>факт биллинга провайдера там, где есть сайдкар reconciled</strong>, иначе "
+            "оценка по тарифу; основание указано в столбце <code>Basis</code>."
         ),
         "back": "Результаты форка",
         "matrix_note": ("Автосинк из <code>results/*.json</code> генератором "
-                        "<code>scripts/build_model_selection.py</code>. Тиры — <b>пер-бакет</b> "
-                        "по ₽/решённую задачу; ✅ — точка на фронте Парето внутри одного набора; "
+                        "<code>scripts/build_model_selection.py</code>. Тиры — по <b>сравнимому набору</b> "
+                        "(бакет × размер) в ₽/решённую задачу; ✅ — точка на фронте Парето внутри одного набора; "
+                        "<code>★</code> — рекомендуемый выбор бакета; <code>(partial)</code> — частичный набор; "
                         "<code>0/N</code> — прогон сделан и провален."),
         "h2_tldr": "Выводы (TL;DR)",
         "h2_howto": "Как читать (по ситуациям)",
         "tldr_head": ("## TL;DR",),
         "howto_head": ("## Как читать",),
-        "legend": ("Легенда: <b>Tier</b> — класс по ₽/решённую задачу (пер-бакет); "
+        "legend": ("Легенда: <b>Tier</b> — класс по ₽/решённую задачу внутри сравнимого набора; "
                    "<b>billing</b> — ₽ = факт биллинга провайдера, <b>est.</b> — оценка по тарифу; "
-                   "<b>✅</b> — точка на фронте Парето; <b>—</b> — не Pareto; <b>н/д</b> — нет данных."),
+                   "<b>★</b> — рекомендуемый выбор бакета; <b>Min</b>/<b>Steps</b> — длительность и шаги прогона; "
+                   "<b>✅</b> — точка на фронте Парето; <b>—</b> — не Pareto; <b>н/д</b> — нет данных; "
+                   "<code>(partial)</code> — неполный набор."),
+        "cols": ("Харнесс", "Модель", "Тир", "Результат", "Стоимость", "Основание",
+                 "Мин", "Шаги", "Парето", "Прогон"),
+        "caption": "Матрица рекомендаций: харнесс × модель по бакетам",
+        "filter_bucket": "Бакет:",
+        "filter_all": "все",
+        "filter_pareto": "только Парето",
+        "sort_cost": "сорт. по ₽ ↑",
+        "rec_badge": "рекомендуем",
+        "lone_title": "единственный набор — не сравнимо",
         "h2_matrix": "Матрица рекомендаций",
         "h2_anti": "Anti-patterns — переплата без выигрыша",
         "h2_cov": "Покрытие и уверенность",
@@ -419,20 +465,33 @@ GUIDANCE_TEXT = {
         "lead": (
             "Practical guidance for choosing a <strong>harness × model</strong> for "
             "harness-bench-fast tasks, built <strong>only from completed runs</strong>. "
-            "For premium models the ₽ figures are <strong>actual provider billing</strong>, not tariff estimates."
+            "₽ is <strong>actual provider billing where a reconciled sidecar exists</strong>, "
+            "otherwise a tariff estimate; the basis is shown in the <code>Basis</code> column."
         ),
         "back": "Fork results",
         "matrix_note": ("Auto-sync from <code>results/*.json</code> by "
-                        "<code>scripts/build_model_selection.py</code>. Tiers <b>per bucket</b> by "
-                        "₽/solved; ✅ — Pareto point within one task set; "
+                        "<code>scripts/build_model_selection.py</code>. Tiers per <b>comparable set</b> "
+                        "(bucket × size) by ₽/solved; ✅ — Pareto point within one task set; "
+                        "<code>★</code> — recommended pick; <code>(partial)</code> — partial set; "
                         "<code>0/N</code> — run done and failed."),
         "h2_tldr": "Conclusions (TL;DR)",
         "h2_howto": "How to read (by situation)",
         "tldr_head": ("## TL;DR",),
         "howto_head": ("## How to read",),
-        "legend": ("Legend: <b>Tier</b> — class by ₽/solved (per bucket); "
+        "legend": ("Legend: <b>Tier</b> — class by ₽/solved within a comparable set; "
                    "<b>billing</b> — ₽ = provider billing, <b>est.</b> — tariff estimate; "
-                   "<b>✅</b> — Pareto point; <b>—</b> — not Pareto; <b>n/a</b> — no data."),
+                   "<b>★</b> — recommended pick for the bucket; <b>Min</b>/<b>Steps</b> — run duration and steps; "
+                   "<b>✅</b> — Pareto point; <b>—</b> — not Pareto; <b>n/a</b> — no data; "
+                   "<code>(partial)</code> — partial set."),
+        "cols": ("Harness", "Model", "Tier", "Result", "Cost/solved", "Basis",
+                 "Min", "Steps", "Pareto", "Stem"),
+        "caption": "Recommendation matrix: harness × model by bucket",
+        "filter_bucket": "Bucket:",
+        "filter_all": "all",
+        "filter_pareto": "Pareto only",
+        "sort_cost": "sort by ₽ ↑",
+        "rec_badge": "recommended",
+        "lone_title": "lone task set — not comparable",
         "h2_matrix": "Recommendation matrix",
         "h2_anti": "Anti-patterns — paying without winning",
         "h2_cov": "Coverage & confidence",
@@ -541,6 +600,34 @@ HTML_CSS = (
     " .tldr ul,.howto ul{margin:.3rem 0}"
     " footer{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;align-items:center}"
     " .repos a{margin-left:.6rem}"
+    " .msel-wrap caption{text-align:left;font-size:.82rem;color:#687571;padding:.2rem 0}"
+    " .msel-controls{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;font-size:.85rem;margin:.3rem 0}"
+    " .msel-controls select{padding:.15rem .3rem}"
+    " .rec{font-size:.72rem;color:#7a5a00;background:#fff3c4;border-radius:.6rem;"
+    "padding:0 .35rem;margin-left:.3rem;white-space:nowrap}"
+    " .lone{color:#8a8a8a}"
+)
+
+MSEL_SCRIPT = (
+    '<script>(function(){var t=document.querySelector(".msel-wrap table");if(!t)return;'
+    'var tb=t.tBodies[0];var allOrig=Array.prototype.slice.call(tb.rows);'
+    'var data=allOrig.filter(function(r){return r.hasAttribute("data-bucket");});'
+    'var groups=allOrig.filter(function(r){return r.classList.contains("bucket");});'
+    'var b=document.getElementById("msel-bucket"),p=document.getElementById("msel-pareto"),'
+    's=document.getElementById("msel-sort");if(!b||!p||!s)return;'
+    'function apply(){var bv=b.value,pv=p.checked;'
+    'data.forEach(function(r){var ok=(!bv||r.dataset.bucket===bv)&&(!pv||r.dataset.pareto==="1");'
+    'r.style.display=ok?"":"none";});'
+    'groups.forEach(function(g){var n=g.nextElementSibling,vis=false;'
+    'while(n&&!n.classList.contains("bucket")){if(n.style.display!=="none"){vis=true;break;}'
+    'n=n.nextElementSibling;}g.style.display=vis?"":"none";});}'
+    'function restore(){allOrig.forEach(function(n){tb.appendChild(n);});}'
+    'function sortByCost(){if(s.checked){groups.forEach(function(g){g.style.display="none";});'
+    'var rows=data.slice().sort(function(a,c){var x=a.dataset.cost===""?Infinity:parseFloat(a.dataset.cost);'
+    'var y=c.dataset.cost===""?Infinity:parseFloat(c.dataset.cost);return x-y;});'
+    'rows.forEach(function(r){tb.appendChild(r);});}else{restore();apply();}}'
+    'b.addEventListener("change",apply);p.addEventListener("change",apply);s.addEventListener("change",sortByCost);'
+    '})();</script>'
 )
 
 
@@ -579,35 +666,61 @@ def render_html(rows: list[dict], locale: str) -> str:
         "    </section>",
         f'    <h2>{_esc(x["h2_matrix"])}</h2>',
         f'    <p class="fine-print">{x["matrix_note"]}</p>',
-        '    <div class="msel-wrap"><table><thead><tr>',
-        '      <th>Harness</th><th>Model</th><th class="num">Tier</th>'
-        '<th class="num">Result</th><th class="num">Cost/solved</th>'
-        '<th>Basis</th><th>Pareto</th><th>Stem</th>',
-        "    </tr></thead><tbody>",
+        '    <div class="msel-controls">'
+        f'<label>{_esc(x["filter_bucket"])} <select id="msel-bucket"><option value="">'
+        f'{_esc(x["filter_all"])}</option>'
+        + "".join(f'<option value="{_esc(b)}">{_esc(BUCKET_LABEL[b])}</option>'
+                  for b in BUCKET_ORDER if any(r["situation_bucket"] == b for r in rows))
+        + f'</select></label>'
+        f'<label><input type="checkbox" id="msel-pareto"> {_esc(x["filter_pareto"])}</label>'
+        f'<label><input type="checkbox" id="msel-sort"> {_esc(x["sort_cost"])}</label>'
+        '</div>',
     ]
+    cols = x["cols"]
+    numeric = {2, 3, 4, 6, 7}
+    head = "".join(
+        f'<th scope="col"{" class=\"num\"" if i in numeric else ""}>{_esc(c)}</th>'
+        for i, c in enumerate(cols))
+    out.append(
+        f'    <div class="msel-wrap"><table><caption>{_esc(x["caption"])}</caption>'
+        f'<thead><tr>{head}</tr></thead><tbody>')
     last_bucket = None
     for r in rows:
         if r["situation_bucket"] != last_bucket:
             last_bucket = r["situation_bucket"]
-            out.append(f'<tr class="bucket"><th colspan="8">'
+            out.append(f'<tr class="bucket"><th scope="colgroup" colspan="{len(cols)}">'
                        f'{_esc(BUCKET_LABEL[r["situation_bucket"]])}</th></tr>')
         tier = r.get("tier")
         tier_html = (f'<span class="tier tier-{tier.lower()}">{tier}</span>' if tier else NA)
-        pareto = '<span class="pareto">✅</span>' if r["pareto"] else DASH
+        if r["pareto"]:
+            pareto = '<span class="pareto" role="img" aria-label="Pareto point">\u2705</span>'
+        elif r.get("singleton"):
+            pareto = f'<span class="lone" title="{_esc(x["lone_title"])}">\u2014</span>'
+        else:
+            pareto = DASH
+        model = _esc(r["model"] or NA)
+        if r.get("recommended"):
+            model += f' <span class="rec">{_esc(x["rec_badge"])}</span>'
+        cost = r.get("cost_per_solved")
         out.append(
-            "<tr>"
+            f'<tr data-bucket="{_esc(r["situation_bucket"])}" '
+            f'data-pareto="{1 if r["pareto"] else 0}" '
+            f'data-cost="{cost if cost is not None else ""}">' +
             f'<td>{_esc(r["harness"] or NA)}</td>'
-            f'<td>{_esc(r["model"] or NA)}</td>'
+            f'<td>{model}</td>'
             f'<td class="num">{tier_html}</td>'
             f'<td class="num">{_fmt_result(r)}</td>'
             f'<td class="num">{_fmt_cps(r)}</td>'
             f'<td>{_fmt_basis(r)}</td>'
+            f'<td class="num">{_fmt_min(r)}</td>'
+            f'<td class="num">{_fmt_steps(r)}</td>'
             f'<td>{pareto}</td>'
             f'<td>{_stem_link(r, locale)}</td>'
             "</tr>"
         )
     out += ["    </tbody></table></div>"]
     out.append(f'    <p class="legend">{x["legend"]}</p>')
+    out.append(MSEL_SCRIPT)
 
     anti = [r for r in rows if _is_premium(r) and not r["pareto"]
             and r["dominated_by"] and r["coverage"]["full"]
