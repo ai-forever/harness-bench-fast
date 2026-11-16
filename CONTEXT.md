@@ -55,6 +55,34 @@ OpenClaw Dynamic Routing / Fallbacks. Отдельный deliverable (следу
 Скрипт, порождающий числа/матрицу руководства из `results/*.json`, по образцу
 fork-генераторов (см. `Generator` в `GLOSSARY.md`), с гейтами `--check/--lint`.
 
+### Tier (Default · Balanced · Premium)
+Класс по «₽/решённую задачу» внутри **сравнимого подмножества**. В Round 2 терцили
+считались **глобально** по всем 72 строкам (p33/p66 = 12.87/49.47 ₽), что несопоставимо
+между бакетами с разными знаменателями (F-D1/F-D5). Поле `tier` в матрице есть, но на
+странице **не отображается**. Round 3: скоуп тиров.
+
+### Cost basis (billing vs tariff estimate)
+Источник ₽ (`cost_rub`): **факт биллинга провайдера** (`results/reconciled/*`, premium) либо
+**оценка по тарифу** (`summary.estimated_cost_rub`, остальные). Столбец `Cost/solved`
+смешивает два базиса (F-D4); для честного сравнения нужен видимый признак базиса.
+
+### Pareto metric
+Величина, по которой строится фронт. Код/ADR использовали **абсолютный `passed`**; в бакете
+`medium-reflect` (total {5,15,20}) это даёт ложные доминирования (F-D2). Round 3: перейти на
+`pass_rate` и ограничить сравнение одним набором/версией.
+
+### Zero-solved vs unmeasured
+`0/N` — прогон **выполнен** и провалился (ceiling marker); `unmeasured` — прогон **не делали**.
+Генератор сейчас молча выкидывает `passed<=0` (F-D3), смешивая оба состояния.
+
+### Guidance page parity (md ↔ html)
+`.md`/`.en.md` несут TL;DR и «Как читать», но `render_html()` их не рендерит (F-UX1) → HTML
+беднее markdown. Нужен один источник нарратива, чтобы версии не расходились.
+
+### Guidance CI gate
+Гейт `build_model_selection.py --check/--lint` в CI. Сейчас отсутствует (F-D9) → дрейф
+docs ↔ `results/*.json` не ловится (у fork-генераторов гейты есть).
+
 ## Relationships
 - Situation = (suite class, wave, budget ceiling) → Recommendation
 - Recommendation = (Harness × Model pair) + Premium justification + Coverage confidence
@@ -80,3 +108,17 @@ fork-генераторов (см. `Generator` в `GLOSSARY.md`), с гейта�
 - **Q5 Порог premium:** не доминируем И (≥ +3 п.п. pass ИЛИ закрывает ≥1 floor/boundary-задачу); иначе anti-pattern.
 - **Q6 Цена:** классификация по **₽/решённую задачу**, пороги — по данным (терцили/медиана), валюта ₽.
 - **Q7 Матрица:** поля `harness, model, reasoning, suite, situation_bucket, passed, total, pass_rate, cost_rub, cost_per_solved, time_min, steps, pareto, dominated_by, coverage{runs,full,version}, confidence`; генератор `scripts/build_model_selection.py` (`--check/--lint`).
+
+## Review findings (2026-11-16)
+Полное ревью страницы: `docs/reviews/2026-11-16-model-selection-guidance-review.md` (PR #20).
+Дефекты F-D1…F-D9 (данные/стоимость/инфра) и F-UX1… (шапка без выводов, дубли столбцов,
+`—` перегружен). Ниже — открытые решения.
+
+## Decisions — Round 3 (open, grilling 2026-11-16)
+- **Q1 Tier scope:** глобально vs **пер-бакет** — OPEN.
+- **Q2 Pareto metric:** `pass_rate` vs absolute `passed` — OPEN.
+- **Q3 Zero-solved:** показывать `0/N` vs оставить `unmeasured` — OPEN.
+- **Q4 Cost basis:** унифицировать (billing-preferred) vs две колонки — OPEN.
+- **Q5 HTML parity:** рендерить TL;DR/«как читать» из общего источника — OPEN.
+- **Q6 Columns/presentation:** убрать дубли, добавить `Tier`, ссылки, формат — OPEN.
+- **Q7 Delivery & CI gate:** ветка/PR + `--check/--lint` в CI — OPEN.
