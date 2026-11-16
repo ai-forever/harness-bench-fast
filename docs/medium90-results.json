@@ -19596,18 +19596,18 @@
       "measurement_type": "adjudicated_medium90",
       "measurement_valid": true,
       "details_url": "secretmodel-1114-ouroboros.html",
-      "result_note": "includes 13 harness protocol failures",
+      "result_note": "includes 14 harness protocol failures",
       "previous": {
-        "passed": 28,
+        "passed": 25,
         "measured": 80,
         "total": 80,
-        "scope_note": "retained outcomes; harness protocol errors count as failures"
+        "scope_note": "last-attempt outcomes; harness protocol errors count as failures"
       },
       "wave21": {
         "passed": 0,
         "measured": 10,
         "total": 10,
-        "scope_note": "retained outcomes; harness protocol errors count as failures"
+        "scope_note": "last-attempt outcomes; harness protocol errors count as failures"
       },
       "components": [
         {
@@ -19693,9 +19693,9 @@
             470,
             471
           ],
-          "passed": 28,
+          "passed": 25,
           "source_version": "0.21.3",
-          "note": "retained outcomes; harness protocol errors count as failures"
+          "note": "last-attempt outcomes; harness protocol errors count as failures"
         },
         {
           "task_numbers": [
@@ -19712,15 +19712,15 @@
           ],
           "passed": 0,
           "source_version": "0.21.3",
-          "note": "retained outcomes; harness protocol errors count as failures"
+          "note": "last-attempt outcomes; harness protocol errors count as failures"
         }
       ],
       "measured_tasks": 90,
       "target_tasks": 90,
       "missing_task_numbers": [],
-      "observed_passed": 28,
-      "overall_passed": 28,
-      "score": 0.3111111111111111,
+      "observed_passed": 25,
+      "overall_passed": 25,
+      "score": 0.2777777777777778,
       "rank": 10,
       "status": "complete",
       "usage": {
@@ -19729,11 +19729,11 @@
         "notes": [
           "Retained public measurement counters only. Missing tasks are unmeasured, not failures.",
           "Task counts show counter availability, not full request-level accounting.",
-          "Counters unavailable for the retained task subset; zero means absent, not zero expenditure. All-attempt usage is excluded.",
-          "Counters unavailable for the retained task subset; zero means absent, not zero expenditure. All-attempt usage is excluded."
+          "Last physical attempt of each of 90 tasks only; 47 earlier attempts excluded. Reported input includes cached tokens, output includes reasoning; neither is added twice. Usage is present for 2749 of 2955 requests; 206 requests are unmetered, so tokens are a lower bound, not a monetary bill. Steps remain unavailable.",
+          "Last physical attempt of each of 90 tasks only; 47 earlier attempts excluded. Reported input includes cached tokens, output includes reasoning; neither is added twice. Usage is present for 2749 of 2955 requests; 206 requests are unmetered, so tokens are a lower bound, not a monetary bill. Steps remain unavailable."
         ],
         "sources_sha256": [
-          "42bf1de09b242454322fbe10e704ae3888563e78840b9e5a756fceb77bd5aedb"
+          "64748d25ba46d0988caa446de68c8092b69d17e6154939de3bfae905870fc742"
         ],
         "steps": {
           "value": null,
@@ -19742,10 +19742,18 @@
           "lower_bound": false
         },
         "tokens": {
-          "value": null,
-          "covered_tasks": 0,
-          "status": "unavailable",
-          "lower_bound": false
+          "value": 733698642,
+          "covered_tasks": 90,
+          "status": "partial",
+          "lower_bound": true,
+          "input_tokens": 728551298,
+          "input_tokens_accounting_complete": true,
+          "output_tokens": 5147344,
+          "output_tokens_accounting_complete": true,
+          "completed_responses": 2749,
+          "completed_responses_accounting_complete": true,
+          "unmetered_requests": 206,
+          "unmetered_requests_accounting_complete": true
         }
       }
     }
