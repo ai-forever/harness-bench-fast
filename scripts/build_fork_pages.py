@@ -63,6 +63,13 @@ WAVES = {
 }
 WAVE_ORDER = ["long", "reflect", "feasibility", "composite_hard"]
 
+# Our suites that can contribute per-task rows even without a medium wave.
+SUITE_LABELS = {
+    "shotlist": "Shot List",
+    "light": "Light",
+    "medium": "Medium",
+}
+
 # task_id integer -> wave (per design: 392-411 long, 412-431 reflect, 432-471
 # feasibility, 512-530 wave-21 composite-hard).
 TASK_ID_WAVES = (
@@ -148,6 +155,23 @@ def classify_wave(stem: str) -> str | None:
         return "reflect"
     if "feasibility" in lower or "wave19" in lower:
         return "feasibility"
+    return None
+
+
+def classify_suite(stem: str) -> str | None:
+    """Suite key (shotlist/light/medium) for an artifact stem, else None.
+
+    Shot List and Light artifacts carry no medium wave, so ``classify_wave``
+    returns None for them; this keeps them addressable by suite on the per-run
+    detail pages.
+    """
+    lower = stem.lower()
+    if "shotlist" in lower:
+        return "shotlist"
+    if "full_391" in lower or "light" in lower:
+        return "light"
+    if classify_wave(stem) is not None:
+        return "medium"
     return None
 
 
@@ -281,18 +305,24 @@ def load_upstream_durations() -> dict:
     return result
 
 
-def _task_entry(entry: dict) -> dict | None:
-    """Normalise one ``results[]`` entry; None when its task_id maps to no wave."""
+def _task_entry(entry: dict, fallback_label: str = SUITE_LABELS["medium"]) -> dict | None:
+    """Normalise one per-task entry (``results[]``/``tasks[]``).
+
+    Entries whose ``task_id`` maps to no medium wave are kept and tagged with
+    *fallback_label* — the source artifact's suite label (Shot List/Light/Medium)
+    — so Shot List / Light runs still render per-task rows.
+    """
     if not isinstance(entry, dict):
         return None
     task_id = entry.get("task_id")
-    wave = classify_task_wave(task_id)
-    if wave is None:
+    if task_id is None:
         return None
+    wave = classify_task_wave(task_id)
     message = entry.get("message")
     return {
         "task_id": str(task_id),
         "wave": wave,
+        "label": WAVES[wave][0] if wave in WAVES else fallback_label,
         "passed": bool(entry.get("passed")),
         "message": "" if message is None else str(message),
         "error": "" if entry.get("error") is None else str(entry.get("error")),
@@ -331,6 +361,56 @@ def _artifact_task_numbers(data: dict) -> dict[int, bool]:
         if number is not None:
             numbers[int(number)] = bool(entry.get("passed"))
     return numbers
+
+
+def _artifact_entries(data: dict) -> list:
+    """Per-task entries from a run artifact: top-level ``results`` or ``tasks``."""
+    entries = data.get("results")
+    if not isinstance(entries, list):
+        entries = data.get("tasks")
+    return entries if isinstance(entries, list) else []
+
+
+def _collect_suite_details(result_dirs, known_ids) -> dict[str, list]:
+    """Per-task entries for known rows from our Shot List / Light artifacts.
+
+    The main pass skips artifacts without a medium wave. Here Shot List / Light
+    artifacts contribute per-task rows to ``_page_details`` for configurations
+    that already exist — never creating rows and never touching the wave
+    aggregates or the published JSON.
+    """
+    details: dict[str, list] = {}
+    for _name, path in collect_paths(result_dirs).items():
+        stem = path.stem
+        if classify_wave(stem) is not None:
+            continue
+        suite = classify_suite(stem)
+        if suite not in ("shotlist", "light"):
+            continue
+        if any(keyword in stem.lower() for keyword in EXCLUDE_KEYWORDS):
+            continue
+        data = _load_json_lenient(path)
+        if not isinstance(data, dict):
+            continue
+        summary = data.get("summary")
+        if not isinstance(summary, dict) or any(
+            field not in summary for field in REQUIRED_SUMMARY_FIELDS
+        ):
+            continue
+        harness = classify_harness(stem) or _override(stem, "harness")
+        model = classify_model(stem) or _override(stem, "model")
+        if harness is None or model is None:
+            continue
+        rid = row_id(harness, model, classify_profile(stem))
+        if rid not in known_ids:
+            continue
+        label = SUITE_LABELS[suite]
+        bucket = details.setdefault(rid, [])
+        for entry in _artifact_entries(data):
+            normalised = _task_entry(entry, label)
+            if normalised is not None:
+                bucket.append(normalised)
+    return details
 
 
 def _aggregate_wave_suite(artifacts: list[dict]) -> dict:
@@ -429,20 +509,32 @@ def build_model(result_dirs: list[Path] | None = None) -> dict:
 
         group["sources"].append(name)
 
-        # Per-task entries from the run's top-level ``results`` array.
-        results = data.get("results")
-        if isinstance(results, list):
+        # Per-task entries for the detail page, from ``results`` OR ``tasks``.
+        entries = _artifact_entries(data)
+        if entries:
             rid = row_id(harness, model, classify_profile(stem))
             bucket = tasks_by_id.setdefault(rid, [])
-            for entry in results:
+            for entry in entries:
                 normalised = _task_entry(entry)
                 if normalised is not None:
                     bucket.append(normalised)
-                # Per-task wall-clock time for this run's wave (ours).
+        # Per-task wall-clock time for this run's wave (ours) — ``results`` only,
+        # matching the published durations (unchanged).
+        results = data.get("results")
+        if isinstance(results, list):
+            for entry in results:
                 if isinstance(entry, dict):
                     seconds = _num(entry.get("elapsed_seconds"))
                     if seconds is not None and math.isfinite(seconds):
                         group["durations"][wave].append(seconds)
+
+    # Shot List / Light artifacts carry no medium wave and were skipped above.
+    # Attach their per-task entries to ALREADY-EXISTING rows only: this never
+    # creates rows and never touches suites/usage/sources (the published JSON
+    # stays byte-identical); it only enriches the internal ``_page_details``.
+    known_ids = {row_id(harness, model, profile) for harness, model, profile in groups}
+    for rid, entries in _collect_suite_details(result_dirs, known_ids).items():
+        tasks_by_id.setdefault(rid, []).extend(entries)
 
     rows: list[dict] = []
     page_details: dict[str, dict] = {}
@@ -499,7 +591,10 @@ def build_model(result_dirs: list[Path] | None = None) -> dict:
         page_details[rid] = {
             "tasks": sorted(
                 tasks_by_id.get(rid, []),
-                key=lambda t: (WAVE_ORDER.index(t["wave"]), t["task_id"]),
+                key=lambda t: (
+                    WAVE_ORDER.index(t["wave"]) if t.get("wave") in WAVE_ORDER else len(WAVE_ORDER),
+                    t["task_id"],
+                ),
             ),
             "wave_usage": group["wave_usage"],
         }
@@ -1041,7 +1136,7 @@ def render_run_page(row: dict, details: dict, locale: str = DEFAULT_LOCALE) -> s
             task_rows.append(
                 "<tr>"
                 f'<td>{_esc(task.get("task_id"))}</td>'
-                f'<td>{_esc(WAVES[task["wave"]][0])}</td>'
+                f'<td>{_esc(task.get("label") or DASH)}</td>'
                 f'<td>{_esc(result)}</td>'
                 f'<td class="numeric">{_esc(fmt_seconds(task.get("elapsed_seconds")))}</td>'
                 f'<td class="numeric">{_esc(fmt_compact(task.get("agent_steps")))}</td>'

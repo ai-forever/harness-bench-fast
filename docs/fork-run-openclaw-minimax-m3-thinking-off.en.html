@@ -24,7 +24,480 @@
       <p class="coverage-note">Per-wave outcomes for this configuration. A wave that was not measured is omitted (not a failure).</p>
       <div class="table-wrap"><table class="leaderboard-table"><thead><tr><th scope="col">Wave</th><th scope="col" class="numeric">Tasks</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">%</th><th scope="col" class="numeric">95% Wilson</th><th scope="col" class="numeric">Time</th><th scope="col" class="numeric">Steps</th><th scope="col" class="numeric">Tokens (cost)</th></tr></thead><tbody><tr><td>Long context<span class="harness">392–411</span></td><td class="numeric">6</td><td class="numeric">0</td><td class="numeric">0.0%</td><td class="numeric">11.5–27.5%</td><td class="numeric">363.2m</td><td class="numeric">276</td><td class="numeric">7.36M (1 913₽)</td></tr><tr><td>Tool reflection<span class="harness">412–431</span></td><td class="numeric">20</td><td class="numeric">13</td><td class="numeric">65.0%</td><td class="numeric">58.3–66.9%</td><td class="numeric">162.0m</td><td class="numeric">698</td><td class="numeric">12.18M (3 426₽)</td></tr><tr><td>Feasibility<span class="harness">432–471</span></td><td class="numeric">40</td><td class="numeric">33</td><td class="numeric">82.5%</td><td class="numeric">77.8–81.5%</td><td class="numeric">266.4m</td><td class="numeric">989</td><td class="numeric">33.11M (8 636₽)</td></tr></tbody></table></div>
     </section>
-    <section aria-label="Tasks"><h2>Tasks</h2><p id="empty">No per-task entries were recorded for this configuration.</p></section>
+    <section aria-label="Tasks"><h2>Tasks</h2><p class="coverage-note">Per-task outcome of every recorded task run for this configuration.</p><div class="table-wrap"><table class="leaderboard-table"><thead><tr><th scope="col">Task</th><th scope="col">Wave</th><th scope="col">Result</th><th scope="col" class="numeric">Time (s)</th><th scope="col" class="numeric">Steps</th><th scope="col" class="numeric">Tokens</th><th scope="col">Note</th></tr></thead><tbody><tr><td>task_392_manuscript_continuity</td><td>Long context</td><td>fail</td><td class="numeric">1216.6</td><td class="numeric">13</td><td class="numeric">700,143</td><td>нет файла errors.csv</td></tr><tr><td>task_393_intranet_multihop</td><td>Long context</td><td>fail</td><td class="numeric">5315.7</td><td class="numeric">7</td><td class="numeric">0</td><td>нет файла answers.json</td></tr><tr><td>task_394_review_annotation</td><td>Long context</td><td>fail</td><td class="numeric">3893.9</td><td class="numeric">65</td><td class="numeric">0</td><td>отзывы: верно 478/800 (59.8%), нужно не меньше 92%. Примеры: r0041 размечен неверно; r0042 размечен неверно; r0052 разм…</td></tr><tr><td>task_395_homework_grading</td><td>Long context</td><td>fail</td><td class="numeric">963.0</td><td class="numeric">110</td><td class="numeric">896,189</td><td>нет файла grades.csv</td></tr><tr><td>task_398_card_game_engine</td><td>Long context</td><td>fail</td><td class="numeric">4207.7</td><td class="numeric">56</td><td class="numeric">5.76M</td><td>партии: верно 0/100, нужно не меньше 95. Примеры: партия 1: расходится rounds, end_reason, winners, supply; партия 2: р…</td></tr><tr><td>task_403_binary_format_reverse</td><td>Long context</td><td>fail</td><td class="numeric">6194.4</td><td class="numeric">25</td><td class="numeric">0</td><td>скрытые файлы: верно 0/40 (0.0%), нужно не меньше 95%. Примеры: h01 (v2): результат расходится с эталоном; h02 (v2): ре…</td></tr><tr><td>task_412_supplier_minimum</td><td>Tool reflection</td><td>pass</td><td class="numeric">535.3</td><td class="numeric">35</td><td class="numeric">508,269</td><td>service state matches the goal</td></tr><tr><td>task_413_crm_pagination</td><td>Tool reflection</td><td>pass</td><td class="numeric">217.7</td><td class="numeric">25</td><td class="numeric">454,219</td><td>service state matches the goal</td></tr><tr><td>task_414_batch_partial</td><td>Tool reflection</td><td>pass</td><td class="numeric">802.4</td><td class="numeric">24</td><td class="numeric">512,025</td><td>service state matches the goal</td></tr><tr><td>task_415_api_throttle</td><td>Tool reflection</td><td>pass</td><td class="numeric">139.9</td><td class="numeric">20</td><td class="numeric">282,430</td><td>service state matches the goal</td></tr><tr><td>task_416_pay_units</td><td>Tool reflection</td><td>pass</td><td class="numeric">92.3</td><td class="numeric">12</td><td class="numeric">160,738</td><td>service state matches the goal</td></tr><tr><td>task_417_transfer_fees</td><td>Tool reflection</td><td>fail</td><td class="numeric">263.0</td><td class="numeric">16</td><td class="numeric">290,163</td><td>R05 received more than the payout</td></tr><tr><td>task_418_ticket_timeout_dupes</td><td>Tool reflection</td><td>pass</td><td class="numeric">190.2</td><td class="numeric">53</td><td class="numeric">487,571</td><td>service state matches the goal</td></tr><tr><td>task_419_storage_async_delete</td><td>Tool reflection</td><td>pass</td><td class="numeric">247.2</td><td class="numeric">39</td><td class="numeric">617,281</td><td>service state matches the goal</td></tr><tr><td>task_420_wiki_optimistic_lock</td><td>Tool reflection</td><td>pass</td><td class="numeric">560.0</td><td class="numeric">41</td><td class="numeric">1.24M</td><td>service state matches the goal</td></tr><tr><td>task_421_catalog_case_search</td><td>Tool reflection</td><td>pass</td><td class="numeric">242.7</td><td class="numeric">25</td><td class="numeric">476,888</td><td>service state matches the goal</td></tr><tr><td>task_422_calendar_timezone</td><td>Tool reflection</td><td>fail</td><td class="numeric">1816.4</td><td class="numeric">76</td><td class="numeric">1.42M</td><td>exit=2: ode:3881446) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 connect listeners added to [Socket]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+Tool execution timed out with an unknown outcome. Check the current state before repeating the operation.
+<details class="task-detail"><summary>output</summary><pre>meeting &#x27;Планирование спринта&#x27; has 0 events instead of exactly one</pre><p>error: exit=2: ode:3881446) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 connect listeners added to [Socket]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+Tool execution timed out with an unknown outcome. Check the current state before repeating the operation.
+</p></details></td></tr><tr><td>task_423_rooms_duration_cap</td><td>Tool reflection</td><td>pass</td><td class="numeric">241.3</td><td class="numeric">35</td><td class="numeric">325,850</td><td>service state matches the goal</td></tr><tr><td>task_424_payments_split_limits</td><td>Tool reflection</td><td>pass</td><td class="numeric">341.6</td><td class="numeric">26</td><td class="numeric">453,641</td><td>service state matches the goal</td></tr><tr><td>task_425_shipping_weight_codes</td><td>Tool reflection</td><td>pass</td><td class="numeric">408.9</td><td class="numeric">53</td><td class="numeric">583,590</td><td>service state matches the goal</td></tr><tr><td>task_426_kv_eventual</td><td>Tool reflection</td><td>fail</td><td class="numeric">82.0</td><td class="numeric">11</td><td class="numeric">105,728</td><td>12 event(s) were never applied</td></tr><tr><td>task_427_report_deprecated_flag</td><td>Tool reflection</td><td>pass</td><td class="numeric">146.9</td><td class="numeric">17</td><td class="numeric">303,821</td><td>service state matches the goal</td></tr><tr><td>task_428_geocode_quota</td><td>Tool reflection</td><td>fail</td><td class="numeric">532.3</td><td class="numeric">21</td><td class="numeric">470,938</td><td>30 addresses have wrong or missing coordinates (e.g. A06)</td></tr><tr><td>task_429_mail_bounce</td><td>Tool reflection</td><td>fail</td><td class="numeric">1819.9</td><td class="numeric">67</td><td class="numeric">2.34M</td><td>exit=2: sExceededWarning: Possible EventEmitter memory leak detected. 11 connect listeners added to [Socket]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+Request timed out before a response was generated. Please try again, or increase `agents.defaults.timeoutSeconds` in your config.
+<details class="task-detail"><summary>output</summary><pre>anouk.devries@zuidmarkt.nl got 2 delivered copies of the notice instead of exactly one</pre><p>error: exit=2: sExceededWarning: Possible EventEmitter memory leak detected. 11 connect listeners added to [Socket]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+Request timed out before a response was generated. Please try again, or increase `agents.defaults.timeoutSeconds` in your config.
+</p></details></td></tr><tr><td>task_430_orders_backorder</td><td>Tool reflection</td><td>fail</td><td class="numeric">167.6</td><td class="numeric">16</td><td class="numeric">277,621</td><td>for sw-cheese received 28 units instead of 40</td></tr><tr><td>task_431_admin_elevation</td><td>Tool reflection</td><td>fail</td><td class="numeric">870.9</td><td class="numeric">86</td><td class="numeric">864,188</td><td>the changes were not applied in changes.csv order</td></tr><tr><td>task_432_clock_contract</td><td>Feasibility</td><td>pass</td><td class="numeric">123.6</td><td class="numeric">17</td><td class="numeric">380,419</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_433_aggregate_identifiability</td><td>Feasibility</td><td>pass</td><td class="numeric">280.5</td><td class="numeric">29</td><td class="numeric">1.06M</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_434_universal_compressor</td><td>Feasibility</td><td>pass</td><td class="numeric">328.0</td><td class="numeric">22</td><td class="numeric">807,362</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_435_archive_transfer</td><td>Feasibility</td><td>pass</td><td class="numeric">244.4</td><td class="numeric">28</td><td class="numeric">801,355</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_436_search_capabilities</td><td>Feasibility</td><td>fail</td><td class="numeric">851.5</td><td class="numeric">37</td><td class="numeric">730,822</td><td>missing or unnecessary diagnostics; incorrect probability<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;stop&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    11103,
+    11813
+  ],
+  &quot;diagnostic_requests&quot;: 3,
+  &quot;extra_requests&quot;: 2,
+  &quot;io_used&quot;: 3,
+  &quot;max_success_probability&quot;: [
+    33152,
+    35439
+  ],
+  &quot;probability_error&quot;: [
+    157,
+    35439
+  ],
+  &quot;query_count&quot;: 3,
+  &quot;reason&quot;: &quot;missing or unnecessary diagnostics; incorrect probability&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: false,
+  &quot;strategy_reason&quot;: &quot;missing or unnecessary diagnostics; incorrect probability&quot;,
+  &quot;success_basis&quot;: &quot;none&quot;,
+  &quot;target_found&quot;: false
+}</pre></details></td></tr><tr><td>task_437_search_index</td><td>Feasibility</td><td>pass</td><td class="numeric">357.6</td><td class="numeric">23</td><td class="numeric">527,962</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    140475,
+    147658
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 2,
+  &quot;max_success_probability&quot;: [
+    140475,
+    147658
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 6,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 1,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_438_opaque_guid</td><td>Feasibility</td><td>pass</td><td class="numeric">792.2</td><td class="numeric">21</td><td class="numeric">0</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=budget_exceeded, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;budget_exceeded&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_439_ledger_reachability</td><td>Feasibility</td><td>pass</td><td class="numeric">433.9</td><td class="numeric">32</td><td class="numeric">1.02M</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_440_universal_compressor</td><td>Feasibility</td><td>pass</td><td class="numeric">392.3</td><td class="numeric">30</td><td class="numeric">1.17M</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_441_stateless_contract</td><td>Feasibility</td><td>fail</td><td class="numeric">317.4</td><td class="numeric">5</td><td class="numeric">0</td><td>decision_correct=True, response_correct=False, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: false,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_442_ledger_reachability</td><td>Feasibility</td><td>pass</td><td class="numeric">725.5</td><td class="numeric">22</td><td class="numeric">0</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_443_search_count</td><td>Feasibility</td><td>pass</td><td class="numeric">408.9</td><td class="numeric">9</td><td class="numeric">0</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;stop&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    136639,
+    144811
+  ],
+  &quot;diagnostic_requests&quot;: 1,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 1,
+  &quot;max_success_probability&quot;: [
+    136639,
+    144811
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 1,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;strategy&quot;,
+  &quot;target_found&quot;: false
+}</pre></details></td></tr><tr><td>task_444_stateless_contract</td><td>Feasibility</td><td>pass</td><td class="numeric">263.1</td><td class="numeric">31</td><td class="numeric">680,106</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_445_parity_repair</td><td>Feasibility</td><td>pass</td><td class="numeric">81.5</td><td class="numeric">14</td><td class="numeric">219,215</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_446_archive_transfer</td><td>Feasibility</td><td>pass</td><td class="numeric">122.1</td><td class="numeric">15</td><td class="numeric">431,267</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_447_sealed_partition</td><td>Feasibility</td><td>fail</td><td class="numeric">171.8</td><td class="numeric">16</td><td class="numeric">326,116</td><td>decision_correct=False, response_correct=False, extra_requests=0, status=None, submission_count=0<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: false,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: false,
+  &quot;status&quot;: null,
+  &quot;submission_count&quot;: 0
+}</pre></details></td></tr><tr><td>task_448_aggregate_identifiability</td><td>Feasibility</td><td>fail</td><td class="numeric">731.6</td><td class="numeric">38</td><td class="numeric">2.01M</td><td>decision_correct=True, response_correct=False, invalid_calls=1, extra_requests=1, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 1,
+  &quot;invalid_calls&quot;: 1,
+  &quot;response_correct&quot;: false,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_449_search_capabilities</td><td>Feasibility</td><td>fail</td><td class="numeric">408.9</td><td class="numeric">0</td><td class="numeric">0</td><td>exit=1: nersExceededWarning: Possible EventEmitter memory leak detected. 11 connect listeners added to [Socket]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+⚠️ Agent couldn&#x27;t generate a response. Note: some tool actions may have already been executed — please verify before retrying.
+<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: false,
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 0,
+  &quot;max_success_probability&quot;: [
+    45925,
+    47252
+  ],
+  &quot;probability_error&quot;: null,
+  &quot;query_count&quot;: 0,
+  &quot;reason&quot;: &quot;invalid commands, quotas or finish&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: false,
+  &quot;strategy_reason&quot;: &quot;missing or unnecessary diagnostics; malformed plan; wrong budget decision&quot;,
+  &quot;success_basis&quot;: &quot;none&quot;,
+  &quot;target_found&quot;: false
+}</pre><p>error: exit=1: nersExceededWarning: Possible EventEmitter memory leak detected. 11 connect listeners added to [Socket]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+⚠️ Agent couldn&#x27;t generate a response. Note: some tool actions may have already been executed — please verify before retrying.
+</p></details></td></tr><tr><td>task_450_maintenance_windows</td><td>Feasibility</td><td>pass</td><td class="numeric">221.0</td><td class="numeric">20</td><td class="numeric">454,312</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_451_search_index</td><td>Feasibility</td><td>pass</td><td class="numeric">417.2</td><td class="numeric">26</td><td class="numeric">539,234</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;stop&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    93319,
+    147658
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 0,
+  &quot;max_success_probability&quot;: [
+    93319,
+    147658
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 0,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;strategy&quot;,
+  &quot;target_found&quot;: false
+}</pre></details></td></tr><tr><td>task_452_search_hint</td><td>Feasibility</td><td>pass</td><td class="numeric">331.7</td><td class="numeric">7</td><td class="numeric">0</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;stop&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    78388,
+    110237
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 0,
+  &quot;max_success_probability&quot;: [
+    78388,
+    110237
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 0,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;strategy&quot;,
+  &quot;target_found&quot;: false
+}</pre></details></td></tr><tr><td>task_453_opaque_guid</td><td>Feasibility</td><td>pass</td><td class="numeric">1041.4</td><td class="numeric">40</td><td class="numeric">2.12M</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_454_search_boundary</td><td>Feasibility</td><td>pass</td><td class="numeric">142.2</td><td class="numeric">11</td><td class="numeric">185,971</td><td>continued search after success<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    142265,
+    148412
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 55,
+  &quot;max_success_probability&quot;: [
+    142265,
+    148412
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 41,
+  &quot;reason&quot;: &quot;continued search after success&quot;,
+  &quot;search_requests&quot;: 12,
+  &quot;strategy_correct&quot;: false,
+  &quot;strategy_reason&quot;: &quot;continued search after success&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_455_maintenance_windows</td><td>Feasibility</td><td>pass</td><td class="numeric">155.7</td><td class="numeric">25</td><td class="numeric">500,719</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_456_build_critical_path</td><td>Feasibility</td><td>pass</td><td class="numeric">327.3</td><td class="numeric">34</td><td class="numeric">871,145</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_457_search_pool</td><td>Feasibility</td><td>pass</td><td class="numeric">197.7</td><td class="numeric">14</td><td class="numeric">244,631</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;stop&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    88321,
+    127636
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 0,
+  &quot;max_success_probability&quot;: [
+    88321,
+    127636
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 0,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;strategy&quot;,
+  &quot;target_found&quot;: false
+}</pre></details></td></tr><tr><td>task_458_deployment_matching</td><td>Feasibility</td><td>pass</td><td class="numeric">442.0</td><td class="numeric">29</td><td class="numeric">1.09M</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_459_replication_cut</td><td>Feasibility</td><td>pass</td><td class="numeric">459.9</td><td class="numeric">39</td><td class="numeric">1.13M</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_460_replication_cut</td><td>Feasibility</td><td>pass</td><td class="numeric">544.8</td><td class="numeric">38</td><td class="numeric">1.27M</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_461_search_pool</td><td>Feasibility</td><td>pass</td><td class="numeric">182.4</td><td class="numeric">15</td><td class="numeric">232,520</td><td>continued search after success<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    30575,
+    31909
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 55,
+  &quot;max_success_probability&quot;: [
+    30575,
+    31909
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 42,
+  &quot;reason&quot;: &quot;continued search after success&quot;,
+  &quot;search_requests&quot;: 12,
+  &quot;strategy_correct&quot;: false,
+  &quot;strategy_reason&quot;: &quot;continued search after success&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_462_build_critical_path</td><td>Feasibility</td><td>pass</td><td class="numeric">1628.5</td><td class="numeric">116</td><td class="numeric">9.45M</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_463_diagnostic_queries</td><td>Feasibility</td><td>fail</td><td class="numeric">250.4</td><td class="numeric">30</td><td class="numeric">906,645</td><td>decision_correct=True, response_correct=False, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: false,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_464_search_boundary</td><td>Feasibility</td><td>pass</td><td class="numeric">253.0</td><td class="numeric">17</td><td class="numeric">327,152</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;stop&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    69579,
+    74206
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 0,
+  &quot;max_success_probability&quot;: [
+    69579,
+    74206
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 0,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;strategy&quot;,
+  &quot;target_found&quot;: false
+}</pre></details></td></tr><tr><td>task_465_search_count</td><td>Feasibility</td><td>pass</td><td class="numeric">345.0</td><td class="numeric">13</td><td class="numeric">233,233</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    138627,
+    144811
+  ],
+  &quot;diagnostic_requests&quot;: 1,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 52,
+  &quot;max_success_probability&quot;: [
+    138627,
+    144811
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 32,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 11,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_466_parity_repair</td><td>Feasibility</td><td>pass</td><td class="numeric">235.9</td><td class="numeric">25</td><td class="numeric">459,371</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_467_sealed_partition</td><td>Feasibility</td><td>pass</td><td class="numeric">258.9</td><td class="numeric">18</td><td class="numeric">412,558</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=budget_exceeded, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;budget_exceeded&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_468_diagnostic_queries</td><td>Feasibility</td><td>pass</td><td class="numeric">511.0</td><td class="numeric">46</td><td class="numeric">1.3M</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=budget_exceeded, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;budget_exceeded&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_469_deployment_matching</td><td>Feasibility</td><td>fail</td><td class="numeric">464.8</td><td class="numeric">8</td><td class="numeric">587,543</td><td>decision_correct=False, response_correct=False, extra_requests=0, status=None, submission_count=0<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: false,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: false,
+  &quot;status&quot;: null,
+  &quot;submission_count&quot;: 0
+}</pre></details></td></tr><tr><td>task_470_search_hint</td><td>Feasibility</td><td>pass</td><td class="numeric">365.4</td><td class="numeric">18</td><td class="numeric">385,807</td><td>continued search after success<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    104756,
+    110237
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 55,
+  &quot;max_success_probability&quot;: [
+    104756,
+    110237
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 33,
+  &quot;reason&quot;: &quot;continued search after success&quot;,
+  &quot;search_requests&quot;: 12,
+  &quot;strategy_correct&quot;: false,
+  &quot;strategy_reason&quot;: &quot;continued search after success&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_471_clock_contract</td><td>Feasibility</td><td>pass</td><td class="numeric">173.6</td><td class="numeric">11</td><td class="numeric">237,129</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_01_create_hello</td><td>Shot List</td><td>pass</td><td class="numeric">164.9</td><td class="numeric">2</td><td class="numeric">35,862</td><td>hello.py ran and produced expected output</td></tr><tr><td>task_03_slugify</td><td>Shot List</td><td>pass</td><td class="numeric">321.3</td><td class="numeric">4</td><td class="numeric">63,981</td><td>src/utils.py: mod.slugify(&#x27;Hello, World!&#x27;) == &#x27;hello-world&#x27;; src/utils.py: mod.slugify(&#x27;Foo Bar Baz&#x27;) == &#x27;foo-bar-baz&#x27;</td></tr><tr><td>task_101_csv_mean_score</td><td>Shot List</td><td>pass</td><td class="numeric">113.1</td><td class="numeric">3</td><td class="numeric">48,947</td><td>mean.txt matches expected content</td></tr><tr><td>task_104_csv_join</td><td>Shot List</td><td>pass</td><td class="numeric">164.8</td><td class="numeric">5</td><td class="numeric">61,557</td><td>joined.csv matches expected content</td></tr><tr><td>task_106_csv_group_count</td><td>Shot List</td><td>pass</td><td class="numeric">101.9</td><td class="numeric">3</td><td class="numeric">48,585</td><td>counts.csv matches expected content</td></tr><tr><td>task_140_grep_emails</td><td>Shot List</td><td>pass</td><td class="numeric">96.5</td><td class="numeric">3</td><td class="numeric">48,694</td><td>emails.txt has all four unique emails</td></tr><tr><td>task_153_xlsx_to_markdown_report</td><td>Shot List</td><td>pass</td><td class="numeric">73.4</td><td class="numeric">4</td><td class="numeric">61,771</td><td>report.md has the three regions with correct totals</td></tr><tr><td>task_157_two_csv_diff</td><td>Shot List</td><td>pass</td><td class="numeric">68.3</td><td class="numeric">6</td><td class="numeric">74,434</td><td>diff files have the expected names</td></tr><tr><td>task_159_unzip_extract</td><td>Shot List</td><td>pass</td><td class="numeric">50.3</td><td class="numeric">4</td><td class="numeric">49,391</td><td>archive.zip extracted to extracted/ with all three files</td></tr><tr><td>task_201_reconcile_vip_users</td><td>Shot List</td><td>pass</td><td class="numeric">217.6</td><td class="numeric">8</td><td class="numeric">93,679</td><td>vip_users.json matches expected JSON</td></tr><tr><td>task_206_reconcile_paid_revenue</td><td>Shot List</td><td>pass</td><td class="numeric">212.3</td><td class="numeric">7</td><td class="numeric">65,923</td><td>vip_revenue.csv matches expected rows</td></tr><tr><td>task_214_customer_data_quality_report</td><td>Shot List</td><td>pass</td><td class="numeric">82.2</td><td class="numeric">3</td><td class="numeric">49,293</td><td>dq_report.json matches expected quality checks</td></tr><tr><td>task_222_memory_name_pyproject</td><td>Shot List</td><td>pass</td><td class="numeric">107.8</td><td class="numeric">4</td><td class="numeric">39,330</td><td>name saved to MEMORY.md and used in pyproject.toml</td></tr><tr><td>task_223_memory_city_timezone_script</td><td>Shot List</td><td>fail</td><td class="numeric">158.5</td><td class="numeric">1</td><td class="numeric">26,412</td><td>MEMORY.md doesn&#x27;t have a &#x27;- Город: Москва&#x27; line</td></tr><tr><td>task_226_memory_requirements_dev</td><td>Shot List</td><td>pass</td><td class="numeric">72.2</td><td class="numeric">1</td><td class="numeric">25,545</td><td>requirements-dev.txt lists the user&#x27;s dev tools</td></tr><tr><td>task_231_memory_refuse_secrets</td><td>Shot List</td><td>fail</td><td class="numeric">171.2</td><td class="numeric">5</td><td class="numeric">54,647</td><td>README.md doesn&#x27;t say the user actually uses Anthropic / Антропик</td></tr><tr><td>task_240_memory_summarize_profile</td><td>Shot List</td><td>pass</td><td class="numeric">96.7</td><td class="numeric">1</td><td class="numeric">25,557</td><td>summary.txt is concise and includes key facts</td></tr><tr><td>task_24_add_header_comment</td><td>Shot List</td><td>pass</td><td class="numeric">268.9</td><td class="numeric">6</td><td class="numeric">60,356</td><td>src/a.py matches /\A# \(c\) 2026 Acme Inc\./; src/b.py matches /\A# \(c\) 2026 Acme Inc\./; src/a.py contains all expec…</td></tr><tr><td>task_263_terminal_du_top_dirs</td><td>Shot List</td><td>pass</td><td class="numeric">79.5</td><td class="numeric">4</td><td class="numeric">61,010</td><td>reports/top_dirs.tsv lines match</td></tr><tr><td>task_266_terminal_sha256_manifest</td><td>Shot List</td><td>pass</td><td class="numeric">104.3</td><td class="numeric">4</td><td class="numeric">61,430</td><td>SHA256SUMS matches payload files</td></tr><tr><td>task_270_tau2_bank_duplicate_charge</td><td>Shot List</td><td>pass</td><td class="numeric">97.7</td><td class="numeric">4</td><td class="numeric">48,710</td><td>bank_action.json matches expected JSON (free text: (&#x27;reason_code&#x27;,))</td></tr><tr><td>task_272_tau2_clinic_reschedule</td><td>Shot List</td><td>pass</td><td class="numeric">227.7</td><td class="numeric">5</td><td class="numeric">0</td><td>clinic_action.json matches expected JSON</td></tr><tr><td>task_307_resolve_many_files</td><td>Shot List</td><td>pass</td><td class="numeric">364.9</td><td class="numeric">17</td><td class="numeric">80,049</td><td>mod01.py free of forbidden substrings; mod01.py lines match; mod02.py free of forbidden substrings; mod02.py lines matc…</td></tr><tr><td>task_309_rename_refactor_scale</td><td>Shot List</td><td>pass</td><td class="numeric">287.0</td><td class="numeric">7</td><td class="numeric">79,540</td><td>lib.py free of forbidden substrings; c1.py free of forbidden substrings; c2.py free of forbidden substrings; c3.py free…</td></tr><tr><td>task_315_skill_b1_failure_codebook</td><td>Shot List</td><td>pass</td><td class="numeric">485.9</td><td class="numeric">6</td><td class="numeric">88,747</td><td>all 8 failure reasons normalized to the correct codes</td></tr><tr><td>task_319_skill_b2_ndr7_parse</td><td>Shot List</td><td>pass</td><td class="numeric">321.8</td><td class="numeric">3</td><td class="numeric">38,395</td><td>all NDR-7 records parsed with correct signed amounts</td></tr><tr><td>task_323_skill_g1_create_slugify_skill</td><td>Shot List</td><td>pass</td><td class="numeric">885.4</td><td class="numeric">9</td><td class="numeric">75,775</td><td>skills/slugify-tool/SKILL.md matches /^name:\s*[\&quot;&#x27;]?slugify-tool[\&quot;&#x27;]?\s*$/; skills/slugify-tool/SKILL.md matches /rev…</td></tr><tr><td>task_332_adv_broken_build</td><td>Shot List</td><td>pass</td><td class="numeric">627.8</td><td class="numeric">6</td><td class="numeric">62,548</td><td>dist/bundle.txt lines match</td></tr><tr><td>task_335_adv_missing_config_file</td><td>Shot List</td><td>pass</td><td class="numeric">565.4</td><td class="numeric">4</td><td class="numeric">49,949</td><td>contradiction reported in NOTES.md (honest deferral)</td></tr><tr><td>task_352_structured_log_summary</td><td>Shot List</td><td>pass</td><td class="numeric">1240.4</td><td class="numeric">5</td><td class="numeric">76,516</td><td>summary.json matches expected JSON</td></tr><tr><td>task_353_reconstruct_sessions</td><td>Shot List</td><td>pass</td><td class="numeric">1171.2</td><td class="numeric">4</td><td class="numeric">66,575</td><td>sessions.csv matches expected CSV</td></tr><tr><td>task_355_segment_audit</td><td>Shot List</td><td>pass</td><td class="numeric">1080.4</td><td class="numeric">4</td><td class="numeric">62,196</td><td>audit.json matches expected JSON</td></tr><tr><td>task_356_deduplicate_contacts</td><td>Shot List</td><td>pass</td><td class="numeric">749.2</td><td class="numeric">2</td><td class="numeric">0</td><td>contacts_clean.json matches expected JSON</td></tr><tr><td>task_357_request_latency</td><td>Shot List</td><td>pass</td><td class="numeric">620.0</td><td class="numeric">5</td><td class="numeric">66,725</td><td>latency.csv matches expected CSV</td></tr><tr><td>task_358_range_parser</td><td>Shot List</td><td>fail</td><td class="numeric">1519.4</td><td class="numeric">2</td><td class="numeric">0</td><td>cannot test ranges.py:parse_ranges: NotImplementedError:</td></tr><tr><td>task_365_package_rename</td><td>Shot List</td><td>pass</td><td class="numeric">956.0</td><td class="numeric">30</td><td class="numeric">98,376</td><td>blueledger absent; greenledger/__init__.py exists; greenledger/api.py matches exactly; greenledger/client.py matches ex…</td></tr><tr><td>task_368_sqlite_migration</td><td>Shot List</td><td>pass</td><td class="numeric">1372.0</td><td class="numeric">17</td><td class="numeric">271,165</td><td>SQLite migration is correct and idempotent</td></tr><tr><td>task_370_change_plan</td><td>Shot List</td><td>pass</td><td class="numeric">341.2</td><td class="numeric">13</td><td class="numeric">92,421</td><td>app.py matches exactly; config.env matches exactly; README.md matches exactly; notes.txt matches exactly; applied.json …</td></tr><tr><td>task_371_test_result_aggregation</td><td>Shot List</td><td>pass</td><td class="numeric">275.7</td><td class="numeric">6</td><td class="numeric">63,760</td><td>report.json matches expected JSON</td></tr><tr><td>task_374_cli_pktool_filter_decode</td><td>Shot List</td><td>pass</td><td class="numeric">227.8</td><td class="numeric">11</td><td class="numeric">180,265</td><td>flows.csv matches expected rows</td></tr><tr><td>task_375_cli_pktool_stats_corrupt</td><td>Shot List</td><td>pass</td><td class="numeric">109.0</td><td class="numeric">5</td><td class="numeric">77,637</td><td>proto_stats.json matches expected JSON</td></tr><tr><td>task_378_cli_cfgctl_layered_merge</td><td>Shot List</td><td>fail</td><td class="numeric">193.8</td><td class="numeric">5</td><td class="numeric">79,719</td><td>effective.env missing</td></tr><tr><td>task_381_cli_slicer_restock</td><td>Shot List</td><td>pass</td><td class="numeric">162.8</td><td class="numeric">6</td><td class="numeric">65,644</td><td>restock.csv matches expected rows</td></tr><tr><td>task_382_cli_mixed_depwalk_hotspots</td><td>Shot List</td><td>pass</td><td class="numeric">195.6</td><td class="numeric">9</td><td class="numeric">148,675</td><td>solve.sh ran; hotspots.csv matches expected output</td></tr><tr><td>task_383_cli_mixed_pktool_ports</td><td>Shot List</td><td>pass</td><td class="numeric">102.9</td><td class="numeric">7</td><td class="numeric">119,814</td><td>solve.sh ran; ports.tsv matches expected output</td></tr><tr><td>task_384_cli_mixed_slicer_warehouse_value</td><td>Shot List</td><td>pass</td><td class="numeric">129.5</td><td class="numeric">10</td><td class="numeric">154,838</td><td>solve.sh ran; warehouse_value.csv matches expected output</td></tr><tr><td>task_389_cli_find_xargs_predicates</td><td>Shot List</td><td>pass</td><td class="numeric">175.0</td><td class="numeric">11</td><td class="numeric">164,307</td><td>solve.sh ran; big_logs.csv matches expected output</td></tr><tr><td>task_41_count_todos</td><td>Shot List</td><td>pass</td><td class="numeric">184.6</td><td class="numeric">7</td><td class="numeric">74,211</td><td>count.txt matches expected content</td></tr><tr><td>task_48_append_eof_each</td><td>Shot List</td><td>pass</td><td class="numeric">87.3</td><td class="numeric">3</td><td class="numeric">49,526</td><td>all logs/*.log end with EOF and keep original content</td></tr><tr><td>task_63_nested_json_edit</td><td>Shot List</td><td>pass</td><td class="numeric">55.6</td><td class="numeric">5</td><td class="numeric">60,901</td><td>database.host updated, other fields intact</td></tr><tr><td>task_69_remove_comments</td><td>Shot List</td><td>pass</td><td class="numeric">49.2</td><td class="numeric">2</td><td class="numeric">35,929</td><td>script.py lines match</td></tr><tr><td>task_92_count_chars</td><td>Shot List</td><td>pass</td><td class="numeric">138.7</td><td class="numeric">4</td><td class="numeric">60,785</td><td>count.txt matches expected content</td></tr></tbody></table></div></section>
     <section aria-label="Sources"><h2>Sources</h2><p class="coverage-note">Run artifacts aggregated into this row (checkout <code>results/</code> first, then <code>../results/</code>).</p><ul class="run-sources"><li><a href="https://github.com/Alex-Kul777/harness-bench-fast/blob/main/results/oc_medium_feasibility_minimaxm3_off_20261109.json"><code>oc_medium_feasibility_minimaxm3_off_20261109.json</code></a></li><li><a href="https://github.com/Alex-Kul777/harness-bench-fast/blob/main/results/oc_medium_long_minimaxm3_off_20261109.json"><code>oc_medium_long_minimaxm3_off_20261109.json</code></a></li><li><a href="https://github.com/Alex-Kul777/harness-bench-fast/blob/main/results/oc_medium_reflect_minimaxm3_off_20261109.json"><code>oc_medium_reflect_minimaxm3_off_20261109.json</code></a></li></ul></section>
     <p class="fine-print">Static page generated by <code>scripts/build_fork_pages.py</code> from saved run JSON in <code>results/</code>. Times are wall-clock minutes; tokens are compact recorded totals; <strong>Tokens (cost)</strong> adds an estimated spend in roubles (₽) — an estimate, not a bill. An unmeasured wave is not a failure. <a href="fork.en.html#medium">← Fork results</a></p>
   </main>

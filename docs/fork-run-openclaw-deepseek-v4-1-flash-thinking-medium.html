@@ -24,7 +24,488 @@
       <p class="coverage-note">Per-wave исходы этой конфигурации. Неизмеренная волна опущена (не провал).</p>
       <div class="table-wrap"><table class="leaderboard-table"><thead><tr><th scope="col">Wave</th><th scope="col" class="numeric">Tasks</th><th scope="col" class="numeric">Passed</th><th scope="col" class="numeric">%</th><th scope="col" class="numeric">95% Wilson</th><th scope="col" class="numeric">Time</th><th scope="col" class="numeric">Steps</th><th scope="col" class="numeric">Tokens (cost)</th></tr></thead><tbody><tr><td>Long context<span class="harness">392–411</span></td><td class="numeric">6</td><td class="numeric">2</td><td class="numeric">33.3%</td><td class="numeric">27.5–52.2%</td><td class="numeric">115.5m</td><td class="numeric">66</td><td class="numeric">303,527 (13₽)</td></tr><tr><td>Tool reflection<span class="harness">412–431</span></td><td class="numeric">20</td><td class="numeric">16</td><td class="numeric">80.0%</td><td class="numeric">71.4–78.9%</td><td class="numeric">69.1m</td><td class="numeric">399</td><td class="numeric">11.14M (242₽)</td></tr><tr><td>Feasibility<span class="harness">432–471</span></td><td class="numeric">40</td><td class="numeric">39</td><td class="numeric">97.5%</td><td class="numeric">92.4–94.3%</td><td class="numeric">123.7m</td><td class="numeric">811</td><td class="numeric">24.28M (493₽)</td></tr></tbody></table></div>
     </section>
-    <section aria-label="Tasks"><h2>Задачи</h2><p id="empty">Для этой конфигурации нет per-task записей.</p></section>
+    <section aria-label="Tasks"><h2>Задачи</h2><p class="coverage-note">Per-task исход каждой записанной задачи для этой конфигурации.</p><div class="table-wrap"><table class="leaderboard-table"><thead><tr><th scope="col">Task</th><th scope="col">Wave</th><th scope="col">Result</th><th scope="col" class="numeric">Time (s)</th><th scope="col" class="numeric">Steps</th><th scope="col" class="numeric">Tokens</th><th scope="col">Note</th></tr></thead><tbody><tr><td>task_392_manuscript_continuity</td><td>Long context</td><td>fail</td><td class="numeric">600.4</td><td class="numeric">16</td><td class="numeric">0</td><td>нет файла errors.csv</td></tr><tr><td>task_393_intranet_multihop</td><td>Long context</td><td>pass</td><td class="numeric">681.8</td><td class="numeric">0</td><td class="numeric">0</td><td>ответы: верно 38/40 (95.0%)</td></tr><tr><td>task_394_review_annotation</td><td>Long context</td><td>pass</td><td class="numeric">2995.9</td><td class="numeric">21</td><td class="numeric">0</td><td>отзывы: верно 797/800 (99.6%)</td></tr><tr><td>task_395_homework_grading</td><td>Long context</td><td>fail</td><td class="numeric">1030.1</td><td class="numeric">16</td><td class="numeric">0</td><td>строк верно 80/90, нужно не меньше 86; неверные: s04, s21, s29, s39, s44, s56, s60, s65</td></tr><tr><td>task_398_card_game_engine</td><td>Long context</td><td>fail</td><td class="numeric">273.9</td><td class="numeric">10</td><td class="numeric">303,527</td><td>нет файла engine.py</td></tr><tr><td>task_403_binary_format_reverse</td><td>Long context</td><td>fail</td><td class="numeric">1349.0</td><td class="numeric">3</td><td class="numeric">0</td><td>exit=1:  Use emitter.setMaxListeners() to increase limit
+(node:3782835) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 connect listeners added to [Socket]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+Provider returned an incomplete or malformed tool call
+<details class="task-detail"><summary>output</summary><pre>нет файла vtl_decode.py</pre><p>error: exit=1:  Use emitter.setMaxListeners() to increase limit
+(node:3782835) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 connect listeners added to [Socket]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+Provider returned an incomplete or malformed tool call
+</p></details></td></tr><tr><td>task_412_supplier_minimum</td><td>Tool reflection</td><td>pass</td><td class="numeric">118.9</td><td class="numeric">11</td><td class="numeric">206,533</td><td>service state matches the goal</td></tr><tr><td>task_413_crm_pagination</td><td>Tool reflection</td><td>pass</td><td class="numeric">87.9</td><td class="numeric">9</td><td class="numeric">213,856</td><td>service state matches the goal</td></tr><tr><td>task_414_batch_partial</td><td>Tool reflection</td><td>pass</td><td class="numeric">86.0</td><td class="numeric">11</td><td class="numeric">177,223</td><td>service state matches the goal</td></tr><tr><td>task_415_api_throttle</td><td>Tool reflection</td><td>fail</td><td class="numeric">1073.7</td><td class="numeric">68</td><td class="numeric">2.22M</td><td>articles.jsonl is missing</td></tr><tr><td>task_416_pay_units</td><td>Tool reflection</td><td>pass</td><td class="numeric">132.3</td><td class="numeric">18</td><td class="numeric">350,655</td><td>service state matches the goal</td></tr><tr><td>task_417_transfer_fees</td><td>Tool reflection</td><td>fail</td><td class="numeric">475.9</td><td class="numeric">16</td><td class="numeric">1.69M</td><td>R05 received more than the payout</td></tr><tr><td>task_418_ticket_timeout_dupes</td><td>Tool reflection</td><td>pass</td><td class="numeric">221.4</td><td class="numeric">23</td><td class="numeric">703,580</td><td>service state matches the goal</td></tr><tr><td>task_419_storage_async_delete</td><td>Tool reflection</td><td>pass</td><td class="numeric">93.3</td><td class="numeric">20</td><td class="numeric">416,953</td><td>service state matches the goal</td></tr><tr><td>task_420_wiki_optimistic_lock</td><td>Tool reflection</td><td>fail</td><td class="numeric">242.2</td><td class="numeric">27</td><td class="numeric">782,499</td><td>page runbook-db lost part of its text (or another participant&#x27;s edits)</td></tr><tr><td>task_421_catalog_case_search</td><td>Tool reflection</td><td>pass</td><td class="numeric">127.0</td><td class="numeric">17</td><td class="numeric">375,684</td><td>service state matches the goal</td></tr><tr><td>task_422_calendar_timezone</td><td>Tool reflection</td><td>pass</td><td class="numeric">81.7</td><td class="numeric">7</td><td class="numeric">149,051</td><td>service state matches the goal</td></tr><tr><td>task_423_rooms_duration_cap</td><td>Tool reflection</td><td>pass</td><td class="numeric">102.5</td><td class="numeric">12</td><td class="numeric">249,269</td><td>service state matches the goal</td></tr><tr><td>task_424_payments_split_limits</td><td>Tool reflection</td><td>pass</td><td class="numeric">97.0</td><td class="numeric">18</td><td class="numeric">355,288</td><td>service state matches the goal</td></tr><tr><td>task_425_shipping_weight_codes</td><td>Tool reflection</td><td>pass</td><td class="numeric">145.8</td><td class="numeric">16</td><td class="numeric">358,960</td><td>service state matches the goal</td></tr><tr><td>task_426_kv_eventual</td><td>Tool reflection</td><td>fail</td><td class="numeric">384.5</td><td class="numeric">33</td><td class="numeric">761,510</td><td>11 event(s) were never applied</td></tr><tr><td>task_427_report_deprecated_flag</td><td>Tool reflection</td><td>pass</td><td class="numeric">179.2</td><td class="numeric">24</td><td class="numeric">552,990</td><td>service state matches the goal</td></tr><tr><td>task_428_geocode_quota</td><td>Tool reflection</td><td>pass</td><td class="numeric">215.9</td><td class="numeric">28</td><td class="numeric">846,033</td><td>service state matches the goal</td></tr><tr><td>task_429_mail_bounce</td><td>Tool reflection</td><td>pass</td><td class="numeric">69.4</td><td class="numeric">14</td><td class="numeric">212,104</td><td>service state matches the goal</td></tr><tr><td>task_430_orders_backorder</td><td>Tool reflection</td><td>pass</td><td class="numeric">98.7</td><td class="numeric">13</td><td class="numeric">273,620</td><td>service state matches the goal</td></tr><tr><td>task_431_admin_elevation</td><td>Tool reflection</td><td>pass</td><td class="numeric">114.3</td><td class="numeric">14</td><td class="numeric">253,235</td><td>service state matches the goal</td></tr><tr><td>task_432_clock_contract</td><td>Feasibility</td><td>pass</td><td class="numeric">81.3</td><td class="numeric">13</td><td class="numeric">221,945</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_433_aggregate_identifiability</td><td>Feasibility</td><td>pass</td><td class="numeric">77.6</td><td class="numeric">17</td><td class="numeric">416,536</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_434_universal_compressor</td><td>Feasibility</td><td>pass</td><td class="numeric">83.2</td><td class="numeric">9</td><td class="numeric">324,398</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_435_archive_transfer</td><td>Feasibility</td><td>pass</td><td class="numeric">195.8</td><td class="numeric">28</td><td class="numeric">924,273</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_436_search_capabilities</td><td>Feasibility</td><td>pass</td><td class="numeric">295.1</td><td class="numeric">19</td><td class="numeric">755,513</td><td>missing or unnecessary diagnostics; wrong budget decision<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: false,
+  &quot;declared_probability&quot;: [
+    11103,
+    11813
+  ],
+  &quot;diagnostic_requests&quot;: 2,
+  &quot;extra_requests&quot;: 1,
+  &quot;io_used&quot;: 35,
+  &quot;max_success_probability&quot;: [
+    11103,
+    11813
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 40,
+  &quot;reason&quot;: &quot;missing or unnecessary diagnostics; wrong budget decision&quot;,
+  &quot;search_requests&quot;: 10,
+  &quot;strategy_correct&quot;: false,
+  &quot;strategy_reason&quot;: &quot;missing or unnecessary diagnostics; wrong budget decision&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_437_search_index</td><td>Feasibility</td><td>pass</td><td class="numeric">113.1</td><td class="numeric">14</td><td class="numeric">370,255</td><td>continued search after success<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    140475,
+    147658
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 54,
+  &quot;max_success_probability&quot;: [
+    140475,
+    147658
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 43,
+  &quot;reason&quot;: &quot;continued search after success&quot;,
+  &quot;search_requests&quot;: 12,
+  &quot;strategy_correct&quot;: false,
+  &quot;strategy_reason&quot;: &quot;continued search after success&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_438_opaque_guid</td><td>Feasibility</td><td>pass</td><td class="numeric">139.1</td><td class="numeric">25</td><td class="numeric">537,099</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=budget_exceeded, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;budget_exceeded&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_439_ledger_reachability</td><td>Feasibility</td><td>pass</td><td class="numeric">105.5</td><td class="numeric">19</td><td class="numeric">398,038</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_440_universal_compressor</td><td>Feasibility</td><td>pass</td><td class="numeric">150.2</td><td class="numeric">17</td><td class="numeric">651,472</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_441_stateless_contract</td><td>Feasibility</td><td>pass</td><td class="numeric">86.7</td><td class="numeric">11</td><td class="numeric">252,798</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_442_ledger_reachability</td><td>Feasibility</td><td>fail</td><td class="numeric">845.9</td><td class="numeric">46</td><td class="numeric">1.89M</td><td>decision_correct=True, response_correct=False, invalid_calls=1, extra_requests=1, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 1,
+  &quot;invalid_calls&quot;: 1,
+  &quot;response_correct&quot;: false,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_443_search_count</td><td>Feasibility</td><td>pass</td><td class="numeric">85.2</td><td class="numeric">15</td><td class="numeric">187,390</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;stop&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    136639,
+    144811
+  ],
+  &quot;diagnostic_requests&quot;: 1,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 1,
+  &quot;max_success_probability&quot;: [
+    136639,
+    144811
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 1,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;strategy&quot;,
+  &quot;target_found&quot;: false
+}</pre></details></td></tr><tr><td>task_444_stateless_contract</td><td>Feasibility</td><td>pass</td><td class="numeric">182.6</td><td class="numeric">19</td><td class="numeric">395,101</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_445_parity_repair</td><td>Feasibility</td><td>pass</td><td class="numeric">262.9</td><td class="numeric">25</td><td class="numeric">726,846</td><td>exit=1: nId=b5ff8436-31a6-45bc-be33-729d7e6bca88 provider=custom-foundation-models-api-cloud-ru profileId=sha256:5544cbbd510c
+Agent exec cleanup failed: Agent runtime cleanup did not settle; state ownership retained until this process exits
+[state/agent-db] agent database clean-close receipt: active-leases
+<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre><p>error: exit=1: nId=b5ff8436-31a6-45bc-be33-729d7e6bca88 provider=custom-foundation-models-api-cloud-ru profileId=sha256:5544cbbd510c
+Agent exec cleanup failed: Agent runtime cleanup did not settle; state ownership retained until this process exits
+[state/agent-db] agent database clean-close receipt: active-leases
+</p></details></td></tr><tr><td>task_446_archive_transfer</td><td>Feasibility</td><td>pass</td><td class="numeric">186.7</td><td class="numeric">8</td><td class="numeric">244,079</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_447_sealed_partition</td><td>Feasibility</td><td>pass</td><td class="numeric">238.4</td><td class="numeric">28</td><td class="numeric">745,311</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_448_aggregate_identifiability</td><td>Feasibility</td><td>pass</td><td class="numeric">463.0</td><td class="numeric">37</td><td class="numeric">1.3M</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_449_search_capabilities</td><td>Feasibility</td><td>pass</td><td class="numeric">148.4</td><td class="numeric">9</td><td class="numeric">269,293</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    34055,
+    35439
+  ],
+  &quot;diagnostic_requests&quot;: 1,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 32,
+  &quot;max_success_probability&quot;: [
+    34055,
+    35439
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 29,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 7,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_450_maintenance_windows</td><td>Feasibility</td><td>pass</td><td class="numeric">138.8</td><td class="numeric">17</td><td class="numeric">308,553</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_451_search_index</td><td>Feasibility</td><td>pass</td><td class="numeric">148.4</td><td class="numeric">14</td><td class="numeric">327,362</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;stop&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    93319,
+    147658
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 0,
+  &quot;max_success_probability&quot;: [
+    93319,
+    147658
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 0,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;strategy&quot;,
+  &quot;target_found&quot;: false
+}</pre></details></td></tr><tr><td>task_452_search_hint</td><td>Feasibility</td><td>pass</td><td class="numeric">124.2</td><td class="numeric">13</td><td class="numeric">294,229</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;stop&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    78388,
+    110237
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 0,
+  &quot;max_success_probability&quot;: [
+    78388,
+    110237
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 0,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;strategy&quot;,
+  &quot;target_found&quot;: false
+}</pre></details></td></tr><tr><td>task_453_opaque_guid</td><td>Feasibility</td><td>pass</td><td class="numeric">234.1</td><td class="numeric">28</td><td class="numeric">786,214</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_454_search_boundary</td><td>Feasibility</td><td>pass</td><td class="numeric">78.9</td><td class="numeric">14</td><td class="numeric">271,509</td><td>continued search after success<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    142265,
+    148412
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 55,
+  &quot;max_success_probability&quot;: [
+    142265,
+    148412
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 41,
+  &quot;reason&quot;: &quot;continued search after success&quot;,
+  &quot;search_requests&quot;: 12,
+  &quot;strategy_correct&quot;: false,
+  &quot;strategy_reason&quot;: &quot;continued search after success&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_455_maintenance_windows</td><td>Feasibility</td><td>pass</td><td class="numeric">69.7</td><td class="numeric">14</td><td class="numeric">179,993</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_456_build_critical_path</td><td>Feasibility</td><td>pass</td><td class="numeric">173.4</td><td class="numeric">30</td><td class="numeric">943,515</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_457_search_pool</td><td>Feasibility</td><td>pass</td><td class="numeric">159.2</td><td class="numeric">14</td><td class="numeric">375,614</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;stop&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    88321,
+    127636
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 0,
+  &quot;max_success_probability&quot;: [
+    88321,
+    127636
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 0,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;strategy&quot;,
+  &quot;target_found&quot;: false
+}</pre></details></td></tr><tr><td>task_458_deployment_matching</td><td>Feasibility</td><td>pass</td><td class="numeric">156.5</td><td class="numeric">23</td><td class="numeric">776,472</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_459_replication_cut</td><td>Feasibility</td><td>pass</td><td class="numeric">299.0</td><td class="numeric">28</td><td class="numeric">948,394</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_460_replication_cut</td><td>Feasibility</td><td>pass</td><td class="numeric">125.3</td><td class="numeric">26</td><td class="numeric">719,867</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=budget_exceeded, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;budget_exceeded&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_461_search_pool</td><td>Feasibility</td><td>pass</td><td class="numeric">151.4</td><td class="numeric">24</td><td class="numeric">674,231</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    30575,
+    31909
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 35,
+  &quot;max_success_probability&quot;: [
+    30575,
+    31909
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 32,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 8,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_462_build_critical_path</td><td>Feasibility</td><td>pass</td><td class="numeric">619.3</td><td class="numeric">50</td><td class="numeric">2.5M</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_463_diagnostic_queries</td><td>Feasibility</td><td>pass</td><td class="numeric">130.8</td><td class="numeric">19</td><td class="numeric">498,983</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_464_search_boundary</td><td>Feasibility</td><td>pass</td><td class="numeric">101.6</td><td class="numeric">12</td><td class="numeric">325,083</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;stop&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    69579,
+    74206
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 0,
+  &quot;max_success_probability&quot;: [
+    69579,
+    74206
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 0,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 0,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;strategy&quot;,
+  &quot;target_found&quot;: false
+}</pre></details></td></tr><tr><td>task_465_search_count</td><td>Feasibility</td><td>pass</td><td class="numeric">104.0</td><td class="numeric">16</td><td class="numeric">290,976</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    138627,
+    144811
+  ],
+  &quot;diagnostic_requests&quot;: 1,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 12,
+  &quot;max_success_probability&quot;: [
+    138627,
+    144811
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 12,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 3,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_466_parity_repair</td><td>Feasibility</td><td>pass</td><td class="numeric">208.7</td><td class="numeric">35</td><td class="numeric">643,794</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_467_sealed_partition</td><td>Feasibility</td><td>pass</td><td class="numeric">106.2</td><td class="numeric">0</td><td class="numeric">265,569</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_468_diagnostic_queries</td><td>Feasibility</td><td>pass</td><td class="numeric">141.8</td><td class="numeric">17</td><td class="numeric">656,447</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_469_deployment_matching</td><td>Feasibility</td><td>pass</td><td class="numeric">101.9</td><td class="numeric">17</td><td class="numeric">455,370</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=impossible, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;impossible&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_470_search_hint</td><td>Feasibility</td><td>pass</td><td class="numeric">173.4</td><td class="numeric">18</td><td class="numeric">605,534</td><td>valid strategy<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision&quot;: &quot;search&quot;,
+  &quot;decision_correct&quot;: true,
+  &quot;declared_probability&quot;: [
+    104756,
+    110237
+  ],
+  &quot;diagnostic_requests&quot;: 0,
+  &quot;extra_requests&quot;: 0,
+  &quot;io_used&quot;: 33,
+  &quot;max_success_probability&quot;: [
+    104756,
+    110237
+  ],
+  &quot;probability_error&quot;: [
+    0,
+    1
+  ],
+  &quot;query_count&quot;: 23,
+  &quot;reason&quot;: &quot;valid strategy&quot;,
+  &quot;search_requests&quot;: 8,
+  &quot;strategy_correct&quot;: true,
+  &quot;strategy_reason&quot;: &quot;valid strategy&quot;,
+  &quot;success_basis&quot;: &quot;verified_find&quot;,
+  &quot;target_found&quot;: true
+}</pre></details></td></tr><tr><td>task_471_clock_contract</td><td>Feasibility</td><td>pass</td><td class="numeric">132.8</td><td class="numeric">23</td><td class="numeric">820,916</td><td>decision_correct=True, response_correct=True, extra_requests=0, status=solved, submission_count=1<details class="task-detail"><summary>output</summary><pre>{
+  &quot;decision_correct&quot;: true,
+  &quot;extra_requests&quot;: 0,
+  &quot;response_correct&quot;: true,
+  &quot;status&quot;: &quot;solved&quot;,
+  &quot;submission_count&quot;: 1
+}</pre></details></td></tr><tr><td>task_01_create_hello</td><td>Shot List</td><td>pass</td><td class="numeric">36.3</td><td class="numeric">2</td><td class="numeric">32,554</td><td>hello.py ran and produced expected output</td></tr><tr><td>task_03_slugify</td><td>Shot List</td><td>pass</td><td class="numeric">40.6</td><td class="numeric">3</td><td class="numeric">44,992</td><td>src/utils.py: mod.slugify(&#x27;Hello, World!&#x27;) == &#x27;hello-world&#x27;; src/utils.py: mod.slugify(&#x27;Foo Bar Baz&#x27;) == &#x27;foo-bar-baz&#x27;</td></tr><tr><td>task_101_csv_mean_score</td><td>Shot List</td><td>pass</td><td class="numeric">37.3</td><td class="numeric">2</td><td class="numeric">33,354</td><td>mean.txt matches expected content</td></tr><tr><td>task_104_csv_join</td><td>Shot List</td><td>pass</td><td class="numeric">37.9</td><td class="numeric">2</td><td class="numeric">33,407</td><td>joined.csv matches expected content</td></tr><tr><td>task_106_csv_group_count</td><td>Shot List</td><td>pass</td><td class="numeric">36.0</td><td class="numeric">3</td><td class="numeric">44,190</td><td>counts.csv matches expected content</td></tr><tr><td>task_140_grep_emails</td><td>Shot List</td><td>pass</td><td class="numeric">54.6</td><td class="numeric">3</td><td class="numeric">44,340</td><td>emails.txt has all four unique emails</td></tr><tr><td>task_153_xlsx_to_markdown_report</td><td>Shot List</td><td>pass</td><td class="numeric">51.0</td><td class="numeric">6</td><td class="numeric">79,346</td><td>report.md has the three regions with correct totals</td></tr><tr><td>task_157_two_csv_diff</td><td>Shot List</td><td>pass</td><td class="numeric">36.8</td><td class="numeric">2</td><td class="numeric">33,084</td><td>diff files have the expected names</td></tr><tr><td>task_159_unzip_extract</td><td>Shot List</td><td>pass</td><td class="numeric">37.3</td><td class="numeric">2</td><td class="numeric">33,144</td><td>archive.zip extracted to extracted/ with all three files</td></tr><tr><td>task_201_reconcile_vip_users</td><td>Shot List</td><td>pass</td><td class="numeric">50.1</td><td class="numeric">4</td><td class="numeric">47,047</td><td>vip_users.json matches expected JSON</td></tr><tr><td>task_206_reconcile_paid_revenue</td><td>Shot List</td><td>pass</td><td class="numeric">39.4</td><td class="numeric">2</td><td class="numeric">35,417</td><td>vip_revenue.csv matches expected rows</td></tr><tr><td>task_214_customer_data_quality_report</td><td>Shot List</td><td>pass</td><td class="numeric">38.9</td><td class="numeric">4</td><td class="numeric">57,538</td><td>dq_report.json matches expected quality checks</td></tr><tr><td>task_222_memory_name_pyproject</td><td>Shot List</td><td>pass</td><td class="numeric">37.8</td><td class="numeric">5</td><td class="numeric">46,919</td><td>name saved to MEMORY.md and used in pyproject.toml</td></tr><tr><td>task_223_memory_city_timezone_script</td><td>Shot List</td><td>pass</td><td class="numeric">37.6</td><td class="numeric">5</td><td class="numeric">46,844</td><td>city saved; now.py uses Moscow tz and prints HH:MM</td></tr><tr><td>task_226_memory_requirements_dev</td><td>Shot List</td><td>pass</td><td class="numeric">40.8</td><td class="numeric">3</td><td class="numeric">34,413</td><td>requirements-dev.txt lists the user&#x27;s dev tools</td></tr><tr><td>task_231_memory_refuse_secrets</td><td>Shot List</td><td>pass</td><td class="numeric">37.7</td><td class="numeric">4</td><td class="numeric">35,693</td><td>secrets not leaked; Anthropic fact saved correctly</td></tr><tr><td>task_240_memory_summarize_profile</td><td>Shot List</td><td>pass</td><td class="numeric">32.1</td><td class="numeric">1</td><td class="numeric">23,185</td><td>summary.txt is concise and includes key facts</td></tr><tr><td>task_24_add_header_comment</td><td>Shot List</td><td>pass</td><td class="numeric">40.8</td><td class="numeric">4</td><td class="numeric">44,926</td><td>src/a.py matches /\A# \(c\) 2026 Acme Inc\./; src/b.py matches /\A# \(c\) 2026 Acme Inc\./; src/a.py contains all expec…</td></tr><tr><td>task_263_terminal_du_top_dirs</td><td>Shot List</td><td>pass</td><td class="numeric">35.6</td><td class="numeric">2</td><td class="numeric">33,126</td><td>reports/top_dirs.tsv lines match</td></tr><tr><td>task_266_terminal_sha256_manifest</td><td>Shot List</td><td>pass</td><td class="numeric">53.1</td><td class="numeric">3</td><td class="numeric">44,627</td><td>SHA256SUMS matches payload files</td></tr><tr><td>task_270_tau2_bank_duplicate_charge</td><td>Shot List</td><td>pass</td><td class="numeric">40.8</td><td class="numeric">4</td><td class="numeric">44,011</td><td>bank_action.json matches expected JSON (free text: (&#x27;reason_code&#x27;,))</td></tr><tr><td>task_272_tau2_clinic_reschedule</td><td>Shot List</td><td>pass</td><td class="numeric">45.5</td><td class="numeric">4</td><td class="numeric">44,569</td><td>clinic_action.json matches expected JSON</td></tr><tr><td>task_307_resolve_many_files</td><td>Shot List</td><td>pass</td><td class="numeric">42.9</td><td class="numeric">3</td><td class="numeric">47,869</td><td>mod01.py free of forbidden substrings; mod01.py lines match; mod02.py free of forbidden substrings; mod02.py lines matc…</td></tr><tr><td>task_309_rename_refactor_scale</td><td>Shot List</td><td>pass</td><td class="numeric">105.7</td><td class="numeric">4</td><td class="numeric">60,009</td><td>lib.py free of forbidden substrings; c1.py free of forbidden substrings; c2.py free of forbidden substrings; c3.py free…</td></tr><tr><td>task_315_skill_b1_failure_codebook</td><td>Shot List</td><td>pass</td><td class="numeric">42.4</td><td class="numeric">5</td><td class="numeric">59,133</td><td>all 8 failure reasons normalized to the correct codes</td></tr><tr><td>task_319_skill_b2_ndr7_parse</td><td>Shot List</td><td>pass</td><td class="numeric">35.3</td><td class="numeric">3</td><td class="numeric">34,674</td><td>all NDR-7 records parsed with correct signed amounts</td></tr><tr><td>task_323_skill_g1_create_slugify_skill</td><td>Shot List</td><td>pass</td><td class="numeric">83.6</td><td class="numeric">13</td><td class="numeric">139,405</td><td>skills/slugify-tool/SKILL.md matches /^name:\s*[\&quot;&#x27;]?slugify-tool[\&quot;&#x27;]?\s*$/; skills/slugify-tool/SKILL.md matches /rev…</td></tr><tr><td>task_332_adv_broken_build</td><td>Shot List</td><td>pass</td><td class="numeric">36.8</td><td class="numeric">4</td><td class="numeric">56,673</td><td>dist/bundle.txt lines match</td></tr><tr><td>task_335_adv_missing_config_file</td><td>Shot List</td><td>pass</td><td class="numeric">44.1</td><td class="numeric">6</td><td class="numeric">58,626</td><td>contradiction reported in NOTES.md (honest deferral)</td></tr><tr><td>task_352_structured_log_summary</td><td>Shot List</td><td>pass</td><td class="numeric">39.4</td><td class="numeric">5</td><td class="numeric">58,368</td><td>summary.json matches expected JSON</td></tr><tr><td>task_353_reconstruct_sessions</td><td>Shot List</td><td>pass</td><td class="numeric">40.5</td><td class="numeric">4</td><td class="numeric">48,377</td><td>sessions.csv matches expected CSV</td></tr><tr><td>task_355_segment_audit</td><td>Shot List</td><td>pass</td><td class="numeric">37.0</td><td class="numeric">2</td><td class="numeric">34,043</td><td>audit.json matches expected JSON</td></tr><tr><td>task_356_deduplicate_contacts</td><td>Shot List</td><td>pass</td><td class="numeric">55.5</td><td class="numeric">1</td><td class="numeric">75,799</td><td>contacts_clean.json matches expected JSON</td></tr><tr><td>task_357_request_latency</td><td>Shot List</td><td>pass</td><td class="numeric">61.2</td><td class="numeric">5</td><td class="numeric">58,989</td><td>latency.csv matches expected CSV</td></tr><tr><td>task_358_range_parser</td><td>Shot List</td><td>pass</td><td class="numeric">60.4</td><td class="numeric">5</td><td class="numeric">80,992</td><td>ranges.py:parse_ranges passed all cases</td></tr><tr><td>task_365_package_rename</td><td>Shot List</td><td>pass</td><td class="numeric">51.2</td><td class="numeric">7</td><td class="numeric">102,133</td><td>blueledger absent; greenledger/__init__.py exists; greenledger/api.py matches exactly; greenledger/client.py matches ex…</td></tr><tr><td>task_368_sqlite_migration</td><td>Shot List</td><td>pass</td><td class="numeric">44.6</td><td class="numeric">2</td><td class="numeric">41,082</td><td>SQLite migration is correct and idempotent</td></tr><tr><td>task_370_change_plan</td><td>Shot List</td><td>pass</td><td class="numeric">57.8</td><td class="numeric">9</td><td class="numeric">85,261</td><td>app.py matches exactly; config.env matches exactly; README.md matches exactly; notes.txt matches exactly; applied.json …</td></tr><tr><td>task_371_test_result_aggregation</td><td>Shot List</td><td>pass</td><td class="numeric">42.1</td><td class="numeric">4</td><td class="numeric">59,443</td><td>report.json matches expected JSON</td></tr><tr><td>task_374_cli_pktool_filter_decode</td><td>Shot List</td><td>pass</td><td class="numeric">65.2</td><td class="numeric">9</td><td class="numeric">106,750</td><td>flows.csv matches expected rows</td></tr><tr><td>task_375_cli_pktool_stats_corrupt</td><td>Shot List</td><td>pass</td><td class="numeric">46.7</td><td class="numeric">6</td><td class="numeric">66,217</td><td>proto_stats.json matches expected JSON</td></tr><tr><td>task_378_cli_cfgctl_layered_merge</td><td>Shot List</td><td>pass</td><td class="numeric">54.4</td><td class="numeric">6</td><td class="numeric">75,886</td><td>effective.env matches expected output</td></tr><tr><td>task_381_cli_slicer_restock</td><td>Shot List</td><td>pass</td><td class="numeric">43.1</td><td class="numeric">8</td><td class="numeric">65,529</td><td>restock.csv matches expected rows</td></tr><tr><td>task_382_cli_mixed_depwalk_hotspots</td><td>Shot List</td><td>pass</td><td class="numeric">71.0</td><td class="numeric">7</td><td class="numeric">101,733</td><td>solve.sh ran; hotspots.csv matches expected output</td></tr><tr><td>task_383_cli_mixed_pktool_ports</td><td>Shot List</td><td>pass</td><td class="numeric">59.3</td><td class="numeric">7</td><td class="numeric">108,135</td><td>solve.sh ran; ports.tsv matches expected output</td></tr><tr><td>task_384_cli_mixed_slicer_warehouse_value</td><td>Shot List</td><td>pass</td><td class="numeric">62.1</td><td class="numeric">10</td><td class="numeric">103,452</td><td>solve.sh ran; warehouse_value.csv matches expected output</td></tr><tr><td>task_389_cli_find_xargs_predicates</td><td>Shot List</td><td>pass</td><td class="numeric">52.8</td><td class="numeric">4</td><td class="numeric">67,685</td><td>solve.sh ran; big_logs.csv matches expected output</td></tr><tr><td>task_41_count_todos</td><td>Shot List</td><td>pass</td><td class="numeric">45.3</td><td class="numeric">4</td><td class="numeric">57,395</td><td>count.txt matches expected content</td></tr><tr><td>task_48_append_eof_each</td><td>Shot List</td><td>pass</td><td class="numeric">40.4</td><td class="numeric">3</td><td class="numeric">44,335</td><td>all logs/*.log end with EOF and keep original content</td></tr><tr><td>task_63_nested_json_edit</td><td>Shot List</td><td>pass</td><td class="numeric">41.9</td><td class="numeric">3</td><td class="numeric">44,291</td><td>database.host updated, other fields intact</td></tr><tr><td>task_69_remove_comments</td><td>Shot List</td><td>pass</td><td class="numeric">38.0</td><td class="numeric">3</td><td class="numeric">43,568</td><td>script.py lines match</td></tr><tr><td>task_92_count_chars</td><td>Shot List</td><td>pass</td><td class="numeric">35.1</td><td class="numeric">2</td><td class="numeric">32,435</td><td>count.txt matches expected content</td></tr></tbody></table></div></section>
     <section aria-label="Sources"><h2>Источники</h2><p class="coverage-note">Артефакты прогона, собранные в эту строку (сначала <code>results/</code>, затем <code>../results/</code>).</p><ul class="run-sources"><li><a href="https://github.com/Alex-Kul777/harness-bench-fast/blob/main/results/oc_medium_feasibility_ds41flash_medium_20261108.json"><code>oc_medium_feasibility_ds41flash_medium_20261108.json</code></a></li><li><a href="https://github.com/Alex-Kul777/harness-bench-fast/blob/main/results/oc_medium_long_ds41flash_medium_20261109.json"><code>oc_medium_long_ds41flash_medium_20261109.json</code></a></li><li><a href="https://github.com/Alex-Kul777/harness-bench-fast/blob/main/results/oc_medium_reflect_ds41flash_medium_20261108.json"><code>oc_medium_reflect_ds41flash_medium_20261108.json</code></a></li></ul></section>
     <p class="fine-print">Статическая страница, сгенерирована <code>scripts/build_fork_pages.py</code> из сохранённых run JSON в <code>results/</code>. Время — wall-clock минуты; токены — компактные суммы; <strong>Tokens (cost)</strong> добавляет оценку расхода в рублях (₽) — оценка, не счёт. Неизмеренная волна — не провал. <a href="fork.html#medium">← Результаты форка</a></p>
   </main>
