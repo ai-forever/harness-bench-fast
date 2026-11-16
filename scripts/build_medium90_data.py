@@ -319,16 +319,16 @@ def build(root=ROOT):
     identity = {"id": "secretmodel-1114-ouroboros", "profile_id": "secretmodel-1114-ouroboros",
                 "model": ouro["model"], "harness": ouro["harness"], "secret_model": True,
                 "runs": 1, "source_version": ouro["task_set_version"],
-                "reasoning_effort": ouro["reasoning_effort"], "measurement_type": "adjudicated_partial_medium90",
-                "measurement_valid": None, "details_url": "secretmodel-1114-ouroboros.html",
-                "result_note": "partial · 13 unresolved HTTP 400 protocol errors"}
+                "reasoning_effort": ouro["reasoning_effort"], "measurement_type": "adjudicated_medium90",
+                "measurement_valid": True, "details_url": "secretmodel-1114-ouroboros.html",
+                "result_note": "includes 13 harness protocol failures"}
     components = []
     for numbers in (list(range(392, 472)), SELECTED):
         subset = [t for t in ouro["tasks"] if t["number"] in numbers]
         components.append(component([t["number"] for t in subset],
                                     {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
                                     {"sources_sha256": [ouro["source_sha256"]], "notes": [ouro["usage_note"]]},
-                                    ouro["task_set_version"], "first authoritative retained outcomes; incomplete run"))
+                                    ouro["task_set_version"], "retained outcomes; harness protocol errors count as failures"))
     rows.append(assemble_row(identity, components))
     assert len({r["id"] for r in rows}) == len(rows)
     complete = sorted((r for r in rows if r["score"] is not None), key=lambda r: -r["score"])
