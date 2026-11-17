@@ -126,6 +126,27 @@ def _patch_reasoning_level(thinking) -> str:
     return level
 
 
+# dsh/pi-ai thinking levels (schema: off|minimal|low|medium|high|xhigh|max).
+# Declaring ``reasoningEfforts`` on the model entry is what makes pi-ai treat the
+# model as reasoning-capable: without it pi-ai assumes ``reasoning: false`` and
+# any effort beyond ``off`` fails with ``UNSUPPORTED_REASONING_EFFORT``.
+DSH_THINKING_LEVELS = ("off", "minimal", "low", "medium", "high", "xhigh", "max")
+
+
+def _reasoning_efforts_block(indent: str) -> str:
+    """YAML ``reasoningEfforts`` mapping for the model entry.
+
+    Keys are the offered levels; values are the wire spellings dispatch sends.
+    ``off`` carries no value (pi-ai reads an absent key as "supported, send
+    nothing"); every other level maps to its own name (the value Cloud.ru
+    accepts). ``ultra`` is intentionally absent — it is not a valid dsh level.
+    """
+    lines = [f"{indent}reasoningEfforts:"]
+    for lvl in DSH_THINKING_LEVELS:
+        lines.append(f"{indent}  {lvl}:" if lvl == "off" else f"{indent}  {lvl}: {lvl}")
+    return "\n".join(lines) + "\n"
+
+
 def build_provider_patch(model: str, thinking=None) -> str:
     """Return the YAML patch that injects the Cloud.ru provider route.
 
@@ -134,6 +155,10 @@ def build_provider_patch(model: str, thinking=None) -> str:
     (endpoint, credential env-var reference, and the reasoning level) plus the
     default agent model. Only the *name* of the credential env var appears here —
     never the secret itself.
+
+    The model entry declares ``reasoningEfforts`` (so pi-ai offers the thinking
+    levels) and ``compat.supportsDeveloperRole: false`` (Cloud.ru rejects the
+    OpenAI ``developer`` role — it only accepts user/tool/system/assistant).
     """
     bare = _bare_model_id(model)
     level = _patch_reasoning_level(thinking)
@@ -148,6 +173,9 @@ def build_provider_patch(model: str, thinking=None) -> str:
         f"        reasoning: {level}\n"
         "        models:\n"
         f"          - id: {bare}\n"
+        f"{_reasoning_efforts_block('            ')}"
+        "            compat:\n"
+        "              supportsDeveloperRole: false\n"
         "- id: agent-default-model\n"
         "  config:\n"
         "    provider: cloudru\n"

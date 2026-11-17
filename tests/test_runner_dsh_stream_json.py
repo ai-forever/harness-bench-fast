@@ -123,6 +123,28 @@ def test_patch_reasoning_level_passthrough(dsh):
         assert f"reasoning: {level}" in dsh.build_provider_patch(BARE, level)
 
 
+def test_patch_declares_reasoning_efforts(dsh):
+    # Without reasoningEfforts pi-ai treats the model as non-reasoning and any
+    # effort beyond `off` fails with UNSUPPORTED_REASONING_EFFORT.
+    patch = dsh.build_provider_patch(BARE, "medium")
+    assert "reasoningEfforts:" in patch
+    for level in ("off", "minimal", "low", "medium", "high", "xhigh", "max"):
+        assert f"              {level}:" in patch
+    # `off` carries no wire value; other levels map to their own name.
+    assert "              off:\n" in patch
+    assert "              medium: medium" in patch
+    assert "              max: max" in patch
+    # `ultra` is not a valid dsh level and must not be declared.
+    assert "ultra" not in patch
+
+
+def test_patch_disables_developer_role(dsh):
+    # Cloud.ru rejects the OpenAI `developer` role (only user/tool/system/assistant).
+    patch = dsh.build_provider_patch(BARE, "medium")
+    assert "compat:" in patch
+    assert "supportsDeveloperRole: false" in patch
+
+
 def test_bare_model_id_strips_provider_prefix(dsh):
     assert dsh._bare_model_id(RAW_PREFIXED) == BARE
     assert dsh._bare_model_id(BARE) == BARE
