@@ -4,7 +4,7 @@ const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboar
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 99);
+assert.equal(light.length, 102);
 assert.equal(medium.length, 79);
 assert.equal(selectResults(data, "medium", "current", "").length, 22);
 for (const rows of [light, medium]) {
@@ -12,7 +12,7 @@ for (const rows of [light, medium]) {
 }
 assert.equal(light.find(r => r.id === "secret-700-sft").result.passed, 368);
 assert.equal(medium.find(r => r.id === "secret-700-sft").result.passed, 9);
-assert.equal(selectResults(data, "light", "historical", "  CODEX ").length, 3);
+assert.equal(selectResults(data, "light", "historical", "  CODEX ").length, 4);
 assert.equal(selectResults(data, "light", "historical", "no-such-model").length, 0);
 assert.equal(formatPassed(390), "390");
 assert.equal(formatPassed(389 + 1 / 3), "389.3");
