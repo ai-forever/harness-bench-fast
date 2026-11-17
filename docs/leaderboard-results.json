@@ -21,7 +21,8 @@
     "brain_haiku_experiment_sha256": "d2eeb500c752c07a71f15f58474334298e590370edd42f0e39f2511130db8cca",
     "haiku_three_harnesses_sha256": "2a9ab223dbe6038d58715c8193a94b414d981b6d3f1388f253a4dcc34dbf26c2",
     "telemetry_sha256": "2058f482d9cc941a8a453c7b9003ee4b3d6525643ff61037001e58dc1b6d8773",
-    "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability."
+    "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability.",
+    "secret_37_1711_pi_light_sha256": "167177206bd36ed74a4620dbbf4aa19f83549a5f64e5220e1b934c7766fff8fc"
   },
   "rows": [
     {
@@ -40,7 +41,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 423.0,
-      "telemetry_note": "@mean1 · Long wave 13/20 · Reflection 19/20 · Steps 0 · Tokens 0 (metrics absent)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 13/20 \u00b7 Reflection 19/20 \u00b7 Steps 0 \u00b7 Tokens 0 (metrics absent)"
     },
     {
       "id": "ua-glm53",
@@ -58,7 +59,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 423.0,
-      "telemetry_note": "@mean1 · Long wave 16/20 · Reflection 19/20 · Steps 4,581 · Tokens 271,316,552 (coverage 429/431)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 16/20 \u00b7 Reflection 19/20 \u00b7 Steps 4,581 \u00b7 Tokens 271,316,552 (coverage 429/431)"
     },
     {
       "id": "run-1",
@@ -76,7 +77,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 422.0,
-      "telemetry_note": "@mean1 · Long wave 14/20 · Reflection 18/20 · Steps 3,973 · Tokens 249,558,870"
+      "telemetry_note": "@mean1 \u00b7 Long wave 14/20 \u00b7 Reflection 18/20 \u00b7 Steps 3,973 \u00b7 Tokens 249,558,870"
     },
     {
       "id": "run-2",
@@ -94,7 +95,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 422.0,
-      "telemetry_note": "@mean1 · Long wave 14/20 · Reflection 20/20 · Steps 0 · Tokens 0 (metrics absent)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 14/20 \u00b7 Reflection 20/20 \u00b7 Steps 0 \u00b7 Tokens 0 (metrics absent)"
     },
     {
       "id": "run-3",
@@ -112,7 +113,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 421.0,
-      "telemetry_note": "@mean1 · Long wave 14/20 · Reflection 19/20 · Steps 3,818 · Tokens 0 (metric absent)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 14/20 \u00b7 Reflection 19/20 \u00b7 Steps 3,818 \u00b7 Tokens 0 (metric absent)"
     },
     {
       "id": "codex-sol61-low",
@@ -130,7 +131,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 420.0,
-      "telemetry_note": "@mean1 · Long wave 19/20 · Reflection 13/20 · Steps 2,817 · Tokens 69,419,504 (raw)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 19/20 \u00b7 Reflection 13/20 \u00b7 Steps 2,817 \u00b7 Tokens 69,419,504 (raw)"
     },
     {
       "id": "run-4",
@@ -148,7 +149,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 419.0,
-      "telemetry_note": "@mean3 · SD 0.6 pp · Long mean 63.3% · Reflection mean 85.0% · Mean steps 4,311 · Mean tokens 631,963,525"
+      "telemetry_note": "@mean3 \u00b7 SD 0.6 pp \u00b7 Long mean 63.3% \u00b7 Reflection mean 85.0% \u00b7 Mean steps 4,311 \u00b7 Mean tokens 631,963,525"
     },
     {
       "id": "ua-ds41",
@@ -166,7 +167,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 419.0,
-      "telemetry_note": "@mean1 · Long wave 12/20 · Reflection 18/20 · Steps 5,210 · Tokens 386,165,256"
+      "telemetry_note": "@mean1 \u00b7 Long wave 12/20 \u00b7 Reflection 18/20 \u00b7 Steps 5,210 \u00b7 Tokens 386,165,256"
     },
     {
       "id": "run-5",
@@ -184,7 +185,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 418.0,
-      "telemetry_note": "@mean1 · Long wave 10/20 · Reflection 20/20 · Steps 5,846 · Tokens 967,731,127 (raw)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 10/20 \u00b7 Reflection 20/20 \u00b7 Steps 5,846 \u00b7 Tokens 967,731,127 (raw)"
     },
     {
       "id": "ua-kimi",
@@ -202,7 +203,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 417.0,
-      "telemetry_note": "@mean1 · Long wave 13/20 · Reflection 17/20 · Steps 3,402 · Tokens 171,347,666 (coverage 426/431)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 13/20 \u00b7 Reflection 17/20 \u00b7 Steps 3,402 \u00b7 Tokens 171,347,666 (coverage 426/431)"
     },
     {
       "id": "glm53-openrouter-opencode",
@@ -220,7 +221,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 413.0,
-      "telemetry_note": "@mean1 · Long wave 12/20 · Reflection 15/20 · Steps 3,745 · Tokens 0 (metrics absent)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 12/20 \u00b7 Reflection 15/20 \u00b7 Steps 3,745 \u00b7 Tokens 0 (metrics absent)"
     },
     {
       "id": "run-6",
@@ -238,7 +239,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 411.0,
-      "telemetry_note": "@mean1 · Long wave 10/20 · Reflection 18/20 · Steps 10,086 · Tokens 854,671,935 (raw)*"
+      "telemetry_note": "@mean1 \u00b7 Long wave 10/20 \u00b7 Reflection 18/20 \u00b7 Steps 10,086 \u00b7 Tokens 854,671,935 (raw)*"
     },
     {
       "id": "multitool-glm53",
@@ -256,7 +257,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 411.0,
-      "telemetry_note": "@mean1 · Long wave 10/20 · Reflection 15/20 · Steps 3,600 · Tokens 155,371,241 (native audit, including child sessions)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 10/20 \u00b7 Reflection 15/20 \u00b7 Steps 3,600 \u00b7 Tokens 155,371,241 (native audit, including child sessions)"
     },
     {
       "id": "glm53-openrouter-deepagents",
@@ -274,7 +275,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 408.0,
-      "telemetry_note": "@mean1 · Long wave 14/20 · Reflection 13/20 · Steps 8,271 · Tokens 696,504,696* (coverage 429/431)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 14/20 \u00b7 Reflection 13/20 \u00b7 Steps 8,271 \u00b7 Tokens 696,504,696* (coverage 429/431)"
     },
     {
       "id": "glm53-openrouter-mini",
@@ -292,7 +293,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 407.0,
-      "telemetry_note": "@mean1 · Long wave 9/20 · Reflection 13/20 · Steps 5,191 · Tokens 769,563,983 (coverage 428/431)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 9/20 \u00b7 Reflection 13/20 \u00b7 Steps 5,191 \u00b7 Tokens 769,563,983 (coverage 428/431)"
     },
     {
       "id": "glm-dsh",
@@ -310,7 +311,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 405.0,
-      "telemetry_note": "@mean1 · Long wave 7/20 · Reflection 15/20 · Steps 3,833 · Tokens 234,756,961 (raw; 0 means absent)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 7/20 \u00b7 Reflection 15/20 \u00b7 Steps 3,833 \u00b7 Tokens 234,756,961 (raw; 0 means absent)"
     },
     {
       "id": "run-55",
@@ -328,7 +329,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 404.0,
-      "telemetry_note": "@mean1 · Long wave 5/20 · Reflection 15/20 · Steps 5,109 · Tokens (raw) 375,324,319"
+      "telemetry_note": "@mean1 \u00b7 Long wave 5/20 \u00b7 Reflection 15/20 \u00b7 Steps 5,109 \u00b7 Tokens (raw) 375,324,319"
     },
     {
       "id": "glm-free-code",
@@ -346,7 +347,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 404.0,
-      "telemetry_note": "@mean1 · Long wave 12/20 · Reflection 11/20 · Steps 4,924 · Tokens 516,879,409 (raw; 0 means absent)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 12/20 \u00b7 Reflection 11/20 \u00b7 Steps 4,924 \u00b7 Tokens 516,879,409 (raw; 0 means absent)"
     },
     {
       "id": "glm53-openrouter-openhands",
@@ -364,7 +365,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 404.0,
-      "telemetry_note": "@mean1 · Long wave 6/20 · Reflection 14/20 · Steps 0 · Tokens 0 (metrics absent)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 6/20 \u00b7 Reflection 14/20 \u00b7 Steps 0 \u00b7 Tokens 0 (metrics absent)"
     },
     {
       "id": "glm53-openrouter-hermes",
@@ -382,7 +383,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 402.0,
-      "telemetry_note": "@mean1 · Long wave 3/20 · Reflection 12/20 · Steps 0 · Tokens 0 (metrics absent)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 3/20 \u00b7 Reflection 12/20 \u00b7 Steps 0 \u00b7 Tokens 0 (metrics absent)"
     },
     {
       "id": "glm-hermes",
@@ -400,7 +401,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 399.0,
-      "telemetry_note": "@mean1 · Long wave 5/20 · Reflection 10/20 · Steps 0 · Tokens 0 (raw; 0 means absent)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 5/20 \u00b7 Reflection 10/20 \u00b7 Steps 0 \u00b7 Tokens 0 (raw; 0 means absent)"
     },
     {
       "id": "run-56",
@@ -418,7 +419,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 397.0,
-      "telemetry_note": "@mean1 · Long wave 4/20 · Reflection 13/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "@mean1 \u00b7 Long wave 4/20 \u00b7 Reflection 13/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-57",
@@ -436,7 +437,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 397.0,
-      "telemetry_note": "@mean1 · Long wave 6/20 · Reflection 13/20 · Steps 2,911 · Tokens (raw) 0"
+      "telemetry_note": "@mean1 \u00b7 Long wave 6/20 \u00b7 Reflection 13/20 \u00b7 Steps 2,911 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "glm53-openrouter-pi",
@@ -469,7 +470,7 @@
       },
       "source_version": "0.18.0",
       "source_passed": 396,
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures · historical431 + new40, not a fresh full run",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures \u00b7 historical431 + new40, not a fresh full run",
       "measurement_type": "historical_plus_wave19",
       "wave19": {
         "passed": 24,
@@ -537,7 +538,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 393.0,
-      "telemetry_note": "@mean1 · Long wave 2/20 · Reflection 8/20 · Steps 0 · Tokens 0 (raw; 0 means absent)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 2/20 \u00b7 Reflection 8/20 \u00b7 Steps 0 \u00b7 Tokens 0 (raw; 0 means absent)"
     },
     {
       "id": "ua-luna",
@@ -555,7 +556,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 388.0,
-      "telemetry_note": "@mean1 · Long wave 3/20 · Reflection 9/20 · Steps 8,716 · Tokens 762,784,868 (coverage 428/431)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 3/20 \u00b7 Reflection 9/20 \u00b7 Steps 8,716 \u00b7 Tokens 762,784,868 (coverage 428/431)"
     },
     {
       "id": "secret-700-sft",
@@ -573,7 +574,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 377.0,
-      "telemetry_note": "@mean1 · Long wave 0/20 · Reflection 9/20 · Steps 6,321 · Tokens (raw, unaudited)* 149,806,005 · Measurement notes"
+      "telemetry_note": "@mean1 \u00b7 Long wave 0/20 \u00b7 Reflection 9/20 \u00b7 Steps 6,321 \u00b7 Tokens (raw, unaudited)* 149,806,005 \u00b7 Measurement notes"
     },
     {
       "id": "multitool-haiku",
@@ -591,7 +592,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 376.0,
-      "telemetry_note": "@mean1 · Long wave 1/20 · Reflection 4/20 · Steps 5,460 · Tokens 212,030,792 (native audit, including child sessions)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 1/20 \u00b7 Reflection 4/20 \u00b7 Steps 5,460 \u00b7 Tokens 212,030,792 (native audit, including child sessions)"
     },
     {
       "id": "cowork-glm53",
@@ -609,7 +610,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 376.0,
-      "telemetry_note": "@mean1 · Long wave 1/20 · Reflection 9/20 · Steps ≥3,568 · Tokens ≥89,614,312 (coverage 429/431)"
+      "telemetry_note": "@mean1 \u00b7 Long wave 1/20 \u00b7 Reflection 9/20 \u00b7 Steps \u22653,568 \u00b7 Tokens \u226589,614,312 (coverage 429/431)"
     },
     {
       "id": "run-58",
@@ -627,7 +628,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 375.0,
-      "telemetry_note": "@mean1 · Long wave 3/20 · Reflection 13/20 · Steps 6,627 · Tokens (raw) 373,783,977"
+      "telemetry_note": "@mean1 \u00b7 Long wave 3/20 \u00b7 Reflection 13/20 \u00b7 Steps 6,627 \u00b7 Tokens (raw) 373,783,977"
     },
     {
       "id": "run-7",
@@ -645,7 +646,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 371.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 8/20 · Steps 6,233 · Tokens (raw) 72,482,990"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 8/20 \u00b7 Steps 6,233 \u00b7 Tokens (raw) 72,482,990"
     },
     {
       "id": "run-8",
@@ -663,7 +664,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 331.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,271 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 5,271 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-9",
@@ -681,7 +682,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 329.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 3,612 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 1/20 \u00b7 Steps 3,612 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-10",
@@ -699,7 +700,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 327.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 4,693 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 4,693 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-11",
@@ -717,7 +718,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 322.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 4,976 · Tokens (raw) 267,982,386*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 4,976 \u00b7 Tokens (raw) 267,982,386*"
     },
     {
       "id": "run-12",
@@ -735,7 +736,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 322.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,329 · Tokens (raw) 317,335,707*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 5,329 \u00b7 Tokens (raw) 317,335,707*"
     },
     {
       "id": "run-13",
@@ -753,7 +754,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 322.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 4,447 · Tokens (raw) 366,492,603*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 4,447 \u00b7 Tokens (raw) 366,492,603*"
     },
     {
       "id": "run-14",
@@ -771,7 +772,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 305.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 10,351 · Tokens (raw) 841,669,092*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 1/20 \u00b7 Steps 10,351 \u00b7 Tokens (raw) 841,669,092*"
     },
     {
       "id": "run-15",
@@ -789,7 +790,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 302.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 10,433 · Tokens (raw) 1,004,755,677*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 10,433 \u00b7 Tokens (raw) 1,004,755,677*"
     },
     {
       "id": "run-16",
@@ -807,7 +808,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 299.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 11,130 · Tokens (raw) 718,324,734*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 11,130 \u00b7 Tokens (raw) 718,324,734*"
     },
     {
       "id": "run-17",
@@ -825,7 +826,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 298.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-18",
@@ -843,7 +844,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 295.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-19",
@@ -876,7 +877,7 @@
       },
       "source_version": "0.18.0",
       "source_passed": 294,
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures · historical431 + new40, not a fresh full run",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures \u00b7 historical431 + new40, not a fresh full run",
       "measurement_type": "historical_plus_wave19",
       "wave19": {
         "passed": 0,
@@ -1002,7 +1003,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 273.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 10,702 · Tokens (raw) 453,994,698*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 1/20 \u00b7 Steps 10,702 \u00b7 Tokens (raw) 453,994,698*"
     },
     {
       "id": "run-21",
@@ -1020,7 +1021,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 266.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 11,451 · Tokens (raw) 231,616,980"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 1/20 \u00b7 Steps 11,451 \u00b7 Tokens (raw) 231,616,980"
     },
     {
       "id": "run-22",
@@ -1038,7 +1039,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 253.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 9,169 · Tokens (raw) 172,168,626"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 1/20 \u00b7 Steps 9,169 \u00b7 Tokens (raw) 172,168,626"
     },
     {
       "id": "run-23",
@@ -1056,7 +1057,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 252.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 2/20 · Steps 5,595 · Tokens (raw) 138,611,193*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 2/20 \u00b7 Steps 5,595 \u00b7 Tokens (raw) 138,611,193*"
     },
     {
       "id": "run-24",
@@ -1074,7 +1075,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 248.0,
-      "telemetry_note": "@mean1 · Long wave 0/20 · Reflection 1/20 · Steps 2,214 · Tokens 6,210,278"
+      "telemetry_note": "@mean1 \u00b7 Long wave 0/20 \u00b7 Reflection 1/20 \u00b7 Steps 2,214 \u00b7 Tokens 6,210,278"
     },
     {
       "id": "run-25",
@@ -1092,7 +1093,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 224.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,159 · Tokens (raw) 368,044,770*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 5,159 \u00b7 Tokens (raw) 368,044,770*"
     },
     {
       "id": "run-26",
@@ -1110,7 +1111,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 220.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-27",
@@ -1128,7 +1129,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 217.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-28",
@@ -1146,7 +1147,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 216.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-29",
@@ -1164,7 +1165,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 212.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 3,744 · Tokens (raw) 54,768,767"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 3,744 \u00b7 Tokens (raw) 54,768,767"
     },
     {
       "id": "run-30",
@@ -1182,7 +1183,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 212.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 6,289 · Tokens (raw) 486,699,543*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 6,289 \u00b7 Tokens (raw) 486,699,543*"
     },
     {
       "id": "run-31",
@@ -1200,7 +1201,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 207.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 1/20 · Steps 4,820 · Tokens (raw) 124,288,018"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 1/20 \u00b7 Steps 4,820 \u00b7 Tokens (raw) 124,288,018"
     },
     {
       "id": "run-32",
@@ -1218,7 +1219,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 205.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-33",
@@ -1236,7 +1237,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 198.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 4,932 · Tokens (raw) 107,919,373"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 4,932 \u00b7 Tokens (raw) 107,919,373"
     },
     {
       "id": "run-34",
@@ -1254,7 +1255,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 191.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,711 · Tokens (raw) 295,423,833*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 5,711 \u00b7 Tokens (raw) 295,423,833*"
     },
     {
       "id": "run-35",
@@ -1272,7 +1273,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 188.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,749 · Tokens (raw) 349,701,240*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 5,749 \u00b7 Tokens (raw) 349,701,240*"
     },
     {
       "id": "run-36",
@@ -1290,7 +1291,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 174.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 3,071 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 3,071 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-37",
@@ -1308,7 +1309,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 171.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-38",
@@ -1326,7 +1327,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 169.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 3,001 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 3,001 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-39",
@@ -1344,7 +1345,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 164.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-40",
@@ -1362,7 +1363,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 160.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-41",
@@ -1380,7 +1381,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 159.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-42",
@@ -1398,7 +1399,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 159.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-43",
@@ -1416,7 +1417,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 156.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-44",
@@ -1434,7 +1435,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 146.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-45",
@@ -1452,7 +1453,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 144.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 2,817 · Tokens (raw) 136,240,902*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 2,817 \u00b7 Tokens (raw) 136,240,902*"
     },
     {
       "id": "run-46",
@@ -1470,7 +1471,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 141.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-47",
@@ -1488,7 +1489,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 139.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 8,575 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 8,575 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-48",
@@ -1506,7 +1507,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 134.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 3,545 · Tokens (raw) 148,656,135*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 3,545 \u00b7 Tokens (raw) 148,656,135*"
     },
     {
       "id": "run-49",
@@ -1524,7 +1525,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 134.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 10,580 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 10,580 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "run-50",
@@ -1542,7 +1543,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 113.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,330 · Tokens (raw) 326,514,969*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 5,330 \u00b7 Tokens (raw) 326,514,969*"
     },
     {
       "id": "run-51",
@@ -1560,7 +1561,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 111.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 5,336 · Tokens (raw) 288,537,210*"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 5,336 \u00b7 Tokens (raw) 288,537,210*"
     },
     {
       "id": "run-52",
@@ -1578,7 +1579,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 21.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 1,786 · Tokens (raw) 4,976,949"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 1,786 \u00b7 Tokens (raw) 4,976,949"
     },
     {
       "id": "run-53",
@@ -1596,7 +1597,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 9.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 2,042 · Tokens (raw) 4,511,527"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 2,042 \u00b7 Tokens (raw) 4,511,527"
     },
     {
       "id": "run-54",
@@ -1614,7 +1615,7 @@
       "medium": null,
       "source_version": "0.18.0",
       "source_passed": 0.0,
-      "telemetry_note": "Long wave 0/20 · Reflection 0/20 · Steps 0 · Tokens (raw) 0"
+      "telemetry_note": "Long wave 0/20 \u00b7 Reflection 0/20 \u00b7 Steps 0 \u00b7 Tokens (raw) 0"
     },
     {
       "id": "wave19-giga35",
@@ -1644,7 +1645,7 @@
           0.04581812953552469
         ]
       },
-      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning default · 471/471 tasks · infrastructure failures: 0",
+      "telemetry_note": "Wave 19 measurement \u00b7 k=1 \u00b7 c=4 \u00b7 max_tokens=16384 \u00b7 reasoning default \u00b7 471/471 tasks \u00b7 infrastructure failures: 0",
       "measurement_type": "full_run",
       "wave19": {
         "passed": 0,
@@ -1763,7 +1764,7 @@
           0.7230582129846858
         ]
       },
-      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning default · 471/471 tasks · infrastructure failures: 0",
+      "telemetry_note": "Wave 19 measurement \u00b7 k=1 \u00b7 c=4 \u00b7 max_tokens=16384 \u00b7 reasoning default \u00b7 471/471 tasks \u00b7 infrastructure failures: 0",
       "measurement_type": "full_run",
       "wave19": {
         "passed": 31,
@@ -1882,7 +1883,7 @@
           0.5588049211064375
         ]
       },
-      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning high · 471/471 tasks · infrastructure failures: 0",
+      "telemetry_note": "Wave 19 measurement \u00b7 k=1 \u00b7 c=4 \u00b7 max_tokens=16384 \u00b7 reasoning high \u00b7 471/471 tasks \u00b7 infrastructure failures: 0",
       "measurement_type": "full_run",
       "wave19": {
         "passed": 9,
@@ -2001,7 +2002,7 @@
           0.8214259851149045
         ]
       },
-      "telemetry_note": "Wave 19 measurement · k=1 · c=4 · max_tokens=16384 · reasoning high · 471/471 tasks · infrastructure failures: 0",
+      "telemetry_note": "Wave 19 measurement \u00b7 k=1 \u00b7 c=4 \u00b7 max_tokens=16384 \u00b7 reasoning high \u00b7 471/471 tasks \u00b7 infrastructure failures: 0",
       "measurement_type": "full_run",
       "wave19": {
         "passed": 27,
@@ -2115,7 +2116,7 @@
       "reasoning_effort": "default",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-codex-giga35",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2168,7 +2169,7 @@
       "reasoning_effort": "default",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-codex-haiku",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2221,7 +2222,7 @@
       "reasoning_effort": "high",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-codex-glm53",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2274,7 +2275,7 @@
       "reasoning_effort": "high",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-codex-deepseek41flash",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2327,7 +2328,7 @@
       "reasoning_effort": "default",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-claude-giga35",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2381,7 +2382,7 @@
       "reasoning_effort": "default",
       "measurement_date": "2026-10-20",
       "details_url": "harness-wave19.html#w19-claude-haiku",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2435,7 +2436,7 @@
       "reasoning_effort": "high",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-claude-glm53",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2488,7 +2489,7 @@
       "reasoning_effort": "high",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-claude-deepseek41flash",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2541,7 +2542,7 @@
       "reasoning_effort": "default",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-pi-haiku",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2595,7 +2596,7 @@
       "reasoning_effort": "high",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-pi-deepseek41flash",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2649,7 +2650,7 @@
       "reasoning_effort": "default",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-openclaw-giga35",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2702,7 +2703,7 @@
       "reasoning_effort": "default",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-openclaw-haiku",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -2776,7 +2777,7 @@
       "reasoning_effort": "high",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-openclaw-glm53",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures · historical431 + new40, not a fresh full run",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures \u00b7 historical431 + new40, not a fresh full run",
       "historical_provenance": {
         "source_version": "0.18.0",
         "source_sha256": "0f8edf1e9af3e9423e982a7a4c74a1aa0d0f92c9ed1bbcac89592127ad731936",
@@ -2894,7 +2895,7 @@
       "reasoning_effort": "high",
       "measurement_date": "2026-10-19",
       "details_url": "harness-wave19.html#w19-openclaw-deepseek41flash",
-      "telemetry_note": "Wave 19 only · tasks432–471 · k=1 · 120 seconds · zero final infrastructure failures",
+      "telemetry_note": "Wave 19 only \u00b7 tasks432\u2013471 \u00b7 k=1 \u00b7 120 seconds \u00b7 zero final infrastructure failures",
       "telemetry": {
         "wave19": {
           "observed_tasks": 40,
@@ -3716,17 +3717,17 @@
       "light": {
         "passed": 385,
         "total": 391,
-        "note": "experimental · selected retries · changed deadline · transport errors unresolved"
+        "note": "experimental \u00b7 selected retries \u00b7 changed deadline \u00b7 transport errors unresolved"
       },
       "medium": {
         "passed": 59,
         "total": 80,
-        "note": "experimental · selected retries · changed deadline · transport errors unresolved"
+        "note": "experimental \u00b7 selected retries \u00b7 changed deadline \u00b7 transport errors unresolved"
       },
       "wave19": {
         "passed": 36,
         "total": 40,
-        "note": "experimental · selected retries · changed deadline · transport errors unresolved"
+        "note": "experimental \u00b7 selected retries \u00b7 changed deadline \u00b7 transport errors unresolved"
       },
       "telemetry": {
         "light": {
@@ -4115,7 +4116,7 @@
     {
       "id": "wave21-sonnet55_80",
       "model": "Sonnet 5.5 (high)",
-      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "harness": "DeepAgents 0.6.12 \u00b7 80 graph steps",
       "runs": 1,
       "measurement_type": "post_selection_rescore",
       "measurement_valid": true,
@@ -4162,7 +4163,7 @@
     {
       "id": "wave21-deepseek41_flash_80",
       "model": "DeepSeek V4.1 Flash 1017 (high)",
-      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "harness": "DeepAgents 0.6.12 \u00b7 80 graph steps",
       "runs": 1,
       "measurement_type": "post_selection_rescore",
       "measurement_valid": true,
@@ -4209,7 +4210,7 @@
     {
       "id": "wave21-fable51_medium_80",
       "model": "Fable 5.1 (medium)",
-      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "harness": "DeepAgents 0.6.12 \u00b7 80 graph steps",
       "runs": 1,
       "measurement_type": "post_selection_rescore",
       "measurement_valid": true,
@@ -4256,7 +4257,7 @@
     {
       "id": "wave21-glm53_high_80",
       "model": "GLM 5.3 (high)",
-      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "harness": "DeepAgents 0.6.12 \u00b7 80 graph steps",
       "runs": 1,
       "measurement_type": "post_selection_rescore",
       "measurement_valid": true,
@@ -4303,7 +4304,7 @@
     {
       "id": "wave21-mimo26pro_high_80",
       "model": "MiMo 2.6 Pro (high)",
-      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "harness": "DeepAgents 0.6.12 \u00b7 80 graph steps",
       "runs": 1,
       "measurement_type": "post_selection_rescore",
       "measurement_valid": true,
@@ -4350,7 +4351,7 @@
     {
       "id": "wave21-qwen38max_high_80",
       "model": "Qwen 3.8 Max (high)",
-      "harness": "DeepAgents 0.6.12 · 80 graph steps",
+      "harness": "DeepAgents 0.6.12 \u00b7 80 graph steps",
       "runs": 1,
       "measurement_type": "post_selection_rescore",
       "measurement_valid": true,
@@ -4397,7 +4398,7 @@
     {
       "id": "wave21-sonnet55_high_160",
       "model": "Sonnet 5.5 (high)",
-      "harness": "DeepAgents 0.6.12 · 160 graph steps",
+      "harness": "DeepAgents 0.6.12 \u00b7 160 graph steps",
       "runs": 1,
       "measurement_type": "post_selection_rescore",
       "measurement_valid": true,
@@ -4444,7 +4445,7 @@
     {
       "id": "wave21-codex0163_deepseek41_unc_high_160",
       "model": "DeepSeek V4.1 Flash 1017 UNCENSORED (high)",
-      "harness": "Codex CLI 0.163.0 · 160 model requests",
+      "harness": "Codex CLI 0.163.0 \u00b7 160 model requests",
       "runs": 1,
       "measurement_type": "post_selection_rescore",
       "measurement_valid": true,
@@ -4513,7 +4514,7 @@
       "wave21": {
         "passed": 1,
         "total": 10,
-        "note": "fresh run 2026-10-24 · no subagents, 160 steps"
+        "note": "fresh run 2026-10-24 \u00b7 no subagents, 160 steps"
       },
       "telemetry": {
         "light": {
@@ -4608,7 +4609,7 @@
       "wave21": {
         "passed": 0,
         "total": 10,
-        "note": "fresh run 2026-10-24 · no subagents, 160 steps"
+        "note": "fresh run 2026-10-24 \u00b7 no subagents, 160 steps"
       },
       "telemetry": {
         "light": {
@@ -4703,7 +4704,7 @@
       "wave21": {
         "passed": 0,
         "total": 10,
-        "note": "fresh run 2026-10-24 · no subagents, 160 steps"
+        "note": "fresh run 2026-10-24 \u00b7 no subagents, 160 steps"
       },
       "telemetry": {
         "light": {
@@ -4844,6 +4845,51 @@
             "status": "partial",
             "lower_bound": true
           }
+        }
+      }
+    },
+    {
+      "id": "secret-37-1711-pi",
+      "model": "secret-37-1711",
+      "harness": "Pi 1.5.2",
+      "secret_model": true,
+      "runs": 1,
+      "reasoning_effort": "high",
+      "source_version": "0.21.3",
+      "measurement_valid": true,
+      "details_url": "secret-37-1711-pi-light.html",
+      "light": {
+        "passed": 382,
+        "total": 391
+      },
+      "medium": null,
+      "medium_historical": null,
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "steps": {
+            "value": 2657,
+            "covered_tasks": 391,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 11576998,
+            "input_tokens": 10742707,
+            "output_tokens": 834291,
+            "covered_tasks": 391,
+            "status": "complete",
+            "completed_responses": 2987,
+            "unmetered_requests": 0
+          },
+          "timeouts": 0,
+          "notes": [
+            "Recovered from message_end assistant events in final retained native stdout JSONL. Steps count unique native toolCall IDs. Tokens sum input, cache reads/writes and output; reasoning is included in output once. Streaming updates, smoke and other suites excluded. Runner aggregate fields were absent because the runner searched a different session directory."
+          ],
+          "sources_sha256": [
+            "167177206bd36ed74a4620dbbf4aa19f83549a5f64e5220e1b934c7766fff8fc"
+          ]
         }
       }
     }
