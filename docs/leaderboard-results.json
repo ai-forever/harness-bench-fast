@@ -6,6 +6,7 @@
   "wave21_tasks": 10,
   "provenance": {
     "secret_37_1711_codex_light_sha256": "8773237ded02b942b14fa2f23c5cd82f133a8050ea6dbb6c6d38d8fcead91976",
+    "secret_37_1711_deepagents_light_sha256": "cf73575735123611685c82f71ff8e237baf1a0546ddf802488971450a75742c6",
     "secret_37_1711_dsh_light_sha256": "97ae92bc7ad5c8dfbc23a54188c257ec6befaa39f907092d985d276f0f54f379",
     "secret_37_1711_pi_light_sha256": "167177206bd36ed74a4620dbbf4aa19f83549a5f64e5220e1b934c7766fff8fc",
     "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs plus three complete Claude Haiku harness runs; v0.19 protocol revisions grouped for display, exact source_version retained per row; composites explicitly labeled; secret sft deepagents accepted by the operator",
@@ -4889,6 +4890,49 @@
           ],
           "sources_sha256": [
             "8773237ded02b942b14fa2f23c5cd82f133a8050ea6dbb6c6d38d8fcead91976"
+          ]
+        }
+      }
+    },
+    {
+      "id": "secret-37-1711-deepagents",
+      "model": "secret-37-1711",
+      "harness": "DeepAgents 0.6.12",
+      "secret_model": true,
+      "runs": 1,
+      "reasoning_effort": "high",
+      "source_version": "0.21.3",
+      "measurement_valid": true,
+      "details_url": "secret-37-1711-deepagents-light.html",
+      "light": {
+        "passed": 362,
+        "total": 391
+      },
+      "medium": null,
+      "medium_historical": null,
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "steps": {
+            "value": 3292,
+            "covered_tasks": 391,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 19047722,
+            "input_tokens": 18240640,
+            "output_tokens": 807082,
+            "covered_tasks": 391,
+            "status": "partial",
+            "lower_bound": true
+          },
+          "notes": [
+            "Final retained task executions only. Tokens are API prompt plus completion usage, reasoning included once. Native in-flight transport retries retained; responses without usage make the sum a lower bound. Recovered transient transport errors are not model failures. Steps count upstream function calls. Smoke and superseded executions excluded."
+          ],
+          "sources_sha256": [
+            "cf73575735123611685c82f71ff8e237baf1a0546ddf802488971450a75742c6"
           ]
         }
       }
