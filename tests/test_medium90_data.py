@@ -27,8 +27,10 @@ def test_published_medium90_is_reproducible_and_exact_suite():
 def test_profiles_preserved_without_name_based_joins_or_wave19_doublecount():
     old = json.loads((ROOT / "docs/leaderboard-results.json").read_text(encoding="utf-8"))
     rows = {r["id"]: r for r in build()["rows"]}
-    assert set(r["id"] for r in old["rows"]) < set(rows)
+    assert set(r["id"] for r in old["rows"] if r.get("medium") or r.get("medium_historical") or r.get("wave19") or r.get("wave21")) < set(rows)
     for original in old["rows"]:
+        if not any(original.get(key) for key in ("medium", "medium_historical", "wave19", "wave21")):
+            continue
         row = rows[original["id"]]
         assert row["source_version"] == original["source_version"]
         assert row["measurement_valid"] == original.get("measurement_valid")

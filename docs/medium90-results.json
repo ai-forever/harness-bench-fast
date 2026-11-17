@@ -105,7 +105,7 @@
     "new_model_calls": 0
   },
   "provenance": {
-    "legacy_results_sha256": "baadb9131a731dd17e130453b52c93b1e735cdd54ced4e06db00bf2d653a0073",
+    "legacy_results_sha256": "9abcdb1cebd11bf978419b1660d443f566796cdb45923d610542be5b1675b2ae",
     "wave21_results_sha256": "1d35d5b2b0d9b28829b5d27d28f852d6f1f33d768e95df7581ffa0073d299803",
     "haiku_medium90_sha256": "6049aec374fdfddd1488c7daa740956246e354e325b456d4b5e9e9e79d07e7e0",
     "codex_medium90_sha256": "11d8d93639ca7dc291b1d22e3a85d511e4a282a128b32b54b269892e7ad0cb25",
