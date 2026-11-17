@@ -19,7 +19,7 @@ def test_published_medium90_is_reproducible_and_exact_suite():
     data = build()
     assert json.loads((ROOT / "docs/medium90-results.json").read_text(encoding="utf-8")) == data
     assert data["task_numbers"] == [task_number(t.id) for t in SUITES["medium"]]
-    assert data["summary"] == {"rows": 129, "ranked_rows": 12, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 12}}
+    assert data["summary"] == {"rows": 130, "ranked_rows": 13, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 13}}
     assert all((r["score"] is None) == (r["measured_tasks"] != 90) for r in data["rows"])
     assert all(len(set(r["missing_task_numbers"])) + r["measured_tasks"] == 90 for r in data["rows"])
 
@@ -80,6 +80,9 @@ def test_payload_provenance_is_portable_across_line_endings(tmp_path):
     for name in ("secretmodel-1114-ouroboros.json", "pi-deepseek0731-medium90-20261114.json", "secretmodel-1114.json", "leaderboard-results.json", "wave21-results.json", "haiku-medium90.json", "codex-deepseek-medium90-20261027.json", "miniswe-deepseek-medium90-20261027.json", "claudecode-sonnet-medium90-20261027.json"):
         content = (ROOT / "docs" / name).read_text(encoding="utf-8")
         (tmp_path / "docs" / name).write_bytes(content.replace("\n", "\r\n").encode("utf-8"))
+    for path in (ROOT / "docs").glob("secret-37-1711-*-medium90-20261117.json"):
+        content = path.read_text(encoding="utf-8")
+        (tmp_path / "docs" / path.name).write_bytes(content.replace("\n", "\r\n").encode("utf-8"))
     assert build(tmp_path) == build()
 
 
