@@ -4,7 +4,7 @@ const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboar
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 99);
+assert.equal(light.length, 100);
 assert.equal(medium.length, 79);
 assert.equal(selectResults(data, "medium", "current", "").length, 22);
 for (const rows of [light, medium]) {

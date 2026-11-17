@@ -22,7 +22,8 @@
     "haiku_three_harnesses_sha256": "2a9ab223dbe6038d58715c8193a94b414d981b6d3f1388f253a4dcc34dbf26c2",
     "telemetry_sha256": "2058f482d9cc941a8a453c7b9003ee4b3d6525643ff61037001e58dc1b6d8773",
     "limitation": "Missing old coverage stays null; historical+wave19 composites are not fresh full runs. Wilson intervals do not estimate repeat variability.",
-    "secret_37_1711_pi_light_sha256": "167177206bd36ed74a4620dbbf4aa19f83549a5f64e5220e1b934c7766fff8fc"
+    "secret_37_1711_pi_light_sha256": "167177206bd36ed74a4620dbbf4aa19f83549a5f64e5220e1b934c7766fff8fc",
+    "secret_37_1711_dsh_light_sha256": "97ae92bc7ad5c8dfbc23a54188c257ec6befaa39f907092d985d276f0f54f379"
   },
   "rows": [
     {
@@ -4889,6 +4890,49 @@
           ],
           "sources_sha256": [
             "167177206bd36ed74a4620dbbf4aa19f83549a5f64e5220e1b934c7766fff8fc"
+          ]
+        }
+      }
+    },
+    {
+      "id": "secret-37-1711-dsh",
+      "model": "secret-37-1711",
+      "harness": "DSH 0.2.0-rc.2",
+      "secret_model": true,
+      "runs": 1,
+      "reasoning_effort": "high",
+      "source_version": "0.21.3",
+      "measurement_valid": true,
+      "details_url": "secret-37-1711-dsh-light.html",
+      "light": {
+        "passed": 384,
+        "total": 391
+      },
+      "medium": null,
+      "medium_historical": null,
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "steps": {
+            "value": 3585,
+            "covered_tasks": 391,
+            "status": "complete",
+            "unit": "tool_calls"
+          },
+          "tokens": {
+            "value": 21920957,
+            "input_tokens": 20834348,
+            "output_tokens": 1086609,
+            "covered_tasks": 391,
+            "status": "partial",
+            "lower_bound": true
+          },
+          "notes": [
+            "Final retained task executions only. Tokens are API prompt plus completion usage, reasoning included once. Native in-flight transport retries retained; responses without usage make the sum a lower bound. Recovered transient transport errors are not model failures. Steps count upstream function calls. Smoke and superseded executions excluded."
+          ],
+          "sources_sha256": [
+            "97ae92bc7ad5c8dfbc23a54188c257ec6befaa39f907092d985d276f0f54f379"
           ]
         }
       }
