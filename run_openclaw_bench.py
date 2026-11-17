@@ -96,6 +96,63 @@ def _reported_usage(usage: object) -> dict | None:
         return None
     return usage
 
+
+# Pinned bench config: `openclaw agent exec` otherwise runs against the
+# operator's ambient config (which carries production plugins/MCP/skills) and
+# is not reproducible. Pin an isolated minimal config instead (see
+# openspec/changes/isolate-bench-openclaw-instance).
+BENCH_CONFIG = BENCH_DIR / "bench" / "openclaw.bench.json"
+
+# Envelope `error.kind` values that mark an infrastructure crash (not a task
+# failure) and are safe to retry. A long run can hit `incomplete_turn` when the
+# provider returns an incomplete/malformed tool call; that is transient, so we
+# rerun the task rather than recording a false model failure.
+RETRYABLE_ERROR_KINDS = ("incomplete_turn",)
+
+
+def resolve_bench_config() -> Path:
+    """Return the pinned bench config path (env override: OPENCLAW_BENCH_CONFIG).
+
+    Fails explicitly when the file is missing — it must NOT silently fall back
+    to the ambient config (design Q6 in isolate-bench-openclaw-instance).
+    """
+    path = Path(os.environ.get("OPENCLAW_BENCH_CONFIG", str(BENCH_CONFIG)))
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"bench config not found: {path} "
+            "(commit bench/openclaw.bench.json or set OPENCLAW_BENCH_CONFIG)"
+        )
+    return path
+
+
+def _envelope_error_kind(stdout: str | None, stderr: str | None,
+                         returncode: int) -> str | None:
+    """Best-effort classification of a failed `agent exec` run.
+
+    Returns the envelope `error.kind` when present; falls back to a stderr /
+    message match for the known incomplete-tool-call crash. Returns ``None`` for
+    a successful run or an unclassified failure.
+    """
+    if returncode == 0:
+        return None
+    if stdout:
+        try:
+            envelope = json.loads(stdout)
+        except (json.JSONDecodeError, TypeError):
+            envelope = None
+        if isinstance(envelope, dict):
+            err = envelope.get("error")
+            if isinstance(err, dict):
+                if err.get("kind"):
+                    return str(err["kind"])
+                msg = str(err.get("message") or "")
+                if "incomplete" in msg.lower() or "malformed tool call" in msg.lower():
+                    return "incomplete_turn"
+    haystack = (stderr or "").lower()
+    if "incomplete_turn" in haystack or "incomplete or malformed tool call" in haystack:
+        return "incomplete_turn"
+    return None
+
 # Thread-safe print
 _print_lock = threading.Lock()
 def safe_print(*args, **kwargs):
@@ -110,6 +167,7 @@ def run_one_task(
     timeout: int = DEFAULT_TIMEOUT,
     keep_workspace: bool = False,
     thinking: str | None = None,
+    retries: int = 0,
 ) -> dict:
     """Run a single benchmark task through `openclaw agent exec`."""
     started = time.monotonic()
@@ -126,9 +184,13 @@ def run_one_task(
         # 1. Setup workspace with task fixtures
         task.setup(workspace_path)
 
-        # 2. Run openclaw agent exec
+        # 2. Run openclaw agent exec against the pinned bench config. Retry on
+        #    a retryable infra crash (e.g. incomplete_turn) so a transient
+        #    malformed tool call is not recorded as a model failure.
+        bench_config = resolve_bench_config()
         cmd = [
             "openclaw", "agent", "exec",
+            "--config", str(bench_config),
             "--model", model,
             "--cwd", str(workspace_path),
             "--timeout", str(timeout),
@@ -138,31 +200,47 @@ def run_one_task(
             cmd.extend(["--thinking", thinking])
         cmd.append(task.prompt)
 
+        run_env = os.environ.copy()
+        if CLOUD_RU_API_KEY:
+            # Non-breaking: the provider config still governs if it ignores env.
+            run_env["CLOUD_RU_API_KEY"] = CLOUD_RU_API_KEY
+            run_env["CLOUD_RU_BENCH_API_KEY"] = CLOUD_RU_API_KEY
+
         agent_error = None
         result = None
-        try:
-            run_env = os.environ.copy()
-            if CLOUD_RU_API_KEY:
-                # Non-breaking: the provider config still governs if it ignores env.
-                run_env["CLOUD_RU_API_KEY"] = CLOUD_RU_API_KEY
-                run_env["CLOUD_RU_BENCH_API_KEY"] = CLOUD_RU_API_KEY
-            result = subprocess.run(
-                cmd,
-                cwd=str(workspace_path),
-                capture_output=True,
-                text=True,
-                timeout=timeout + 60,
-                encoding="utf-8",
-                errors="replace",
-                env=run_env,
-            )
-            if result.returncode != 0:
+        for attempt in range(retries + 1):
+            agent_error = None
+            try:
+                result = subprocess.run(
+                    cmd,
+                    cwd=str(workspace_path),
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout + 60,
+                    encoding="utf-8",
+                    errors="replace",
+                    env=run_env,
+                )
+                if result.returncode == 0:
+                    break
                 stderr_tail = (result.stderr or "")[-300:]
                 agent_error = f"exit={result.returncode}: {stderr_tail}"
-        except subprocess.TimeoutExpired:
-            agent_error = f"timed out after {timeout}s"
-        except Exception as exc:
-            agent_error = f"exception: {exc}"
+                kind = _envelope_error_kind(result.stdout, result.stderr, result.returncode)
+                if attempt < retries and kind in RETRYABLE_ERROR_KINDS:
+                    safe_print(
+                        f"[{task.id}] retryable infra crash ({kind}) — "
+                        f"attempt {attempt + 2}/{retries + 1}",
+                        flush=True,
+                    )
+                    time.sleep(2)
+                    continue
+                break
+            except subprocess.TimeoutExpired:
+                agent_error = f"timed out after {timeout}s"
+                break
+            except Exception as exc:
+                agent_error = f"exception: {exc}"
+                break
 
         elapsed = time.monotonic() - started
 
@@ -371,6 +449,7 @@ def run_concurrent(
     thinking: str | None = None,
     harness_version: str | None = None,
     command: str | None = None,
+    retries: int = 0,
 ) -> list[dict]:
     """Run tasks with ThreadPoolExecutor."""
     checkpoint = checkpoint or {}
@@ -395,7 +474,7 @@ def run_concurrent(
     def task_wrapper(tid: str, idx: int) -> dict:
         task = get_task(tid)
         safe_print(f"[{idx}/{len(task_ids)}] {task.id}: starting...", flush=True)
-        run = run_one_task(task, model=model, timeout=timeout, keep_workspace=keep_workspace, thinking=thinking)
+        run = run_one_task(task, model=model, timeout=timeout, keep_workspace=keep_workspace, thinking=thinking, retries=retries)
         status = "✅ PASS" if run["passed"] else "❌ FAIL"
         safe_print(f"[{idx}/{len(task_ids)}] {task.id}: [{status}] {run['elapsed_seconds']:.1f}s — {run['message'][:120]}", flush=True)
         if run.get("agent_usage_available") is False:
@@ -502,6 +581,8 @@ def main():
     parser.add_argument("--json-output", default=None)
     parser.add_argument("--status-file", default=None, help="JSON status file for monitoring")
     parser.add_argument("--concurrency", type=int, default=1, help="Parallel tasks")
+    parser.add_argument("--retries", type=int, default=1,
+                        help="Retries per task on a retryable infra crash (incomplete_turn); default 1")
     parser.add_argument("--rerun-on-fail", action="store_true", help="Skip passed tasks from checkpoint")
     args = parser.parse_args()
 
@@ -547,6 +628,7 @@ def main():
         status_file=args.status_file,
         concurrency=args.concurrency,
         checkpoint=checkpoint,
+        retries=args.retries,
     )
 
     passed = sum(1 for r in results if r["passed"])
