@@ -351,6 +351,34 @@ def build(root=ROOT):
                     "measurement_type": "fresh_medium90", "measurement_valid": True,
                     "details_url": f"secret-37-1711-{key}-medium90.html"}
         rows.append(assemble_row(identity, components))
+    ouro_path = root / "docs/secretmodel-1114-ouroboros-dev-20261118.json"
+    ouro = json.loads(ouro_path.read_text(encoding="utf-8"))
+    if ([t["number"] for t in ouro["tasks"]] != sorted(NUMBERS)
+            or sum(t["passed"] for t in ouro["tasks"]) != ouro["overall_passed"]):
+        raise ValueError("Invalid Ouroboros Development task coverage")
+    identity = {"id": "secretmodel-1114-ouroboros-dev-20261118",
+                "profile_id": "secretmodel-1114-ouroboros-dev-20261118",
+                "model": ouro["model"], "harness": "Ouroboros " + ouro["harness_version"] + " (Development)",
+                "secret_model": True, "runs": 1, "source_version": ouro["task_set_version"],
+                "reasoning_effort": ouro["reasoning_effort"], "measurement_type": "adjudicated_medium90",
+                "measurement_valid": True, "details_url": "secretmodel-1114-ouroboros-dev-20261118.html",
+                "result_note": "nondefault: 4h; adaptive 200-request caps on two tasks; harness errors count as failures"}
+    components = []
+    for numbers in (list(range(392, 472)), SELECTED):
+        subset = [t for t in ouro["tasks"] if t["number"] in numbers]
+        covered = [t for t in subset if t["usage_responses"] > 0]
+        partial = len(covered) != len(subset) or not all(t["token_usage_complete"] for t in subset)
+        usage = {"notes": [ouro["usage_note"], ouro["protocol_note"]],
+                 "tokens": {"value": sum(t["total_tokens"] for t in covered),
+                            "covered_tasks": len(covered), "status": "partial" if partial else "complete",
+                            "lower_bound": partial,
+                            "input_tokens": sum(t["input_tokens"] for t in covered),
+                            "output_tokens": sum(t["output_tokens"] for t in covered),
+                            "completed_responses": sum(t["usage_responses"] for t in subset),
+                            "unmetered_requests": sum(t["unmetered_requests"] for t in subset)}}
+        components.append(component(numbers, {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
+                                    usage, ouro["task_set_version"], "latest attempts; nondefault adaptive budgets"))
+    rows.append(assemble_row(identity, components))
     assert len({r["id"] for r in rows}) == len(rows)
     complete = sorted((r for r in rows if r["score"] is not None), key=lambda r: -r["score"])
     for r in complete:
