@@ -323,32 +323,6 @@ def build(root=ROOT):
             components.append(component(numbers, {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
                                         usage, secret["task_set_version"], note))
         rows.append(assemble_row(identity, components))
-    ouro_path = root / "docs/secretmodel-1114-ouroboros.json"
-    ouro = json.loads(ouro_path.read_text(encoding="utf-8"))
-    identity = {"id": "secretmodel-1114-ouroboros", "profile_id": "secretmodel-1114-ouroboros",
-                "model": ouro["model"], "harness": ouro["harness"], "secret_model": True,
-                "runs": 1, "source_version": ouro["task_set_version"],
-                "reasoning_effort": ouro["reasoning_effort"], "measurement_type": "adjudicated_medium90",
-                "measurement_valid": True, "details_url": "secretmodel-1114-ouroboros.html",
-                "result_note": "includes 14 harness protocol failures"}
-    components = []
-    for numbers in (list(range(392, 472)), SELECTED):
-        subset = [t for t in ouro["tasks"] if t["number"] in numbers]
-        usage = {"sources_sha256": [ouro["usage_audit_sha256"]], "notes": [ouro["usage_note"]]}
-        covered = [t for t in subset if t["usage_responses"] > 0]
-        partial = len(covered) != len(subset) or not all(t["token_usage_complete"] for t in subset)
-        usage["tokens"] = {"value": sum(t["total_tokens"] for t in covered),
-                           "covered_tasks": len(covered), "status": "partial" if partial else "complete",
-                           "lower_bound": partial,
-                           "input_tokens": sum(t["input_tokens"] for t in covered),
-                           "output_tokens": sum(t["output_tokens"] for t in covered),
-                           "completed_responses": sum(t["usage_responses"] for t in subset),
-                           "unmetered_requests": sum(t["unmetered_requests"] for t in subset)}
-        components.append(component([t["number"] for t in subset],
-                                    {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
-                                    usage,
-                                    ouro["task_set_version"], "last-attempt outcomes; harness protocol errors count as failures"))
-    rows.append(assemble_row(identity, components))
     for path in sorted((root / "docs").glob("secret-37-1711-*-medium90-20261117.json")):
         retained = json.loads(path.read_text(encoding="utf-8"))
         outcomes = retained["outcomes"]
