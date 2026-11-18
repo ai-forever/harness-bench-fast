@@ -43,6 +43,8 @@ A [fresh Claude Code + Sonnet 5.5 Medium90 run](docs/claudecode-sonnet-medium90.
 
 A [fresh Pi 1.5.2 + DeepSeek V4 Flash 0731 Medium90 run](docs/pi-deepseek0731-medium90.html) on 14 November 2026 scored **65/90 (72.2%)** with high reasoning and sixteen concurrent tasks. It includes all ten timeouts and one provider refusal as failures. Retained native counters are 4,542 tool calls and at least 445,223,867 tokens; the protocol records the incomplete response accounting.
 
+A [fresh Ouroboros Development 7.11.1-alpha.0 Light391 measurement](docs/secret-37-1711-ouroboros-light.html) on 18 November 2026 records the complete `secret-37-1711` result, retained-attempt usage, infrastructure replacements and the server-import correction. Enable **Show secret models** on the Light leaderboard.
+
 Existing measurements are rescored offline on the new membership. Historical
 source versions, protocols, reasoning levels and budgets remain visible;
 results are combined only for compatible configurations. **A Medium score is

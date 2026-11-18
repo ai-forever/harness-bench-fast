@@ -460,7 +460,7 @@ def build():
             "telemetry": {"light": measurement["usage"]},
         })
     retained_sources = {}
-    for path in sorted((ROOT / "docs").glob("secret-37-1711-*-light-20261117.json")):
+    for path in sorted((ROOT / "docs").glob("secret-37-1711-*-light-202611*.json")):
         measured = json.loads(path.read_text(encoding="utf-8"))
         outcomes = measured["outcomes"]
         if (measured["total"] != 391 or len(outcomes) != 391
@@ -474,7 +474,9 @@ def build():
         complete = measured["token_complete_tasks"] == 391 and measured["missing_usage_responses"] == 0
         usage = {"tasks": 391, "observed_tasks": 391,
                  "steps": {"value": measured["steps"], "covered_tasks": 391,
-                           "status": "complete", "unit": "tool_calls"},
+                           "status": "complete" if measured.get("steps_complete_tasks", 391) == 391 else "partial",
+                           "unit": "tool_calls",
+                           **({"lower_bound": True} if measured.get("steps_complete_tasks", 391) < 391 else {})},
                  "tokens": {"value": measured["tokens"], "input_tokens": measured["input_tokens"],
                             "output_tokens": measured["output_tokens"], "covered_tasks": 391,
                             "status": "complete" if complete else "partial", "lower_bound": not complete},
