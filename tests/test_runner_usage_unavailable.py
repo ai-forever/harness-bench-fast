@@ -168,3 +168,42 @@ def test_run_one_task_garbage_stdout_is_unavailable(monkeypatch):
     result = mod.run_one_task(_FakeTask(), model="m/x", timeout=5)
     assert result["agent_usage_available"] is False
     assert result["agent_total_tokens"] is None
+
+
+# ── nested `usageReport.state` marker (fix-oc-usage-unavailable-marker) ─
+
+def test_reported_usage_unavailable_nested_marker_is_none():
+    # New envelope path (retry/continuation) marks usage unavailable with a
+    # non-empty dict that carries NO flat token buckets.
+    mod = _load()
+    usage = {"usageReport": {"state": "unavailable"},
+             "contextUsage": {"state": "unavailable"}}
+    assert mod._reported_usage(usage) is None
+
+
+def test_reported_usage_available_flat_with_usageReport_is_returned():
+    mod = _load()
+    usage = {"usageReport": {"state": "available"}, "input": 10421, "output": 161,
+             "cacheRead": 20352, "cacheWrite": 0, "reasoningTokens": 19, "total": 30934}
+    assert mod._reported_usage(usage) == usage
+
+
+def test_reported_usage_missing_flat_buckets_is_unavailable():
+    mod = _load()
+    assert mod._reported_usage({"contextUsage": {"state": "available"}}) is None
+
+
+def test_run_one_task_nested_unavailable_is_unavailable_not_zero(monkeypatch):
+    mod = _load()
+    envelope = {"ok": True, "status": "ok",
+                "usage": {"usageReport": {"state": "unavailable"},
+                          "contextUsage": {"state": "unavailable"}},
+                "assistantTurns": 12, "toolSummary": {"calls": 3}}
+    monkeypatch.setattr(
+        mod.subprocess, "run",
+        lambda *a, **kw: subprocess.CompletedProcess(
+            a, 0, stdout=json.dumps(envelope), stderr=""))
+    result = mod.run_one_task(_FakeTask(), model="m/x", timeout=5)
+    assert result["agent_usage_available"] is False
+    assert result["agent_total_tokens"] is None
+    assert result["agent_input_tokens"] is None

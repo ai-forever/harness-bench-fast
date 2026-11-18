@@ -87,12 +87,20 @@ _USAGE_BUCKETS = (
 
 
 def _reported_usage(usage: object) -> dict | None:
-    """Return the envelope's `usage` mapping when the run actually reported it.
+    """Return the envelope's `usage` mapping when the run actually reported tokens.
 
-    Returns ``None`` (unavailable) for a missing/empty mapping. Callers must
-    keep unavailable buckets as ``None`` — never coerce them to ``0``.
+    Returns ``None`` (unavailable) for a missing/empty mapping, for the new
+    envelope shape that marks usage unavailable
+    (``usage.usageReport.state == "unavailable"``), or when no flat token
+    buckets (``input``/``output``/``total``) are present. Callers must keep
+    unavailable buckets as ``None`` — never coerce them to ``0`` (issue #449).
     """
     if not isinstance(usage, dict) or not usage:
+        return None
+    report = usage.get("usageReport")
+    if isinstance(report, dict) and report.get("state") == "unavailable":
+        return None
+    if not any(bucket in usage for bucket in ("input", "output", "total")):
         return None
     return usage
 
