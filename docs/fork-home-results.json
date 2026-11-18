@@ -9,6 +9,20 @@
       "tasks": 52,
       "ours": [
         {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: max (2026-11-18)",
+          "model": "DeepSeek-V4.1-Flash (cloud.ru) (thinking: max)",
+          "result": "52/52",
+          "pct": "100.0%",
+          "time": "84.1m",
+          "steps": "438",
+          "tokens_cost": "7 106 700 (217₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_ds41flash_max_20261118.html"
+        },
+        {
           "harness": "OpenClaw 2026.10.9 (8b18b55)",
           "profile": "thinking: medium (2026-11-07)",
           "model": "DeepSeek-V4.1-Flash (cloud.ru) (thinking: medium)",
@@ -21,6 +35,20 @@
           "source": "ours",
           "waves": null,
           "detail": "fork-detail-oc_shotlist_ds41flash_medium_20261107.html"
+        },
+        {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: medium (2026-11-17)",
+          "model": "DeepSeek-V4.1-Flash (cloud.ru) (thinking: medium)",
+          "result": "51/52",
+          "pct": "98.1%",
+          "time": "22.4m",
+          "steps": "269",
+          "tokens_cost": "2 032 131 (45₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_ds41flash_medium_20261117.html"
         },
         {
           "harness": "DeepSeek Harness 0.2.2-rc.1",

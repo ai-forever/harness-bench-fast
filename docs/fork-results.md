@@ -33,10 +33,11 @@ Upstream-методика и upstream-строки — в [`../README.md`](../RE
 > [`docs/reconciliation-2026-11-15.md`](reconciliation-2026-11-15.md)).
 
 <!-- FORK:RESULTS:BEGIN -->
-Автосинк: 91 прогонов
+Автосинк: 92 прогонов
 
 | Harness | Suite | Profile | Model | Result | % | Time | Steps | Tokens (cost) |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
+| DeepSeek Harness | Shot List (52) | thinking: max | DeepSeek-V4.1-Flash (thinking: max) | 52/52 | 100.0% | 84.1m | 438 | 7 106 700 (217₽) |
 | DeepSeek Harness | Shot List (52) | thinking: medium | DeepSeek-V4.1-Flash (thinking: medium) | 51/52 | 98.1% | 22.4m | 269 | 2 032 131 (45₽) |
 | DeepSeek Harness | Shot List (52) | thinking: off | DeepSeek-V4.1-Flash (thinking: off) | 51/52 | 98.1% | 19.1m | 266 | 1 975 401 (43₽) |
 | DeepSeek Harness | Medium (392-471) | thinking: off | DeepSeek-V4.1-Flash (thinking: off) | 39/40 | 97.5% | 161.8m | 727 | 20 621 016 (494₽) |
