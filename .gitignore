@@ -232,3 +232,11 @@ __marimo__/
 # harness_bench: raw run logs and ad-hoc dumps (kept locally, summarized
 # in README.md).
 harness_bench/runs/
+
+# Cloud.ru provider billing exports ("Raw activity rows (MSK)") and any local
+# billing dumps — REAL billing data must never be committed. Keep them
+# out-of-repo (agent billing-inbox, /tmp) and pass paths to the reconcile tools.
+Raw_activity_rows*.csv
+*Raw_activity_rows*.csv
+billing-inbox/
+tools/billing-fixtures/*.csv

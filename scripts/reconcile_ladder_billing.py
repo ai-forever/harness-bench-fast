@@ -31,7 +31,9 @@ Options:
     --check          do not modify files; exit 0 iff every sidecar is current
     -h, --help
 
-With no CSV paths the vendored fixtures in ``tools/billing-fixtures/`` are used.
+CSV paths are required: the raw Cloud.ru activity export(s) must be passed
+    explicitly and must NEVER be vendored in the repo (the provider export is real
+    billing data).
 """
 from __future__ import annotations
 
@@ -43,10 +45,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT_DIR = REPO_ROOT / "results" / "reconciled"
-DEFAULT_FIXTURES = [
-    REPO_ROOT / "tools" / "billing-fixtures" / "bill_old.csv",
-    REPO_ROOT / "tools" / "billing-fixtures" / "bill_new.csv",
-]
+# NOTE: no vendored billing fixtures. Raw Cloud.ru activity exports are real
+# billing data and must stay OUT of the repository; pass their paths explicitly
+# (e.g. an out-of-repo dir like the agent's billing-inbox or /tmp).
 
 # Cloud.ru provider model id -> short fork token.
 PROVIDER_MODEL_TO_TOKEN: dict[str, str] = {
@@ -202,7 +203,14 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--check", action="store_true", help="verify sidecars; never write")
     args = parser.parse_args(argv)
 
-    paths = args.csv or DEFAULT_FIXTURES
+    paths = args.csv
+    if not paths:
+        print(
+            "error: pass one or more Cloud.ru activity CSV export(s); raw billing "
+            "data must not be vendored in the repo.",
+            file=sys.stderr,
+        )
+        return 2
     for path in paths:
         if not path.is_file():
             print(f"error: CSV not found: {path}", file=sys.stderr)
