@@ -3,8 +3,8 @@
  "branch": "research/model-selection-guidance",
  "note": "READ-ONLY analysis layer; results/*.json; premium ₽ from provider billing.",
  "terciles_cps": {
-  "p33": 12.87,
-  "p66": 49.47
+  "p33": 12.68,
+  "p66": 46.22
  },
  "buckets_full": {
   "shot-list": 52,
@@ -72,6 +72,66 @@
    "confidence": "medium (single run, full suite)"
   },
   {
+   "harness": "DeepSeek Harness",
+   "model": "DeepSeek-V4.1-Flash (thinking: max)",
+   "reasoning": "max",
+   "suite": "Shot List (52)",
+   "situation_bucket": "shot-list",
+   "passed": 52,
+   "total": 52,
+   "pass_rate": 1.0,
+   "cost_rub": 217.11,
+   "cost_per_solved": 4.1752,
+   "time_min": 84.127,
+   "steps": 438,
+   "coverage": {
+    "runs": 1,
+    "full": true,
+    "version": "0.16.0"
+   },
+   "stem": "dsh_shotlist_ds41flash_max_20261118",
+   "tokens": 7106700,
+   "basis": "estimate",
+   "tier": "Default",
+   "pareto": false,
+   "singleton": false,
+   "recommended": false,
+   "dominated_by": [
+    "oc_shotlist_ds41flash_medium_20261107"
+   ],
+   "confidence": "medium (single run, full suite)"
+  },
+  {
+   "harness": "DeepSeek Harness",
+   "model": "DeepSeek-V4.1-Flash (thinking: medium)",
+   "reasoning": "medium",
+   "suite": "Shot List (52)",
+   "situation_bucket": "shot-list",
+   "passed": 51,
+   "total": 52,
+   "pass_rate": 0.9808,
+   "cost_rub": 44.63,
+   "cost_per_solved": 0.8751,
+   "time_min": 22.435,
+   "steps": 269,
+   "coverage": {
+    "runs": 1,
+    "full": true,
+    "version": "0.16.0"
+   },
+   "stem": "dsh_shotlist_ds41flash_medium_20261117",
+   "tokens": 2032131,
+   "basis": "estimate",
+   "tier": "Default",
+   "pareto": false,
+   "singleton": false,
+   "recommended": false,
+   "dominated_by": [
+    "dsh_shotlist_ds41flash_off_20261111"
+   ],
+   "confidence": "medium (single run, full suite)"
+  },
+  {
    "harness": "OpenClaw",
    "model": "DeepSeek-V4.1-Flash (thinking: high)",
    "reasoning": "high",
@@ -97,6 +157,7 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111"
    ],
    "confidence": "medium (single run, full suite)"
@@ -127,6 +188,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash_high_20261107",
     "oc_shotlist_ds41flash_medium_20261107"
@@ -159,6 +222,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash_high_20261107",
     "oc_shotlist_ds41flash_medium_20261107",
@@ -192,6 +257,7 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111"
    ],
    "confidence": "medium (single run, full suite)"
@@ -222,6 +288,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash_high_20261107",
     "oc_shotlist_ds41flash_medium_20261107",
@@ -255,6 +323,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
     "oc_shotlist_ds41flash_high_20261107",
@@ -289,6 +359,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
     "oc_shotlist_ds41flash_high_20261107",
@@ -324,6 +396,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
     "oc_shotlist_ds41flash_high_20261107",
@@ -392,6 +466,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
     "oc_shotlist_ds41flash_high_20261107",
@@ -427,6 +503,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
     "oc_shotlist_ds41flash_high_20261107",
@@ -458,11 +536,13 @@
    "stem": "pi_shotlist_glm52_thinking_off",
    "tokens": 1913439,
    "basis": "estimate",
-   "tier": "Default",
+   "tier": "Balanced",
    "pareto": false,
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -500,6 +580,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -538,6 +620,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -577,6 +661,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -619,6 +705,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -662,6 +750,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -700,6 +790,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -734,11 +826,13 @@
    "stem": "oc_shotlist_minimaxm3_off_20261109",
    "tokens": 3650102,
    "basis": "estimate",
-   "tier": "Balanced",
+   "tier": "Premium",
    "pareto": false,
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -785,6 +879,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -833,6 +929,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -882,6 +980,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -932,6 +1032,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -980,6 +1082,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -1030,6 +1134,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -1083,6 +1189,7 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash_high_20261107",
     "oc_shotlist_ds41flash_medium_20261107",
@@ -1112,11 +1219,13 @@
    "stem": "pi_shotlist_qwen36",
    "tokens": 1318346,
    "basis": "estimate",
-   "tier": "Default",
+   "tier": "Balanced",
    "pareto": false,
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -1155,6 +1264,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_thinking_off",
@@ -1212,6 +1323,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_thinking_off",
@@ -1268,6 +1381,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -1308,6 +1423,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -1350,6 +1467,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
@@ -1395,6 +1514,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash",
     "oc_shotlist_ds41flash_high_20261107",
@@ -1432,6 +1553,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_oss120b",
@@ -1473,6 +1596,7 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "oc_shotlist_ds41flash_high_20261107",
     "oc_shotlist_ds41flash_medium_20261107",
@@ -1507,6 +1631,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_oss120b",
@@ -1570,6 +1696,8 @@
    "singleton": false,
    "recommended": false,
    "dominated_by": [
+    "dsh_shotlist_ds41flash_max_20261118",
+    "dsh_shotlist_ds41flash_medium_20261117",
     "dsh_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_ds41flash_off_20261111",
     "hermes_shotlist_oss120b",
