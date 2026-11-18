@@ -8,6 +8,7 @@
     "secret_37_1711_codex_light_sha256": "8773237ded02b942b14fa2f23c5cd82f133a8050ea6dbb6c6d38d8fcead91976",
     "secret_37_1711_deepagents_light_sha256": "cf73575735123611685c82f71ff8e237baf1a0546ddf802488971450a75742c6",
     "secret_37_1711_dsh_light_sha256": "97ae92bc7ad5c8dfbc23a54188c257ec6befaa39f907092d985d276f0f54f379",
+    "secret_37_1711_ouroboros_light_sha256": "67fde45ba38bf1ad2ba7e5cd7d3db7d74771065a311d97c23d5ad1e5d5008213",
     "secret_37_1711_pi_light_sha256": "167177206bd36ed74a4620dbbf4aa19f83549a5f64e5220e1b934c7766fff8fc",
     "secret_37_1711_strands_light_sha256": "dcd7fe840d15347676b0953ab8c29fc87960c697b2f7c046ab4e133b20193963",
     "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs plus three complete Claude Haiku harness runs; v0.19 protocol revisions grouped for display, exact source_version retained per row; composites explicitly labeled; secret sft deepagents accepted by the operator",
@@ -4977,6 +4978,50 @@
           ],
           "sources_sha256": [
             "97ae92bc7ad5c8dfbc23a54188c257ec6befaa39f907092d985d276f0f54f379"
+          ]
+        }
+      }
+    },
+    {
+      "id": "secret-37-1711-ouroboros",
+      "model": "secret-37-1711",
+      "harness": "Ouroboros Development 7.11.1-alpha.0",
+      "secret_model": true,
+      "runs": 1,
+      "reasoning_effort": "high (transport override)",
+      "source_version": "0.21.3",
+      "measurement_valid": true,
+      "details_url": "secret-37-1711-ouroboros-light.html",
+      "light": {
+        "passed": 203,
+        "total": 391
+      },
+      "medium": null,
+      "medium_historical": null,
+      "telemetry": {
+        "light": {
+          "tasks": 391,
+          "observed_tasks": 391,
+          "steps": {
+            "value": 2633,
+            "covered_tasks": 391,
+            "status": "partial",
+            "unit": "tool_calls",
+            "lower_bound": true
+          },
+          "tokens": {
+            "value": 434049641,
+            "input_tokens": 432810343,
+            "output_tokens": 1239298,
+            "covered_tasks": 391,
+            "status": "partial",
+            "lower_bound": true
+          },
+          "notes": [
+            "Final retained task executions only; smoke and superseded infrastructure attempts excluded. Tokens sum API prompt and completion usage, reasoning included once. Responses without usage make the sum a lower bound. Steps count captured upstream function calls, not native agent graph steps. CLI failures remain in the denominator; successful verifiers retain credit. Tool-call counts are also a captured lower bound; transport failures can leave response accounting incomplete."
+          ],
+          "sources_sha256": [
+            "67fde45ba38bf1ad2ba7e5cd7d3db7d74771065a311d97c23d5ad1e5d5008213"
           ]
         }
       }
