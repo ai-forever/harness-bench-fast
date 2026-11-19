@@ -233,7 +233,7 @@ def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
         text = (root / "docs" / name).read_text(encoding="utf-8")
         assert "\n" in text
         (docs / name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
-    for path in (root / "docs").glob("secret-37-1711-*-light-20261117.json"):
+    for path in (root / "docs").glob("secret-37-1711-*-light-202611*.json"):
         text = path.read_text(encoding="utf-8")
         (docs / path.name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
     build.__globals__["ROOT"] = tmp_path
