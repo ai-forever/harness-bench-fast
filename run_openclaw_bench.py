@@ -16,6 +16,7 @@ Usage:
 import argparse
 import json
 import os
+import sqlite3
 import subprocess
 import sys
 import threading
@@ -105,6 +106,87 @@ def _reported_usage(usage: object) -> dict | None:
     return usage
 
 
+def _find_trajectory_db(state_dir: Path | None) -> Path | None:
+    """Return the state-dir sqlite that holds `trajectory_runtime_events`."""
+    if not state_dir or not state_dir.is_dir():
+        return None
+    for db in sorted(state_dir.rglob("*.sqlite")):
+        if db.name.endswith((".reindex-lock.sqlite",
+                             ".generation-lock.sqlite",
+                             ".generation-writer.sqlite")):
+            continue
+        try:
+            con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+            try:
+                has = con.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' "
+                    "AND name='trajectory_runtime_events' LIMIT 1"
+                ).fetchone()
+            finally:
+                con.close()
+        except sqlite3.Error:
+            continue
+        if has:
+            return db
+    return None
+
+
+def _trajectory_usage(state_dir: Path | None, session_id: str) -> dict | None:
+    """Recover a run's token usage from the OpenClaw trajectory store.
+
+    When an `agent exec` envelope omits usage
+    (``usageReport.state == "unavailable"``), the run's cumulative usage is
+    still recorded in ``<state-dir>/**/openclaw-agent.sqlite`` in the
+    ``trajectory_runtime_events`` table (``data.usage``). Return an
+    envelope-shaped usage dict for the entry with the largest ``total``, or
+    ``None`` when nothing is recoverable (missing dir/db/table, bad JSON).
+    """
+    if not session_id:
+        return None
+    try:
+        db = _find_trajectory_db(state_dir)
+        if db is None:
+            return None
+        con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+    except (sqlite3.Error, OSError):
+        return None
+    best: dict | None = None
+    best_total = 0.0
+    try:
+        cur = con.execute(
+            "SELECT event_json FROM trajectory_runtime_events "
+            "WHERE session_id = ?",
+            (session_id,),
+        )
+        for (raw,) in cur:
+            try:
+                event = json.loads(raw)
+            except (json.JSONDecodeError, TypeError):
+                continue
+            data = event.get("data") if isinstance(event, dict) else None
+            usage = data.get("usage") if isinstance(data, dict) else None
+            if not isinstance(usage, dict):
+                continue
+            total = usage.get("total")
+            if not isinstance(total, (int, float)) or total <= 0:
+                continue
+            if total > best_total:
+                best_total = float(total)
+                best = {
+                    "input": usage.get("input"),
+                    "output": usage.get("output"),
+                    "total": total,
+                    "cacheRead": usage.get("cacheRead"),
+                    "cacheWrite": usage.get("cacheWrite"),
+                    "reasoningTokens": usage.get("reasoningTokens"),
+                }
+    except sqlite3.Error:
+        return None
+    finally:
+        con.close()
+    return best
+
+
 # Pinned bench config: `openclaw agent exec` otherwise runs against the
 # operator's ambient config (which carries production plugins/MCP/skills) and
 # is not reproducible. Pin an isolated minimal config instead (see
@@ -180,14 +262,22 @@ def run_one_task(
     """Run a single benchmark task through `openclaw agent exec`."""
     started = time.monotonic()
     workspace_keepalive = None
+    state_keepalive = None
 
     try:
         if keep_workspace:
             workspace_path = Path(f"/tmp/oc_bench_{task.id}")
             workspace_path.mkdir(parents=True, exist_ok=True)
+            state_path = Path(f"/tmp/oc_state_{task.id}")
+            state_path.mkdir(parents=True, exist_ok=True)
         else:
             workspace_keepalive = TemporaryDirectory(prefix=f"oc_bench_{task.id}_")
             workspace_path = Path(workspace_keepalive.name)
+            # Preserve the OpenClaw state dir for the run so usage can be
+            # recovered from the trajectory when the envelope omits it
+            # (`agent exec --state-dir` requires the dir to already exist).
+            state_keepalive = TemporaryDirectory(prefix=f"oc_state_{task.id}_")
+            state_path = Path(state_keepalive.name)
 
         # 1. Setup workspace with task fixtures
         task.setup(workspace_path)
@@ -201,6 +291,7 @@ def run_one_task(
             "--config", str(bench_config),
             "--model", model,
             "--cwd", str(workspace_path),
+            "--state-dir", str(state_path),
             "--timeout", str(timeout),
             "--json",
         ]
@@ -260,6 +351,7 @@ def run_one_task(
         #                   costUsd, assistantTurns, toolSummary:{calls,tools,failures}, model, sessionId}
         token_stats = {bucket: None for bucket in _USAGE_BUCKETS}
         token_stats["agent_usage_available"] = False
+        token_stats["agent_usage_source"] = None
         if result and result.stdout:
             try:
                 envelope = json.loads(result.stdout)
@@ -267,6 +359,15 @@ def run_one_task(
                 envelope = None
             if isinstance(envelope, dict):
                 usage = _reported_usage(envelope.get("usage"))
+                session_id = envelope.get("sessionId") or ""
+                usage_source = "envelope" if usage is not None else None
+                if usage is None and session_id:
+                    # Envelope omitted usage (usageReport.state=unavailable):
+                    # recover the run's tokens from the preserved trajectory.
+                    recovered = _trajectory_usage(state_path, session_id)
+                    if recovered is not None:
+                        usage = recovered
+                        usage_source = "trajectory"
                 tool_summary = envelope.get("toolSummary") or {}
                 available = usage is not None
                 if available:
@@ -275,7 +376,7 @@ def run_one_task(
                         "agent_output_tokens": usage.get("output", 0),
                         "agent_total_tokens": usage.get("total", 0),
                         "agent_reasoning_tokens": usage.get("reasoningTokens", 0),
-                        # Explicit cache buckets from the envelope (invariant:
+                        # Explicit cache buckets (invariant:
                         # total = input + output + cacheRead + cacheWrite).
                         # Stored verbatim; only derived downstream when absent.
                         "agent_cache_read_tokens": usage.get("cacheRead"),
@@ -284,10 +385,11 @@ def run_one_task(
                 # else: keep the None buckets from above (usage unavailable).
                 token_stats.update({
                     "agent_usage_available": available,
+                    "agent_usage_source": usage_source,
                     "agent_steps": tool_summary.get("calls", 0),
                     "agent_turns": envelope.get("assistantTurns", 0),
                     "agent_cost_usd": envelope.get("costUsd"),
-                    "agent_session_id": envelope.get("sessionId", ""),
+                    "agent_session_id": session_id,
                 })
 
         return {
