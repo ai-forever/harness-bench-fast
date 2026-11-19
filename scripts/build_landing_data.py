@@ -465,12 +465,15 @@ def build():
         outcomes = measured["outcomes"]
         if (measured["total"] != 391 or len(outcomes) != 391
                 or {t["number"] for t in outcomes} != set(range(1, 392))
-                or sum(t["passed"] for t in outcomes) != measured["passed"]
-                or not measured["measurement_valid"]):
+                or sum(t["passed"] for t in outcomes) != measured["passed"]):
             raise ValueError(f"Incomplete or invalid Light measurement: {path.name}")
         harness = measured.get("harness_key", "pi")
         sha = hashlib.sha256(path.read_text(encoding="utf-8").encode("utf-8")).hexdigest()
         retained_sources[f"secret_37_1711_{harness}_light_sha256"] = sha
+        if measured.get("status") == "withdrawn" and measured["measurement_valid"] is False:
+            continue
+        if not measured["measurement_valid"] or measured.get("status") == "withdrawn":
+            raise ValueError(f"Incomplete or invalid Light measurement: {path.name}")
         complete = measured["token_complete_tasks"] == 391 and measured["missing_usage_responses"] == 0
         usage = {"tasks": 391, "observed_tasks": 391,
                  "steps": {"value": measured["steps"], "covered_tasks": 391,
