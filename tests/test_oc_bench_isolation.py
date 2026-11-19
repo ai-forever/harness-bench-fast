@@ -146,3 +146,11 @@ def test_run_one_task_no_retry_without_retries(monkeypatch):
     res = mod.run_one_task(_FakeTask(), model="m/x", timeout=5, retries=0)
     assert calls["n"] == 1
     assert res["error"] is not None
+
+
+def test_cli_retries_default_is_two():
+    # Owner-approved: raise the OC runner default from 1 to 2 so a transient
+    # incomplete_turn that survives one retry still gets a second chance.
+    mod = _load()
+    args = mod.build_parser().parse_args(["--tasks", "x"])
+    assert args.retries == 2

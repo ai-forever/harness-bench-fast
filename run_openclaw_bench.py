@@ -571,7 +571,7 @@ def resolve_harness_version(explicit: str | None) -> str | None:
     return explicit or os.environ.get("HARNESS_BENCH_HARNESS_VERSION") or detect_harness_version()
 
 
-def main():
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run harness-bench-fast via OpenClaw")
     parser.add_argument("--tasks", nargs="+", help="Specific task IDs")
     parser.add_argument("--failed-only", action="store_true")
@@ -589,9 +589,14 @@ def main():
     parser.add_argument("--json-output", default=None)
     parser.add_argument("--status-file", default=None, help="JSON status file for monitoring")
     parser.add_argument("--concurrency", type=int, default=1, help="Parallel tasks")
-    parser.add_argument("--retries", type=int, default=1,
-                        help="Retries per task on a retryable infra crash (incomplete_turn); default 1")
+    parser.add_argument("--retries", type=int, default=2,
+                        help="Retries per task on a retryable infra crash (incomplete_turn); default 2")
     parser.add_argument("--rerun-on-fail", action="store_true", help="Skip passed tasks from checkpoint")
+    return parser
+
+
+def main():
+    parser = build_parser()
     args = parser.parse_args()
 
     task_ids = resolve_task_ids(args)

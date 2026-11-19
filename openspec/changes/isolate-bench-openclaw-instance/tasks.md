@@ -16,7 +16,7 @@
 ## Реализация
 - [x] `run_openclaw_bench.py`: `--config <repo>/bench/openclaw.bench.json` в argv `agent exec` (`resolve_bench_config`)
 - [x] `run_openclaw_bench.py`: `CLOUD_RU_BENCH_API_KEY` попадает в env вызова
-- [x] `run_openclaw_bench.py`: ретрай задачи при `error.kind == "incomplete_turn"` (`--retries`, default 1)
+- [x] `run_openclaw_bench.py`: ретрай задачи при `error.kind == "incomplete_turn"` (`--retries`, default 2)
 - [x] `bench/README.md`: назначение/запуск/что изолировано
 - [x] `bench/openclaw.bench.json`: финализирован (Cloud.ru + pruning/compaction; `maxTokens` 32768; без plugins/mcp/skills)
 

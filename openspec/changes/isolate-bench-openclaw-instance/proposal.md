@@ -45,7 +45,7 @@ roots».
   (`--config <repo>/bench/openclaw.bench.json`), а SHALL NOT наследовать ambient-конфиг
   оператора; дополнительно прокидывает `CLOUD_RU_BENCH_API_KEY` в окружение вызова.
   Плюс **ретрай задачи** при классифицируемом инфра-крахе (`error.kind ==
-  "incomplete_turn"`) — флаг `--retries` (default 1).
+  "incomplete_turn"`) — флаг `--retries` (default 2).
 - **`bench/README.md`** — назначение, запуск, что изолировано, что осталось общим.
 - **Регресс-тест** `tests/test_oc_bench_isolation.py`: команда `agent exec` содержит
   `--config …/bench/openclaw.bench.json`; конфиг-файл парсится и содержит ровно одного

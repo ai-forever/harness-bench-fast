@@ -50,7 +50,7 @@
 - **Q7 — лимит вывода.** В bench-конфиге `maxTokens` поднят 16384 → **32768**: меньше шансов,
   что крупный tool-call обрежется по лимиту вывода и станет `malformed`.
 - **Q8 — ретрай.** Раннер ретраит задачу при `error.kind == "incomplete_turn"`
-  (`--retries`, default 1). Классификация — `_envelope_error_kind` (envelope-first,
+  (`--retries`, default 2). Классификация — `_envelope_error_kind` (envelope-first,
   fallback по stderr-тексту). Обычный провал верификатора НЕ ретраится (это провал модели,
   а не инфра-крах).
 - **Q9 — что НЕ делаем.** Не трогаем сам `openclaw agent exec` (продукт). Listener-warning

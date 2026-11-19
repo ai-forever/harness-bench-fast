@@ -83,7 +83,7 @@ Bench-конфиг SHALL задавать для бенчируемой моде
 
 `run_openclaw_bench.run_one_task` SHALL повторять прогон задачи, когда
 `openclaw agent exec` завершается классифицируемым инфраструктурным крахом
-(`error.kind == "incomplete_turn"`), до `--retries` раз (по умолчанию 1). Число попыток
+(`error.kind == "incomplete_turn"`), до `--retries` раз (по умолчанию 2). Число попыток
 SHALL ограничиваться: исчерпав ретраи, раннер SHALL записать задачу как проваленную.
 
 #### Scenario: incomplete_turn ретраится
