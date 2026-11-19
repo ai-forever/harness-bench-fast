@@ -85,11 +85,11 @@ Upstream-методика и upstream-строки — в [`../README.md`](../RE
 | OpenClaw | Medium (392-471) | thinking: ultra | GigaChat 3.5-432B-A28B (thinking: ultra) | 0/40 | 0.0% | 62.6m | 369 | 15 557 817 (78₽) |
 | OpenClaw | Medium (392-471) | thinking: ultra | GigaChat 3.5-432B-A28B (thinking: ultra) | 0/6 | 0.0% | 22.0m | 173 | 7 195 797 (31₽) |
 | OpenClaw | Medium (392-471) | thinking: ultra | GigaChat 3.5-432B-A28B (thinking: ultra) | 0/20 | 0.0% | 20.1m | 259 | 4 749 821 (17₽) |
-| OpenClaw | Medium (392-471) | thinking: medium | MiniMax-M3 (thinking: medium) | 26/40 | 65.0% | 385.8m | 1 329 | 50 707 607 (13 173₽) |
+| OpenClaw | Medium (392-471) | thinking: medium | MiniMax-M3 (thinking: medium) | 27/40 | 67.5% | 385.8m | 1 329 | 50 707 607 (13 173₽) |
 | OpenClaw | Medium (392-471) | thinking: medium | MiniMax-M3 (thinking: medium) | 11/20 | 55.0% | 109.4m | 623 | 10 614 066 (2 960₽) |
 | OpenClaw | Medium (392-471) | thinking: medium | MiniMax-M3 (thinking: medium) | 0/6 | 0.0% | 154.9m | 284 | 14 488 379 (3 707₽) |
-| OpenClaw | Medium (392-471) | thinking: off | MiniMax-M3 (thinking: off) | 33/40 | 82.5% | 266.4m | 989 | 33 114 679 (8 636₽) |
-| OpenClaw | Medium (392-471) | thinking: off | MiniMax-M3 (thinking: off) | 13/20 | 65.0% | 162.0m | 698 | 12 178 668 (3 426₽) |
+| OpenClaw | Medium (392-471) | thinking: off | MiniMax-M3 (thinking: off) | 34/40 | 85.0% | 266.4m | 989 | 33 114 679 (8 636₽) |
+| OpenClaw | Medium (392-471) | thinking: off | MiniMax-M3 (thinking: off) | 15/20 | 75.0% | 162.0m | 698 | 12 178 668 (3 426₽) |
 | OpenClaw | Medium (392-471) | thinking: off | MiniMax-M3 (thinking: off) | 0/6 | 0.0% | 363.2m | 276 | 7 360 375 (1 913₽) |
 | Pi | Shot List (52) | — | Claude Fable 5 | 46/52 | 88.5% | 13.9m | 712 | 549 550 (1 263₽) |
 | Pi | Shot List (52) | — | Claude Fable 5.1 | 47/52 | 90.4% | 19.6m | 752 | 644 155 (1 485₽) |

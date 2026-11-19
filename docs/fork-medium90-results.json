@@ -433,7 +433,7 @@
           "measurement": "complete"
         },
         "feasibility": {
-          "passed": 26,
+          "passed": 27,
           "total": 40,
           "measurement": "complete"
         },
@@ -455,8 +455,8 @@
           0.587
         ],
         "feasibility": [
-          0.614,
-          0.659
+          0.638,
+          0.682
         ]
       },
       "sources": [
@@ -480,12 +480,12 @@
           "measurement": "partial"
         },
         "reflect": {
-          "passed": 13,
+          "passed": 15,
           "total": 20,
           "measurement": "complete"
         },
         "feasibility": {
-          "passed": 33,
+          "passed": 34,
           "total": 40,
           "measurement": "complete"
         },
@@ -503,12 +503,12 @@
           0.275
         ],
         "reflect": [
-          0.583,
-          0.669
+          0.67,
+          0.75
         ],
         "feasibility": [
-          0.778,
-          0.815
+          0.802,
+          0.837
         ]
       },
       "sources": [

@@ -36,6 +36,15 @@ import urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from fork_false_negative_override import (  # noqa: E402
+    apply_summary as _fn_summary,
+)
+from fork_false_negative_override import (
+    rescored_label as _fn_label,
+)
+from fork_false_negative_override import (
+    task_status as _fn_status,
+)
 from fork_i18n import DEFAULT_LOCALE, LOCALES, locale_filename, other_locale, t  # noqa: E402
 from fork_metrics import steps_from_json  # noqa: E402
 
@@ -305,7 +314,8 @@ def load_upstream_durations() -> dict:
     return result
 
 
-def _task_entry(entry: dict, fallback_label: str = SUITE_LABELS["medium"]) -> dict | None:
+def _task_entry(entry: dict, fallback_label: str = SUITE_LABELS["medium"],
+                stem: str | None = None) -> dict | None:
     """Normalise one per-task entry (``results[]``/``tasks[]``).
 
     Entries whose ``task_id`` maps to no medium wave are kept and tagged with
@@ -319,11 +329,15 @@ def _task_entry(entry: dict, fallback_label: str = SUITE_LABELS["medium"]) -> di
         return None
     wave = classify_task_wave(task_id)
     message = entry.get("message")
+    evidence = _fn_status(stem, task_id) if stem else None
+    passed = bool(entry.get("passed")) or evidence is not None
+    rescored = _fn_label(evidence) if evidence else None
     return {
         "task_id": str(task_id),
         "wave": wave,
         "label": WAVES[wave][0] if wave in WAVES else fallback_label,
-        "passed": bool(entry.get("passed")),
+        "passed": passed,
+        "rescored": rescored,
         "message": "" if message is None else str(message),
         "error": "" if entry.get("error") is None else str(entry.get("error")),
         "elapsed_seconds": _num(entry.get("elapsed_seconds")),
@@ -339,7 +353,7 @@ def _empty_usage() -> dict:
 _TASK_NUM_RE = re.compile(r"task_(\d+)")
 
 
-def _artifact_task_numbers(data: dict) -> dict[int, bool]:
+def _artifact_task_numbers(data: dict, stem: str | None = None) -> dict[int, bool]:
     r"""Map task number -> passed for one run artifact ({} when none parseable).
 
     Mirrors ``build_fork_home._TASK_NUM_RE``: the number comes from the entry's
@@ -359,7 +373,10 @@ def _artifact_task_numbers(data: dict) -> dict[int, bool]:
             match = _TASK_NUM_RE.search(str(entry.get("task_id") or ""))
             number = int(match.group(1)) if match else None
         if number is not None:
-            numbers[int(number)] = bool(entry.get("passed"))
+            passed = bool(entry.get("passed"))
+            if stem and _fn_status(stem, entry.get("task_id")) is not None:
+                passed = True
+            numbers[int(number)] = passed
     return numbers
 
 
@@ -407,7 +424,7 @@ def _collect_suite_details(result_dirs, known_ids) -> dict[str, list]:
         label = SUITE_LABELS[suite]
         bucket = details.setdefault(rid, [])
         for entry in _artifact_entries(data):
-            normalised = _task_entry(entry, label)
+            normalised = _task_entry(entry, label, stem=stem)
             if normalised is not None:
                 bucket.append(normalised)
     return details
@@ -488,8 +505,8 @@ def build_model(result_dirs: list[Path] | None = None) -> dict:
         group["wave_artifacts"][wave].append(
             {
                 "name": name,
-                "numbers": _artifact_task_numbers(data),
-                "summary_passed": int(summary.get("passed") or 0),
+                "numbers": _artifact_task_numbers(data, stem),
+                "summary_passed": int(_fn_summary(stem, summary).get("passed") or 0),
                 "summary_total": int(summary.get("total") or 0),
             }
         )
@@ -515,7 +532,7 @@ def build_model(result_dirs: list[Path] | None = None) -> dict:
             rid = row_id(harness, model, classify_profile(stem))
             bucket = tasks_by_id.setdefault(rid, [])
             for entry in entries:
-                normalised = _task_entry(entry)
+                normalised = _task_entry(entry, stem=stem)
                 if normalised is not None:
                     bucket.append(normalised)
         # Per-task wall-clock time for this run's wave (ours) — ``results`` only,
@@ -1132,7 +1149,7 @@ def render_run_page(row: dict, details: dict, locale: str = DEFAULT_LOCALE) -> s
         for task in tasks:
             message = task.get("message") or ""
             error = task.get("error") or ""
-            result = "pass" if task.get("passed") else "fail"
+            result = task.get("rescored") or ("pass" if task.get("passed") else "fail")
             task_rows.append(
                 "<tr>"
                 f'<td>{_esc(task.get("task_id"))}</td>'
