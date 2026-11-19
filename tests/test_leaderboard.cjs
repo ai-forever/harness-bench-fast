@@ -4,7 +4,7 @@ const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboar
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 103);
+assert.equal(light.length, 99);
 assert.equal(medium.length, 79);
 assert.equal(selectResults(data, "medium", "current", "").length, 22);
 for (const rows of [light, medium]) {
@@ -12,7 +12,7 @@ for (const rows of [light, medium]) {
 }
 assert.equal(light.find(r => r.id === "secret-700-sft").result.passed, 368);
 assert.equal(medium.find(r => r.id === "secret-700-sft").result.passed, 9);
-assert.equal(selectResults(data, "light", "historical", "  CODEX ").length, 4);
+assert.equal(selectResults(data, "light", "historical", "  CODEX ").length, 3);
 assert.equal(selectResults(data, "light", "historical", "no-such-model").length, 0);
 assert.equal(formatPassed(390), "390");
 assert.equal(formatPassed(389 + 1 / 3), "389.3");
@@ -191,7 +191,7 @@ assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.pa
 const medium90 = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/medium90-results.json")));
 const currentData = { ...data, medium90 };
 const ranked90 = selectResults(currentData, "medium", "current", "");
-assert.equal(ranked90.length, 17);
+assert.equal(ranked90.length, 12);
 assert.ok(ranked90.every(row => row.result.total === 90));
 assert.deepEqual(selectResults(currentData, "medium", "current", "haiku").map(row => row.result.passed), [63, 60]);
 assert.deepEqual(selectResults(currentData, "light", "current", ""), selectResults(data, "light", "current", ""));
@@ -273,3 +273,11 @@ assert.equal(ouroLight.measurement_valid, false);
 assert.equal(ouroLight.status, "withdrawn");
 assert.equal(ouroLight.passed, 203);
 assert.equal(ouroLight.outcomes.length, 391);
+
+const opd = selectResults(data, "light", "current", "secret-37-opd", true);
+assert.equal(opd.length, 1);
+assert.equal(opd[0].runs, 4);
+assert.deepEqual(opd[0].result, { passed: 376, total: 391 });
+assert.equal(selectResults(data, "light", "current", "secret-37-opd", false).length, 0);
+assert.ok(!data.rows.some(row => row.id.startsWith("secret-37-1711-")));
+assert.ok(!currentData.medium90.rows.some(row => row.id.startsWith("secret-37-1711-")));

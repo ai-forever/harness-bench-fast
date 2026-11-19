@@ -178,7 +178,7 @@ def test_published_landing_scores_preserve_all_source_totals_and_missing_wave19(
     composites = [row for row in data["rows"] if row.get("measurement_type") == "historical_plus_wave19"]
     assert len(historical) == 78 and len(full) == 12
     assert len(new_only) == 13 and len(composites) == 3
-    assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 121 + sum(r["model"] == "secret-37-1711" for r in data["rows"])
+    assert len(data["rows"]) == len({row["id"] for row in data["rows"]}) == 122
     astra = next(row for row in data["rows"] if row["id"] == "astra-pi-medium")
     assert astra["light"] is None and astra["medium_historical"] is None
     assert astra["medium"]["passed"] == 58 and astra["medium"]["total"] == 80
@@ -233,7 +233,7 @@ def test_landing_provenance_is_independent_of_checkout_line_endings(tmp_path):
         text = (root / "docs" / name).read_text(encoding="utf-8")
         assert "\n" in text
         (docs / name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
-    for path in (root / "docs").glob("secret-37-1711-*-light-202611*.json"):
+    for path in (root / "docs").glob("secret-37-opd-light.json"):
         text = path.read_text(encoding="utf-8")
         (docs / path.name).write_bytes(text.replace("\n", "\r\n").encode("utf-8"))
     build.__globals__["ROOT"] = tmp_path

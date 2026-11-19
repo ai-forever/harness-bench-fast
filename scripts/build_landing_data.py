@@ -459,42 +459,37 @@ def build():
             "medium": None, "medium_historical": None,
             "telemetry": {"light": measurement["usage"]},
         })
-    retained_sources = {}
-    for path in sorted((ROOT / "docs").glob("secret-37-1711-*-light-202611*.json")):
-        measured = json.loads(path.read_text(encoding="utf-8"))
-        outcomes = measured["outcomes"]
-        if (measured["total"] != 391 or len(outcomes) != 391
-                or {t["number"] for t in outcomes} != set(range(1, 392))
-                or sum(t["passed"] for t in outcomes) != measured["passed"]):
-            raise ValueError(f"Incomplete or invalid Light measurement: {path.name}")
-        harness = measured.get("harness_key", "pi")
-        sha = hashlib.sha256(path.read_text(encoding="utf-8").encode("utf-8")).hexdigest()
-        retained_sources[f"secret_37_1711_{harness}_light_sha256"] = sha
-        if measured.get("status") == "withdrawn" and measured["measurement_valid"] is False:
-            continue
-        if not measured["measurement_valid"] or measured.get("status") == "withdrawn":
-            raise ValueError(f"Incomplete or invalid Light measurement: {path.name}")
-        complete = measured["token_complete_tasks"] == 391 and measured["missing_usage_responses"] == 0
-        usage = {"tasks": 391, "observed_tasks": 391,
-                 "steps": {"value": measured["steps"], "covered_tasks": 391,
-                           "status": "complete" if measured.get("steps_complete_tasks", 391) == 391 else "partial",
-                           "unit": "tool_calls",
-                           **({"lower_bound": True} if measured.get("steps_complete_tasks", 391) < 391 else {})},
-                 "tokens": {"value": measured["tokens"], "input_tokens": measured["input_tokens"],
-                            "output_tokens": measured["output_tokens"], "covered_tasks": 391,
-                            "status": "complete" if complete else "partial", "lower_bound": not complete},
-                 "notes": [measured["counter_note"]], "sources_sha256": [sha]}
-        rows.append({"id": f"secret-37-1711-{harness}", "model": measured["model"],
-                     "harness": measured["harness"], "secret_model": True, "runs": 1,
-                     "reasoning_effort": measured["reasoning_effort"], "source_version": measured["task_set_version"],
-                     "measurement_valid": True, "details_url": f"secret-37-1711-{harness}-light.html",
-                     "light": {"passed": measured["passed"], "total": 391},
-                     "medium": None, "medium_historical": None, "telemetry": {"light": usage}})
+    opd_path = ROOT / "docs/secret-37-opd-light.json"
+    opd_text = opd_path.read_text(encoding="utf-8")
+    opd = json.loads(opd_text)
+    runs = opd["runs"]
+    if (len(runs) != 4 or any(
+        len(run["outcomes"]) != 391
+        or {t["number"] for t in run["outcomes"]} != set(range(1, 392))
+        or sum(t["passed"] for t in run["outcomes"]) != run["passed"]
+        for run in runs
+    )):
+        raise ValueError("Incomplete secret-37-opd Light coverage")
+    opd_sha = hashlib.sha256(opd_text.encode("utf-8")).hexdigest()
+    rows.append({
+        "id": "secret-37-opd", "model": "secret-37-opd", "harness": opd["harness"],
+        "secret_model": True, "runs": len(runs), "reasoning_effort": opd["reasoning_effort"],
+        "source_version": opd["task_set_version"], "measurement_valid": True,
+        "details_url": "secret-37-opd-light.html",
+        "light": {"passed": sum(run["passed"] for run in runs) / len(runs), "total": 391},
+        "medium": None, "medium_historical": None,
+        "telemetry": {"light": {
+            "tasks": 391, "observed_tasks": 391,
+            "tokens": {"value": sum(run["tokens"] for run in runs) / len(runs),
+                       "status": "complete", "covered_tasks": 391},
+            "notes": ["Mean tokens per run from Pi usage."], "sources_sha256": [opd_sha],
+        }},
+    })
     return {
         "task_set_version": "0.19", "light_tasks": 391, "medium_tasks": 80,
         "wave21_task_set_version": "0.21.2", "wave21_tasks": 10,
         "provenance": {
-            **retained_sources,
+            "secret_37_opd_light_sha256": opd_sha,
             "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs plus three complete Claude Haiku harness runs; v0.19 protocol revisions grouped for display, exact source_version retained per row; composites explicitly labeled; secret sft deepagents accepted by the operator",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
             "wave21_results_sha256": hashlib.sha256((ROOT / "docs/wave21-results.json").read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
