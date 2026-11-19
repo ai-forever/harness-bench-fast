@@ -4,7 +4,7 @@ const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboar
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 104);
+assert.equal(light.length, 103);
 assert.equal(medium.length, 79);
 assert.equal(selectResults(data, "medium", "current", "").length, 22);
 for (const rows of [light, medium]) {
@@ -266,11 +266,10 @@ assert.equal(ouroDev.harness, "Ouroboros 7.11.1-alpha.0 (Development)");
 assert.equal(ouroDev.usage.tokens.value, 1144165427);
 assert.equal(ouroDev.usage.tokens.lower_bound, true);
 
-const ouroLight = light.find(row => row.id === "secret-37-1711-ouroboros");
-assert.equal(ouroLight.result.passed, 203);
-assert.equal(ouroLight.result.total, 391);
-assert.equal(ouroLight.medium, null);
-assert.equal(ouroLight.secret_model, true);
-assert.equal(ouroLight.usage.tokens.value, 434049641);
-assert.equal(ouroLight.usage.tokens.status, "partial");
-assert.equal(ouroLight.usage.steps.status, "partial");
+// Withdrawn integration-defective Light run stays historical, never ranked.
+assert.equal(light.find(row => row.id === "secret-37-1711-ouroboros"), undefined);
+const ouroLight = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/secret-37-1711-ouroboros-light-20261118.json"), "utf8"));
+assert.equal(ouroLight.measurement_valid, false);
+assert.equal(ouroLight.status, "withdrawn");
+assert.equal(ouroLight.passed, 203);
+assert.equal(ouroLight.outcomes.length, 391);
