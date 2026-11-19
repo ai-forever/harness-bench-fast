@@ -5,12 +5,7 @@
   "wave21_task_set_version": "0.21.2",
   "wave21_tasks": 10,
   "provenance": {
-    "secret_37_1711_codex_light_sha256": "8773237ded02b942b14fa2f23c5cd82f133a8050ea6dbb6c6d38d8fcead91976",
-    "secret_37_1711_deepagents_light_sha256": "cf73575735123611685c82f71ff8e237baf1a0546ddf802488971450a75742c6",
-    "secret_37_1711_dsh_light_sha256": "97ae92bc7ad5c8dfbc23a54188c257ec6befaa39f907092d985d276f0f54f379",
-    "secret_37_1711_ouroboros_light_sha256": "a36a8870aa2f97692ad594f8b70d919966e795a0b2028925b53beefb7ea5ddbd",
-    "secret_37_1711_pi_light_sha256": "167177206bd36ed74a4620dbbf4aa19f83549a5f64e5220e1b934c7766fff8fc",
-    "secret_37_1711_strands_light_sha256": "dcd7fe840d15347676b0953ab8c29fc87960c697b2f7c046ab4e133b20193963",
+    "secret_37_opd_light_sha256": "7e9bbb3cbd8c6e5e5464fc002e4b2e929a9b331eb77a3e9a10861cff2820c344",
     "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs plus three complete Claude Haiku harness runs; v0.19 protocol revisions grouped for display, exact source_version retained per row; composites explicitly labeled; secret sft deepagents accepted by the operator",
     "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
     "wave21_results_sha256": "1d35d5b2b0d9b28829b5d27d28f852d6f1f33d768e95df7581ffa0073d299803",
@@ -4854,146 +4849,17 @@
       }
     },
     {
-      "id": "secret-37-1711-codex",
-      "model": "secret-37-1711",
-      "harness": "Codex CLI 0.164.0",
-      "secret_model": true,
-      "runs": 1,
-      "reasoning_effort": "high",
-      "source_version": "0.21.3",
-      "measurement_valid": true,
-      "details_url": "secret-37-1711-codex-light.html",
-      "light": {
-        "passed": 377,
-        "total": 391
-      },
-      "medium": null,
-      "medium_historical": null,
-      "telemetry": {
-        "light": {
-          "tasks": 391,
-          "observed_tasks": 391,
-          "steps": {
-            "value": 1940,
-            "covered_tasks": 391,
-            "status": "complete",
-            "unit": "tool_calls"
-          },
-          "tokens": {
-            "value": 10757477,
-            "input_tokens": 9950984,
-            "output_tokens": 806493,
-            "covered_tasks": 391,
-            "status": "partial",
-            "lower_bound": true
-          },
-          "notes": [
-            "Final retained task executions only. Tokens are API prompt plus completion usage, reasoning included once. Native in-flight transport retries retained; responses without usage make the sum a lower bound. Recovered transient transport errors are not model failures. Steps count upstream function calls. Smoke and superseded executions excluded."
-          ],
-          "sources_sha256": [
-            "8773237ded02b942b14fa2f23c5cd82f133a8050ea6dbb6c6d38d8fcead91976"
-          ]
-        }
-      }
-    },
-    {
-      "id": "secret-37-1711-deepagents",
-      "model": "secret-37-1711",
-      "harness": "DeepAgents 0.6.12",
-      "secret_model": true,
-      "runs": 1,
-      "reasoning_effort": "high",
-      "source_version": "0.21.3",
-      "measurement_valid": true,
-      "details_url": "secret-37-1711-deepagents-light.html",
-      "light": {
-        "passed": 362,
-        "total": 391
-      },
-      "medium": null,
-      "medium_historical": null,
-      "telemetry": {
-        "light": {
-          "tasks": 391,
-          "observed_tasks": 391,
-          "steps": {
-            "value": 3292,
-            "covered_tasks": 391,
-            "status": "complete",
-            "unit": "tool_calls"
-          },
-          "tokens": {
-            "value": 19047722,
-            "input_tokens": 18240640,
-            "output_tokens": 807082,
-            "covered_tasks": 391,
-            "status": "partial",
-            "lower_bound": true
-          },
-          "notes": [
-            "Final retained task executions only. Tokens are API prompt plus completion usage, reasoning included once. Native in-flight transport retries retained; responses without usage make the sum a lower bound. Recovered transient transport errors are not model failures. Steps count upstream function calls. Smoke and superseded executions excluded."
-          ],
-          "sources_sha256": [
-            "cf73575735123611685c82f71ff8e237baf1a0546ddf802488971450a75742c6"
-          ]
-        }
-      }
-    },
-    {
-      "id": "secret-37-1711-dsh",
-      "model": "secret-37-1711",
-      "harness": "DSH 0.2.0-rc.2",
-      "secret_model": true,
-      "runs": 1,
-      "reasoning_effort": "high",
-      "source_version": "0.21.3",
-      "measurement_valid": true,
-      "details_url": "secret-37-1711-dsh-light.html",
-      "light": {
-        "passed": 384,
-        "total": 391
-      },
-      "medium": null,
-      "medium_historical": null,
-      "telemetry": {
-        "light": {
-          "tasks": 391,
-          "observed_tasks": 391,
-          "steps": {
-            "value": 3585,
-            "covered_tasks": 391,
-            "status": "complete",
-            "unit": "tool_calls"
-          },
-          "tokens": {
-            "value": 21920957,
-            "input_tokens": 20834348,
-            "output_tokens": 1086609,
-            "covered_tasks": 391,
-            "status": "partial",
-            "lower_bound": true
-          },
-          "notes": [
-            "Final retained task executions only. Tokens are API prompt plus completion usage, reasoning included once. Native in-flight transport retries retained; responses without usage make the sum a lower bound. Recovered transient transport errors are not model failures. Steps count upstream function calls. Smoke and superseded executions excluded."
-          ],
-          "sources_sha256": [
-            "97ae92bc7ad5c8dfbc23a54188c257ec6befaa39f907092d985d276f0f54f379"
-          ]
-        }
-      }
-    },
-    {
-      "id": "secret-37-1711-pi",
-      "model": "secret-37-1711",
+      "id": "secret-37-opd",
+      "model": "secret-37-opd",
       "harness": "Pi 1.5.2",
       "secret_model": true,
-      "runs": 1,
-      "reasoning_effort": "high",
+      "runs": 4,
+      "reasoning_effort": "medium",
       "source_version": "0.21.3",
       "measurement_valid": true,
-      "details_url": "secret-37-1711-pi-light.html",
+      "details_url": "secret-37-opd-light.html",
       "light": {
-        "passed": 382,
+        "passed": 376.0,
         "total": 391
       },
       "medium": null,
@@ -5002,68 +4868,16 @@
         "light": {
           "tasks": 391,
           "observed_tasks": 391,
-          "steps": {
-            "value": 2657,
-            "covered_tasks": 391,
-            "status": "complete",
-            "unit": "tool_calls"
-          },
           "tokens": {
-            "value": 11576998,
-            "input_tokens": 10742707,
-            "output_tokens": 834291,
-            "covered_tasks": 391,
+            "value": 12816041.5,
             "status": "complete",
-            "lower_bound": false
+            "covered_tasks": 391
           },
           "notes": [
-            "Recovered from message_end assistant events in final retained native stdout JSONL. Steps count unique native toolCall IDs. Tokens sum input, cache reads/writes and output; reasoning is included in output once. Streaming updates, smoke and other suites excluded. Runner aggregate fields were absent because the runner searched a different session directory."
+            "Mean tokens per run from Pi usage."
           ],
           "sources_sha256": [
-            "167177206bd36ed74a4620dbbf4aa19f83549a5f64e5220e1b934c7766fff8fc"
-          ]
-        }
-      }
-    },
-    {
-      "id": "secret-37-1711-strands",
-      "model": "secret-37-1711",
-      "harness": "Strands Agents 1.58.0",
-      "secret_model": true,
-      "runs": 1,
-      "reasoning_effort": "high",
-      "source_version": "0.21.3",
-      "measurement_valid": true,
-      "details_url": "secret-37-1711-strands-light.html",
-      "light": {
-        "passed": 375,
-        "total": 391
-      },
-      "medium": null,
-      "medium_historical": null,
-      "telemetry": {
-        "light": {
-          "tasks": 391,
-          "observed_tasks": 391,
-          "steps": {
-            "value": 2713,
-            "covered_tasks": 391,
-            "status": "complete",
-            "unit": "tool_calls"
-          },
-          "tokens": {
-            "value": 10695091,
-            "input_tokens": 9849297,
-            "output_tokens": 845794,
-            "covered_tasks": 391,
-            "status": "partial",
-            "lower_bound": true
-          },
-          "notes": [
-            "Final retained task executions only. Tokens are API prompt plus completion usage, reasoning included once. Native in-flight transport retries retained; responses without usage make the sum a lower bound. Recovered transient transport errors are not model failures. Steps count upstream function calls. Smoke and superseded executions excluded."
-          ],
-          "sources_sha256": [
-            "dcd7fe840d15347676b0953ab8c29fc87960c697b2f7c046ab4e133b20193963"
+            "7e9bbb3cbd8c6e5e5464fc002e4b2e929a9b331eb77a3e9a10861cff2820c344"
           ]
         }
       }

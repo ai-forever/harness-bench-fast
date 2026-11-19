@@ -323,34 +323,6 @@ def build(root=ROOT):
             components.append(component(numbers, {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
                                         usage, secret["task_set_version"], note))
         rows.append(assemble_row(identity, components))
-    for path in sorted((root / "docs").glob("secret-37-1711-*-medium90-20261117.json")):
-        retained = json.loads(path.read_text(encoding="utf-8"))
-        outcomes = retained["outcomes"]
-        if (not retained["measurement_valid"] or retained["total"] != 90
-                or [r["number"] for r in outcomes] != sorted(NUMBERS)
-                or sum(r["passed"] for r in outcomes) != retained["passed"]):
-            raise ValueError(f"Invalid retained Medium90 result: {path.name}")
-        components = []
-        for numbers in (list(range(392, 472)), SELECTED):
-            subset = [r for r in outcomes if r["number"] in numbers]
-            usage = {"notes": [retained["counter_note"]]}
-            for metric, field in (("steps", "agent_steps"), ("tokens", "agent_total_tokens")):
-                partial = metric == "tokens" and not all(r["token_usage_complete"] for r in subset)
-                usage[metric] = {"value": sum(r[field] for r in subset), "covered_tasks": len(subset),
-                                 "status": "partial" if partial else "complete", "lower_bound": partial}
-            usage["steps"]["unit"] = "native_tool_calls"
-            usage["tokens"].update(input_tokens=sum(r["input_tokens"] for r in subset),
-                                    output_tokens=sum(r["output_tokens"] for r in subset),
-                                    unmetered_requests=sum(r["missing_usage_responses"] for r in subset))
-            components.append(component(numbers, {"total": len(subset), "passed": sum(r["passed"] for r in subset)},
-                                        usage, retained["task_set_version"], "fresh retained Medium90"))
-        key = retained.get("harness_key", "pi")
-        identity = {"id": f"secret-37-1711-{key}-medium", "profile_id": f"secret-37-1711-{key}-medium",
-                    "model": retained["model"], "harness": retained["harness"], "secret_model": True,
-                    "runs": 1, "source_version": retained["task_set_version"], "reasoning_effort": retained["reasoning_effort"],
-                    "measurement_type": "fresh_medium90", "measurement_valid": True,
-                    "details_url": f"secret-37-1711-{key}-medium90.html"}
-        rows.append(assemble_row(identity, components))
     ouro_path = root / "docs/secretmodel-1114-ouroboros-dev-20261118.json"
     ouro = json.loads(ouro_path.read_text(encoding="utf-8"))
     if ([t["number"] for t in ouro["tasks"]] != sorted(NUMBERS)
