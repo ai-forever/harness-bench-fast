@@ -31,7 +31,7 @@ Do not edit by hand — change the script/JSON and rebuild.
 > provider's actual billing**: their ₽ column is the billed amount, not a tariff estimate.
 
 <!-- FORK:RESULTS:BEGIN -->
-Auto-sync: 116 runs
+Auto-sync: 120 runs
 
 | Harness | Suite | Profile | Model | Result | % | Time | Steps | Tokens (cost) |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -64,11 +64,15 @@ Auto-sync: 116 runs
 | OpenClaw | Shot List (52) | thinking: off | DeepSeek-V4.1-Flash (thinking: off) | 50/52 | 96.2% | 37.9m | 244 | 2 718 375 (50₽) |
 | OpenClaw | Shot List (52) | thinking: off | GLM-5.2 (thinking: off) | 47/52 | 90.4% | 231.9m | 247 | 1 777 320 (1 302₽) |
 | OpenClaw | Shot List (52) | — | GLM-5.3 | 44/52 | 84.6% | 46.1m | 148 | 1 955 767 (125₽) |
+| OpenClaw | Shot List (52) | thinking: high | GLM-5.3-FlashX (thinking: high) | 49/52 | 94.2% | 44.3m | 244 | 2 655 706 (76₽) |
 | OpenClaw | Shot List (52) | thinking: high | GPT-5.5 (thinking: high) | 50/52 | 96.2% | 37.0m | 334 | 3 117 683 (2 904₽) |
 | OpenClaw | Shot List (52) | thinking: off | GPT-5.5 (thinking: off) | 51/52 | 98.1% | 30.5m | 267 | 2 756 135 (2 523₽) |
+| OpenClaw | Shot List (52) | thinking: off | GPT-6.1-Sol (thinking: off) | 50/52 | 96.2% | 50.0m | 280 | 2 950 601 (978₽) |
 | OpenClaw | Shot List (52) | — | GPT-OSS-120B | 17/52 | 32.7% | 205.2m | 120 | 1 261 870 (786₽) |
+| OpenClaw | Shot List (52) | thinking: off | Gemini-3.8-Flash (thinking: off) | 52/52 | 100.0% | 54.8m | 472 | 9 000 184 (402₽) |
 | OpenClaw | Shot List (52) | thinking: off | GigaChat 3.5-432B-A28B (thinking: off) | 25/52 | 48.1% | 48.1m | 429 | 6 585 042 (208₽) |
 | OpenClaw | Shot List (52) | thinking: ultra | GigaChat 3.5-432B-A28B (thinking: ultra) | 20/52 | 38.5% | 49.5m | 473 | 8 819 332 (39₽) |
+| OpenClaw | Shot List (52) | thinking: medium | Kimi-K3 (thinking: medium) | 52/52 | 100.0% | 45.6m | 219 | 2 340 020 (581₽) |
 | OpenClaw | Shot List (52) | thinking: medium | MiniMax-M3 (thinking: medium) | 47/52 | 90.4% | 306.9m | 328 | 4 052 449 (1 119₽) |
 | OpenClaw | Shot List (52) | thinking: off | MiniMax-M3 (thinking: off) | 48/52 | 92.3% | 295.4m | 312 | 3 650 102 (972₽) |
 | OpenClaw | Shot List (52) | thinking: ultra | MiniMax-M3 (thinking: ultra) | 46/52 | 88.5% | 52.1m | 305 | 3 892 497 (1 068₽) |

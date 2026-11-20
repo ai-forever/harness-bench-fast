@@ -107,6 +107,34 @@
           "detail": "fork-detail-oc_shotlist_ds41flash_medium_20261107.html"
         },
         {
+          "harness": "OpenClaw 2026.11.2 (b556fdf)",
+          "profile": "thinking: off (2026-11-20)",
+          "model": "Gemini-3.8-Flash (cloud.ru) (thinking: off)",
+          "result": "52/52",
+          "pct": "100.0%",
+          "time": "54.8m",
+          "steps": "472",
+          "tokens_cost": "9 000 184 (402₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-oc_shotlist_gem38flash_off_20261120.html"
+        },
+        {
+          "harness": "OpenClaw 2026.11.2 (b556fdf)",
+          "profile": "thinking: medium (2026-11-20)",
+          "model": "Kimi-K3 (cloud.ru) (thinking: medium)",
+          "result": "52/52",
+          "pct": "100.0%",
+          "time": "45.6m",
+          "steps": "219",
+          "tokens_cost": "2 340 020 (581₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-oc_shotlist_kimik3_medium_20261120.html"
+        },
+        {
           "harness": "DeepSeek Harness 0.2.2-rc.1",
           "profile": "thinking: medium (2026-11-17)",
           "model": "DeepSeek-V4.1-Flash (cloud.ru) (thinking: medium)",
@@ -345,6 +373,20 @@
           "detail": "fork-detail-oc_shotlist_gpt55_high_20261110.html"
         },
         {
+          "harness": "OpenClaw 2026.11.2 (b556fdf)",
+          "profile": "thinking: off (2026-11-20)",
+          "model": "GPT-6.1-Sol (cloud.ru) (thinking: off)",
+          "result": "50/52",
+          "pct": "96.2%",
+          "time": "50.0m",
+          "steps": "280",
+          "tokens_cost": "2 950 601 (978₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-oc_shotlist_gpt61sol_off_20261120.html"
+        },
+        {
           "harness": "Pi 🟣 Pi Agent (Docker + Cloud.ru)",
           "profile": "thinking: max (2026-11-19)",
           "model": "Gemini-3.8-Flash (cloud.ru) (thinking: max)",
@@ -427,6 +469,20 @@
           "source": "ours",
           "waves": null,
           "detail": "fork-detail-hermes_shotlist_ds41flash_off_20261111.html"
+        },
+        {
+          "harness": "OpenClaw 2026.11.2 (b556fdf)",
+          "profile": "thinking: high (2026-11-20)",
+          "model": "GLM-5.3-FlashX (cloud.ru) (thinking: high)",
+          "result": "49/52",
+          "pct": "94.2%",
+          "time": "44.3m",
+          "steps": "244",
+          "tokens_cost": "2 655 706 (76₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-oc_shotlist_glm53flashx_high_20261120.html"
         },
         {
           "harness": "Pi",
