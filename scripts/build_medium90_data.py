@@ -351,20 +351,20 @@ def build(root=ROOT):
         components.append(component(numbers, {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
                                     usage, ouro["task_set_version"], "latest attempts; nondefault adaptive budgets"))
     rows.append(assemble_row(identity, components))
-    tagme_path = root / "docs/claudecode-haiku-tagme-medium90.json"
-    tagme = json.loads(tagme_path.read_text(encoding="utf-8"))
-    measured = {t["number"] for t in tagme["tasks"]}
-    if (len(measured) != len(tagme["tasks"]) or set(NUMBERS) - measured != set(tagme["missing_task_numbers"])
-            or sum(t["passed"] for t in tagme["tasks"]) != tagme["confirmed_passed"]):
-        raise ValueError("Invalid Claude Code TagMe partial task coverage")
-    identity = {"id": "claudecode-haiku-tagme-medium90", "profile_id": "claudecode-haiku-tagme-medium90",
-                "model": tagme["model"], "harness": tagme["harness"] + " (TagMe)", "secret_model": False,
-                "runs": 1, "source_version": tagme["task_set_version"],
-                "reasoning_effort": tagme["reasoning_effort"], "measurement_type": "interrupted_medium90",
-                "measurement_valid": True, "details_url": "claudecode-haiku-tagme-medium90.html"}
+    openrouter_path = root / "docs/claudecode-haiku-openrouter-medium90.json"
+    openrouter = json.loads(openrouter_path.read_text(encoding="utf-8"))
+    measured = {t["number"] for t in openrouter["tasks"]}
+    if (len(measured) != len(openrouter["tasks"]) or set(NUMBERS) - measured != set(openrouter["missing_task_numbers"])
+            or sum(t["passed"] for t in openrouter["tasks"]) != openrouter["confirmed_passed"]):
+        raise ValueError("Invalid Claude Code OpenRouter partial task coverage")
+    identity = {"id": "claudecode-haiku-openrouter-medium90", "profile_id": "claudecode-haiku-openrouter-medium90",
+                "model": openrouter["model"], "harness": openrouter["harness"] + " (OpenRouter)", "secret_model": False,
+                "runs": 1, "source_version": openrouter["task_set_version"],
+                "reasoning_effort": openrouter["reasoning_effort"], "measurement_type": "interrupted_medium90",
+                "measurement_valid": True, "details_url": "claudecode-haiku-openrouter-medium90.html"}
     components = []
     for numbers in (range(392, 472), SELECTED):
-        subset = [t for t in tagme["tasks"] if t["number"] in numbers]
+        subset = [t for t in openrouter["tasks"] if t["number"] in numbers]
         usage = {}
         for metric in ("steps", "tokens"):
             values = [t[metric] for t in subset if t[metric] is not None]
@@ -373,7 +373,7 @@ def build(root=ROOT):
                              "lower_bound": len(values) != len(subset)}
         components.append(component([t["number"] for t in subset],
                                     {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
-                                    usage, tagme["task_set_version"], "Retained valid verdicts after infrastructure retries"))
+                                    usage, openrouter["task_set_version"], "Retained valid verdicts after infrastructure retries"))
     rows.append(assemble_row(identity, components))
     assert len({r["id"] for r in rows}) == len(rows)
     complete = sorted((r for r in rows if r["score"] is not None), key=lambda r: -r["score"])
@@ -389,7 +389,7 @@ def build(root=ROOT):
                        "incompatible_pairs": "Historical DeepAgents GLM/DeepSeek enabled native subagents; new wave21 disabled them. Keep separate profiles. 80/160 graph steps and model API request caps are distinct.",
                        "controls": "Forty wave20 controls and ten unselected calibration tasks excluded from Medium90.",
                        "new_model_calls": 0},
-            "provenance": {"legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path), "haiku_medium90_sha256": fingerprint(fresh_path), "codex_medium90_sha256": fingerprint(codex90_path), "miniswe_medium90_sha256": fingerprint(miniswe90_path), "claudecode_sonnet_medium90_sha256": fingerprint(claudecode_sonnet90_path), "pi_deepseek0731_medium90_sha256": fingerprint(pi0731_path), "claudecode_haiku_tagme_sha256": fingerprint(tagme_path)},
+            "provenance": {"legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path), "haiku_medium90_sha256": fingerprint(fresh_path), "codex_medium90_sha256": fingerprint(codex90_path), "miniswe_medium90_sha256": fingerprint(miniswe90_path), "claudecode_sonnet_medium90_sha256": fingerprint(claudecode_sonnet90_path), "pi_deepseek0731_medium90_sha256": fingerprint(pi0731_path), "claudecode_haiku_openrouter_sha256": fingerprint(openrouter_path)},
             "summary": {"rows": len(rows), "ranked_rows": len(complete),
                         "coverage": {str(n): sum(r["measured_tasks"] == n for r in rows) for n in sorted({r["measured_tasks"] for r in rows})}},
             "rows": rows}

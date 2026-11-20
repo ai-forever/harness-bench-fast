@@ -5,7 +5,6 @@
   "model": "Claude Haiku 5.5",
   "model_id": "anthropic/claude-haiku-5.5",
   "harness": "Claude Code 2.1.278",
-  "gateway": "TagMe Anthropic Messages",
   "reasoning_effort": "default",
   "temperature": "default",
   "concurrency": 16,
@@ -528,5 +527,14 @@
   "recovered_task_numbers": [
     401,
     409
-  ]
+  ],
+  "provider_label": "OpenRouter",
+  "first_attempt_usage": {
+    "total_tokens": 104345716,
+    "tasks": 90,
+    "runner_reported_tokens": 104212513,
+    "trace_recovered_tokens": 133203,
+    "trace_recovered_task": 527,
+    "scope": "First task attempts only, including unaccepted verdicts. Usage is limited to counters recorded in the artifacts."
+  }
 }
