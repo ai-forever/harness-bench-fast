@@ -10,16 +10,14 @@
   "temperature": "default",
   "concurrency": 16,
   "task_count": 90,
-  "confirmed_passed": 58,
+  "confirmed_passed": 59,
   "missing_task_numbers": [
     393,
     395,
     399,
-    401,
     405,
     406,
-    408,
-    409
+    408
   ],
   "tasks": [
     {
@@ -59,6 +57,12 @@
       "tokens": 9664838
     },
     {
+      "number": 401,
+      "passed": true,
+      "steps": 94,
+      "tokens": 5667626
+    },
+    {
       "number": 402,
       "passed": false,
       "steps": 137,
@@ -81,6 +85,12 @@
       "passed": false,
       "steps": 265,
       "tokens": 2173772
+    },
+    {
+      "number": 409,
+      "passed": false,
+      "steps": 218,
+      "tokens": 2339016
     },
     {
       "number": 410,
@@ -514,5 +524,9 @@
       "steps": 68,
       "tokens": 3538056
     }
+  ],
+  "recovered_task_numbers": [
+    401,
+    409
   ]
 }
