@@ -111,16 +111,18 @@
     "codex_medium90_sha256": "11d8d93639ca7dc291b1d22e3a85d511e4a282a128b32b54b269892e7ad0cb25",
     "miniswe_medium90_sha256": "3102410c5b7f96e16f793f6f4a0dae5268b2ea60d4e657a51cf09f8d70bfd3bc",
     "claudecode_sonnet_medium90_sha256": "e86d2d4062ea4291c95e19119683ad7600eba73343ff19e4fb55339e17479b44",
-    "pi_deepseek0731_medium90_sha256": "bcce79bb9238cb1b396af802f70786e6f25d0048f8d00b1fd5e2a7cfd051c112"
+    "pi_deepseek0731_medium90_sha256": "bcce79bb9238cb1b396af802f70786e6f25d0048f8d00b1fd5e2a7cfd051c112",
+    "claudecode_haiku_tagme_sha256": "5a8c0d656cb02a6da4d116039ff428694842b09dd0c284f689c4bda544b59760"
   },
   "summary": {
-    "rows": 129,
+    "rows": 130,
     "ranked_rows": 12,
     "coverage": {
       "1": 1,
       "10": 8,
       "40": 89,
       "80": 19,
+      "82": 1,
       "90": 12
     }
   },
@@ -19769,6 +19771,167 @@
           "completed_responses_accounting_complete": true,
           "unmetered_requests": 335,
           "unmetered_requests_accounting_complete": true
+        }
+      }
+    },
+    {
+      "id": "claudecode-haiku-tagme-medium90",
+      "profile_id": "claudecode-haiku-tagme-medium90",
+      "model": "Claude Haiku 5.5",
+      "harness": "Claude Code 2.1.278 (TagMe)",
+      "secret_model": false,
+      "runs": 1,
+      "source_version": "0.21.3",
+      "reasoning_effort": "default",
+      "measurement_type": "interrupted_medium90",
+      "measurement_valid": true,
+      "details_url": "claudecode-haiku-tagme-medium90.html",
+      "previous": {
+        "passed": 51,
+        "measured": 72,
+        "total": 80,
+        "scope_note": "Retained valid verdicts after infrastructure retries"
+      },
+      "wave21": {
+        "passed": 7,
+        "measured": 10,
+        "total": 10,
+        "scope_note": "Retained valid verdicts after infrastructure retries"
+      },
+      "components": [
+        {
+          "task_numbers": [
+            392,
+            394,
+            396,
+            397,
+            398,
+            400,
+            402,
+            403,
+            404,
+            407,
+            410,
+            411,
+            412,
+            413,
+            414,
+            415,
+            416,
+            417,
+            418,
+            419,
+            420,
+            421,
+            422,
+            423,
+            424,
+            425,
+            426,
+            427,
+            428,
+            429,
+            430,
+            431,
+            432,
+            433,
+            434,
+            435,
+            436,
+            437,
+            438,
+            439,
+            440,
+            441,
+            442,
+            443,
+            444,
+            445,
+            446,
+            447,
+            448,
+            449,
+            450,
+            451,
+            452,
+            453,
+            454,
+            455,
+            456,
+            457,
+            458,
+            459,
+            460,
+            461,
+            462,
+            463,
+            464,
+            465,
+            466,
+            467,
+            468,
+            469,
+            470,
+            471
+          ],
+          "passed": 51,
+          "source_version": "0.21.3",
+          "note": "Retained valid verdicts after infrastructure retries"
+        },
+        {
+          "task_numbers": [
+            512,
+            518,
+            520,
+            522,
+            523,
+            524,
+            525,
+            526,
+            527,
+            530
+          ],
+          "passed": 7,
+          "source_version": "0.21.3",
+          "note": "Retained valid verdicts after infrastructure retries"
+        }
+      ],
+      "measured_tasks": 82,
+      "target_tasks": 90,
+      "missing_task_numbers": [
+        393,
+        395,
+        399,
+        401,
+        405,
+        406,
+        408,
+        409
+      ],
+      "observed_passed": 58,
+      "overall_passed": null,
+      "score": null,
+      "rank": null,
+      "status": "partial",
+      "usage": {
+        "tasks": 90,
+        "observed_tasks": 82,
+        "notes": [
+          "Retained public measurement counters only. Missing tasks are unmeasured, not failures.",
+          "Task counts show counter availability, not full request-level accounting."
+        ],
+        "sources_sha256": [],
+        "steps": {
+          "value": 4289,
+          "covered_tasks": 81,
+          "status": "partial",
+          "lower_bound": true
+        },
+        "tokens": {
+          "value": 103691531,
+          "covered_tasks": 81,
+          "status": "partial",
+          "lower_bound": true
         }
       }
     }
