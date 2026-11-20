@@ -717,11 +717,24 @@ Rows are sorted by pass count.
 | OpenClaw | thinking: off (2026-08-13) | GPT-OSS-120B | 17/52 | 32.7% | 205.2m | 120 | 1,261,870 (1,080₽) |
 | Pi | — (2026-11-07) | GigaChat 3 Pro | 16/52 | 30.8% | 25.7m | 2,034 | 12,883,705 (230₽) |
 | deepagents | GigaChat (2026-07-29) | GigaChat 3 Lightning | 10/52 | 19.2% | 8.3m | 318 | 427,026 |
+| DeepSeek Harness | thinking: medium (2026-11-20) | Kimi-K3 | 52/52 | 100.0% | 27.0m | 211 | 1,275,039 (287₽) |
+| DeepSeek Harness | thinking: off (2026-11-20) | Gemini-3.8-Flash | 52/52 | 100.0% | 49.1m | 469 | 3,296,914 (220₽) |
+| Pi | thinking: off (2026-11-19) | Gemini-3.8-Flash | 51/52 | 98.1% | 83.3m | 511 | 2,267,300 (206₽) |
+| Pi | thinking: medium (2026-11-19) | GPT-6.1-Sol | 51/52 | 98.1% | 20.7m | 243 | 437,490 (146₽) |
+| Pi | thinking: max (2026-11-19) | Kimi-K3 | 51/52 | 98.1% | 32.7m | 223 | 522,344 (213₽) |
+| DeepSeek Harness | thinking: max (2026-11-20) | GLM-5.3-FlashX | 51/52 | 98.1% | 23.2m | 281 | 2,070,362 (66₽) |
+| Pi | thinking: max (2026-11-19) | GLM-5.3-FlashX | 49/52 | 94.2% | 11.8m | 258 | 517,470 (22₽) |
+| DeepSeek Harness | thinking: off (2026-11-20) | GPT-6.1-Sol | 49/52 | 94.2% | 44.6m | 333 | 1,669,883 (369₽) |
 
 The shot list separates models into clear tiers: \**>90%** (Kimi, Pi, Hermes,
 Claude, OpenClaw thinking:off), **88-90%** (OpenClaw thinking:high, Hermes
 thinking:off), **75-80%** (opencode, OpenClaw Qwen3.6), **50-60%** (DeepSeek), **25-35%**
 (GPT-OSS, GigaChat 3.5/Pro), and **<20%** (GigaChat Lightning).
+
+Cloud.ru batch (2026-11-19/20): **Kimi-K3** and **Gemini-3.8-Flash** reach **52/52 (100%)**
+on the DeepSeek Harness — the only new runs to match DeepSeek-V4.1-Flash at the ceiling;
+**GLM-5.3-FlashX** and **GPT-6.1-Sol** peak at **51/52 (98.1%)** (GLM on the DeepSeek Harness,
+GPT on Pi). Gemini-3.8-Flash reaches 100% at a heavy token cost on higher reasoning levels.
 
 OpenClaw with GPT-OSS-120B scores 17/52 (32.7%) — ahead of deepagents' 13/52
 (25.0%) with the same model, showing the OpenClaw agent loop adds +7.7 pp over
