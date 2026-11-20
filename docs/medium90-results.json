@@ -112,7 +112,7 @@
     "miniswe_medium90_sha256": "3102410c5b7f96e16f793f6f4a0dae5268b2ea60d4e657a51cf09f8d70bfd3bc",
     "claudecode_sonnet_medium90_sha256": "e86d2d4062ea4291c95e19119683ad7600eba73343ff19e4fb55339e17479b44",
     "pi_deepseek0731_medium90_sha256": "bcce79bb9238cb1b396af802f70786e6f25d0048f8d00b1fd5e2a7cfd051c112",
-    "claudecode_haiku_tagme_sha256": "c6ecfeb68b9b16622894728bc50fa845975fcbfe2bc4db27f4acc9b48cac1eb6"
+    "claudecode_haiku_openrouter_sha256": "d84e281976e2cf2536c062088d602214a852510dfad0f5b68f46a16e129a62fc"
   },
   "summary": {
     "rows": 130,
@@ -19775,17 +19775,17 @@
       }
     },
     {
-      "id": "claudecode-haiku-tagme-medium90",
-      "profile_id": "claudecode-haiku-tagme-medium90",
+      "id": "claudecode-haiku-openrouter-medium90",
+      "profile_id": "claudecode-haiku-openrouter-medium90",
       "model": "Claude Haiku 5.5",
-      "harness": "Claude Code 2.1.278 (TagMe)",
+      "harness": "Claude Code 2.1.278 (OpenRouter)",
       "secret_model": false,
       "runs": 1,
       "source_version": "0.21.3",
       "reasoning_effort": "default",
       "measurement_type": "interrupted_medium90",
       "measurement_valid": true,
-      "details_url": "claudecode-haiku-tagme-medium90.html",
+      "details_url": "claudecode-haiku-openrouter-medium90.html",
       "previous": {
         "passed": 52,
         "measured": 74,

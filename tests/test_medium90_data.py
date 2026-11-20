@@ -60,7 +60,7 @@ def test_complete_compatible_components_score_but_missing_or_unverified_do_not()
 
 def test_payload_provenance_is_portable_across_line_endings(tmp_path):
     (tmp_path / "docs").mkdir()
-    for name in ("claudecode-haiku-tagme-medium90.json", "secretmodel-1114-ouroboros-dev-20261118.json", "pi-deepseek0731-medium90-20261114.json", "secretmodel-1114.json", "leaderboard-results.json", "wave21-results.json", "haiku-medium90.json", "codex-deepseek-medium90-20261027.json", "miniswe-deepseek-medium90-20261027.json", "claudecode-sonnet-medium90-20261027.json"):
+    for name in ("claudecode-haiku-openrouter-medium90.json", "secretmodel-1114-ouroboros-dev-20261118.json", "pi-deepseek0731-medium90-20261114.json", "secretmodel-1114.json", "leaderboard-results.json", "wave21-results.json", "haiku-medium90.json", "codex-deepseek-medium90-20261027.json", "miniswe-deepseek-medium90-20261027.json", "claudecode-sonnet-medium90-20261027.json"):
         content = (ROOT / "docs" / name).read_text(encoding="utf-8")
         (tmp_path / "docs" / name).write_bytes(content.replace("\n", "\r\n").encode("utf-8"))
     assert build(tmp_path) == build()
