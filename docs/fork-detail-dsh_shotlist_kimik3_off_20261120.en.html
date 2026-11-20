@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DeepSeek Harness 0.2.2-rc.1 · Kimi-K3 (cloud.ru) (thinking: off) · fork run detail</title>
+  <link rel="stylesheet" href="landing.css">
+  <style>.msg pre{white-space:pre-wrap;word-break:break-word;max-height:280px;overflow:auto;margin:.3rem 0 0}</style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="index.html">harness_bench_fast<span class="brand-dot">.</span></a>
+    <nav aria-label="Primary"><a href="fork.en.html#shotlist">← Fork results</a> <a class="lang-switch" href="fork-detail-dsh_shotlist_kimik3_off_20261120.html" title="Переключить на русский">RU</a></nav>
+  </header>
+  <main>
+    <section class="intro">
+      <p class="eyebrow">Fork run detail</p>
+      <h1>DeepSeek Harness 0.2.2-rc.1 · Kimi-K3 (cloud.ru) (thinking: off)</h1>
+      <p class="lead">Profile: thinking: off (2026-11-20) · Version: 0.16.0 · Result: 50/52 (96.2%) · Time: 39.4m · Steps: 235 · Tokens (cost): 1 555 801 (398₽)</p>
+    </section>
+    <h2>Tasks (52)</h2>
+    <div class="table-wrap">
+      <table class="leaderboard-table"><thead><tr>
+        <th scope="col" class="numeric">#</th><th scope="col">Task</th><th scope="col">Result</th>
+        <th scope="col" class="numeric">Seconds</th><th scope="col" class="numeric">Tokens</th><th scope="col">Message</th>
+      </tr></thead><tbody>
+<tr><td class="numeric">1</td><td>task_01_create_hello</td><td>PASS</td><td class="numeric">14.3</td><td class="numeric">15 440</td><td>hello.py ran and produced expected output</td></tr>
+<tr><td class="numeric">2</td><td>task_24_add_header_comment</td><td>PASS</td><td class="numeric">22.2</td><td class="numeric">27 199</td><td>src/a.py matches /\A# \(c\) 2026 Acme Inc\./; src/b.py matches /\A# \(c\) 2026 Acme Inc\./; src/a.py contains all expected substrings; src/b.py contains all expected substrings</td></tr>
+<tr><td class="numeric">3</td><td>task_03_slugify</td><td>PASS</td><td class="numeric">50.8</td><td class="numeric">30 188</td><td>src/utils.py: mod.slugify(&#x27;Hello, World!&#x27;) == &#x27;hello-world&#x27;; src/utils.py: mod.slugify(&#x27;Foo Bar Baz&#x27;) == &#x27;foo-bar-baz&#x27;</td></tr>
+<tr><td class="numeric">4</td><td>task_41_count_todos</td><td>PASS</td><td class="numeric">26.3</td><td class="numeric">21 162</td><td>count.txt matches expected content</td></tr>
+<tr><td class="numeric">5</td><td>task_48_append_eof_each</td><td>PASS</td><td class="numeric">27.4</td><td class="numeric">21 475</td><td>all logs/*.log end with EOF and keep original content</td></tr>
+<tr><td class="numeric">6</td><td>task_63_nested_json_edit</td><td>PASS</td><td class="numeric">22.7</td><td class="numeric">26 197</td><td>database.host updated, other fields intact</td></tr>
+<tr><td class="numeric">7</td><td>task_69_remove_comments</td><td>PASS</td><td class="numeric">14.3</td><td class="numeric">15 512</td><td>script.py lines match</td></tr>
+<tr><td class="numeric">8</td><td>task_92_count_chars</td><td>PASS</td><td class="numeric">13.8</td><td class="numeric">15 348</td><td>count.txt matches expected content</td></tr>
+<tr><td class="numeric">9</td><td>task_101_csv_mean_score</td><td>PASS</td><td class="numeric">23.2</td><td class="numeric">15 993</td><td>mean.txt matches expected content</td></tr>
+<tr><td class="numeric">10</td><td>task_104_csv_join</td><td>PASS</td><td class="numeric">28.1</td><td class="numeric">21 963</td><td>joined.csv matches expected content</td></tr>
+<tr><td class="numeric">11</td><td>task_106_csv_group_count</td><td>PASS</td><td class="numeric">19.6</td><td class="numeric">16 157</td><td>counts.csv matches expected content</td></tr>
+<tr><td class="numeric">12</td><td>task_140_grep_emails</td><td>PASS</td><td class="numeric">17.1</td><td class="numeric">20 794</td><td>emails.txt has all four unique emails</td></tr>
+<tr><td class="numeric">13</td><td>task_157_two_csv_diff</td><td>PASS</td><td class="numeric">21.3</td><td class="numeric">21 648</td><td>diff files have the expected names</td></tr>
+<tr><td class="numeric">14</td><td>task_153_xlsx_to_markdown_report</td><td>PASS</td><td class="numeric">31.8</td><td class="numeric">27 925</td><td>report.md has the three regions with correct totals</td></tr>
+<tr><td class="numeric">15</td><td>task_159_unzip_extract</td><td>PASS</td><td class="numeric">16.8</td><td class="numeric">15 898</td><td>archive.zip extracted to extracted/ with all three files</td></tr>
+<tr><td class="numeric">16</td><td>task_201_reconcile_vip_users</td><td>PASS</td><td class="numeric">30.7</td><td class="numeric">24 071</td><td>vip_users.json matches expected JSON</td></tr>
+<tr><td class="numeric">17</td><td>task_214_customer_data_quality_report</td><td>PASS</td><td class="numeric">16.4</td><td class="numeric">16 251</td><td>dq_report.json matches expected quality checks</td></tr>
+<tr><td class="numeric">18</td><td>task_206_reconcile_paid_revenue</td><td>PASS</td><td class="numeric">39.3</td><td class="numeric">32 440</td><td>vip_revenue.csv matches expected rows</td></tr>
+<tr><td class="numeric">19</td><td>task_222_memory_name_pyproject</td><td>PASS</td><td class="numeric">31.6</td><td class="numeric">25 176</td><td>name saved to MEMORY.md and used in pyproject.toml</td></tr>
+<tr><td class="numeric">20</td><td>task_223_memory_city_timezone_script</td><td>PASS</td><td class="numeric">30.4</td><td class="numeric">35 567</td><td>city saved; now.py uses Moscow tz and prints HH:MM</td></tr>
+<tr><td class="numeric">21</td><td>task_226_memory_requirements_dev</td><td>PASS</td><td class="numeric">17.2</td><td class="numeric">17 390</td><td>requirements-dev.txt lists the user&#x27;s dev tools</td></tr>
+<tr><td class="numeric">22</td><td>task_240_memory_summarize_profile</td><td>PASS</td><td class="numeric">16.2</td><td class="numeric">17 457</td><td>summary.txt is concise and includes key facts</td></tr>
+<tr><td class="numeric">23</td><td>task_231_memory_refuse_secrets</td><td>PASS</td><td class="numeric">38.4</td><td class="numeric">25 212</td><td>secrets not leaked; Anthropic fact saved correctly</td></tr>
+<tr><td class="numeric">24</td><td>task_263_terminal_du_top_dirs</td><td>PASS</td><td class="numeric">20.8</td><td class="numeric">15 882</td><td>reports/top_dirs.tsv lines match</td></tr>
+<tr><td class="numeric">25</td><td>task_266_terminal_sha256_manifest</td><td>PASS</td><td class="numeric">23.8</td><td class="numeric">21 722</td><td>SHA256SUMS matches payload files</td></tr>
+<tr><td class="numeric">26</td><td>task_270_tau2_bank_duplicate_charge</td><td>PASS</td><td class="numeric">21.2</td><td class="numeric">16 211</td><td>bank_action.json matches expected JSON (free text: (&#x27;reason_code&#x27;,))</td></tr>
+<tr><td class="numeric">27</td><td>task_272_tau2_clinic_reschedule</td><td>PASS</td><td class="numeric">18.1</td><td class="numeric">16 512</td><td>clinic_action.json matches expected JSON</td></tr>
+<tr><td class="numeric">28</td><td>task_307_resolve_many_files</td><td>PASS</td><td class="numeric">34.2</td><td class="numeric">30 766</td><td>mod01.py free of forbidden substrings; mod01.py lines match; mod02.py free of forbidden substrings; mod02.py lines match; mod03.py free of forbidden substrings; mod03.py lines match; mod04.py free of forbidden substrings; mod04.py lines match; mod05.py free of forbidden substrings; mod05.py lines match; mod06.py free of forbidden substrings; mod06.py lines match; mod07.py free of forbidden substrings; mod07.py lines match; mod08.py free of forbidden substrings; mod08.py lines match; mod09.py free of forbidden substrings; mod09.py lines match; mod10.py free of forbidden substrings; mod10.py lines match; mod11.py free of forbidden substrings; mod11.py lines match; mod12.py free of forbidden substrings; mod12.py lines match; pytest tests/ passed</td></tr>
+<tr><td class="numeric">29</td><td>task_309_rename_refactor_scale</td><td>PASS</td><td class="numeric">53.2</td><td class="numeric">52 709</td><td>lib.py free of forbidden substrings; c1.py free of forbidden substrings; c2.py free of forbidden substrings; c3.py free of forbidden substrings; c4.py free of forbidden substrings; c5.py free of forbidden substrings; c6.py free of forbidden substrings; c7.py free of forbidden substrings; c8.py free of forbidden substrings; c9.py free of forbidden substrings; c10.py free of forbidden substrings; c11.py free of forbidden substrings; c12.py free of forbidden substrings; pytest tests/ passed</td></tr>
+<tr><td class="numeric">30</td><td>task_315_skill_b1_failure_codebook</td><td>PASS</td><td class="numeric">31.9</td><td class="numeric">18 489</td><td>all 8 failure reasons normalized to the correct codes</td></tr>
+<tr><td class="numeric">31</td><td>task_319_skill_b2_ndr7_parse</td><td>PASS</td><td class="numeric">33.8</td><td class="numeric">23 145</td><td>all NDR-7 records parsed with correct signed amounts</td></tr>
+<tr><td class="numeric">32</td><td>task_332_adv_broken_build</td><td>PASS</td><td class="numeric">21.7</td><td class="numeric">21 959</td><td>dist/bundle.txt lines match</td></tr>
+<tr><td class="numeric">33</td><td>task_335_adv_missing_config_file</td><td>PASS</td><td class="numeric">37.6</td><td class="numeric">22 774</td><td>contradiction reported in NOTES.md (honest deferral)</td></tr>
+<tr><td class="numeric">34</td><td>task_323_skill_g1_create_slugify_skill</td><td>PASS</td><td class="numeric">105.1</td><td class="numeric">73 925</td><td>skills/slugify-tool/SKILL.md matches /^name:\s*[\&quot;&#x27;]?slugify-tool[\&quot;&#x27;]?\s*$/; skills/slugify-tool/SKILL.md matches /review-status:\s*[\&quot;&#x27;]?draft[\&quot;&#x27;]?/; skills/slugify-tool/TESTS.md matches /[a-z0-9]+(?:-[a-z0-9]+)+/; skills/slugify-tool/scripts/slugify.py: mod.slugify(&#x27;Hello, World!&#x27;) == &#x27;hello-world&#x27;; skills/slugify-tool/scripts/slugify.py: mod.slugify(&#x27;Foo  Bar Baz&#x27;) == &#x27;foo-bar-baz&#x27;</td></tr>
+<tr><td class="numeric">35</td><td>task_352_structured_log_summary</td><td>PASS</td><td class="numeric">36.9</td><td class="numeric">17 439</td><td>summary.json matches expected JSON</td></tr>
+<tr><td class="numeric">36</td><td>task_355_segment_audit</td><td>PASS</td><td class="numeric">24.1</td><td class="numeric">22 233</td><td>audit.json matches expected JSON</td></tr>
+<tr><td class="numeric">37</td><td>task_353_reconstruct_sessions</td><td>PASS</td><td class="numeric">57.5</td><td class="numeric">26 365</td><td>sessions.csv matches expected CSV</td></tr>
+<tr><td class="numeric">38</td><td>task_357_request_latency</td><td>PASS</td><td class="numeric">33.0</td><td class="numeric">23 880</td><td>latency.csv matches expected CSV</td></tr>
+<tr><td class="numeric">39</td><td>task_356_deduplicate_contacts</td><td>FAIL</td><td class="numeric">73.8</td><td class="numeric">36 254</td><td>contacts_clean.json JSON mismatch: expected [{&#x27;canonical_id&#x27;: &#x27;u1&#x27;, &#x27;email&#x27;: &#x27;anna.alt@example.com&#x27;, &#x27;phone&#x27;: &#x27;+3725550199&#x27;, &#x27;name&#x27;: &#x27;A. K.&#x27;, &#x27;source_ids&#x27;: [&#x27;u1&#x27;, &#x27;u10&#x27;, &#x27;u11&#x27;, &#x27;u9&#x27;]}, {&#x27;canonical_id&#x27;: &#x27;u2&#x27;, &#x27;email&#x27;: &#x27;&#x27;, &#x27;phone&#x27;: &#x27;+3725550102&#x27;, &#x27;name&#x27;: &#x27;Boris&#x27;, &#x27;source_ids&#x27;: [&#x27;u2&#x27;, &#x27;u7&#x27;]}], got [{&#x27;id&#x27;: &#x27;u1&#x27;, &#x27;name&#x27;: &#x27;A. K.&#x27;, &#x27;email&#x27;: &#x27;anna.alt@example.com&#x27;, &#x27;phone&#x27;: &#x27;+3725550199&#x27;, &#x27;source_ids&#x27;: [&#x27;u1&#x27;, &#x27;u10&#x27;, &#x27;u11&#x27;, &#x27;u9&#x27;]}, {&#x27;id&#x27;: &#x27;u2&#x27;, &#x27;name&#x27;: &#x27;Boris&#x27;, &#x27;email&#x27;: &#x27;&#x27;, &#x27;phone&#x27;: &#x27;+3725550102&#x27;, &#x27;source_ids&#x27;: [&#x27;u2&#x27;, &#x27;u7&#x27;]}]</td></tr>
+<tr><td class="numeric">40</td><td>task_365_package_rename</td><td>PASS</td><td class="numeric">132.4</td><td class="numeric">62 907</td><td>blueledger absent; greenledger/__init__.py exists; greenledger/api.py matches exactly; greenledger/client.py matches exactly; greenledger/plugins/__init__.py matches exactly; greenledger/plugins/report.py matches exactly; app.py matches exactly; tests/test_api.py matches exactly; tests/test_client.py matches exactly; pyproject.toml matches exactly; README.md matches exactly; docs/current.md matches exactly; Dockerfile matches exactly; .github/workflows/test.yml matches exactly; CHANGELOG.md matches exactly; tests/data/legacy_blueledger.json matches exactly; migrations/legacy_blueledger.sql matches exactly</td></tr>
+<tr><td class="numeric">41</td><td>task_358_range_parser</td><td>PASS</td><td class="numeric">241.1</td><td class="numeric">43 199</td><td>ranges.py:parse_ranges passed all cases</td></tr>
+<tr><td class="numeric">42</td><td>task_370_change_plan</td><td>PASS</td><td class="numeric">62.7</td><td class="numeric">34 921</td><td>app.py matches exactly; config.env matches exactly; README.md matches exactly; notes.txt matches exactly; applied.json matches expected JSON</td></tr>
+<tr><td class="numeric">43</td><td>task_371_test_result_aggregation</td><td>FAIL</td><td class="numeric">30.0</td><td class="numeric">23 466</td><td>report.json JSON mismatch: expected {&#x27;total&#x27;: 6, &#x27;attempts_total&#x27;: 9, &#x27;passed&#x27;: 3, &#x27;failed&#x27;: 2, &#x27;skipped&#x27;: 1, &#x27;failed_tests&#x27;: [&#x27;test_auth&#x27;, &#x27;test_export&#x27;], &#x27;retried_tests&#x27;: [&#x27;test_auth&#x27;, &#x27;test_login&#x27;, &#x27;test_search&#x27;], &#x27;flaky_tests&#x27;: [&#x27;test_search&#x27;], &#x27;slowest&#x27;: [{&#x27;name&#x27;: &#x27;test_export&#x27;, &#x27;duration_ms&#x27;: 900}, {&#x27;name&#x27;: &#x27;test_search&#x27;, &#x27;duration_ms&#x27;: 420}, {&#x27;name&#x27;: &#x27;test_auth&#x27;, &#x27;duration_ms&#x27;: 250}]}, got {&#x27;total&#x27;: 6, &#x27;passed&#x27;: 3, &#x27;failed&#x27;: 2, &#x27;skipped&#x27;: 1, &#x27;attempts_total&#x27;: 9, &#x27;failed_tests&#x27;: [&#x27;test_auth&#x27;, &#x27;test_export&#x27;], &#x27;retried_tests&#x27;: [&#x27;test_auth&#x27;, &#x27;test_login&#x27;, &#x27;test_search&#x27;], &#x27;flaky_tests&#x27;: [&#x27;test_search&#x27;], &#x27;slowest&#x27;: [{&#x27;name&#x27;: &#x27;test_export&#x27;, &#x27;duration_ms&#x27;: 900}, {&#x27;name&#x27;: &#x27;test_search&#x27;, &#x27;duration_ms&#x27;: 420}, {&#x27;name&#x27;: &#x27;test_login&#x27;, &#x27;duration_ms&#x27;: 100}]}</td></tr>
+<tr><td class="numeric">44</td><td>task_368_sqlite_migration</td><td>PASS</td><td class="numeric">180.0</td><td class="numeric">67 637</td><td>SQLite migration is correct and idempotent</td></tr>
+<tr><td class="numeric">45</td><td>task_374_cli_pktool_filter_decode</td><td>PASS</td><td class="numeric">31.6</td><td class="numeric">31 397</td><td>flows.csv matches expected rows</td></tr>
+<tr><td class="numeric">46</td><td>task_375_cli_pktool_stats_corrupt</td><td>PASS</td><td class="numeric">36.8</td><td class="numeric">31 702</td><td>proto_stats.json matches expected JSON</td></tr>
+<tr><td class="numeric">47</td><td>task_378_cli_cfgctl_layered_merge</td><td>PASS</td><td class="numeric">42.7</td><td class="numeric">32 522</td><td>effective.env matches expected output</td></tr>
+<tr><td class="numeric">48</td><td>task_381_cli_slicer_restock</td><td>PASS</td><td class="numeric">41.9</td><td class="numeric">26 243</td><td>restock.csv matches expected rows</td></tr>
+<tr><td class="numeric">49</td><td>task_382_cli_mixed_depwalk_hotspots</td><td>PASS</td><td class="numeric">58.8</td><td class="numeric">49 552</td><td>solve.sh ran; hotspots.csv matches expected output</td></tr>
+<tr><td class="numeric">50</td><td>task_383_cli_mixed_pktool_ports</td><td>PASS</td><td class="numeric">64.7</td><td class="numeric">85 189</td><td>solve.sh ran; ports.tsv matches expected output</td></tr>
+<tr><td class="numeric">51</td><td>task_384_cli_mixed_slicer_warehouse_value</td><td>PASS</td><td class="numeric">79.2</td><td class="numeric">57 001</td><td>solve.sh ran; warehouse_value.csv matches expected output</td></tr>
+<tr><td class="numeric">52</td><td>task_389_cli_find_xargs_predicates</td><td>PASS</td><td class="numeric">167.9</td><td class="numeric">63 337</td><td>solve.sh ran; big_logs.csv matches expected output</td></tr>
+      </tbody></table>
+    </div>
+    <p class="fine-print">No LLM judge. Every task is checked mechanically. Source: <code></code>. <a href="fork.en.html#shotlist">← Fork results</a></p>
+  </main>
+</body>
+</html>

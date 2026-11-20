@@ -23,6 +23,76 @@
           "detail": "fork-detail-dsh_shotlist_ds41flash_max_20261118.html"
         },
         {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: max (2026-11-20)",
+          "model": "Gemini-3.8-Flash (cloud.ru) (thinking: max)",
+          "result": "52/52",
+          "pct": "100.0%",
+          "time": "142.0m",
+          "steps": "1 046",
+          "tokens_cost": "30 152 903 (1 051₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_gem38flash_max_20261120.html"
+        },
+        {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: medium (2026-11-20)",
+          "model": "Gemini-3.8-Flash (cloud.ru) (thinking: medium)",
+          "result": "52/52",
+          "pct": "100.0%",
+          "time": "119.5m",
+          "steps": "764",
+          "tokens_cost": "15 087 535 (666₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_gem38flash_medium_20261120.html"
+        },
+        {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: off (2026-11-20)",
+          "model": "Gemini-3.8-Flash (cloud.ru) (thinking: off)",
+          "result": "52/52",
+          "pct": "100.0%",
+          "time": "49.1m",
+          "steps": "469",
+          "tokens_cost": "3 296 914 (220₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_gem38flash_off_20261120.html"
+        },
+        {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: max (2026-11-20)",
+          "model": "Kimi-K3 (cloud.ru) (thinking: max)",
+          "result": "52/52",
+          "pct": "100.0%",
+          "time": "43.4m",
+          "steps": "251",
+          "tokens_cost": "1 668 265 (423₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_kimik3_max_20261120.html"
+        },
+        {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: medium (2026-11-20)",
+          "model": "Kimi-K3 (cloud.ru) (thinking: medium)",
+          "result": "52/52",
+          "pct": "100.0%",
+          "time": "27.0m",
+          "steps": "211",
+          "tokens_cost": "1 275 039 (287₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_kimik3_medium_20261120.html"
+        },
+        {
           "harness": "OpenClaw 2026.10.9 (8b18b55)",
           "profile": "thinking: medium (2026-11-07)",
           "model": "DeepSeek-V4.1-Flash (cloud.ru) (thinking: medium)",
@@ -63,6 +133,20 @@
           "source": "ours",
           "waves": null,
           "detail": "fork-detail-dsh_shotlist_ds41flash_off_20261111.html"
+        },
+        {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: max (2026-11-20)",
+          "model": "GLM-5.3-FlashX (cloud.ru) (thinking: max)",
+          "result": "51/52",
+          "pct": "98.1%",
+          "time": "23.2m",
+          "steps": "281",
+          "tokens_cost": "2 070 362 (66₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_glm53flashx_max_20261120.html"
         },
         {
           "harness": "OpenClaw 2026.10.9 (8b18b55)",
@@ -205,6 +289,20 @@
           "detail": "fork-detail-pi_shotlist_sonnet45_20261114.html"
         },
         {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: off (2026-11-20)",
+          "model": "Kimi-K3 (cloud.ru) (thinking: off)",
+          "result": "50/52",
+          "pct": "96.2%",
+          "time": "39.4m",
+          "steps": "235",
+          "tokens_cost": "1 555 801 (398₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_kimik3_off_20261120.html"
+        },
+        {
           "harness": "OpenClaw",
           "profile": "— (2026-11-07)",
           "model": "DeepSeek-V4.1-Flash (cloud.ru)",
@@ -301,6 +399,20 @@
           "source": "ours",
           "waves": null,
           "detail": "fork-detail-pi_sonnet46_shotlist_medium_20261114.html"
+        },
+        {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: off (2026-11-20)",
+          "model": "GPT-6.1-Sol (cloud.ru) (thinking: off)",
+          "result": "49/52",
+          "pct": "94.2%",
+          "time": "44.6m",
+          "steps": "333",
+          "tokens_cost": "1 669 883 (369₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_gpt61sol_off_20261120.html"
         },
         {
           "harness": "Hermes Agent v0.23.1 (2026.9.24) · stable · local 3b4215785882",
@@ -427,6 +539,20 @@
           "source": "ours",
           "waves": null,
           "detail": "fork-detail-pi_shotlist_sonnet46_off_20261113.html"
+        },
+        {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: max (2026-11-20)",
+          "model": "GPT-6.1-Sol (cloud.ru) (thinking: max)",
+          "result": "48/52",
+          "pct": "92.3%",
+          "time": "106.6m",
+          "steps": "447",
+          "tokens_cost": "2 525 980 (625₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_gpt61sol_max_20261120.html"
         },
         {
           "harness": "OpenClaw 2026.11.2 (b556fdf)",
@@ -583,6 +709,34 @@
           "detail": "fork-detail-pi_shotlist_glm53flashx_low_20261119.html"
         },
         {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: high (2026-11-20)",
+          "model": "GLM-5.3-FlashX (cloud.ru) (thinking: high)",
+          "result": "44/52",
+          "pct": "84.6%",
+          "time": "14.3m",
+          "steps": "205",
+          "tokens_cost": "1 216 084 (31₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_glm53flashx_high_20261120.html"
+        },
+        {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: medium (2026-11-20)",
+          "model": "GPT-6.1-Sol (cloud.ru) (thinking: medium)",
+          "result": "44/52",
+          "pct": "84.6%",
+          "time": "121.4m",
+          "steps": "360",
+          "tokens_cost": "1 801 431 (333₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_gpt61sol_medium_20261120.html"
+        },
+        {
           "harness": "OpenClaw",
           "profile": "— (2026-11-04)",
           "model": "GLM-5.3 (cloud.ru)",
@@ -595,6 +749,20 @@
           "source": "ours",
           "waves": null,
           "detail": "fork-detail-oc_shotlist_glm53.html"
+        },
+        {
+          "harness": "DeepSeek Harness 0.2.2-rc.1",
+          "profile": "thinking: low (2026-11-20)",
+          "model": "GLM-5.3-FlashX (cloud.ru) (thinking: low)",
+          "result": "43/52",
+          "pct": "82.7%",
+          "time": "17.1m",
+          "steps": "217",
+          "tokens_cost": "1 305 013 (32₽)",
+          "version": "0.16.0",
+          "source": "ours",
+          "waves": null,
+          "detail": "fork-detail-dsh_shotlist_glm53flashx_low_20261120.html"
         },
         {
           "harness": "Pi",

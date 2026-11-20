@@ -31,13 +31,25 @@ Do not edit by hand — change the script/JSON and rebuild.
 > provider's actual billing**: their ₽ column is the billed amount, not a tariff estimate.
 
 <!-- FORK:RESULTS:BEGIN -->
-Auto-sync: 104 runs
+Auto-sync: 116 runs
 
 | Harness | Suite | Profile | Model | Result | % | Time | Steps | Tokens (cost) |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | DeepSeek Harness | Shot List (52) | thinking: max | DeepSeek-V4.1-Flash (thinking: max) | 52/52 | 100.0% | 84.1m | 438 | 7 106 700 (217₽) |
 | DeepSeek Harness | Shot List (52) | thinking: medium | DeepSeek-V4.1-Flash (thinking: medium) | 51/52 | 98.1% | 22.4m | 269 | 2 032 131 (45₽) |
 | DeepSeek Harness | Shot List (52) | thinking: off | DeepSeek-V4.1-Flash (thinking: off) | 51/52 | 98.1% | 19.1m | 266 | 1 975 401 (43₽) |
+| DeepSeek Harness | Shot List (52) | thinking: high | GLM-5.3-FlashX (thinking: high) | 44/52 | 84.6% | 14.3m | 205 | 1 216 084 (31₽) |
+| DeepSeek Harness | Shot List (52) | thinking: low | GLM-5.3-FlashX (thinking: low) | 43/52 | 82.7% | 17.1m | 217 | 1 305 013 (32₽) |
+| DeepSeek Harness | Shot List (52) | thinking: max | GLM-5.3-FlashX (thinking: max) | 51/52 | 98.1% | 23.2m | 281 | 2 070 362 (66₽) |
+| DeepSeek Harness | Shot List (52) | thinking: max | GPT-6.1-Sol (thinking: max) | 48/52 | 92.3% | 106.6m | 447 | 2 525 980 (625₽) |
+| DeepSeek Harness | Shot List (52) | thinking: medium | GPT-6.1-Sol (thinking: medium) | 44/52 | 84.6% | 121.4m | 360 | 1 801 431 (333₽) |
+| DeepSeek Harness | Shot List (52) | thinking: off | GPT-6.1-Sol (thinking: off) | 49/52 | 94.2% | 44.6m | 333 | 1 669 883 (369₽) |
+| DeepSeek Harness | Shot List (52) | thinking: max | Gemini-3.8-Flash (thinking: max) | 52/52 | 100.0% | 142.0m | 1 046 | 30 152 903 (1 051₽) |
+| DeepSeek Harness | Shot List (52) | thinking: medium | Gemini-3.8-Flash (thinking: medium) | 52/52 | 100.0% | 119.5m | 764 | 15 087 535 (666₽) |
+| DeepSeek Harness | Shot List (52) | thinking: off | Gemini-3.8-Flash (thinking: off) | 52/52 | 100.0% | 49.1m | 469 | 3 296 914 (220₽) |
+| DeepSeek Harness | Shot List (52) | thinking: max | Kimi-K3 (thinking: max) | 52/52 | 100.0% | 43.4m | 251 | 1 668 265 (423₽) |
+| DeepSeek Harness | Shot List (52) | thinking: medium | Kimi-K3 (thinking: medium) | 52/52 | 100.0% | 27.0m | 211 | 1 275 039 (287₽) |
+| DeepSeek Harness | Shot List (52) | thinking: off | Kimi-K3 (thinking: off) | 50/52 | 96.2% | 39.4m | 235 | 1 555 801 (398₽) |
 | DeepSeek Harness | Medium (392-471) | thinking: off | DeepSeek-V4.1-Flash (thinking: off) | 39/40 | 97.5% | 161.8m | 727 | 20 621 016 (494₽) |
 | DeepSeek Harness | Medium (392-471) | thinking: off | DeepSeek-V4.1-Flash (thinking: off) | 16/20 | 80.0% | 95.8m | 379 | 8 316 142 (206₽) |
 | DeepSeek Harness | Medium (392-471) | thinking: off | DeepSeek-V4.1-Flash (thinking: off) | 5/6 | 83.3% | 244.9m | 436 | 74 296 407 (979₽) |
