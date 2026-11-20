@@ -31,7 +31,7 @@ Do not edit by hand — change the script/JSON and rebuild.
 > provider's actual billing**: their ₽ column is the billed amount, not a tariff estimate.
 
 <!-- FORK:RESULTS:BEGIN -->
-Auto-sync: 92 runs
+Auto-sync: 104 runs
 
 | Harness | Suite | Profile | Model | Result | % | Time | Steps | Tokens (cost) |
 | --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -101,12 +101,24 @@ Auto-sync: 92 runs
 | Pi | Shot List (52) | — | DeepSeek-V4.1-Flash | 49/52 | 94.2% | 21.3m | 330 | 1 438 179 (42₽) |
 | Pi | Shot List (52) | thinking: off | GLM-5.2 (thinking: off) | 49/52 | 94.2% | 102.8m | 388 | 1 913 439 (377₽) |
 | Pi | Shot List (52) | — | GLM-5.3 | 49/52 | 94.2% | 64.9m | 349 | 1 764 093 (221₽) |
+| Pi | Shot List (52) | thinking: high | GLM-5.3-FlashX (thinking: high) | 46/52 | 88.5% | 12.2m | 262 | 540 292 (24₽) |
+| Pi | Shot List (52) | thinking: low | GLM-5.3-FlashX (thinking: low) | 45/52 | 86.5% | 10.5m | 235 | 405 974 (16₽) |
+| Pi | Shot List (52) | thinking: max | GLM-5.3-FlashX (thinking: max) | 49/52 | 94.2% | 11.8m | 258 | 517 470 (22₽) |
 | Pi | Shot List (52) | thinking: high | GPT-5.5 (thinking: high) | 49/52 | 94.2% | 11.6m | 299 | 467 135 (569₽) |
 | Pi | Shot List (52) | thinking: off | GPT-5.5 (thinking: off) | 48/52 | 92.3% | 9.0m | 300 | 433 896 (497₽) |
+| Pi | Shot List (52) | thinking: max | GPT-6.1-Sol (thinking: max) | 51/52 | 98.1% | 26.8m | 293 | 589 808 (190₽) |
+| Pi | Shot List (52) | thinking: medium | GPT-6.1-Sol (thinking: medium) | 51/52 | 98.1% | 20.7m | 243 | 437 490 (146₽) |
+| Pi | Shot List (52) | thinking: off | GPT-6.1-Sol (thinking: off) | 51/52 | 98.1% | 21.2m | 248 | 460 633 (156₽) |
+| Pi | Shot List (52) | thinking: max | Gemini-3.8-Flash (thinking: max) | 50/52 | 96.2% | 179.8m | 879 | 8 747 589 (578₽) |
+| Pi | Shot List (52) | thinking: medium | Gemini-3.8-Flash (thinking: medium) | 50/52 | 96.2% | 149.9m | 644 | 4 067 191 (372₽) |
+| Pi | Shot List (52) | thinking: off | Gemini-3.8-Flash (thinking: off) | 51/52 | 98.1% | 83.3m | 511 | 2 267 300 (206₽) |
 | Pi | Shot List (52) | — | GigaChat 3 Pro | 16/52 | 30.8% | 25.7m | 2 034 | 12 883 705 (957₽) |
 | Pi | Shot List (52) | thinking: high | GigaChat 3.5 Reasoning (thinking: high) | 34/52 | 65.4% | 33.8m | 1 160 | 3 796 473 (436₽) |
 | Pi | Shot List (52) | thinking: low | GigaChat 3.5 Reasoning (thinking: low) | 35/52 | 67.3% | 15.8m | 1 116 | 3 041 748 (352₽) |
 | Pi | Shot List (52) | thinking: medium | GigaChat 3.5 Reasoning (thinking: medium) | 34/52 | 65.4% | 19.2m | 1 176 | 2 974 629 (354₽) |
+| Pi | Shot List (52) | thinking: max | Kimi-K3 (thinking: max) | 51/52 | 98.1% | 32.7m | 223 | 522 344 (213₽) |
+| Pi | Shot List (52) | thinking: medium | Kimi-K3 (thinking: medium) | 51/52 | 98.1% | 38.0m | 225 | 551 804 (236₽) |
+| Pi | Shot List (52) | thinking: off | Kimi-K3 (thinking: off) | 51/52 | 98.1% | 40.9m | 239 | 614 257 (259₽) |
 | Pi | Shot List (52) | — | Qwen3.6-35B-A3B | 42/52 | 80.8% | 18.5m | 327 | 1 318 346 (299₽) |
 | Pi | Medium (392-471) | thinking: medium | Claude Sonnet 4.6 (thinking: medium) | 21/40 | 52.5% | 474.7m | 2 770 | 84 810 504 (9 525₽) |
 | Pi | Medium (392-471) | thinking: medium | Claude Sonnet 4.6 (thinking: medium) | 14/20 | 70.0% | 97.4m | 1 492 | 11 603 358 (1 293₽) |

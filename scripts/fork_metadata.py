@@ -43,6 +43,11 @@ HARNESS_PREFIXES: tuple[tuple[str, str], ...] = (
 )
 
 MODEL_TOKENS: tuple[tuple[str, str], ...] = (
+    # Cloud.ru new-model batch (2026-11-19) — specific tokens BEFORE their bases
+    ("glm53flashx",  "GLM-5.3-FlashX"),
+    ("gpt61sol",     "GPT-6.1-Sol"),
+    ("kimik3",       "Kimi-K3"),
+    ("gem38flash",   "Gemini-3.8-Flash"),
     ("sonnet46",     "Claude Sonnet 4.6"),
     ("sonnet45",     "Claude Sonnet 4.5"),
     ("opus55",       "Claude Opus 5.5"),

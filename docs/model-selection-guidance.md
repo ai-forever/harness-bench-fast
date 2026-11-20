@@ -25,6 +25,11 @@
   задача.
 - **Харнесс влияет на результат не меньше модели**: одна и та же модель на разных харнессах даёт
   разные score/время/шаги. Выбирайте **пару** (harness × model), а не «модель вообще».
+- **Cloud.ru batch (2026-11-19, Pi, 52 задачи):** `GLM-5.3-FlashX` — самый дешёвый
+  (≈0.45 ₽/решённую задачу, 49/52 на `max`); `GPT-6.1-Sol` и `Kimi-K3` держат **51/52 стабильно на
+  всех уровнях** (off/medium/max), но дороже (~3–5 ₽/задача); `Gemini-3.8-Flash` — **runaway токенов**
+  на высоком reasoning (2.3M→8.8M токенов off→max) при падении score (51→50/52) и худшем ₽/задача.
+  Ни одна из новых моделей не бьёт DeepSeek-V4.1-Flash по ₽/решённую задачу.
 - **Чего в данных нет:** `wave21 (hard-coupled)` не измерен вовсе; long-волна покрыта лишь
   частично (6/20); Light-391 — 3 прогона. Такие клетки помечены `unmeasured`, а не «fail».
 
@@ -34,36 +39,48 @@
 `scripts/build_model_selection.py`. Руками не редактировать — правь данные/скрипт и пересобирай.
 
 <!-- MSEL:BEGIN -->
-Автосинк: 90 строк (вкл. 0/N) · тиры — пер-бакет по ₽/решённую задачу · ✅ — точка на фронте Парето (внутри одного набора)
+Автосинк: 102 строк (вкл. 0/N) · тиры — пер-бакет по ₽/решённую задачу · ✅ — точка на фронте Парето (внутри одного набора)
 
 | Bucket | Harness | Model | Tier | Result | Cost/solved | Basis | Min | Steps | Pareto | Stem |
 | --- | --- | --- | :-: | ---: | ---: | :-: | ---: | ---: | :-: | --- |
 | Shot List (52) | OpenClaw | DeepSeek-V4.1-Flash (thinking: medium) | Default | 52/52 | 1.07₽ | est. | 40.6 | 224 | ✅ | `oc_shotlist_ds41flash_medium_20261107` |
-| Shot List (52) | DeepSeek Harness | DeepSeek-V4.1-Flash (thinking: off) ★ | Default | 51/52 | 0.84₽ | est. | 19.1 | 266 | ✅ | `dsh_shotlist_ds41flash_off_20261111` |
+| Shot List (52) | DeepSeek Harness | DeepSeek-V4.1-Flash (thinking: off) | Default | 51/52 | 0.84₽ | est. | 19.1 | 266 | ✅ | `dsh_shotlist_ds41flash_off_20261111` |
+| Shot List (52) | Pi | GLM-5.3-FlashX (thinking: max) | Default | 49/52 | 0.45₽ | est. | 11.8 | 258 | ✅ | `pi_shotlist_glm53flashx_max_20261119` |
+| Shot List (52) | Pi | GLM-5.3-FlashX (thinking: low) ★ | Default | 45/52 | 0.36₽ | est. | 10.5 | 235 | ✅ | `pi_shotlist_glm53flashx_low_20261119` |
 | Shot List (52) | DeepSeek Harness | DeepSeek-V4.1-Flash (thinking: max) | Default | 52/52 | 4.18₽ | est. | 84.1 | 438 | — | `dsh_shotlist_ds41flash_max_20261118` |
 | Shot List (52) | DeepSeek Harness | DeepSeek-V4.1-Flash (thinking: medium) | Default | 51/52 | 0.88₽ | est. | 22.4 | 269 | — | `dsh_shotlist_ds41flash_medium_20261117` |
 | Shot List (52) | OpenClaw | DeepSeek-V4.1-Flash (thinking: high) | Default | 51/52 | 1.06₽ | est. | 40.3 | 244 | — | `oc_shotlist_ds41flash_high_20261107` |
+| Shot List (52) | Pi | GPT-6.1-Sol (thinking: medium) | Default | 51/52 | 2.87₽ | est. | 20.7 | 243 | — | `pi_shotlist_gpt61sol_medium_20261119` |
+| Shot List (52) | Pi | GPT-6.1-Sol (thinking: off) | Default | 51/52 | 3.06₽ | est. | 21.2 | 248 | — | `pi_shotlist_gpt61sol_off_20261119` |
+| Shot List (52) | Pi | GPT-6.1-Sol (thinking: max) | Default | 51/52 | 3.73₽ | est. | 26.8 | 293 | — | `pi_shotlist_gpt61sol_max_20261119` |
+| Shot List (52) | Pi | Gemini-3.8-Flash (thinking: off) | Default | 51/52 | 4.04₽ | est. | 83.3 | 511 | — | `pi_shotlist_gem38flash_off_20261119` |
+| Shot List (52) | Pi | Kimi-K3 (thinking: max) | Default | 51/52 | 4.17₽ | est. | 32.7 | 223 | — | `pi_shotlist_kimik3_max_20261119` |
+| Shot List (52) | Pi | Kimi-K3 (thinking: medium) | Balanced | 51/52 | 4.63₽ | est. | 38.0 | 225 | — | `pi_shotlist_kimik3_medium_20261119` |
+| Shot List (52) | Pi | Kimi-K3 (thinking: off) | Balanced | 51/52 | 5.08₽ | est. | 40.9 | 239 | — | `pi_shotlist_kimik3_off_20261119` |
 | Shot List (52) | Pi | Claude Sonnet 4.5 (thinking: n/a) | Premium | 51/52 | 20.79₽ | billing | 25.7 | 1352 | — | `pi_shotlist_sonnet45_20261114` |
 | Shot List (52) | OpenClaw | GPT-5.5 (thinking: off) | Premium | 51/52 | 49.47₽ | est. | 30.5 | 267 | — | `oc_shotlist_gpt55_off_20261110` |
 | Shot List (52) | OpenClaw | DeepSeek-V4.1-Flash (thinking: off) | Default | 50/52 | 1.01₽ | est. | 37.9 | 244 | — | `oc_shotlist_ds41flash_off_20261107` |
-| Shot List (52) | OpenClaw | DeepSeek-V4.1-Flash (thinking: n/a) | Default | 50/52 | 4.43₽ | est. | 47.3 | 237 | — | `oc_shotlist_ds41flash` |
-| Shot List (52) | Pi | Claude Sonnet 4.6 (thinking: medium) | Balanced | 50/52 | 14.98₽ | est. | 14.3 | 1056 | — | `pi_sonnet46_shotlist_medium_20261114` |
-| Shot List (52) | Pi | Claude Sonnet 4.6 (thinking: n/a) | Balanced | 50/52 | 15.16₽ | est. | 14.6 | 1060 | — | `pi_sonnet46_shotlist_20261113` |
+| Shot List (52) | OpenClaw | DeepSeek-V4.1-Flash (thinking: n/a) | Balanced | 50/52 | 4.43₽ | est. | 47.3 | 237 | — | `oc_shotlist_ds41flash` |
+| Shot List (52) | Pi | Gemini-3.8-Flash (thinking: medium) | Balanced | 50/52 | 7.43₽ | est. | 149.9 | 644 | — | `pi_shotlist_gem38flash_medium_20261119` |
+| Shot List (52) | Pi | Gemini-3.8-Flash (thinking: max) | Balanced | 50/52 | 11.55₽ | est. | 179.8 | 879 | — | `pi_shotlist_gem38flash_max_20261119` |
+| Shot List (52) | Pi | Claude Sonnet 4.6 (thinking: medium) | Premium | 50/52 | 14.98₽ | est. | 14.3 | 1056 | — | `pi_sonnet46_shotlist_medium_20261114` |
+| Shot List (52) | Pi | Claude Sonnet 4.6 (thinking: n/a) | Premium | 50/52 | 15.16₽ | est. | 14.6 | 1060 | — | `pi_sonnet46_shotlist_20261113` |
 | Shot List (52) | OpenClaw | GPT-5.5 (thinking: high) | Premium | 50/52 | 58.07₽ | est. | 37.0 | 334 | — | `oc_shotlist_gpt55_high_20261110` |
 | Shot List (52) | Pi | DeepSeek-V4.1-Flash (thinking: n/a) | Default | 49/52 | 0.85₽ | est. | 21.3 | 330 | — | `pi_shotlist_ds41flash` |
-| Shot List (52) | Pi | GLM-5.3 (thinking: n/a) | Default | 49/52 | 4.51₽ | est. | 64.9 | 349 | — | `pi_shotlist_glm53` |
-| Shot List (52) | Hermes | DeepSeek-V4.1-Flash (thinking: off) | Default | 49/52 | 5.90₽ | est. | 22.0 | 221 | — | `hermes_shotlist_ds41flash_off_20261111` |
+| Shot List (52) | Pi | GLM-5.3 (thinking: n/a) | Balanced | 49/52 | 4.51₽ | est. | 64.9 | 349 | — | `pi_shotlist_glm53` |
+| Shot List (52) | Hermes | DeepSeek-V4.1-Flash (thinking: off) | Balanced | 49/52 | 5.90₽ | est. | 22.0 | 221 | — | `hermes_shotlist_ds41flash_off_20261111` |
 | Shot List (52) | Pi | GLM-5.2 (thinking: off) | Balanced | 49/52 | 7.69₽ | est. | 102.8 | 388 | — | `pi_shotlist_glm52_thinking_off` |
 | Shot List (52) | Pi | GPT-5.5 (thinking: high) | Balanced | 49/52 | 11.61₽ | est. | 11.6 | 299 | — | `pi_shotlist_gpt55_high_20261110` |
 | Shot List (52) | Pi | Claude Sonnet 4.6 (thinking: n/a) | Balanced | 49/52 | 13.33₽ | billing | 14.0 | 996 | — | `pi_shotlist_sonnet46_20261114` |
-| Shot List (52) | Pi | Claude Opus 4.8 (thinking: n/a) | Balanced | 49/52 | 15.60₽ | billing | 12.3 | 808 | — | `pi_shotlist_opus48_20261114` |
-| Shot List (52) | Pi | Claude Sonnet 4.6 (thinking: off) | Balanced | 49/52 | 16.71₽ | est. | 12.8 | 1152 | — | `pi_shotlist_sonnet46_off_20261113` |
+| Shot List (52) | Pi | Claude Opus 4.8 (thinking: n/a) | Premium | 49/52 | 15.60₽ | billing | 12.3 | 808 | — | `pi_shotlist_opus48_20261114` |
+| Shot List (52) | Pi | Claude Sonnet 4.6 (thinking: off) | Premium | 49/52 | 16.71₽ | est. | 12.8 | 1152 | — | `pi_shotlist_sonnet46_off_20261113` |
 | Shot List (52) | Pi | GPT-5.5 (thinking: off) | Balanced | 48/52 | 10.35₽ | est. | 9.0 | 300 | — | `pi_shotlist_gpt55_off_20261110` |
 | Shot List (52) | Pi | Claude Opus 5.5 (thinking: n/a) | Balanced | 48/52 | 11.59₽ | billing | 13.3 | 720 | — | `pi_shotlist_opus55_20261114` |
 | Shot List (52) | OpenClaw | MiniMax-M3 (thinking: off) | Premium | 48/52 | 20.25₽ | est. | 295.4 | 312 | — | `oc_shotlist_minimaxm3_off_20261109` |
 | Shot List (52) | OpenClaw | MiniMax-M3 (thinking: medium) | Premium | 47/52 | 23.81₽ | est. | 306.9 | 328 | — | `oc_shotlist_minimaxm3_medium_20261109` |
 | Shot List (52) | OpenClaw | GLM-5.2 (thinking: off) | Premium | 47/52 | 27.69₽ | est. | 231.9 | 247 | — | `oc_shotlist_thinking_off` |
 | Shot List (52) | Pi | Claude Fable 5.1 (thinking: n/a) | Premium | 47/52 | 31.60₽ | billing | 19.6 | 752 | — | `pi_shotlist_fable51_20261114` |
+| Shot List (52) | Pi | GLM-5.3-FlashX (thinking: high) | Default | 46/52 | 0.53₽ | est. | 12.2 | 262 | — | `pi_shotlist_glm53flashx_high_20261119` |
 | Shot List (52) | OpenClaw | MiniMax-M3 (thinking: ultra) | Premium | 46/52 | 23.22₽ | est. | 52.1 | 305 | — | `oc_shotlist_minimaxm3_ultra_20261109` |
 | Shot List (52) | Pi | Claude Fable 5 (thinking: n/a) | Premium | 46/52 | 27.46₽ | billing | 13.9 | 712 | — | `pi_shotlist_fable5_20261114` |
 | Shot List (52) | Hermes | GLM-5.2 (thinking: off) | Premium | 46/52 | 32.80₽ | est. | 68.5 | н/д | — | `hermes_shotlist_thinking_off` |
@@ -74,7 +91,7 @@
 | Shot List (52) | Pi | GigaChat 3.5 Reasoning (thinking: low) | Balanced | 35/52 | 10.05₽ | est. | 15.8 | 1116 | — | `pi_shotlist_giga35_reasoning_low_20261107` |
 | Shot List (52) | Pi | GigaChat 3.5 Reasoning (thinking: medium) | Balanced | 34/52 | 10.40₽ | est. | 19.2 | 1176 | — | `pi_shotlist_giga35_reasoning_medium_20261107` |
 | Shot List (52) | Pi | GigaChat 3.5 Reasoning (thinking: high) | Balanced | 34/52 | 12.82₽ | est. | 33.8 | 1160 | — | `pi_shotlist_giga35_reasoning_high_20261107` |
-| Shot List (52) | Hermes | GPT-OSS-120B (thinking: n/a) | Default | 28/52 | 5.19₽ | est. | 37.9 | 427 | — | `hermes_shotlist_oss120b` |
+| Shot List (52) | Hermes | GPT-OSS-120B (thinking: n/a) | Balanced | 28/52 | 5.19₽ | est. | 37.9 | 427 | — | `hermes_shotlist_oss120b` |
 | Shot List (52) | OpenClaw | GigaChat 3.5-432B-A28B (thinking: off) | Balanced | 25/52 | 8.33₽ | est. | 48.1 | 429 | — | `oc_shotlist_giga35base_off_20261113` |
 | Shot List (52) | OpenClaw | GigaChat 3.5-432B-A28B (thinking: ultra) | Default | 20/52 | 1.94₽ | est. | 49.5 | 473 | — | `oc_shotlist_giga35base_ultra_20261114` |
 | Shot List (52) | OpenClaw | GPT-OSS-120B (thinking: n/a) | Premium | 17/52 | 46.22₽ | est. | 205.2 | 120 | — | `oc_shotlist_oss120b` |
