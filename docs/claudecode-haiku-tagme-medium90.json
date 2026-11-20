@@ -1,0 +1,518 @@
+{
+  "task_set_version": "0.21.3",
+  "tested_revision": "2b638bc753e4a4a3086a94a99fb3ff0b6cfa0dd0",
+  "date": "2026-11-20",
+  "model": "Claude Haiku 5.5",
+  "model_id": "anthropic/claude-haiku-5.5",
+  "harness": "Claude Code 2.1.278",
+  "gateway": "TagMe Anthropic Messages",
+  "reasoning_effort": "default",
+  "temperature": "default",
+  "concurrency": 16,
+  "task_count": 90,
+  "confirmed_passed": 58,
+  "missing_task_numbers": [
+    393,
+    395,
+    399,
+    401,
+    405,
+    406,
+    408,
+    409
+  ],
+  "tasks": [
+    {
+      "number": 392,
+      "passed": false,
+      "steps": 115,
+      "tokens": 1866825
+    },
+    {
+      "number": 394,
+      "passed": false,
+      "steps": 77,
+      "tokens": 1482129
+    },
+    {
+      "number": 396,
+      "passed": false,
+      "steps": 204,
+      "tokens": 4807918
+    },
+    {
+      "number": 397,
+      "passed": false,
+      "steps": 52,
+      "tokens": 1134748
+    },
+    {
+      "number": 398,
+      "passed": false,
+      "steps": 354,
+      "tokens": 2943986
+    },
+    {
+      "number": 400,
+      "passed": true,
+      "steps": 525,
+      "tokens": 9664838
+    },
+    {
+      "number": 402,
+      "passed": false,
+      "steps": 137,
+      "tokens": 1145802
+    },
+    {
+      "number": 403,
+      "passed": false,
+      "steps": 600,
+      "tokens": 7184795
+    },
+    {
+      "number": 404,
+      "passed": false,
+      "steps": 167,
+      "tokens": 14267170
+    },
+    {
+      "number": 407,
+      "passed": false,
+      "steps": 265,
+      "tokens": 2173772
+    },
+    {
+      "number": 410,
+      "passed": false,
+      "steps": 203,
+      "tokens": 546410
+    },
+    {
+      "number": 411,
+      "passed": false,
+      "steps": 388,
+      "tokens": 4892339
+    },
+    {
+      "number": 412,
+      "passed": false,
+      "steps": 5,
+      "tokens": 151970
+    },
+    {
+      "number": 413,
+      "passed": true,
+      "steps": 24,
+      "tokens": 547479
+    },
+    {
+      "number": 414,
+      "passed": true,
+      "steps": 7,
+      "tokens": 218368
+    },
+    {
+      "number": 415,
+      "passed": false,
+      "steps": 4,
+      "tokens": 115976
+    },
+    {
+      "number": 416,
+      "passed": true,
+      "steps": 10,
+      "tokens": 333792
+    },
+    {
+      "number": 417,
+      "passed": false,
+      "steps": 11,
+      "tokens": 384797
+    },
+    {
+      "number": 418,
+      "passed": false,
+      "steps": 15,
+      "tokens": 549617
+    },
+    {
+      "number": 419,
+      "passed": true,
+      "steps": 20,
+      "tokens": 759760
+    },
+    {
+      "number": 420,
+      "passed": true,
+      "steps": 24,
+      "tokens": 857299
+    },
+    {
+      "number": 421,
+      "passed": true,
+      "steps": 16,
+      "tokens": 545569
+    },
+    {
+      "number": 422,
+      "passed": false,
+      "steps": 4,
+      "tokens": 148836
+    },
+    {
+      "number": 423,
+      "passed": true,
+      "steps": 13,
+      "tokens": 466343
+    },
+    {
+      "number": 424,
+      "passed": true,
+      "steps": 13,
+      "tokens": 458991
+    },
+    {
+      "number": 425,
+      "passed": true,
+      "steps": 10,
+      "tokens": 363525
+    },
+    {
+      "number": 426,
+      "passed": true,
+      "steps": 11,
+      "tokens": 387072
+    },
+    {
+      "number": 427,
+      "passed": false,
+      "steps": 10,
+      "tokens": 343687
+    },
+    {
+      "number": 428,
+      "passed": true,
+      "steps": 15,
+      "tokens": 544271
+    },
+    {
+      "number": 429,
+      "passed": true,
+      "steps": 11,
+      "tokens": 409279
+    },
+    {
+      "number": 430,
+      "passed": false,
+      "steps": 11,
+      "tokens": 375847
+    },
+    {
+      "number": 431,
+      "passed": false,
+      "steps": 13,
+      "tokens": 485001
+    },
+    {
+      "number": 432,
+      "passed": true,
+      "steps": 5,
+      "tokens": 245309
+    },
+    {
+      "number": 433,
+      "passed": true,
+      "steps": 16,
+      "tokens": 733977
+    },
+    {
+      "number": 434,
+      "passed": true,
+      "steps": 16,
+      "tokens": 822541
+    },
+    {
+      "number": 435,
+      "passed": true,
+      "steps": 12,
+      "tokens": 511317
+    },
+    {
+      "number": 436,
+      "passed": true,
+      "steps": 10,
+      "tokens": 303418
+    },
+    {
+      "number": 437,
+      "passed": true,
+      "steps": 9,
+      "tokens": 295296
+    },
+    {
+      "number": 438,
+      "passed": true,
+      "steps": 7,
+      "tokens": 218057
+    },
+    {
+      "number": 439,
+      "passed": true,
+      "steps": 10,
+      "tokens": 364471
+    },
+    {
+      "number": 440,
+      "passed": true,
+      "steps": 13,
+      "tokens": 559305
+    },
+    {
+      "number": 441,
+      "passed": true,
+      "steps": 12,
+      "tokens": 432419
+    },
+    {
+      "number": 442,
+      "passed": true,
+      "steps": 48,
+      "tokens": 3020151
+    },
+    {
+      "number": 443,
+      "passed": true,
+      "steps": 6,
+      "tokens": 250428
+    },
+    {
+      "number": 444,
+      "passed": true,
+      "steps": 9,
+      "tokens": 399136
+    },
+    {
+      "number": 445,
+      "passed": true,
+      "steps": 19,
+      "tokens": 672669
+    },
+    {
+      "number": 446,
+      "passed": true,
+      "steps": 8,
+      "tokens": 349951
+    },
+    {
+      "number": 447,
+      "passed": true,
+      "steps": 13,
+      "tokens": 577321
+    },
+    {
+      "number": 448,
+      "passed": true,
+      "steps": 18,
+      "tokens": 924433
+    },
+    {
+      "number": 449,
+      "passed": true,
+      "steps": 9,
+      "tokens": 329545
+    },
+    {
+      "number": 450,
+      "passed": true,
+      "steps": 10,
+      "tokens": 465816
+    },
+    {
+      "number": 451,
+      "passed": true,
+      "steps": 5,
+      "tokens": 141036
+    },
+    {
+      "number": 452,
+      "passed": true,
+      "steps": 5,
+      "tokens": 177748
+    },
+    {
+      "number": 453,
+      "passed": true,
+      "steps": 17,
+      "tokens": 671525
+    },
+    {
+      "number": 454,
+      "passed": true,
+      "steps": 14,
+      "tokens": 518014
+    },
+    {
+      "number": 455,
+      "passed": true,
+      "steps": 15,
+      "tokens": 593630
+    },
+    {
+      "number": 456,
+      "passed": true,
+      "steps": 17,
+      "tokens": 906042
+    },
+    {
+      "number": 457,
+      "passed": true,
+      "steps": 5,
+      "tokens": 180505
+    },
+    {
+      "number": 458,
+      "passed": true,
+      "steps": 13,
+      "tokens": 466528
+    },
+    {
+      "number": 459,
+      "passed": false,
+      "steps": 30,
+      "tokens": 1441342
+    },
+    {
+      "number": 460,
+      "passed": true,
+      "steps": 14,
+      "tokens": 554084
+    },
+    {
+      "number": 461,
+      "passed": true,
+      "steps": 16,
+      "tokens": 534408
+    },
+    {
+      "number": 462,
+      "passed": true,
+      "steps": 30,
+      "tokens": 2021959
+    },
+    {
+      "number": 463,
+      "passed": true,
+      "steps": 17,
+      "tokens": 829122
+    },
+    {
+      "number": 464,
+      "passed": true,
+      "steps": 6,
+      "tokens": 182618
+    },
+    {
+      "number": 465,
+      "passed": true,
+      "steps": 8,
+      "tokens": 291326
+    },
+    {
+      "number": 466,
+      "passed": false,
+      "steps": 11,
+      "tokens": 455995
+    },
+    {
+      "number": 467,
+      "passed": true,
+      "steps": 8,
+      "tokens": 343113
+    },
+    {
+      "number": 468,
+      "passed": true,
+      "steps": 10,
+      "tokens": 314222
+    },
+    {
+      "number": 469,
+      "passed": true,
+      "steps": 16,
+      "tokens": 532665
+    },
+    {
+      "number": 470,
+      "passed": true,
+      "steps": 14,
+      "tokens": 483071
+    },
+    {
+      "number": 471,
+      "passed": true,
+      "steps": 13,
+      "tokens": 498889
+    },
+    {
+      "number": 512,
+      "passed": true,
+      "steps": 38,
+      "tokens": 1648022
+    },
+    {
+      "number": 518,
+      "passed": true,
+      "steps": 58,
+      "tokens": 2840197
+    },
+    {
+      "number": 520,
+      "passed": false,
+      "steps": 22,
+      "tokens": 917505
+    },
+    {
+      "number": 522,
+      "passed": true,
+      "steps": 46,
+      "tokens": 2423424
+    },
+    {
+      "number": 523,
+      "passed": true,
+      "steps": 46,
+      "tokens": 2210127
+    },
+    {
+      "number": 524,
+      "passed": false,
+      "steps": 33,
+      "tokens": 1342084
+    },
+    {
+      "number": 525,
+      "passed": true,
+      "steps": 42,
+      "tokens": 2015436
+    },
+    {
+      "number": 526,
+      "passed": true,
+      "steps": 68,
+      "tokens": 2585067
+    },
+    {
+      "number": 527,
+      "passed": false,
+      "steps": null,
+      "tokens": null
+    },
+    {
+      "number": 530,
+      "passed": true,
+      "steps": 68,
+      "tokens": 3538056
+    }
+  ]
+}
