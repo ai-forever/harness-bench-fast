@@ -191,7 +191,7 @@ assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.pa
 const medium90 = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/medium90-results.json")));
 const currentData = { ...data, medium90 };
 const ranked90 = selectResults(currentData, "medium", "current", "");
-assert.equal(ranked90.length, 17);
+assert.equal(ranked90.length, 15);
 assert.ok(ranked90.every(row => row.result.total === 90));
 assert.deepEqual(selectResults(currentData, "medium", "current", "haiku").map(row => row.result.passed), [63, 60]);
 assert.deepEqual(selectResults(currentData, "light", "current", ""), selectResults(data, "light", "current", ""));
@@ -241,15 +241,16 @@ assert.equal(sonnetCode90.usage.tokens.status, "complete");
 for (const suite of ["light", "medium"]) {
   const hidden = selectResults(currentData, suite, "current", "", false);
   assert.ok(hidden.every(row => !/^secret/i.test(row.model)));
-  assert.equal(selectResults(currentData, suite, "current", "SecretModel-1114", false).length, 0);
-  const shown = selectResults(currentData, suite, "current", "SecretModel-1114", true);
-  assert.equal(shown.length, suite === "light" ? 2 : 3);
+  const model = suite === "light" ? "SecretModel-1114" : "GigaChat-4";
+  assert.equal(selectResults(currentData, suite, "current", model, false).length, 0);
+  const shown = selectResults(currentData, suite, "current", model, true);
+  assert.equal(shown.length, suite === "light" ? 2 : 1);
   assert.ok(shown.every(row => row.result.total === (suite === "light" ? 391 : 90)));
 }
-assert.deepEqual(selectResults(currentData, "medium", "current", "SecretModel-1114", true).map(r => r.result.passed), [40, 36, 21]);
+assert.deepEqual(selectResults(currentData, "medium", "current", "GigaChat-4", true).map(r => r.result.passed), [40]);
 assert.ok(landing.includes('id="show-secret-models" type="checkbox"'));
 assert.equal(selectResults(currentData, "medium", "medium80", "secret", false).length, 0);
-assert.equal(selectResults(currentData, "medium", "current", "SecretModel-1114", true)[0].result.note, "provisional · HTTP 400");
+assert.equal(selectResults(currentData, "medium", "current", "GigaChat-4", true)[0].result.note, "provisional · HTTP 400");
 
 const pi0731 = selectResults(currentData, "medium", "current", "0731");
 assert.equal(pi0731.length, 1);
@@ -258,13 +259,7 @@ assert.equal(pi0731[0].harness, "Pi 1.5.2");
 assert.equal(pi0731[0].usage.tokens.value, 445223867);
 assert.equal(pi0731[0].usage.tokens.lower_bound, true);
 assert.ok(formatUsage(pi0731[0].usage, "tokens").text.startsWith("≥ "));
-assert.equal(selectResults(currentData, "medium", "current", "Ouroboros", true).length, 1);
-
-const ouroDev = selectResults(currentData, "medium", "current", "Ouroboros", true)[0];
-assert.equal(ouroDev.result.passed, 36);
-assert.equal(ouroDev.harness, "Ouroboros 7.11.1-alpha.0 (Development)");
-assert.equal(ouroDev.usage.tokens.value, 1144165427);
-assert.equal(ouroDev.usage.tokens.lower_bound, true);
+assert.equal(selectResults(currentData, "medium", "current", "Ouroboros", true).length, 0);
 
 const ouroLight = light.find(row => row.id === "secret-37-1711-ouroboros");
 assert.equal(ouroLight.result.passed, 203);

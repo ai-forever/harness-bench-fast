@@ -19,7 +19,7 @@ def test_published_medium90_is_reproducible_and_exact_suite():
     data = build()
     assert json.loads((ROOT / "docs/medium90-results.json").read_text(encoding="utf-8")) == data
     assert data["task_numbers"] == [task_number(t.id) for t in SUITES["medium"]]
-    assert data["summary"] == {"rows": 134, "ranked_rows": 17, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 17}}
+    assert data["summary"] == {"rows": 132, "ranked_rows": 15, "coverage": {"1": 1, "10": 8, "40": 89, "80": 19, "90": 15}}
     assert all((r["score"] is None) == (r["measured_tasks"] != 90) for r in data["rows"])
     assert all(len(set(r["missing_task_numbers"])) + r["measured_tasks"] == 90 for r in data["rows"])
 
@@ -60,7 +60,7 @@ def test_complete_compatible_components_score_but_missing_or_unverified_do_not()
 
 def test_payload_provenance_is_portable_across_line_endings(tmp_path):
     (tmp_path / "docs").mkdir()
-    for name in ("secretmodel-1114-ouroboros-dev-20261118.json", "pi-deepseek0731-medium90-20261114.json", "secretmodel-1114.json", "leaderboard-results.json", "wave21-results.json", "haiku-medium90.json", "codex-deepseek-medium90-20261027.json", "miniswe-deepseek-medium90-20261027.json", "claudecode-sonnet-medium90-20261027.json"):
+    for name in ("pi-deepseek0731-medium90-20261114.json", "secretmodel-1114.json", "leaderboard-results.json", "wave21-results.json", "haiku-medium90.json", "codex-deepseek-medium90-20261027.json", "miniswe-deepseek-medium90-20261027.json", "claudecode-sonnet-medium90-20261027.json"):
         content = (ROOT / "docs" / name).read_text(encoding="utf-8")
         (tmp_path / "docs" / name).write_bytes(content.replace("\n", "\r\n").encode("utf-8"))
     for path in (ROOT / "docs").glob("secret-37-1711-*-medium90-20261117.json"):
@@ -170,22 +170,3 @@ def test_secret_pi_usage_preserves_score_and_marks_missing_native_episodes():
     assert row["usage"]["steps"]["status"] == "unavailable"
     assert sum(t["token_usage_complete"] for t in measurement["tasks"]) == 76
     assert all(t["agent_total_tokens"] == t["input_tokens"] + t["output_tokens"] for t in measurement["tasks"])
-
-
-def test_ouroboros_dev_latest_attempts_and_nondefault_limits():
-    source = json.loads((ROOT / "docs/secretmodel-1114-ouroboros-dev-20261118.json").read_text())
-    row = next(r for r in build()["rows"] if r["id"] == "secretmodel-1114-ouroboros-dev-20261118")
-    tasks = {t["number"]: t for t in source["tasks"]}
-    assert row["secret_model"] and row["model"] == "SecretModel-1114"
-    assert row["harness"] == "Ouroboros 7.11.1-alpha.0 (Development)"
-    assert row["overall_passed"] == 36 and row["score"] == 0.4
-    assert row["measured_tasks"] == 90 and row["missing_task_numbers"] == []
-    assert tasks[399]["passed"] and tasks[399]["grader_pass_after_harness_error"]
-    assert tasks[407]["classification"] == "budget_fail" and not tasks[407]["passed"]
-    assert {n: tasks[n]["selected_attempt"] for n in (397,407,410,411,453)} == {397:5,407:5,410:4,411:4,453:3}
-    assert not tasks[410]["passed"]  # Earlier PASS must not replace the requested latest attempt.
-    assert source["model_request_cap"]["introduced_during_attempt"]
-    assert source["task_timeout_seconds"] == 14400
-    assert row["usage"]["tokens"]["value"] == sum(t["total_tokens"] for t in tasks.values())
-    assert row["usage"]["tokens"]["lower_bound"]
-    assert row["usage"]["steps"]["value"] is None  # Physical requests are not graph steps.
