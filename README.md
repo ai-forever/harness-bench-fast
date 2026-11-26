@@ -717,6 +717,9 @@ Rows are sorted by pass count.
 | OpenClaw | thinking: off (2026-08-13) | GPT-OSS-120B | 17/52 | 32.7% | 205.2m | 120 | 1,261,870 (1,080₽) |
 | Pi | — (2026-11-07) | GigaChat 3 Pro | 16/52 | 30.8% | 25.7m | 2,034 | 12,883,705 (230₽) |
 | deepagents | GigaChat (2026-07-29) | GigaChat 3 Lightning | 10/52 | 19.2% | 8.3m | 318 | 427,026 |
+| DeepSeek Harness | thinking: off (2026-11-26) | GigaChat-4-37B-A3 | 47/52 | 90.4% | 44.5m | 397 | 5,030,535 (451₽) |
+| DeepSeek Harness | thinking: medium (2026-11-26) | GigaChat-4-37B-A3 | 49/52 | **94.2%** | 36.2m | 379 | 3,513,092 (318₽) |
+| DeepSeek Harness | thinking: high (2026-11-26) | GigaChat-4-37B-A3 | 48/52 | 92.3% | 36.8m | 370 | 3,778,393 (340₽) |
 | DeepSeek Harness | thinking: medium (2026-11-20) | Kimi-K3 | 52/52 | 100.0% | 27.0m | 211 | 1,275,039 (287₽) |
 | DeepSeek Harness | thinking: off (2026-11-20) | Gemini-3.8-Flash | 52/52 | 100.0% | 49.1m | 469 | 3,296,914 (220₽) |
 | Pi | thinking: off (2026-11-19) | Gemini-3.8-Flash | 51/52 | 98.1% | 83.3m | 511 | 2,267,300 (206₽) |
@@ -735,6 +738,8 @@ Cloud.ru batch (2026-11-19/20): **Kimi-K3** and **Gemini-3.8-Flash** reach **52/
 on the DeepSeek Harness — the only new runs to match DeepSeek-V4.1-Flash at the ceiling;
 **GLM-5.3-FlashX** and **GPT-6.1-Sol** peak at **51/52 (98.1%)** (GLM on the DeepSeek Harness,
 GPT on Pi). Gemini-3.8-Flash reaches 100% at a heavy token cost on higher reasoning levels.
+
+GigaChat 4 37B (day-1, 2026-11-26): first harness-bench-fast run of **GigaChat-4-37B-A3** (`GigaChat/GigaChat-4-37B-A3`) on the DeepSeek Harness, a reasoning sweep over thinking off/medium/high. It scores **49/52 (94.2%)** at thinking:medium — the best level and the cheapest of the three (~318₽) — ahead of high 48/52 (92.3%, ~340₽) and off 47/52 (90.4%, ~451₽). All runs completed cleanly (reason=completed, 0 API errors). Stable failures across levels: `task_266_terminal_sha256_manifest` (all three) and `task_368_sqlite_migration` / Russian-locale exact-content tasks (off only). Harness: dsh 0.2.2-rc.1, task-set v0.16.0.
 
 OpenClaw with GPT-OSS-120B scores 17/52 (32.7%) — ahead of deepagents' 13/52
 (25.0%) with the same model, showing the OpenClaw agent loop adds +7.7 pp over
