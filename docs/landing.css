@@ -107,6 +107,3 @@ footer { display: flex; justify-content: space-between; gap: 20px; padding-block
 .run-snapshot details { font-size: 13px; }
 @media (max-width: 620px) { .run-snapshot { padding: 18px; } .run-snapshot tbody th { font-size: 12px; } }
 .wave19-section { margin-top: 40px; }
-
-.secret-toggle { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; white-space: nowrap; }
-.secret-toggle input { display: inline-block; width: auto; margin: 0; padding: 0; }

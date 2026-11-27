@@ -43,6 +43,8 @@ A [fresh Claude Code + Sonnet 5.5 Medium90 run](docs/claudecode-sonnet-medium90.
 
 A [fresh Pi 1.5.2 + DeepSeek V4 Flash 0731 Medium90 run](docs/pi-deepseek0731-medium90.html) on 14 November 2026 scored **65/90 (72.2%)** with high reasoning and sixteen concurrent tasks. It includes all ten timeouts and one provider refusal as failures. Retained native counters are 4,542 tool calls and at least 445,223,867 tokens; the protocol records the incomplete response accounting.
 
+[GigaChat-4 37b with mini-SWE-agent 2.4.6](docs/gigachat-4-37b-miniswe-medium90.html) solved **16/90 (17.8%)** on 26–27 November 2026 with high reasoning effort.
+
 The [18 November Ouroboros Development Light391 measurement](docs/secret-37-1711-ouroboros-light.html) for `secret-37-1711` was **withdrawn on 19 November 2026** after a streaming tool-call index collision audit found an integration/protocol defect. Historical outcomes and usage remain available, but the invalid 203/391 result is excluded from the leaderboard; no replacement score is published.
 
 Existing measurements are rescored offline on the new membership. Historical

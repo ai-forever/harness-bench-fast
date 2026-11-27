@@ -2,18 +2,17 @@
 
 // Every view has one explicit denominator. Missing scores never fall back to a
 // full-run score, and unmeasured waves are never treated as failures.
-function selectResults(data, suite, coverage, search, showSecret = true) {
-  const visible = row => showSecret || !(row.secret_model || /^secret/i.test(row.model));
+function selectResults(data, suite, coverage, search) {
   if (suite === "medium" && coverage === "current" && data.medium90) {
     const query = search.trim().toLocaleLowerCase();
-    return data.medium90.rows.filter(visible).filter(row => row.status === "complete" && row.measurement_valid === true && row.measured_tasks === 90 && row.target_tasks === 90 && Number.isFinite(row.score))
+    return data.medium90.rows.filter(row => row.status === "complete" && row.measurement_valid === true && row.measured_tasks === 90 && row.target_tasks === 90 && Number.isFinite(row.score))
       .filter(row => (row.model + " " + row.harness).toLocaleLowerCase().includes(query))
       .map(row => ({ ...row, result: { passed: row.overall_passed, total: 90, note: row.result_note }, usage: row.usage }))
       .sort((a, b) => b.result.passed - a.result.passed || a.model.localeCompare(b.model) || a.harness.localeCompare(b.harness));
   }
   const key = suite === "medium" && coverage === "wave21" ? "wave21" : suite === "light" ? "light" : (coverage === "current" || coverage === "medium80") ? "medium" : coverage === "wave19" ? "wave19" : "medium_historical";
   const query = search.trim().toLocaleLowerCase();
-  return data.rows.filter(visible).filter(row => row[key] !== null && row[key] !== undefined)
+  return data.rows.filter(row => row[key] !== null && row[key] !== undefined)
     .filter(row => key !== "wave21" || row[key].total === 10)
     .filter(row => coverage !== "medium80" || row[key].total === 80)
     .filter(row => (row.model + " " + row.harness).toLocaleLowerCase().includes(query))
@@ -50,8 +49,6 @@ if (typeof document !== "undefined") {
   (async function () {
     const body = document.getElementById("results");
     const search = document.getElementById("search");
-    const secretToggle = document.getElementById("show-secret-models");
-    secretToggle.checked = false;
     const more = document.getElementById("show-more");
     const empty = document.getElementById("empty");
     const buttons = [...document.querySelectorAll("[data-suite]")];
@@ -61,7 +58,7 @@ if (typeof document !== "undefined") {
       return ["#medium", "#medium-wave21"].includes(location.hash) ? "medium" : "light";
     }
     let suite = selectedSuite();
-    const rowAnchors = { "#secret-sft-codex": "secret-sft-codex-v019", "#secret-700b": "secret-700b-v019", "#secret-sft-mini": "secret-sft-mini-v019", "#universal-agent-haiku": "universal-agent-haiku", "#universal-agent-deepseek": "universal-agent-deepseek", "#giga35-ultra-reasoning": "giga35-ultra-reasoning-v019" };
+    const rowAnchors = { "#universal-agent-haiku": "universal-agent-haiku", "#universal-agent-deepseek": "universal-agent-deepseek", "#giga35-ultra-reasoning": "giga35-ultra-reasoning-v019" };
     // Preserve incoming links to models and protocol notes from the old landing.
     if (location.hash && !["#light", "#medium", "#medium-wave21", ...Object.keys(rowAnchors)].includes(location.hash)) {
       location.replace("archive.html" + location.hash);
@@ -144,8 +141,8 @@ if (typeof document !== "undefined") {
       document.getElementById("coverage-note").textContent = suite === "light"
         ? "Light · 391 tasks · frozen suite."
         : "Medium · 90 tasks · complete measurements, including coupled workflows.";
-      const rows = selectResults(data, suite, "current", search.value, secretToggle.checked);
-      const ranking = selectResults(data, suite, "current", "", secretToggle.checked);
+      const rows = selectResults(data, suite, "current", search.value);
+      const ranking = selectResults(data, suite, "current", "");
       renderTable(body, expanded ? rows : rows.slice(0, 12), ranking, "current");
       document.getElementById("run-count").textContent = rows.length + (rows.length === 1 ? " configuration" : " configurations");
       more.hidden = expanded || rows.length <= 12;
@@ -154,9 +151,9 @@ if (typeof document !== "undefined") {
       empty.textContent = "No results match your search.";
       const historicalSection = document.getElementById("medium80-section");
       historicalSection.hidden = suite !== "medium";
-      const historicalRows = suite === "medium" ? selectResults(data, "medium", "medium80", search.value, secretToggle.checked) : [];
+      const historicalRows = suite === "medium" ? selectResults(data, "medium", "medium80", search.value) : [];
       renderTable(document.getElementById("medium80-results"), historicalRows,
-        selectResults(data, "medium", "medium80", "", secretToggle.checked), "medium80");
+        selectResults(data, "medium", "medium80", ""), "medium80");
       document.getElementById("medium80-count").textContent = historicalRows.length + (historicalRows.length === 1 ? " configuration" : " configurations");
       document.getElementById("medium80-empty").hidden = historicalRows.length > 0;
     }
@@ -184,7 +181,6 @@ if (typeof document !== "undefined") {
         render();
         if (expanded) document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: "center" });
       });
-      secretToggle.addEventListener("change", () => { expanded = false; render(); });
       search.addEventListener("input", () => { expanded = false; render(); });
       more.addEventListener("click", () => { expanded = true; render(); });
     } catch (error) {

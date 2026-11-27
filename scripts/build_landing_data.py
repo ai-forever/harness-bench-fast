@@ -110,6 +110,8 @@ def build():
     assert sum(snapshot["waves"][i]["count"] for i in medium) == 40
     rows = []
     for key, row in parser.rows.items():
+        if row["model"].casefold().startswith("secret"):
+            continue
         item = snapshot["rows"][key]
         passed = item["passed"]
         if len(passed) != len(snapshot["waves"]):
@@ -154,30 +156,6 @@ def build():
             assert row["id"] not in by_id
             rows.append(row)
             by_id[row["id"]] = row
-    secret_path = ROOT / "docs/secret-700b-v019.json"
-    secret = json.loads(secret_path.read_text(encoding="utf-8"))
-    assert secret["ranked"] is True and secret["measurement_valid"] is True
-    assert secret["validation_basis"] == "operator_acceptance"
-    assert secret["recorded_tasks"] == secret["total_tasks"] == 471
-    passed_numbers = secret["passed_task_numbers"]
-    assert len(set(passed_numbers)) == len(passed_numbers) == secret["passed_tasks"]
-    subsets = {}
-    for name, source, start, end in (
-        ("light", "light", 1, 391), ("medium", "medium", 392, 471),
-        ("wave19", "wave19_feasibility", 432, 471),
-    ):
-        count = secret["counts"][source]
-        assert count["total"] == end - start + 1
-        assert count["passed"] == sum(start <= number <= end for number in passed_numbers)
-        subsets[name] = {"passed": count["passed"], "total": count["total"]}
-    rows.append({
-        "id": "secret-700b-v019", "harness": secret["harness"], "model": secret["model"],
-        "runs": 1, "measurement_type": "operator_accepted", "measurement_valid": True,
-        "validation_basis": secret["validation_basis"],
-        "source_version": secret["task_set_version"], "source_passed": secret["passed_tasks"],
-        "source_sha256": secret["source_report_sha256"],
-        "medium_historical": None, "details_url": "secret-700b.html", **subsets,
-    })
     sonnet_path = ROOT / "docs/sonnet55-medium.json"
     sonnet = json.loads(sonnet_path.read_text(encoding="utf-8"))
     assert sonnet["measurement_valid"] is True and sonnet["infrastructure_failures"] == 0
@@ -223,32 +201,6 @@ def build():
         "medium": metric(astra["passed"], 80),
         "wave19": metric(sum(number >= 432 for number in passed_numbers), 40),
         "details_url": "astra-medium.html",
-    })
-    mini_path = ROOT / "docs/secret-sft-mini-v019.json"
-    mini = json.loads(mini_path.read_text(encoding="utf-8"))
-    assert mini["measurement_valid"] is True and mini["infrastructure_failures"] == 0
-    assert mini["validation"]["valid"] is True and mini["validation"]["errors"] == []
-    assert mini["task_set_version"] == "0.19.0"
-    assert mini["recorded_tasks"] == mini["total_tasks"] == 471
-    passed_numbers = mini["passed_task_numbers"]
-    assert len(set(passed_numbers)) == len(passed_numbers) == mini["passed_tasks"]
-    assert all(1 <= number <= 471 for number in passed_numbers)
-    subsets = {}
-    for name, source, start, end in (
-        ("light", "light", 1, 391), ("medium", "medium", 392, 471),
-        ("wave19", "wave19_feasibility", 432, 471),
-    ):
-        count = mini["counts"][source]
-        assert count["total"] == end - start + 1
-        assert count["passed"] == sum(start <= number <= end for number in passed_numbers)
-        subsets[name] = metric(count["passed"], count["total"])
-    rows.append({
-        "id": "secret-sft-mini-v019", "harness": mini["harness"], "model": mini["model"],
-        "runs": 1, "measurement_type": "full_run", "measurement_valid": True,
-        "validation_basis": mini["validation_basis"], "reasoning_effort": "default",
-        "source_version": mini["task_set_version"], "source_passed": mini["passed_tasks"],
-        "source_sha256": mini["source_report_sha256"], "measurement_date": mini["run_dates"],
-        "medium_historical": None, "details_url": "secret-sft-mini.html", **subsets,
     })
     ua_path = ROOT / "docs/universal-agent-haiku.json"
     ua = json.loads(ua_path.read_text(encoding="utf-8"))
@@ -328,43 +280,6 @@ def build():
         "source_sha256": ultra["source_report_sha256"], "measurement_date": ultra["measurement_dates"],
         "medium_historical": None, "details_url": "giga35-ultra-reasoning.html", **subsets,
     })
-    codex_path = ROOT / "docs/secret-sft-codex-v019.json"
-    codex = json.loads(codex_path.read_text(encoding="utf-8"))
-    assert codex["task_set_version"] == "0.19.0"
-    assert codex["recorded_tasks"] == codex["total_tasks"] == 471
-    passed_numbers = codex["passed_task_numbers"]
-    assert len(set(passed_numbers)) == len(passed_numbers) == codex["passed_tasks"]
-    assert all(1 <= number <= 471 for number in passed_numbers)
-    subsets = {}
-    for name, source, start, end in (
-        ("light", "light", 1, 391), ("medium", "medium", 392, 471),
-        ("wave19", "wave19_feasibility", 432, 471),
-    ):
-        count = codex["counts"][source]
-        assert count["total"] == end - start + 1
-        assert count["passed"] == sum(start <= number <= end for number in passed_numbers)
-        usage = count["tokens"]
-        assert usage["total_tokens"] == usage["input_tokens"] + usage["output_tokens"]
-        assert usage["requests"] == usage["requests_with_usage"] + usage["requests_missing_usage"]
-        subsets[name] = {**metric(count["passed"], count["total"]), "token_usage": usage}
-    total_usage = codex["telemetry"]["selected_api"]
-    for key in ("input_tokens", "output_tokens", "total_tokens", "requests", "requests_with_usage", "requests_missing_usage"):
-        assert total_usage[key] == sum(subsets[name]["token_usage"][key] for name in ("light", "medium"))
-    # An audited infrastructure retry must finish before this row is ranked.
-    if codex["measurement_valid"]:
-        assert codex["ranked"] is True and codex["status"] == "complete"
-        assert codex["validation"]["valid"] and not codex["validation"]["errors"]
-        assert codex["infrastructure_failures"] == 0 and not codex["pending_task_numbers"]
-        rows.append({
-            "id": "secret-sft-codex-v019", "harness": codex["harness"], "model": codex["model"],
-            "runs": 1, "measurement_type": "full_run", "measurement_valid": True,
-            "validation_basis": codex["validation_basis"], "reasoning_effort": "default",
-            "source_version": codex["task_set_version"], "source_passed": codex["passed_tasks"],
-            "source_sha256": codex["source_report_sha256"], "measurement_date": codex["run_dates"],
-            "medium_historical": None, "details_url": "secret-sft-codex.html", **subsets,
-        })
-    else:
-        assert codex["ranked"] is False and codex["pending_task_numbers"]
     brain_path = ROOT / "docs/brain-haiku-experiment.json"
     brain = json.loads(brain_path.read_text(encoding="utf-8"))
     tasks = brain["tasks"]
@@ -445,59 +360,15 @@ def build():
     attach_telemetry(rows, telemetry)
     APPEND_WAVE21(rows, ROOT)
     APPEND_FRESH_ROWS(rows, ROOT)
-    secret = json.loads((ROOT / "docs/secretmodel-1114.json").read_text(encoding="utf-8"))
-    for measurement in secret["measurements"]:
-        if measurement["suite"] != "light":
-            continue
-        suffix = "pi" if measurement["harness"] == "pi-mono" else "mini-swe"
-        rows.append({
-            "id": "secretmodel-1114-" + suffix, "model": secret["model"],
-            "harness": measurement["harness"], "secret_model": True, "runs": 1,
-            "reasoning_effort": secret["reasoning_effort"], "source_version": secret["task_set_version"],
-            "measurement_valid": True, "details_url": "secretmodel-1114.html",
-            "light": {"passed": measurement["passed"], "total": measurement["total"]},
-            "medium": None, "medium_historical": None,
-            "telemetry": {"light": measurement["usage"]},
-        })
-    opd_path = ROOT / "docs/secret-37-opd-light.json"
-    opd_text = opd_path.read_text(encoding="utf-8")
-    opd = json.loads(opd_text)
-    runs = opd["runs"]
-    if (len(runs) != 4 or any(
-        len(run["outcomes"]) != 391
-        or {t["number"] for t in run["outcomes"]} != set(range(1, 392))
-        or sum(t["passed"] for t in run["outcomes"]) != run["passed"]
-        for run in runs
-    )):
-        raise ValueError("Incomplete secret-37-opd Light coverage")
-    opd_sha = hashlib.sha256(opd_text.encode("utf-8")).hexdigest()
-    rows.append({
-        "id": "secret-37-opd", "model": "secret-37-opd", "harness": opd["harness"],
-        "secret_model": True, "runs": len(runs), "reasoning_effort": opd["reasoning_effort"],
-        "source_version": opd["task_set_version"], "measurement_valid": True,
-        "details_url": "secret-37-opd-light.html",
-        "light": {"passed": sum(run["passed"] for run in runs) / len(runs), "total": 391},
-        "medium": None, "medium_historical": None,
-        "telemetry": {"light": {
-            "tasks": 391, "observed_tasks": 391,
-            "tokens": {"value": sum(run["tokens"] for run in runs) / len(runs),
-                       "status": "complete", "covered_tasks": 391},
-            "notes": ["Mean tokens per run from Pi usage."], "sources_sha256": [opd_sha],
-        }},
-    })
     return {
         "task_set_version": "0.19", "light_tasks": 391, "medium_tasks": 80,
         "wave21_task_set_version": "0.21.2", "wave21_tasks": 10,
         "provenance": {
-            "secret_37_opd_light_sha256": opd_sha,
-            "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs plus three complete Claude Haiku harness runs; v0.19 protocol revisions grouped for display, exact source_version retained per row; composites explicitly labeled; secret sft deepagents accepted by the operator",
+            "method": "Historical rescores, eight complete v0.19.0 runs, sixteen new wave19 harness configurations and fresh Sonnet/Astra Medium runs plus three complete Claude Haiku harness runs; v0.19 protocol revisions grouped for display, exact source_version retained per row; composites explicitly labeled",
             "source_commit": "3796b9084093e5f9383077d7bde8f1ce1f0d57b5",
             "wave21_results_sha256": hashlib.sha256((ROOT / "docs/wave21-results.json").read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             # Hash canonical UTF-8/LF text, independent of Git checkout CRLF.
             "wave_results_sha256": hashlib.sha256(waves.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
-            "secret_700b_sha256": hashlib.sha256(secret_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
-            "secret_sft_codex_sha256": hashlib.sha256(codex_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
-            "secret_sft_mini_sha256": hashlib.sha256(mini_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "sonnet55_medium_sha256": hashlib.sha256(sonnet_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "astra_medium_sha256": hashlib.sha256(astra_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),
             "universal_agent_haiku_sha256": hashlib.sha256(ua_path.read_text(encoding="utf-8").encode("utf-8")).hexdigest(),

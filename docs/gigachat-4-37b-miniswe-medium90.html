@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GigaChat-4 37b · mini-SWE-agent · Medium90</title>
+  <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+  <main>
+    <p><a href="index.html#medium">← Medium leaderboard</a></p>
+    <section class="measurement-protocol">
+      <p>26–27 November 2026 · task-set v0.21.3</p>
+      <h1>GigaChat-4 37b on HBF Medium</h1>
+      <p>GigaChat-4 37b solved <strong>16 of 90 tasks (17.8%)</strong> in one run with mini-SWE-agent 2.4.6 and high reasoning effort. All 90 tasks received a verifier verdict. Fourteen of the 74 failures reached the eight-hour time limit.</p>
+      <h2>Run settings</h2>
+      <p>Eight tasks ran in parallel. Each task had eight hours and a default budget of 100 model calls. Individual task settings could raise the call limit. The harness retained reasoning history and allowed up to 32,768 output tokens per response.</p>
+      <p>After the runner ran out of memory, it resumed from 18 saved verdicts and repeated the eight interrupted tasks. The remaining attempts ran with an 8 GiB per-process data limit and a 32 GiB memory limit for the runner.</p>
+      <h2>Recorded usage</h2>
+      <p>The model reported 643,102,720 input tokens and 4,713,430 output tokens across 4,609 responses from the final attempts. That totals <strong>647,816,150 tokens</strong> across all 90 tasks. Native step counts were available for 76 tasks and totalled <strong>at least 4,389 steps</strong>.</p>
+      <p><a href="gigachat-4-37b-miniswe-medium90.json">Per-task results and usage</a> · <a href="medium90-protocol.html">Medium suite and scoring</a></p>
+    </section>
+  </main>
+</body>
+</html>

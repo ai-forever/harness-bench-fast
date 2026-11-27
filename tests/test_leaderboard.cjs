@@ -4,15 +4,13 @@ const { selectResults, formatPassed, formatUsage } = require("../docs/leaderboar
 const data = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/leaderboard-results.json")));
 const light = selectResults(data, "light", "historical", "");
 const medium = selectResults(data, "medium", "historical", "");
-assert.equal(light.length, 99);
-assert.equal(medium.length, 79);
-assert.equal(selectResults(data, "medium", "current", "").length, 22);
+assert.equal(light.length, 92);
+assert.equal(medium.length, 78);
+assert.equal(selectResults(data, "medium", "current", "").length, 19);
 for (const rows of [light, medium]) {
   for (let i = 1; i < rows.length; i++) assert.ok(rows[i - 1].result.passed >= rows[i].result.passed);
 }
-assert.equal(light.find(r => r.id === "secret-700-sft").result.passed, 368);
-assert.equal(medium.find(r => r.id === "secret-700-sft").result.passed, 9);
-assert.equal(selectResults(data, "light", "historical", "  CODEX ").length, 3);
+assert.equal(selectResults(data, "light", "historical", "  CODEX ").length, 2);
 assert.equal(selectResults(data, "light", "historical", "no-such-model").length, 0);
 assert.equal(formatPassed(390), "390");
 assert.equal(formatPassed(389 + 1 / 3), "389.3");
@@ -23,7 +21,7 @@ console.log("Leaderboard scope, ranking, missing-data and search checks passed."
 for (const row of data.rows.filter(r => r.measurement_type === "full_run")) { assert.equal(row.light.passed + row.medium.passed, row.source_passed); assert.equal(row.medium.total, 80); }
 
 const wave19 = selectResults(data, "medium", "wave19", "");
-assert.equal(wave19.length, 32);
+assert.equal(wave19.length, 29);
 const ua = selectResults(data, "light", "current", "Universal Agent").filter(r => r.id === "universal-agent-haiku");
 assert.equal(ua.length, 1);
 assert.equal(ua[0].result.passed, 384);
@@ -67,30 +65,6 @@ assert.ok(!landing.includes("medium-coverage"));
 assert.ok(!landing.includes("Task coverage"));
 assert.ok(!landing.includes('id="wave19-results"'));
 
-const allSecret = selectResults(data, "light", "current", "secret sft");
-assert.equal(allSecret.length, 3);
-const mini = allSecret.find(row => row.id === "secret-sft-mini-v019");
-assert.equal(mini.result.passed, 371);
-assert.equal(mini.medium.passed, 8);
-assert.equal(mini.wave19.passed, 0);
-assert.equal(mini.source_passed, 379);
-assert.equal(mini.measurement_valid, true);
-assert.equal(mini.details_url, "secret-sft-mini.html");
-assert.equal(mini.result.wilson95.length, 2);
-const secret = allSecret.filter(row => row.id === "secret-700b-v019");
-assert.equal(secret.length, 1);
-assert.equal(secret[0].result.passed, 370);
-assert.equal(secret[0].measurement_valid, true);
-assert.equal(secret[0].result.wilson95, undefined);
-assert.equal(selectResults(data, "medium", "current", "secret sft deepagents")[0].result.passed, 7);
-assert.equal(selectResults(data, "medium", "wave19", "secret sft")[0].result.passed, 0);
-
-assert.ok(!landing.includes('class="run-snapshot"'));
-assert.ok(!landing.includes('secret sft · stopped run'));
-assert.equal(secret[0].details_url, "secret-700b.html");
-assert.ok(fs.existsSync(require("node:path").join(__dirname, "../docs/secret-700b.html")));
-
-assert.equal(secret[0].validation_basis, "operator_acceptance");
 assert.ok(!landing.includes("unvalidated"));
 
 // Totals follow the selected task subset, never a whole-run fallback.
@@ -109,17 +83,10 @@ assert.equal(formatUsage({ tasks: 40, steps: { value: null, status: "unavailable
 assert.equal(formatUsage({ tasks: 40, steps: { value: 0, covered_tasks: 40, status: "complete" } }, "steps").text, "0");
 assert.equal(formatUsage({ tasks: 80, steps: { value: 17, covered_tasks: 3, status: "raw" } }, "steps").note, "Raw · 3/80 tasks");
 assert.equal(selectResults(data, "medium", "current", "").find(r => r.id === "run-19").usage.steps.value, null);
-assert.equal(selectResults(data, "light", "current", "Codex").find(r => r.id !== "secret-sft-codex-v019").usage, null);
+assert.equal(selectResults(data, "light", "current", "Codex")[0].usage, null);
 assert.equal((landing.match(/>Steps<\/th>/g) || []).length, 2);
 assert.equal((landing.match(/>Tokens<\/th>/g) || []).length, 2);
 console.log("Subset usage, exact totals, incomplete counters and real zero checks passed.");
-
-const codex = selectResults(data, "light", "current", "secret sft Codex")[0];
-assert.equal(codex.result.passed, 365);
-assert.equal(codex.usage.tokens.value, 8998150);
-assert.equal(formatUsage(codex.usage, "tokens").text, "≥ 9M");
-assert.equal(selectResults(data, "medium", "current", "secret sft Codex")[0].usage.tokens.value, 103032947);
-assert.equal(selectResults(data, "medium", "wave19", "secret sft Codex")[0].usage.tokens.value, 360166);
 
 const brain = data.rows.find(row => row.id === "brain-haiku-experiment");
 assert.equal(brain.light.passed + brain.medium.passed, 444);
@@ -191,7 +158,7 @@ assert.equal(wave21.find(row => row.id === "wave21-qwen38max_high_80").result.pa
 const medium90 = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/medium90-results.json")));
 const currentData = { ...data, medium90 };
 const ranked90 = selectResults(currentData, "medium", "current", "");
-assert.equal(ranked90.length, 12);
+assert.equal(ranked90.length, 10);
 assert.ok(ranked90.every(row => row.result.total === 90));
 assert.deepEqual(selectResults(currentData, "medium", "current", "haiku").map(row => row.result.passed), [63, 60]);
 assert.deepEqual(selectResults(currentData, "light", "current", ""), selectResults(data, "light", "current", ""));
@@ -207,7 +174,7 @@ const invalidComplete = { ...medium90.rows.find(r => r.status === "complete"), m
 assert.equal(selectResults({ ...data, medium90: { rows: [invalidComplete] } }, "medium", "current", "").length, 0);
 
 const historical80 = selectResults(currentData, "medium", "medium80", "");
-assert.equal(historical80.length, 22);
+assert.equal(historical80.length, 19);
 assert.ok(historical80.every(row => row.result.total === 80));
 assert.deepEqual(historical80, selectResults(data, "medium", "current", ""));
 assert.equal(selectResults(currentData, "medium", "medium80", "haiku").length, 6);
@@ -237,20 +204,6 @@ assert.equal(sonnetCode90.usage.tokens.value, sonnetCode90Source.tokens);
 assert.equal(sonnetCode90.usage.steps.value, sonnetCode90Source.steps);
 assert.equal(sonnetCode90.usage.tokens.status, "complete");
 
-// Secret rows stay out of every landing view, search, counts and ranking until opted in.
-for (const suite of ["light", "medium"]) {
-  const hidden = selectResults(currentData, suite, "current", "", false);
-  assert.ok(hidden.every(row => !/^secret/i.test(row.model)));
-  assert.equal(selectResults(currentData, suite, "current", "SecretModel-1114", false).length, 0);
-  const shown = selectResults(currentData, suite, "current", "SecretModel-1114", true);
-  assert.equal(shown.length, suite === "light" ? 2 : 3);
-  assert.ok(shown.every(row => row.result.total === (suite === "light" ? 391 : 90)));
-}
-assert.deepEqual(selectResults(currentData, "medium", "current", "SecretModel-1114", true).map(r => r.result.passed), [40, 36, 21]);
-assert.ok(landing.includes('id="show-secret-models" type="checkbox"'));
-assert.equal(selectResults(currentData, "medium", "medium80", "secret", false).length, 0);
-assert.equal(selectResults(currentData, "medium", "current", "SecretModel-1114", true)[0].result.note, "provisional · HTTP 400");
-
 const pi0731 = selectResults(currentData, "medium", "current", "0731");
 assert.equal(pi0731.length, 1);
 assert.equal(pi0731[0].result.passed, 65);
@@ -258,14 +211,6 @@ assert.equal(pi0731[0].harness, "Pi 1.5.2");
 assert.equal(pi0731[0].usage.tokens.value, 445223867);
 assert.equal(pi0731[0].usage.tokens.lower_bound, true);
 assert.ok(formatUsage(pi0731[0].usage, "tokens").text.startsWith("≥ "));
-assert.equal(selectResults(currentData, "medium", "current", "Ouroboros", true).length, 1);
-
-const ouroDev = selectResults(currentData, "medium", "current", "Ouroboros", true)[0];
-assert.equal(ouroDev.result.passed, 36);
-assert.equal(ouroDev.harness, "Ouroboros 7.11.1-alpha.0 (Development)");
-assert.equal(ouroDev.usage.tokens.value, 1144165427);
-assert.equal(ouroDev.usage.tokens.lower_bound, true);
-
 // Withdrawn integration-defective Light run stays historical, never ranked.
 assert.equal(light.find(row => row.id === "secret-37-1711-ouroboros"), undefined);
 const ouroLight = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "../docs/secret-37-1711-ouroboros-light-20261118.json"), "utf8"));
@@ -274,10 +219,19 @@ assert.equal(ouroLight.status, "withdrawn");
 assert.equal(ouroLight.passed, 203);
 assert.equal(ouroLight.outcomes.length, 391);
 
-const opd = selectResults(data, "light", "current", "secret-37-opd", true);
-assert.equal(opd.length, 1);
-assert.equal(opd[0].runs, 4);
-assert.deepEqual(opd[0].result, { passed: 376, total: 391 });
-assert.equal(selectResults(data, "light", "current", "secret-37-opd", false).length, 0);
-assert.ok(!data.rows.some(row => row.id.startsWith("secret-37-1711-")));
-assert.ok(!currentData.medium90.rows.some(row => row.id.startsWith("secret-37-1711-")));
+for (const feed of [data, medium90]) {
+  assert.doesNotMatch(JSON.stringify(feed), /secret/i);
+}
+assert.doesNotMatch(landing, /secret/i);
+const giga = selectResults(currentData, "medium", "current", "GigaChat-4 37b");
+assert.equal(giga.length, 1);
+assert.equal(giga[0].harness, "mini-SWE-agent 2.4.6");
+assert.equal(giga[0].result.passed, 16);
+assert.equal(giga[0].reasoning_effort, "high");
+assert.equal(giga[0].usage.steps.value, 4389);
+assert.equal(giga[0].usage.steps.covered_tasks, 76);
+assert.equal(giga[0].usage.steps.lower_bound, true);
+assert.equal(giga[0].usage.tokens.value, 647816150);
+assert.equal(giga[0].usage.tokens.covered_tasks, 90);
+assert.equal(selectResults(currentData, "light", "current", "GigaChat-4 37b").length, 0);
+assert.ok(fs.existsSync(require("node:path").join(__dirname, "../docs", giga[0].details_url)));

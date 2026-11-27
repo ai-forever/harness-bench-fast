@@ -285,71 +285,34 @@ def build(root=ROOT):
                 "measurement_type": "fresh_medium90", "measurement_valid": True,
                 "details_url": "pi-deepseek0731-medium90.html", "result_note": "includes 1 provider refusal"}
     rows.append(assemble_row(identity, components))
-    secret_path = root / "docs/secretmodel-1114.json"
-    secret = json.loads(secret_path.read_text(encoding="utf-8"))
-    for measurement in secret["measurements"]:
-        if measurement["suite"] != "medium":
-            continue
-        tasks = measurement["tasks"]
-        assert sorted(t["number"] for t in tasks) == sorted(NUMBERS)
-        assert sum(t["passed"] for t in tasks) == measurement["passed"]
-        suffix = "pi" if measurement["harness"] == "pi-mono" else "mini-swe"
-        identity = {"id": "secretmodel-1114-" + suffix, "profile_id": "secretmodel-1114-" + suffix,
-                    "model": secret["model"], "harness": measurement["harness"], "secret_model": True,
-                    "runs": 1, "source_version": secret["task_set_version"],
-                    "reasoning_effort": secret["reasoning_effort"], "measurement_type": "fresh_medium90",
-                    "measurement_valid": True, "details_url": "secretmodel-1114.html"}
-        if suffix == "pi":
-            identity["result_note"] = "provisional · HTTP 400"
-        components = []
-        for numbers, note in ((list(range(392, 472)), "fresh Medium90 run · earlier80 subset"),
-                              (SELECTED, "fresh Medium90 run · selected wave21 subset")):
-            subset = [t for t in tasks if t["number"] in numbers]
-            usage = {"sources_sha256": [measurement["source_sha256"]]}
-            if measurement.get("usage_audit_sha256"):
-                usage["notes"] = measurement["usage"]["notes"]
-                usage["sources_sha256"].append(measurement["usage_audit_sha256"])
-            for metric, field in (("steps", "agent_steps"), ("tokens", "agent_total_tokens")):
-                values = [t[field] for t in subset if t[field] is not None]
-                partial = len(values) < len(subset) or (
-                    metric == "tokens" and any(t.get("token_usage_complete") is False for t in subset))
-                usage[metric] = {"value": sum(values) if values else None, "covered_tasks": len(values),
-                                 "status": "partial" if values and partial else "complete" if values else "unavailable",
-                                 "lower_bound": bool(values) and partial}
-                if metric == "tokens" and measurement.get("usage_audit_sha256"):
-                    for key in ("input_tokens", "output_tokens", "unmetered_requests"):
-                        usage[metric][key] = sum(t[key] for t in subset)
-                    usage[metric]["completed_responses"] = sum(t["usage_responses"] for t in subset)
-            components.append(component(numbers, {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
-                                        usage, secret["task_set_version"], note))
-        rows.append(assemble_row(identity, components))
-    ouro_path = root / "docs/secretmodel-1114-ouroboros-dev-20261118.json"
-    ouro = json.loads(ouro_path.read_text(encoding="utf-8"))
-    if ([t["number"] for t in ouro["tasks"]] != sorted(NUMBERS)
-            or sum(t["passed"] for t in ouro["tasks"]) != ouro["overall_passed"]):
-        raise ValueError("Invalid Ouroboros Development task coverage")
-    identity = {"id": "secretmodel-1114-ouroboros-dev-20261118",
-                "profile_id": "secretmodel-1114-ouroboros-dev-20261118",
-                "model": ouro["model"], "harness": "Ouroboros " + ouro["harness_version"] + " (Development)",
-                "secret_model": True, "runs": 1, "source_version": ouro["task_set_version"],
-                "reasoning_effort": ouro["reasoning_effort"], "measurement_type": "adjudicated_medium90",
-                "measurement_valid": True, "details_url": "secretmodel-1114-ouroboros-dev-20261118.html",
-                "result_note": "nondefault: 4h; adaptive 200-request caps on two tasks; harness errors count as failures"}
+    giga_path = root / "docs/gigachat-4-37b-miniswe-medium90.json"
+    giga = json.loads(giga_path.read_text(encoding="utf-8"))
+    outcomes = giga["outcomes"]
+    assert giga["measurement_valid"] and giga["total"] == len(NUMBERS)
+    assert [task["number"] for task in outcomes] == NUMBERS
+    assert sum(task["passed"] for task in outcomes) == giga["passed"]
     components = []
-    for numbers in (list(range(392, 472)), SELECTED):
-        subset = [t for t in ouro["tasks"] if t["number"] in numbers]
-        covered = [t for t in subset if t["usage_responses"] > 0]
-        partial = len(covered) != len(subset) or not all(t["token_usage_complete"] for t in subset)
-        usage = {"notes": [ouro["usage_note"], ouro["protocol_note"]],
-                 "tokens": {"value": sum(t["total_tokens"] for t in covered),
-                            "covered_tasks": len(covered), "status": "partial" if partial else "complete",
-                            "lower_bound": partial,
-                            "input_tokens": sum(t["input_tokens"] for t in covered),
-                            "output_tokens": sum(t["output_tokens"] for t in covered),
-                            "completed_responses": sum(t["usage_responses"] for t in subset),
-                            "unmetered_requests": sum(t["unmetered_requests"] for t in subset)}}
-        components.append(component(numbers, {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
-                                    usage, ouro["task_set_version"], "latest attempts; nondefault adaptive budgets"))
+    for numbers in (range(392, 472), SELECTED):
+        subset = [task for task in outcomes if task["number"] in numbers]
+        steps = [t["agent_steps"] for t in subset if t["agent_steps"] is not None]
+        partial = len(steps) < len(subset)
+        inputs = sum(t["input_tokens"] for t in subset)
+        outputs = sum(t["output_tokens"] for t in subset)
+        assert all(t["completed_responses"] > 0 for t in subset)
+        usage = {
+            "sources_sha256": [giga["source_digest"]],
+            "steps": {"value": sum(steps), "covered_tasks": len(steps), "unit": "native_steps",
+                      "status": "partial" if partial else "complete", "lower_bound": partial},
+            "tokens": {"value": inputs + outputs, "input_tokens": inputs, "output_tokens": outputs,
+                       "covered_tasks": len(subset), "status": "complete",
+                       "completed_responses": sum(t["completed_responses"] for t in subset)},
+        }
+        components.append(component(list(numbers), {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
+                                    usage, giga["task_set_version"], "Fresh Medium90 run, final retained attempts"))
+    identity = {"id": giga_path.stem, "profile_id": giga_path.stem, "model": giga["model"],
+                "harness": giga["harness"], "runs": 1, "source_version": giga["task_set_version"],
+                "reasoning_effort": giga["reasoning_effort"], "measurement_type": "fresh_medium90",
+                "measurement_valid": giga["measurement_valid"], "details_url": giga_path.with_suffix(".html").name}
     rows.append(assemble_row(identity, components))
     openrouter_path = root / "docs/claudecode-haiku-openrouter-medium90.json"
     openrouter = json.loads(openrouter_path.read_text(encoding="utf-8"))
@@ -358,7 +321,7 @@ def build(root=ROOT):
             or sum(t["passed"] for t in openrouter["tasks"]) != openrouter["confirmed_passed"]):
         raise ValueError("Invalid Claude Code OpenRouter partial task coverage")
     identity = {"id": "claudecode-haiku-openrouter-medium90", "profile_id": "claudecode-haiku-openrouter-medium90",
-                "model": openrouter["model"], "harness": openrouter["harness"] + " (OpenRouter)", "secret_model": False,
+                "model": openrouter["model"], "harness": openrouter["harness"] + " (OpenRouter)",
                 "runs": 1, "source_version": openrouter["task_set_version"],
                 "reasoning_effort": openrouter["reasoning_effort"], "measurement_type": "interrupted_medium90",
                 "measurement_valid": True, "details_url": "claudecode-haiku-openrouter-medium90.html"}
@@ -389,7 +352,7 @@ def build(root=ROOT):
                        "incompatible_pairs": "Historical DeepAgents GLM/DeepSeek enabled native subagents; new wave21 disabled them. Keep separate profiles. 80/160 graph steps and model API request caps are distinct.",
                        "controls": "Forty wave20 controls and ten unselected calibration tasks excluded from Medium90.",
                        "new_model_calls": 0},
-            "provenance": {"legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path), "haiku_medium90_sha256": fingerprint(fresh_path), "codex_medium90_sha256": fingerprint(codex90_path), "miniswe_medium90_sha256": fingerprint(miniswe90_path), "claudecode_sonnet_medium90_sha256": fingerprint(claudecode_sonnet90_path), "pi_deepseek0731_medium90_sha256": fingerprint(pi0731_path), "claudecode_haiku_openrouter_sha256": fingerprint(openrouter_path)},
+            "provenance": {"gigachat_4_37b_miniswe_sha256": fingerprint(giga_path), "legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path), "haiku_medium90_sha256": fingerprint(fresh_path), "codex_medium90_sha256": fingerprint(codex90_path), "miniswe_medium90_sha256": fingerprint(miniswe90_path), "claudecode_sonnet_medium90_sha256": fingerprint(claudecode_sonnet90_path), "pi_deepseek0731_medium90_sha256": fingerprint(pi0731_path), "claudecode_haiku_openrouter_sha256": fingerprint(openrouter_path)},
             "summary": {"rows": len(rows), "ranked_rows": len(complete),
                         "coverage": {str(n): sum(r["measured_tasks"] == n for r in rows) for n in sorted({r["measured_tasks"] for r in rows})}},
             "rows": rows}

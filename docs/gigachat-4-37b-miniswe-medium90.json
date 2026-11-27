@@ -1,0 +1,826 @@
+{
+  "measurement_date": "2026-11-27",
+  "task_set_version": "0.21.3",
+  "model": "GigaChat-4 37b",
+  "harness": "mini-SWE-agent 2.4.6",
+  "reasoning_effort": "high",
+  "measurement_valid": true,
+  "total": 90,
+  "passed": 16,
+  "concurrency": 8,
+  "task_timeout_seconds": 28800,
+  "default_model_call_limit": 100,
+  "source_digest": "afc64b931993302c1fa6e2da09fbd991d2a5dd46d0ac0d676e8f75eca4d32a9d",
+  "outcomes": [
+    {
+      "number": 392,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 55,
+      "completed_responses": 54,
+      "input_tokens": 15657951,
+      "output_tokens": 35096
+    },
+    {
+      "number": 393,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 38,
+      "completed_responses": 41,
+      "input_tokens": 10804425,
+      "output_tokens": 31439
+    },
+    {
+      "number": 394,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 29,
+      "completed_responses": 29,
+      "input_tokens": 8695348,
+      "output_tokens": 13157
+    },
+    {
+      "number": 395,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 104,
+      "completed_responses": 100,
+      "input_tokens": 37154484,
+      "output_tokens": 84389
+    },
+    {
+      "number": 396,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 81,
+      "completed_responses": 85,
+      "input_tokens": 25741516,
+      "output_tokens": 66750
+    },
+    {
+      "number": 397,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 100,
+      "completed_responses": 100,
+      "input_tokens": 27244745,
+      "output_tokens": 111195
+    },
+    {
+      "number": 398,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 78,
+      "completed_responses": 78,
+      "input_tokens": 26587920,
+      "output_tokens": 75353
+    },
+    {
+      "number": 399,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 100,
+      "completed_responses": 100,
+      "input_tokens": 14223301,
+      "output_tokens": 61799
+    },
+    {
+      "number": 400,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 99,
+      "completed_responses": 100,
+      "input_tokens": 25513773,
+      "output_tokens": 113739
+    },
+    {
+      "number": 401,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 100,
+      "completed_responses": 100,
+      "input_tokens": 33081474,
+      "output_tokens": 39653
+    },
+    {
+      "number": 402,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 101,
+      "completed_responses": 87,
+      "input_tokens": 19812610,
+      "output_tokens": 82126
+    },
+    {
+      "number": 403,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 99,
+      "completed_responses": 100,
+      "input_tokens": 27210434,
+      "output_tokens": 112780
+    },
+    {
+      "number": 404,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 69,
+      "completed_responses": 72,
+      "input_tokens": 14197246,
+      "output_tokens": 48095
+    },
+    {
+      "number": 405,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 26,
+      "completed_responses": 18,
+      "input_tokens": 4673379,
+      "output_tokens": 2546
+    },
+    {
+      "number": 406,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 99,
+      "completed_responses": 100,
+      "input_tokens": 31560674,
+      "output_tokens": 158511
+    },
+    {
+      "number": 407,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 100,
+      "completed_responses": 100,
+      "input_tokens": 35347413,
+      "output_tokens": 63690
+    },
+    {
+      "number": 408,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 100,
+      "completed_responses": 100,
+      "input_tokens": 23300784,
+      "output_tokens": 46129
+    },
+    {
+      "number": 409,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 54,
+      "completed_responses": 59,
+      "input_tokens": 21679379,
+      "output_tokens": 34461
+    },
+    {
+      "number": 410,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 103,
+      "completed_responses": 100,
+      "input_tokens": 37826093,
+      "output_tokens": 99576
+    },
+    {
+      "number": 411,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 100,
+      "completed_responses": 100,
+      "input_tokens": 26629090,
+      "output_tokens": 105813
+    },
+    {
+      "number": 412,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 19,
+      "completed_responses": 16,
+      "input_tokens": 252856,
+      "output_tokens": 16874
+    },
+    {
+      "number": 413,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 15,
+      "completed_responses": 15,
+      "input_tokens": 182629,
+      "output_tokens": 5477
+    },
+    {
+      "number": 414,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 57,
+      "completed_responses": 57,
+      "input_tokens": 2258854,
+      "output_tokens": 56911
+    },
+    {
+      "number": 415,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 42,
+      "completed_responses": 42,
+      "input_tokens": 1028796,
+      "output_tokens": 36074
+    },
+    {
+      "number": 416,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 44,
+      "completed_responses": 34,
+      "input_tokens": 652632,
+      "output_tokens": 16640
+    },
+    {
+      "number": 417,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 33,
+      "input_tokens": 652964,
+      "output_tokens": 25125
+    },
+    {
+      "number": 418,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 17,
+      "input_tokens": 324168,
+      "output_tokens": 16304
+    },
+    {
+      "number": 419,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 18,
+      "input_tokens": 221755,
+      "output_tokens": 11835
+    },
+    {
+      "number": 420,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 43,
+      "completed_responses": 43,
+      "input_tokens": 5663056,
+      "output_tokens": 121781
+    },
+    {
+      "number": 421,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 30,
+      "completed_responses": 30,
+      "input_tokens": 1103966,
+      "output_tokens": 23213
+    },
+    {
+      "number": 422,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 25,
+      "completed_responses": 26,
+      "input_tokens": 1207922,
+      "output_tokens": 84210
+    },
+    {
+      "number": 423,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 27,
+      "completed_responses": 27,
+      "input_tokens": 945871,
+      "output_tokens": 37685
+    },
+    {
+      "number": 424,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 27,
+      "input_tokens": 633589,
+      "output_tokens": 22577
+    },
+    {
+      "number": 425,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 43,
+      "completed_responses": 43,
+      "input_tokens": 1223460,
+      "output_tokens": 24062
+    },
+    {
+      "number": 426,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 18,
+      "input_tokens": 223308,
+      "output_tokens": 12269
+    },
+    {
+      "number": 427,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 29,
+      "completed_responses": 28,
+      "input_tokens": 610452,
+      "output_tokens": 8860
+    },
+    {
+      "number": 428,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 40,
+      "completed_responses": 40,
+      "input_tokens": 1793869,
+      "output_tokens": 70345
+    },
+    {
+      "number": 429,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 40,
+      "completed_responses": 37,
+      "input_tokens": 1453098,
+      "output_tokens": 54652
+    },
+    {
+      "number": 430,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 63,
+      "completed_responses": 64,
+      "input_tokens": 4418203,
+      "output_tokens": 117559
+    },
+    {
+      "number": 431,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 79,
+      "completed_responses": 80,
+      "input_tokens": 6128758,
+      "output_tokens": 126337
+    },
+    {
+      "number": 432,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 41,
+      "completed_responses": 40,
+      "input_tokens": 2268709,
+      "output_tokens": 35025
+    },
+    {
+      "number": 433,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 15,
+      "input_tokens": 392214,
+      "output_tokens": 6714
+    },
+    {
+      "number": 434,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 26,
+      "completed_responses": 22,
+      "input_tokens": 1024070,
+      "output_tokens": 10202
+    },
+    {
+      "number": 435,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 19,
+      "completed_responses": 19,
+      "input_tokens": 487145,
+      "output_tokens": 8368
+    },
+    {
+      "number": 436,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 19,
+      "completed_responses": 16,
+      "input_tokens": 431736,
+      "output_tokens": 17308
+    },
+    {
+      "number": 437,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 29,
+      "completed_responses": 24,
+      "input_tokens": 731326,
+      "output_tokens": 22531
+    },
+    {
+      "number": 438,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 62,
+      "input_tokens": 5480539,
+      "output_tokens": 108295
+    },
+    {
+      "number": 439,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 42,
+      "input_tokens": 2123110,
+      "output_tokens": 45503
+    },
+    {
+      "number": 440,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 66,
+      "completed_responses": 65,
+      "input_tokens": 6452940,
+      "output_tokens": 77068
+    },
+    {
+      "number": 441,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 24,
+      "completed_responses": 19,
+      "input_tokens": 628911,
+      "output_tokens": 12104
+    },
+    {
+      "number": 442,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 20,
+      "input_tokens": 595368,
+      "output_tokens": 12548
+    },
+    {
+      "number": 443,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 24,
+      "completed_responses": 24,
+      "input_tokens": 671564,
+      "output_tokens": 17896
+    },
+    {
+      "number": 444,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 27,
+      "completed_responses": 27,
+      "input_tokens": 991368,
+      "output_tokens": 13559
+    },
+    {
+      "number": 445,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 25,
+      "completed_responses": 25,
+      "input_tokens": 915346,
+      "output_tokens": 11581
+    },
+    {
+      "number": 446,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 36,
+      "completed_responses": 30,
+      "input_tokens": 1865753,
+      "output_tokens": 36743
+    },
+    {
+      "number": 447,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 60,
+      "completed_responses": 60,
+      "input_tokens": 3570432,
+      "output_tokens": 42264
+    },
+    {
+      "number": 448,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 24,
+      "completed_responses": 24,
+      "input_tokens": 949010,
+      "output_tokens": 13133
+    },
+    {
+      "number": 449,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 19,
+      "completed_responses": 17,
+      "input_tokens": 451981,
+      "output_tokens": 15201
+    },
+    {
+      "number": 450,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 80,
+      "completed_responses": 82,
+      "input_tokens": 6745217,
+      "output_tokens": 69615
+    },
+    {
+      "number": 451,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 20,
+      "completed_responses": 20,
+      "input_tokens": 558976,
+      "output_tokens": 15185
+    },
+    {
+      "number": 452,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 15,
+      "completed_responses": 12,
+      "input_tokens": 309385,
+      "output_tokens": 15020
+    },
+    {
+      "number": 453,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 32,
+      "input_tokens": 1296808,
+      "output_tokens": 43507
+    },
+    {
+      "number": 454,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 20,
+      "completed_responses": 17,
+      "input_tokens": 520035,
+      "output_tokens": 20425
+    },
+    {
+      "number": 455,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 34,
+      "completed_responses": 35,
+      "input_tokens": 1193597,
+      "output_tokens": 20052
+    },
+    {
+      "number": 456,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 26,
+      "input_tokens": 803452,
+      "output_tokens": 15302
+    },
+    {
+      "number": 457,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 26,
+      "completed_responses": 23,
+      "input_tokens": 668243,
+      "output_tokens": 21214
+    },
+    {
+      "number": 458,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 55,
+      "completed_responses": 53,
+      "input_tokens": 3151947,
+      "output_tokens": 43360
+    },
+    {
+      "number": 459,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 100,
+      "completed_responses": 100,
+      "input_tokens": 7551482,
+      "output_tokens": 68190
+    },
+    {
+      "number": 460,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 100,
+      "completed_responses": 100,
+      "input_tokens": 13828065,
+      "output_tokens": 186092
+    },
+    {
+      "number": 461,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 30,
+      "completed_responses": 28,
+      "input_tokens": 992853,
+      "output_tokens": 26642
+    },
+    {
+      "number": 462,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 11,
+      "input_tokens": 225417,
+      "output_tokens": 4703
+    },
+    {
+      "number": 463,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 53,
+      "completed_responses": 53,
+      "input_tokens": 4263136,
+      "output_tokens": 47726
+    },
+    {
+      "number": 464,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 20,
+      "completed_responses": 17,
+      "input_tokens": 495692,
+      "output_tokens": 19441
+    },
+    {
+      "number": 465,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 12,
+      "input_tokens": 288597,
+      "output_tokens": 17680
+    },
+    {
+      "number": 466,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 49,
+      "completed_responses": 47,
+      "input_tokens": 2251951,
+      "output_tokens": 55264
+    },
+    {
+      "number": 467,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 45,
+      "completed_responses": 45,
+      "input_tokens": 2877873,
+      "output_tokens": 41265
+    },
+    {
+      "number": 468,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 51,
+      "completed_responses": 51,
+      "input_tokens": 3500064,
+      "output_tokens": 73010
+    },
+    {
+      "number": 469,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 67,
+      "completed_responses": 62,
+      "input_tokens": 5028694,
+      "output_tokens": 66877
+    },
+    {
+      "number": 470,
+      "passed": false,
+      "timed_out": true,
+      "agent_steps": null,
+      "completed_responses": 11,
+      "input_tokens": 217584,
+      "output_tokens": 7613
+    },
+    {
+      "number": 471,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 30,
+      "completed_responses": 30,
+      "input_tokens": 1216410,
+      "output_tokens": 23280
+    },
+    {
+      "number": 512,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 100,
+      "completed_responses": 100,
+      "input_tokens": 7061291,
+      "output_tokens": 125085
+    },
+    {
+      "number": 518,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 100,
+      "completed_responses": 100,
+      "input_tokens": 4469757,
+      "output_tokens": 36419
+    },
+    {
+      "number": 520,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 95,
+      "completed_responses": 97,
+      "input_tokens": 5316994,
+      "output_tokens": 83681
+    },
+    {
+      "number": 522,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 81,
+      "completed_responses": 82,
+      "input_tokens": 5682284,
+      "output_tokens": 162537
+    },
+    {
+      "number": 523,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 61,
+      "completed_responses": 62,
+      "input_tokens": 2490931,
+      "output_tokens": 66845
+    },
+    {
+      "number": 524,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 93,
+      "completed_responses": 82,
+      "input_tokens": 5810156,
+      "output_tokens": 127244
+    },
+    {
+      "number": 525,
+      "passed": true,
+      "timed_out": false,
+      "agent_steps": 106,
+      "completed_responses": 85,
+      "input_tokens": 5988046,
+      "output_tokens": 70532
+    },
+    {
+      "number": 526,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 104,
+      "completed_responses": 100,
+      "input_tokens": 8752272,
+      "output_tokens": 95949
+    },
+    {
+      "number": 527,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 105,
+      "completed_responses": 100,
+      "input_tokens": 8174038,
+      "output_tokens": 162904
+    },
+    {
+      "number": 530,
+      "passed": false,
+      "timed_out": false,
+      "agent_steps": 79,
+      "completed_responses": 65,
+      "input_tokens": 3417706,
+      "output_tokens": 99641
+    }
+  ]
+}
