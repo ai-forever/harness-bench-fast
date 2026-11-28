@@ -330,6 +330,10 @@ def build(root=ROOT):
                 partial = len(values) != len(subset)
                 usage[metric] = {"value": sum(values), "covered_tasks": len(values),
                                  "status": "partial" if partial else "raw", "lower_bound": partial}
+        if "tokens" in usage:
+            for field in ("input_tokens", "output_tokens", "completed_responses", "unmetered_requests"):
+                usage["tokens"][field] = sum(task[field] for task in subset)
+            usage["notes"] = ["Cloud.ru API total_tokens over matched responses. Separately reported cache reads are listed in the run details."]
         components.append(component(list(numbers), {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
                                     usage, cloudru_pi["task_set_version"], "Fresh Medium90 run, final retained attempts"))
     identity = {"id": cloudru_pi_path.stem, "profile_id": cloudru_pi_path.stem, "model": cloudru_pi["model"],

@@ -14,541 +14,991 @@
       "number": 392,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 497355,
+      "input_tokens": 416501,
+      "output_tokens": 80854,
+      "cache_read_tokens": 3121344,
+      "completed_responses": 55,
+      "unmetered_requests": 0
     },
     {
       "number": 393,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 246444,
+      "input_tokens": 172638,
+      "output_tokens": 73806,
+      "cache_read_tokens": 5559744,
+      "completed_responses": 66,
+      "unmetered_requests": 0
     },
     {
       "number": 394,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 1790927,
+      "input_tokens": 1555927,
+      "output_tokens": 235000,
+      "cache_read_tokens": 14309248,
+      "completed_responses": 74,
+      "unmetered_requests": 0
     },
     {
       "number": 395,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 328889,
+      "input_tokens": 233073,
+      "output_tokens": 95816,
+      "cache_read_tokens": 6540544,
+      "completed_responses": 53,
+      "unmetered_requests": 0
     },
     {
       "number": 396,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 363848,
+      "input_tokens": 278461,
+      "output_tokens": 85387,
+      "cache_read_tokens": 5816576,
+      "completed_responses": 75,
+      "unmetered_requests": 0
     },
     {
       "number": 397,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 558002,
+      "input_tokens": 505568,
+      "output_tokens": 52434,
+      "cache_read_tokens": 5596480,
+      "completed_responses": 53,
+      "unmetered_requests": 0
     },
     {
       "number": 398,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 657044,
+      "input_tokens": 545461,
+      "output_tokens": 111583,
+      "cache_read_tokens": 4489856,
+      "completed_responses": 60,
+      "unmetered_requests": 0
     },
     {
       "number": 399,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 263770,
+      "input_tokens": 167275,
+      "output_tokens": 96495,
+      "cache_read_tokens": 6063424,
+      "completed_responses": 63,
+      "unmetered_requests": 0
     },
     {
       "number": 400,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 327181,
+      "input_tokens": 202464,
+      "output_tokens": 124717,
+      "cache_read_tokens": 6296338,
+      "completed_responses": 55,
+      "unmetered_requests": 0
     },
     {
       "number": 401,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 199315,
+      "input_tokens": 148506,
+      "output_tokens": 50809,
+      "cache_read_tokens": 9033088,
+      "completed_responses": 105,
+      "unmetered_requests": 0
     },
     {
       "number": 402,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 488534,
+      "input_tokens": 431447,
+      "output_tokens": 57087,
+      "cache_read_tokens": 1564096,
+      "completed_responses": 26,
+      "unmetered_requests": 0
     },
     {
       "number": 403,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 2129769,
+      "input_tokens": 1957065,
+      "output_tokens": 172704,
+      "cache_read_tokens": 9119104,
+      "completed_responses": 67,
+      "unmetered_requests": 0
     },
     {
       "number": 404,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 81004,
+      "input_tokens": 65032,
+      "output_tokens": 15972,
+      "cache_read_tokens": 415424,
+      "completed_responses": 19,
+      "unmetered_requests": 0
     },
     {
       "number": 405,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 323407,
+      "input_tokens": 248269,
+      "output_tokens": 75138,
+      "cache_read_tokens": 4976832,
+      "completed_responses": 41,
+      "unmetered_requests": 0
     },
     {
       "number": 406,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 929711,
+      "input_tokens": 755599,
+      "output_tokens": 174112,
+      "cache_read_tokens": 10399104,
+      "completed_responses": 67,
+      "unmetered_requests": 0
     },
     {
       "number": 407,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 7721356,
+      "input_tokens": 7443197,
+      "output_tokens": 278159,
+      "cache_read_tokens": 32618496,
+      "completed_responses": 179,
+      "unmetered_requests": 0
     },
     {
       "number": 408,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 689714,
+      "input_tokens": 526038,
+      "output_tokens": 163676,
+      "cache_read_tokens": 26122582,
+      "completed_responses": 166,
+      "unmetered_requests": 0
     },
     {
       "number": 409,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 717245,
+      "input_tokens": 584755,
+      "output_tokens": 132490,
+      "cache_read_tokens": 20180160,
+      "completed_responses": 100,
+      "unmetered_requests": 0
     },
     {
       "number": 410,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 1163877,
+      "input_tokens": 1002798,
+      "output_tokens": 161079,
+      "cache_read_tokens": 13673024,
+      "completed_responses": 88,
+      "unmetered_requests": 0
     },
     {
       "number": 411,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 334021,
+      "input_tokens": 236341,
+      "output_tokens": 97680,
+      "cache_read_tokens": 7030720,
+      "completed_responses": 82,
+      "unmetered_requests": 0
     },
     {
       "number": 412,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 54837,
+      "input_tokens": 37484,
+      "output_tokens": 17353,
+      "cache_read_tokens": 111392,
+      "completed_responses": 14,
+      "unmetered_requests": 0
     },
     {
       "number": 413,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 112469,
+      "input_tokens": 78608,
+      "output_tokens": 33861,
+      "cache_read_tokens": 712454,
+      "completed_responses": 31,
+      "unmetered_requests": 0
     },
     {
       "number": 414,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 15711,
+      "input_tokens": 11299,
+      "output_tokens": 4412,
+      "cache_read_tokens": 53884,
+      "completed_responses": 11,
+      "unmetered_requests": 0
     },
     {
       "number": 415,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 146568,
+      "input_tokens": 110509,
+      "output_tokens": 36059,
+      "cache_read_tokens": 1488632,
+      "completed_responses": 53,
+      "unmetered_requests": 0
     },
     {
       "number": 416,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 66479,
+      "input_tokens": 50259,
+      "output_tokens": 16220,
+      "cache_read_tokens": 87230,
+      "completed_responses": 10,
+      "unmetered_requests": 0
     },
     {
       "number": 417,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 75878,
+      "input_tokens": 41416,
+      "output_tokens": 34462,
+      "cache_read_tokens": 199363,
+      "completed_responses": 16,
+      "unmetered_requests": 0
     },
     {
       "number": 418,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 43025,
+      "input_tokens": 29509,
+      "output_tokens": 13516,
+      "cache_read_tokens": 317120,
+      "completed_responses": 26,
+      "unmetered_requests": 0
     },
     {
       "number": 419,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 35219,
+      "input_tokens": 23702,
+      "output_tokens": 11517,
+      "cache_read_tokens": 244863,
+      "completed_responses": 22,
+      "unmetered_requests": 0
     },
     {
       "number": 420,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 99587,
+      "input_tokens": 57057,
+      "output_tokens": 42530,
+      "cache_read_tokens": 932058,
+      "completed_responses": 35,
+      "unmetered_requests": 0
     },
     {
       "number": 421,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 83780,
+      "input_tokens": 56261,
+      "output_tokens": 27519,
+      "cache_read_tokens": 578688,
+      "completed_responses": 20,
+      "unmetered_requests": 0
     },
     {
       "number": 422,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 28938,
+      "input_tokens": 17605,
+      "output_tokens": 11333,
+      "cache_read_tokens": 45952,
+      "completed_responses": 8,
+      "unmetered_requests": 0
     },
     {
       "number": 423,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 106027,
+      "input_tokens": 75819,
+      "output_tokens": 30208,
+      "cache_read_tokens": 291392,
+      "completed_responses": 16,
+      "unmetered_requests": 0
     },
     {
       "number": 424,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 53781,
+      "input_tokens": 39801,
+      "output_tokens": 13980,
+      "cache_read_tokens": 579640,
+      "completed_responses": 49,
+      "unmetered_requests": 0
     },
     {
       "number": 425,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 53712,
+      "input_tokens": 35498,
+      "output_tokens": 18214,
+      "cache_read_tokens": 256064,
+      "completed_responses": 18,
+      "unmetered_requests": 0
     },
     {
       "number": 426,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 72675,
+      "input_tokens": 46367,
+      "output_tokens": 26308,
+      "cache_read_tokens": 182357,
+      "completed_responses": 14,
+      "unmetered_requests": 0
     },
     {
       "number": 427,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 33159,
+      "input_tokens": 23112,
+      "output_tokens": 10047,
+      "cache_read_tokens": 236224,
+      "completed_responses": 21,
+      "unmetered_requests": 0
     },
     {
       "number": 428,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 128055,
+      "input_tokens": 81604,
+      "output_tokens": 46451,
+      "cache_read_tokens": 698467,
+      "completed_responses": 27,
+      "unmetered_requests": 0
     },
     {
       "number": 429,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 39723,
+      "input_tokens": 34914,
+      "output_tokens": 4809,
+      "cache_read_tokens": 150293,
+      "completed_responses": 18,
+      "unmetered_requests": 0
     },
     {
       "number": 430,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 36913,
+      "input_tokens": 30916,
+      "output_tokens": 5997,
+      "cache_read_tokens": 243520,
+      "completed_responses": 19,
+      "unmetered_requests": 0
     },
     {
       "number": 431,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 67600,
+      "input_tokens": 38547,
+      "output_tokens": 29053,
+      "cache_read_tokens": 427268,
+      "completed_responses": 21,
+      "unmetered_requests": 0
     },
     {
       "number": 432,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 48469,
+      "input_tokens": 33788,
+      "output_tokens": 14681,
+      "cache_read_tokens": 255306,
+      "completed_responses": 20,
+      "unmetered_requests": 0
     },
     {
       "number": 433,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 117544,
+      "input_tokens": 86911,
+      "output_tokens": 30633,
+      "cache_read_tokens": 409472,
+      "completed_responses": 21,
+      "unmetered_requests": 0
     },
     {
       "number": 434,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 39603,
+      "input_tokens": 25477,
+      "output_tokens": 14126,
+      "cache_read_tokens": 194669,
+      "completed_responses": 17,
+      "unmetered_requests": 0
     },
     {
       "number": 435,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 48665,
+      "input_tokens": 34329,
+      "output_tokens": 14336,
+      "cache_read_tokens": 225605,
+      "completed_responses": 12,
+      "unmetered_requests": 0
     },
     {
       "number": 436,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 68612,
+      "input_tokens": 47143,
+      "output_tokens": 21469,
+      "cache_read_tokens": 229433,
+      "completed_responses": 14,
+      "unmetered_requests": 0
     },
     {
       "number": 437,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 37724,
+      "input_tokens": 23204,
+      "output_tokens": 14520,
+      "cache_read_tokens": 173027,
+      "completed_responses": 12,
+      "unmetered_requests": 0
     },
     {
       "number": 438,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 64058,
+      "input_tokens": 46467,
+      "output_tokens": 17591,
+      "cache_read_tokens": 231988,
+      "completed_responses": 15,
+      "unmetered_requests": 0
     },
     {
       "number": 439,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 393714,
+      "input_tokens": 308790,
+      "output_tokens": 84924,
+      "cache_read_tokens": 2036928,
+      "completed_responses": 37,
+      "unmetered_requests": 0
     },
     {
       "number": 440,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 70742,
+      "input_tokens": 57331,
+      "output_tokens": 13411,
+      "cache_read_tokens": 302077,
+      "completed_responses": 22,
+      "unmetered_requests": 0
     },
     {
       "number": 441,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 48982,
+      "input_tokens": 39703,
+      "output_tokens": 9279,
+      "cache_read_tokens": 373212,
+      "completed_responses": 17,
+      "unmetered_requests": 0
     },
     {
       "number": 442,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 245626,
+      "input_tokens": 182557,
+      "output_tokens": 63069,
+      "cache_read_tokens": 779456,
+      "completed_responses": 22,
+      "unmetered_requests": 0
     },
     {
       "number": 443,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 32981,
+      "input_tokens": 22208,
+      "output_tokens": 10773,
+      "cache_read_tokens": 196864,
+      "completed_responses": 15,
+      "unmetered_requests": 0
     },
     {
       "number": 444,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 29262,
+      "input_tokens": 20028,
+      "output_tokens": 9234,
+      "cache_read_tokens": 151808,
+      "completed_responses": 15,
+      "unmetered_requests": 0
     },
     {
       "number": 445,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 63454,
+      "input_tokens": 46442,
+      "output_tokens": 17012,
+      "cache_read_tokens": 197487,
+      "completed_responses": 18,
+      "unmetered_requests": 0
     },
     {
       "number": 446,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 50778,
+      "input_tokens": 41192,
+      "output_tokens": 9586,
+      "cache_read_tokens": 126162,
+      "completed_responses": 14,
+      "unmetered_requests": 0
     },
     {
       "number": 447,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 88575,
+      "input_tokens": 50858,
+      "output_tokens": 37717,
+      "cache_read_tokens": 722816,
+      "completed_responses": 32,
+      "unmetered_requests": 0
     },
     {
       "number": 448,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 293007,
+      "input_tokens": 232654,
+      "output_tokens": 60353,
+      "cache_read_tokens": 2095296,
+      "completed_responses": 44,
+      "unmetered_requests": 0
     },
     {
       "number": 449,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 46709,
+      "input_tokens": 27961,
+      "output_tokens": 18748,
+      "cache_read_tokens": 199662,
+      "completed_responses": 13,
+      "unmetered_requests": 0
     },
     {
       "number": 450,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 56483,
+      "input_tokens": 38067,
+      "output_tokens": 18416,
+      "cache_read_tokens": 489856,
+      "completed_responses": 26,
+      "unmetered_requests": 0
     },
     {
       "number": 451,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 68362,
+      "input_tokens": 43279,
+      "output_tokens": 25083,
+      "cache_read_tokens": 366400,
+      "completed_responses": 17,
+      "unmetered_requests": 0
     },
     {
       "number": 452,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 45756,
+      "input_tokens": 33586,
+      "output_tokens": 12170,
+      "cache_read_tokens": 130176,
+      "completed_responses": 12,
+      "unmetered_requests": 0
     },
     {
       "number": 453,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 124666,
+      "input_tokens": 88145,
+      "output_tokens": 36521,
+      "cache_read_tokens": 707472,
+      "completed_responses": 29,
+      "unmetered_requests": 0
     },
     {
       "number": 454,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 33559,
+      "input_tokens": 21353,
+      "output_tokens": 12206,
+      "cache_read_tokens": 236302,
+      "completed_responses": 17,
+      "unmetered_requests": 0
     },
     {
       "number": 455,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 34774,
+      "input_tokens": 25042,
+      "output_tokens": 9732,
+      "cache_read_tokens": 265536,
+      "completed_responses": 20,
+      "unmetered_requests": 0
     },
     {
       "number": 456,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 95871,
+      "input_tokens": 65003,
+      "output_tokens": 30868,
+      "cache_read_tokens": 1307072,
+      "completed_responses": 32,
+      "unmetered_requests": 0
     },
     {
       "number": 457,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 34039,
+      "input_tokens": 21819,
+      "output_tokens": 12220,
+      "cache_read_tokens": 167787,
+      "completed_responses": 13,
+      "unmetered_requests": 0
     },
     {
       "number": 458,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 50407,
+      "input_tokens": 33718,
+      "output_tokens": 16689,
+      "cache_read_tokens": 303426,
+      "completed_responses": 18,
+      "unmetered_requests": 0
     },
     {
       "number": 459,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 180044,
+      "input_tokens": 119737,
+      "output_tokens": 60307,
+      "cache_read_tokens": 1440699,
+      "completed_responses": 44,
+      "unmetered_requests": 0
     },
     {
       "number": 460,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 331270,
+      "input_tokens": 235445,
+      "output_tokens": 95825,
+      "cache_read_tokens": 3991372,
+      "completed_responses": 56,
+      "unmetered_requests": 0
     },
     {
       "number": 461,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 51656,
+      "input_tokens": 34957,
+      "output_tokens": 16699,
+      "cache_read_tokens": 384896,
+      "completed_responses": 20,
+      "unmetered_requests": 0
     },
     {
       "number": 462,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 159978,
+      "input_tokens": 113031,
+      "output_tokens": 46947,
+      "cache_read_tokens": 598080,
+      "completed_responses": 29,
+      "unmetered_requests": 0
     },
     {
       "number": 463,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 54192,
+      "input_tokens": 34111,
+      "output_tokens": 20081,
+      "cache_read_tokens": 317248,
+      "completed_responses": 21,
+      "unmetered_requests": 0
     },
     {
       "number": 464,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 31305,
+      "input_tokens": 21532,
+      "output_tokens": 9773,
+      "cache_read_tokens": 99930,
+      "completed_responses": 10,
+      "unmetered_requests": 0
     },
     {
       "number": 465,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 38266,
+      "input_tokens": 24639,
+      "output_tokens": 13627,
+      "cache_read_tokens": 233280,
+      "completed_responses": 16,
+      "unmetered_requests": 0
     },
     {
       "number": 466,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 88649,
+      "input_tokens": 71963,
+      "output_tokens": 16686,
+      "cache_read_tokens": 364094,
+      "completed_responses": 23,
+      "unmetered_requests": 0
     },
     {
       "number": 467,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 63308,
+      "input_tokens": 36739,
+      "output_tokens": 26569,
+      "cache_read_tokens": 433048,
+      "completed_responses": 26,
+      "unmetered_requests": 0
     },
     {
       "number": 468,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 53473,
+      "input_tokens": 35648,
+      "output_tokens": 17825,
+      "cache_read_tokens": 370388,
+      "completed_responses": 21,
+      "unmetered_requests": 0
     },
     {
       "number": 469,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 59917,
+      "input_tokens": 37113,
+      "output_tokens": 22804,
+      "cache_read_tokens": 504156,
+      "completed_responses": 29,
+      "unmetered_requests": 0
     },
     {
       "number": 470,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 83570,
+      "input_tokens": 62457,
+      "output_tokens": 21113,
+      "cache_read_tokens": 215723,
+      "completed_responses": 15,
+      "unmetered_requests": 0
     },
     {
       "number": 471,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 66478,
+      "input_tokens": 50424,
+      "output_tokens": 16054,
+      "cache_read_tokens": 231104,
+      "completed_responses": 18,
+      "unmetered_requests": 0
     },
     {
       "number": 512,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 81855,
+      "input_tokens": 50397,
+      "output_tokens": 31458,
+      "cache_read_tokens": 1739670,
+      "completed_responses": 54,
+      "unmetered_requests": 0
     },
     {
       "number": 518,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 118332,
+      "input_tokens": 82955,
+      "output_tokens": 35377,
+      "cache_read_tokens": 2685461,
+      "completed_responses": 78,
+      "unmetered_requests": 0
     },
     {
       "number": 520,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 109460,
+      "input_tokens": 64810,
+      "output_tokens": 44650,
+      "cache_read_tokens": 2267973,
+      "completed_responses": 56,
+      "unmetered_requests": 0
     },
     {
       "number": 522,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 262789,
+      "input_tokens": 183313,
+      "output_tokens": 79476,
+      "cache_read_tokens": 5733030,
+      "completed_responses": 93,
+      "unmetered_requests": 0
     },
     {
       "number": 523,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 131118,
+      "input_tokens": 92046,
+      "output_tokens": 39072,
+      "cache_read_tokens": 2938408,
+      "completed_responses": 79,
+      "unmetered_requests": 0
     },
     {
       "number": 524,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 309247,
+      "input_tokens": 214090,
+      "output_tokens": 95157,
+      "cache_read_tokens": 1905697,
+      "completed_responses": 49,
+      "unmetered_requests": 0
     },
     {
       "number": 525,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 76475,
+      "input_tokens": 46762,
+      "output_tokens": 29713,
+      "cache_read_tokens": 1364736,
+      "completed_responses": 47,
+      "unmetered_requests": 0
     },
     {
       "number": 526,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 87331,
+      "input_tokens": 58745,
+      "output_tokens": 28586,
+      "cache_read_tokens": 1819138,
+      "completed_responses": 68,
+      "unmetered_requests": 0
     },
     {
       "number": 527,
       "passed": false,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 220582,
+      "input_tokens": 154101,
+      "output_tokens": 66481,
+      "cache_read_tokens": 3251136,
+      "completed_responses": 62,
+      "unmetered_requests": 0
     },
     {
       "number": 530,
       "passed": true,
       "agent_steps": null,
-      "tokens": null
+      "tokens": 146249,
+      "input_tokens": 111182,
+      "output_tokens": 35067,
+      "cache_read_tokens": 2846543,
+      "completed_responses": 83,
+      "unmetered_requests": 0
     }
   ]
 }

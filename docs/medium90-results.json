@@ -105,7 +105,7 @@
     "new_model_calls": 0
   },
   "provenance": {
-    "gigachat_4_cloudru_pi_sha256": "61c86c4b08f6f2979dd4aa39cfb3f1407842c660185972b75681d373974ac956",
+    "gigachat_4_cloudru_pi_sha256": "5a5c633e670f7d45b58f146e87856034dade48ad320eb7ec409340d99640a488",
     "gigachat_4_37b_miniswe_sha256": "df1aab95ede4747feda707f20d8ac1a4a2cce15dfb6fafc6f772a72e25a12144",
     "legacy_results_sha256": "f1b395f934c5d457912ecb0f11ed32cfec0d0ecbebf797677d9b3990558dad34",
     "wave21_results_sha256": "1d35d5b2b0d9b28829b5d27d28f852d6f1f33d768e95df7581ffa0073d299803",
@@ -18952,7 +18952,9 @@
         "observed_tasks": 90,
         "notes": [
           "Retained public measurement counters only. Missing tasks are unmeasured, not failures.",
-          "Task counts show counter availability, not full request-level accounting."
+          "Task counts show counter availability, not full request-level accounting.",
+          "Cloud.ru API total_tokens over matched responses. Separately reported cache reads are listed in the run details.",
+          "Cloud.ru API total_tokens over matched responses. Separately reported cache reads are listed in the run details."
         ],
         "sources_sha256": [],
         "steps": {
@@ -18962,10 +18964,18 @@
           "lower_bound": false
         },
         "tokens": {
-          "value": null,
-          "covered_tasks": 0,
-          "status": "unavailable",
-          "lower_bound": false
+          "value": 26303515,
+          "covered_tasks": 90,
+          "status": "raw",
+          "lower_bound": false,
+          "input_tokens": 22029954,
+          "input_tokens_accounting_complete": true,
+          "output_tokens": 4273561,
+          "output_tokens_accounting_complete": true,
+          "completed_responses": 3484,
+          "completed_responses_accounting_complete": true,
+          "unmetered_requests": 0,
+          "unmetered_requests_accounting_complete": true
         }
       }
     },
