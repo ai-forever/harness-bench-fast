@@ -105,8 +105,9 @@
     "new_model_calls": 0
   },
   "provenance": {
+    "gigachat_4_cloudru_pi_sha256": "61c86c4b08f6f2979dd4aa39cfb3f1407842c660185972b75681d373974ac956",
     "gigachat_4_37b_miniswe_sha256": "df1aab95ede4747feda707f20d8ac1a4a2cce15dfb6fafc6f772a72e25a12144",
-    "legacy_results_sha256": "255a894f0c976342d673e8d98094cd3d981bfc288653b3c601082d547789998a",
+    "legacy_results_sha256": "f1b395f934c5d457912ecb0f11ed32cfec0d0ecbebf797677d9b3990558dad34",
     "wave21_results_sha256": "1d35d5b2b0d9b28829b5d27d28f852d6f1f33d768e95df7581ffa0073d299803",
     "haiku_medium90_sha256": "6049aec374fdfddd1488c7daa740956246e354e325b456d4b5e9e9e79d07e7e0",
     "codex_medium90_sha256": "11d8d93639ca7dc291b1d22e3a85d511e4a282a128b32b54b269892e7ad0cb25",
@@ -116,15 +117,15 @@
     "claudecode_haiku_openrouter_sha256": "d84e281976e2cf2536c062088d602214a852510dfad0f5b68f46a16e129a62fc"
   },
   "summary": {
-    "rows": 124,
-    "ranked_rows": 10,
+    "rows": 125,
+    "ranked_rows": 11,
     "coverage": {
       "1": 1,
       "10": 8,
       "40": 88,
       "80": 16,
       "84": 1,
-      "90": 10
+      "90": 11
     }
   },
   "rows": [
@@ -17105,7 +17106,7 @@
       "observed_passed": 38,
       "overall_passed": 38,
       "score": 0.4222222222222222,
-      "rank": 7,
+      "rank": 8,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -17270,7 +17271,7 @@
       "observed_passed": 29,
       "overall_passed": 29,
       "score": 0.32222222222222224,
-      "rank": 8,
+      "rank": 9,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -17435,7 +17436,7 @@
       "observed_passed": 0,
       "overall_passed": 0,
       "score": 0.0,
-      "rank": 10,
+      "rank": 11,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -18776,7 +18777,7 @@
       "observed_passed": 16,
       "overall_passed": 16,
       "score": 0.17777777777777778,
-      "rank": 9,
+      "rank": 10,
       "status": "complete",
       "usage": {
         "tasks": 90,
@@ -18806,6 +18807,165 @@
           "output_tokens_accounting_complete": true,
           "completed_responses": 4609,
           "completed_responses_accounting_complete": true
+        }
+      }
+    },
+    {
+      "id": "gigachat-4-cloudru-pi-medium90",
+      "profile_id": "gigachat-4-cloudru-pi-medium90",
+      "model": "GigaChat-4 (Cloud.ru)",
+      "harness": "Pi 1.6.1",
+      "runs": 1,
+      "source_version": "0.21.3",
+      "reasoning_effort": "default",
+      "measurement_type": "fresh_medium90",
+      "measurement_valid": true,
+      "details_url": "gigachat-4-cloudru-pi-medium90.html",
+      "previous": {
+        "passed": 46,
+        "measured": 80,
+        "total": 80,
+        "scope_note": "Fresh Medium90 run, final retained attempts"
+      },
+      "wave21": {
+        "passed": 7,
+        "measured": 10,
+        "total": 10,
+        "scope_note": "Fresh Medium90 run, final retained attempts"
+      },
+      "components": [
+        {
+          "task_numbers": [
+            392,
+            393,
+            394,
+            395,
+            396,
+            397,
+            398,
+            399,
+            400,
+            401,
+            402,
+            403,
+            404,
+            405,
+            406,
+            407,
+            408,
+            409,
+            410,
+            411,
+            412,
+            413,
+            414,
+            415,
+            416,
+            417,
+            418,
+            419,
+            420,
+            421,
+            422,
+            423,
+            424,
+            425,
+            426,
+            427,
+            428,
+            429,
+            430,
+            431,
+            432,
+            433,
+            434,
+            435,
+            436,
+            437,
+            438,
+            439,
+            440,
+            441,
+            442,
+            443,
+            444,
+            445,
+            446,
+            447,
+            448,
+            449,
+            450,
+            451,
+            452,
+            453,
+            454,
+            455,
+            456,
+            457,
+            458,
+            459,
+            460,
+            461,
+            462,
+            463,
+            464,
+            465,
+            466,
+            467,
+            468,
+            469,
+            470,
+            471
+          ],
+          "passed": 46,
+          "source_version": "0.21.3",
+          "note": "Fresh Medium90 run, final retained attempts"
+        },
+        {
+          "task_numbers": [
+            512,
+            518,
+            520,
+            522,
+            523,
+            524,
+            525,
+            526,
+            527,
+            530
+          ],
+          "passed": 7,
+          "source_version": "0.21.3",
+          "note": "Fresh Medium90 run, final retained attempts"
+        }
+      ],
+      "measured_tasks": 90,
+      "target_tasks": 90,
+      "missing_task_numbers": [],
+      "observed_passed": 53,
+      "overall_passed": 53,
+      "score": 0.5888888888888889,
+      "rank": 7,
+      "status": "complete",
+      "usage": {
+        "tasks": 90,
+        "observed_tasks": 90,
+        "notes": [
+          "Retained public measurement counters only. Missing tasks are unmeasured, not failures.",
+          "Task counts show counter availability, not full request-level accounting."
+        ],
+        "sources_sha256": [],
+        "steps": {
+          "value": null,
+          "covered_tasks": 0,
+          "status": "unavailable",
+          "lower_bound": false
+        },
+        "tokens": {
+          "value": null,
+          "covered_tasks": 0,
+          "status": "unavailable",
+          "lower_bound": false
         }
       }
     },

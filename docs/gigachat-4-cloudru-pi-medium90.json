@@ -1,0 +1,554 @@
+{
+  "measurement_date": "2026-11-28",
+  "task_set_version": "0.21.3",
+  "model": "GigaChat-4 (Cloud.ru)",
+  "harness": "Pi 1.6.1",
+  "reasoning_effort": "default",
+  "measurement_valid": true,
+  "total": 90,
+  "passed": 53,
+  "concurrency": 16,
+  "source_digest": "4855c605a544046f6cc9131051548100eaba2701bc7eb2d165bccec69ca80ba5",
+  "outcomes": [
+    {
+      "number": 392,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 393,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 394,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 395,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 396,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 397,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 398,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 399,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 400,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 401,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 402,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 403,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 404,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 405,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 406,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 407,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 408,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 409,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 410,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 411,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 412,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 413,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 414,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 415,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 416,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 417,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 418,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 419,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 420,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 421,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 422,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 423,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 424,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 425,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 426,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 427,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 428,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 429,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 430,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 431,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 432,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 433,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 434,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 435,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 436,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 437,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 438,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 439,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 440,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 441,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 442,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 443,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 444,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 445,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 446,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 447,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 448,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 449,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 450,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 451,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 452,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 453,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 454,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 455,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 456,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 457,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 458,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 459,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 460,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 461,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 462,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 463,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 464,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 465,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 466,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 467,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 468,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 469,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 470,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 471,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 512,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 518,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 520,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 522,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 523,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 524,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 525,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 526,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 527,
+      "passed": false,
+      "agent_steps": null,
+      "tokens": null
+    },
+    {
+      "number": 530,
+      "passed": true,
+      "agent_steps": null,
+      "tokens": null
+    }
+  ]
+}

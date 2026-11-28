@@ -314,6 +314,29 @@ def build(root=ROOT):
                 "reasoning_effort": giga["reasoning_effort"], "measurement_type": "fresh_medium90",
                 "measurement_valid": giga["measurement_valid"], "details_url": giga_path.with_suffix(".html").name}
     rows.append(assemble_row(identity, components))
+    cloudru_pi_path = root / "docs/gigachat-4-cloudru-pi-medium90.json"
+    cloudru_pi = json.loads(cloudru_pi_path.read_text(encoding="utf-8"))
+    outcomes = cloudru_pi["outcomes"]
+    assert cloudru_pi["measurement_valid"] and cloudru_pi["total"] == len(NUMBERS)
+    assert [task["number"] for task in outcomes] == NUMBERS
+    assert sum(task["passed"] for task in outcomes) == cloudru_pi["passed"]
+    components = []
+    for numbers in (range(392, 472), SELECTED):
+        subset = [task for task in outcomes if task["number"] in numbers]
+        usage = {}
+        for metric, field in (("steps", "agent_steps"), ("tokens", "tokens")):
+            values = [task[field] for task in subset if task[field] is not None]
+            if values:
+                partial = len(values) != len(subset)
+                usage[metric] = {"value": sum(values), "covered_tasks": len(values),
+                                 "status": "partial" if partial else "raw", "lower_bound": partial}
+        components.append(component(list(numbers), {"total": len(subset), "passed": sum(t["passed"] for t in subset)},
+                                    usage, cloudru_pi["task_set_version"], "Fresh Medium90 run, final retained attempts"))
+    identity = {"id": cloudru_pi_path.stem, "profile_id": cloudru_pi_path.stem, "model": cloudru_pi["model"],
+                "harness": cloudru_pi["harness"], "runs": 1, "source_version": cloudru_pi["task_set_version"],
+                "reasoning_effort": cloudru_pi["reasoning_effort"], "measurement_type": "fresh_medium90",
+                "measurement_valid": cloudru_pi["measurement_valid"], "details_url": cloudru_pi_path.with_suffix(".html").name}
+    rows.append(assemble_row(identity, components))
     openrouter_path = root / "docs/claudecode-haiku-openrouter-medium90.json"
     openrouter = json.loads(openrouter_path.read_text(encoding="utf-8"))
     measured = {t["number"] for t in openrouter["tasks"]}
@@ -352,7 +375,7 @@ def build(root=ROOT):
                        "incompatible_pairs": "Historical DeepAgents GLM/DeepSeek enabled native subagents; new wave21 disabled them. Keep separate profiles. 80/160 graph steps and model API request caps are distinct.",
                        "controls": "Forty wave20 controls and ten unselected calibration tasks excluded from Medium90.",
                        "new_model_calls": 0},
-            "provenance": {"gigachat_4_37b_miniswe_sha256": fingerprint(giga_path), "legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path), "haiku_medium90_sha256": fingerprint(fresh_path), "codex_medium90_sha256": fingerprint(codex90_path), "miniswe_medium90_sha256": fingerprint(miniswe90_path), "claudecode_sonnet_medium90_sha256": fingerprint(claudecode_sonnet90_path), "pi_deepseek0731_medium90_sha256": fingerprint(pi0731_path), "claudecode_haiku_openrouter_sha256": fingerprint(openrouter_path)},
+            "provenance": {"gigachat_4_cloudru_pi_sha256": fingerprint(cloudru_pi_path), "gigachat_4_37b_miniswe_sha256": fingerprint(giga_path), "legacy_results_sha256": fingerprint(legacy_path), "wave21_results_sha256": fingerprint(wave_path), "haiku_medium90_sha256": fingerprint(fresh_path), "codex_medium90_sha256": fingerprint(codex90_path), "miniswe_medium90_sha256": fingerprint(miniswe90_path), "claudecode_sonnet_medium90_sha256": fingerprint(claudecode_sonnet90_path), "pi_deepseek0731_medium90_sha256": fingerprint(pi0731_path), "claudecode_haiku_openrouter_sha256": fingerprint(openrouter_path)},
             "summary": {"rows": len(rows), "ranked_rows": len(complete),
                         "coverage": {str(n): sum(r["measured_tasks"] == n for r in rows) for n in sorted({r["measured_tasks"] for r in rows})}},
             "rows": rows}
